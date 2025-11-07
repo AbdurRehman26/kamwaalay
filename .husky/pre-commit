@@ -1,0 +1,6 @@
+set -e
+
+npm run build
+npm run lint
+php artisan test
+git add .
