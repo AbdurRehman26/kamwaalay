@@ -30,7 +30,7 @@ export default function Contact() {
     return (
         <PublicLayout>
 
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
                     <p className="text-xl text-white/90">We'd love to hear from you</p>
@@ -51,7 +51,7 @@ export default function Contact() {
                                     type="text"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
-                                    className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
                                 {errors.name && <div className="text-red-500 text-sm mt-1">{errors.name}</div>}
@@ -62,7 +62,7 @@ export default function Contact() {
                                     type="email"
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
-                                    className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
                                 {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email}</div>}
@@ -73,7 +73,7 @@ export default function Contact() {
                                     type="tel"
                                     value={data.phone}
                                     onChange={(e) => setData('phone', e.target.value)}
-                                    className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                 />
                                 {errors.phone && <div className="text-red-500 text-sm mt-1">{errors.phone}</div>}
                             </div>
@@ -83,7 +83,7 @@ export default function Contact() {
                                     value={data.message}
                                     onChange={(e) => setData('message', e.target.value)}
                                     rows={6}
-                                    className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
                                 {errors.message && <div className="text-red-500 text-sm mt-1">{errors.message}</div>}
@@ -91,7 +91,7 @@ export default function Contact() {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-300 font-semibold"
+                                className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold"
                             >
                                 Send Message
                             </button>

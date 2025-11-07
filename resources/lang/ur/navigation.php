@@ -12,5 +12,6 @@ return [
     'logout' => 'لاگ آؤٹ',
     'login' => 'لاگ ان',
     'register' => 'رجسٹر کریں',
+    'get_started' => 'شروع کریں',
 ];
 

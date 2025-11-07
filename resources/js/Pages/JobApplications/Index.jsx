@@ -108,7 +108,7 @@ export default function JobApplicationsIndex() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-16">
+            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-orange-500 text-white py-16">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Browse Service Requests</h1>
                     <p className="text-xl text-white/90">Find service requests from users and apply</p>
@@ -133,7 +133,7 @@ export default function JobApplicationsIndex() {
                             <select
                                 value={serviceType}
                                 onChange={(e) => setServiceType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
                             >
                                 {serviceTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
@@ -159,7 +159,7 @@ export default function JobApplicationsIndex() {
                                         setShowLocationSuggestions(true);
                                     }
                                 }}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
                                 placeholder="Search location..."
                             />
                             {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
@@ -168,7 +168,7 @@ export default function JobApplicationsIndex() {
                                         <div
                                             key={index}
                                             onClick={() => handleLocationSelect(suggestion)}
-                                            className="px-4 py-2 hover:bg-purple-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                            className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                                         >
                                             {suggestion.display_text}
                                         </div>
@@ -179,7 +179,7 @@ export default function JobApplicationsIndex() {
                         <div className="flex items-end">
                             <button
                                 onClick={handleFilter}
-                                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
+                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                             >
                                 Apply Filters
                             </button>
@@ -199,7 +199,7 @@ export default function JobApplicationsIndex() {
                                 <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                                     <div className="p-6">
                                         <div className="flex items-center justify-between mb-4">
-                                            <span className="bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
+                                            <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
                                                 {booking.service_type?.replace('_', ' ') || 'N/A'}
                                             </span>
                                             <span className="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full font-semibold">
@@ -221,7 +221,7 @@ export default function JobApplicationsIndex() {
                                         <div className="mt-4">
                                             <Link
                                                 to={route('job-applications.create', booking.id)}
-                                                className="block w-full text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg font-semibold"
+                                                className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
                                             >
                                                 Apply Now
                                             </Link>
@@ -242,7 +242,7 @@ export default function JobApplicationsIndex() {
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                 link.active
-                                                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                                                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                                                     : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
                                             } ${!link.url && 'cursor-not-allowed opacity-50'}`}
                                         />

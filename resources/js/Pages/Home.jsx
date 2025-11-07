@@ -29,7 +29,7 @@ export default function Home() {
         { name: 'Cook', icon: '👨‍🍳', color: 'from-orange-500 to-orange-600' },
         { name: 'Babysitter', icon: '👶', color: 'from-pink-500 to-pink-600' },
         { name: 'Caregiver', icon: '👵', color: 'from-green-500 to-green-600' },
-        { name: 'Cleaner', icon: '✨', color: 'from-purple-500 to-purple-600' },
+        { name: 'Cleaner', icon: '✨', color: 'from-blue-500 to-blue-600' },
         { name: 'All Rounder', icon: '🌟', color: 'from-yellow-500 to-yellow-600' },
     ];
 
@@ -79,7 +79,7 @@ export default function Home() {
         <PublicLayout>
 
             {/* Hero Section */}
-            <section className="relative bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 text-white overflow-hidden">
+            <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-orange-500 text-white overflow-hidden">
                 <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-20 left-20 w-96 h-96 bg-white rounded-full filter blur-3xl"></div>
                     <div className="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full filter blur-3xl"></div>
@@ -96,21 +96,21 @@ export default function Home() {
                             {user?.role !== 'helper' && (
                                 <Link
                                     to={route('helpers.index')}
-                                    className="bg-white text-purple-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
+                                    className="bg-white text-blue-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
                                 >
                                     Browse Helpers
                                 </Link>
                             )}
                             <Link
                                 to={route('service-requests.browse')}
-                                className="bg-white text-purple-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
+                                className="bg-white text-blue-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
                             >
                                 Services Required
                             </Link>
                             {user?.role !== 'helper' && (
                                 <Link
                                     to={route('bookings.create')}
-                                    className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-purple-600 transition-all duration-300 min-w-[200px] text-center"
+                                    className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 min-w-[200px] text-center"
                                 >
                                     Post Request
                                 </Link>
@@ -118,7 +118,7 @@ export default function Home() {
                             {user && (user.role === 'helper' || user.role === 'business') && (
                                 <Link
                                     to={route('service-listings.create')}
-                                    className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-purple-600 transition-all duration-300 min-w-[200px] text-center"
+                                    className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 min-w-[200px] text-center"
                                 >
                                     Offer Service
                                 </Link>
@@ -132,12 +132,12 @@ export default function Home() {
             <section className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        <div className="text-center p-8 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
-                            <div className="text-5xl font-bold text-purple-600 mb-3">{stats?.total_helpers || 0}+</div>
+                        <div className="text-center p-8 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+                            <div className="text-5xl font-bold text-blue-600 mb-3">{stats?.total_helpers || 0}+</div>
                             <div className="text-gray-700 font-medium">Verified Helpers</div>
                         </div>
                         <div className="text-center p-8 bg-gradient-to-br from-pink-50 to-orange-50 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
-                            <div className="text-5xl font-bold text-pink-600 mb-3">{stats?.total_bookings || 0}+</div>
+                            <div className="text-5xl font-bold text-blue-600 mb-3">{stats?.total_bookings || 0}+</div>
                             <div className="text-gray-700 font-medium">Bookings</div>
                         </div>
                         <div className="text-center p-8 bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
@@ -166,10 +166,10 @@ export default function Home() {
                             <Link
                                 key={service.name}
                                 to={route('helpers.index') + `?service_type=${service.name.toLowerCase().replace(' ', '_')}`}
-                                className="group bg-white p-8 rounded-2xl text-center hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-purple-200"
+                                className="group bg-white p-8 rounded-2xl text-center hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-blue-200"
                             >
                                 <div className={`text-7xl mb-6 transform group-hover:scale-110 transition-transform duration-300`}>{service.icon}</div>
-                                <h3 className="text-lg font-bold text-gray-800 group-hover:text-purple-600 transition-colors">{service.name}</h3>
+                                <h3 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">{service.name}</h3>
                             </Link>
                         ))}
                     </div>
@@ -188,10 +188,10 @@ export default function Home() {
                     <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
                         {steps.map((step, index) => (
                             <div key={index} className="text-center relative">
-                                <div className="bg-gradient-to-br from-purple-500 to-pink-500 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-5xl shadow-xl transform hover:scale-110 transition-transform">
+                                <div className="bg-gradient-to-br w-24 h-24 flex items-center justify-center mx-auto mb-6 text-white text-5xl transform hover:scale-110 transition-transform">
                                     {step.icon}
                                 </div>
-                                <div className="bg-gradient-to-br from-purple-600 to-pink-600 text-white w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6 font-bold text-2xl shadow-lg">
+                                <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6 font-bold text-2xl shadow-lg">
                                     {step.number}
                                 </div>
                                 <h3 className="text-2xl font-bold mb-4 text-gray-900">{step.title}</h3>
@@ -203,7 +203,7 @@ export default function Home() {
             </section>
 
             {/* Trust Indicators */}
-            <section className="py-24 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+            <section className="py-24 bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Why Choose Us?</h2>
@@ -251,7 +251,7 @@ export default function Home() {
                                         to={route('helpers.show', helper.id)}
                                         className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                                     >
-                                        <div className="h-64 bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center overflow-hidden">
+                                        <div className="h-64 bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center overflow-hidden">
                                             {helper.photo ? (
                                                 <img src={`/storage/${helper.photo}`} alt={helper.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                                             ) : (
@@ -261,7 +261,7 @@ export default function Home() {
                                         <div className="p-6">
                                             <h3 className="text-2xl font-bold mb-2 text-gray-900">{helper.name}</h3>
                                             <p className="text-gray-600 mb-3 capitalize">
-                                                {helper.service_listings && helper.service_listings.length > 0 && helper.service_listings[0].service_types && helper.service_listings[0].service_types.length > 0 
+                                                {helper.service_listings && helper.service_listings.length > 0 && helper.service_listings[0].service_types && helper.service_listings[0].service_types.length > 0
                                                     ? helper.service_listings?.[0]?.service_types?.[0]?.service_type?.replace('_', ' ') || 'Helper'
                                                     : 'Helper'}
                                             </p>
@@ -283,7 +283,7 @@ export default function Home() {
                         <div className="text-center mt-12">
                             <Link
                                 to={route('helpers.index')}
-                                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl inline-block"
+                                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl inline-block"
                             >
                                 View All Helpers
                             </Link>
@@ -316,7 +316,7 @@ export default function Home() {
             </section>
 
             {/* CTA Section */}
-            <section className="py-24 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white">
+            <section className="py-24 bg-gradient-to-r from-blue-600 via-blue-700 to-orange-500 text-white">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
                     <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Find Your Perfect Helper?</h2>
                     <p className="text-xl mb-10 text-white/90 max-w-2xl mx-auto">
@@ -326,19 +326,19 @@ export default function Home() {
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link
                                 to={route('register')}
-                                className="bg-white text-purple-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px]"
+                                className="bg-white text-blue-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px]"
                             >
                                 Get Started
                             </Link>
                             <Link
                                 to={route('helpers.index')}
-                                className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-purple-600 transition-all duration-300 min-w-[200px]"
+                                className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 min-w-[200px]"
                             >
                                 Browse Helpers
                             </Link>
                             <Link
                                 to={route('service-requests.browse')}
-                                className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-purple-600 transition-all duration-300 min-w-[200px]"
+                                className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 min-w-[200px]"
                             >
                                 Services Required
                             </Link>
@@ -349,7 +349,7 @@ export default function Home() {
                             {(user.role === 'helper' || user.role === 'business') && (
                                 <Link
                                     to={route('service-listings.create')}
-                                    className="bg-white text-purple-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px]"
+                                    className="bg-white text-blue-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px]"
                                 >
                                     Offer Your Service
                                 </Link>
@@ -357,7 +357,7 @@ export default function Home() {
                             {user.role !== 'helper' && (
                                 <Link
                                     to={route('bookings.create')}
-                                    className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-purple-600 transition-all duration-300 min-w-[200px]"
+                                    className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 min-w-[200px]"
                                 >
                                     Post Service Request
                                 </Link>

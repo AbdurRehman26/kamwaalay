@@ -55,7 +55,7 @@ export default function JobApplicationCreate() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Apply for Service Request</h1>
                     <p className="text-xl text-white/90">Submit your application to this service request</p>
@@ -121,7 +121,7 @@ export default function JobApplicationCreate() {
                                 value={data.message}
                                 onChange={(e) => setData(prev => ({ ...prev, message: e.target.value }))}
                                 rows={6}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                 placeholder="Tell the client why you're perfect for this job. Mention your experience, skills, and availability..."
                             />
                             {errors.message && <div className="text-red-500 text-sm mt-1">{errors.message}</div>}
@@ -136,7 +136,7 @@ export default function JobApplicationCreate() {
                                 step="0.01"
                                 value={data.proposed_rate}
                                 onChange={(e) => setData(prev => ({ ...prev, proposed_rate: e.target.value }))}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                 placeholder="e.g., 500"
                             />
                             {errors.proposed_rate && <div className="text-red-500 text-sm mt-1">{errors.proposed_rate}</div>}
@@ -146,7 +146,7 @@ export default function JobApplicationCreate() {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
+                                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                             >
                                 {processing ? 'Submitting...' : 'Submit Application'}
                             </button>

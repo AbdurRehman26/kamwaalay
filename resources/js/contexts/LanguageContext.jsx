@@ -6,6 +6,7 @@ const LanguageContext = createContext();
 export const LanguageProvider = ({ children }) => {
     const [locale, setLocale] = useState('en');
     const [translations, setTranslations] = useState({});
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         // Get locale from localStorage or default to 'en'
@@ -21,14 +22,17 @@ export const LanguageProvider = ({ children }) => {
 
     const loadTranslations = async (loc) => {
         try {
-            // Load translations from API
-            // For now, we'll use empty translations and let the backend provide them when needed
-            // Translations can be loaded from the backend API if needed
-            setTranslations({});
+            setLoading(true);
+            const response = await api.get(`/translations/${loc}`);
+            if (response.data && response.data.translations) {
+                setTranslations(response.data.translations);
+            }
         } catch (error) {
             console.error('Error loading translations:', error);
             // Fallback to empty translations
             setTranslations({});
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -37,7 +41,7 @@ export const LanguageProvider = ({ children }) => {
             await api.post(`/locale/${newLocale}`);
             setLocale(newLocale);
             localStorage.setItem('locale', newLocale);
-            loadTranslations(newLocale);
+            await loadTranslations(newLocale);
 
             // Update HTML attributes
             const html = document.documentElement;
@@ -49,14 +53,33 @@ export const LanguageProvider = ({ children }) => {
     };
 
     const t = (key, params = {}) => {
-        let translation = translations[key] || key;
+        // Support nested keys like 'common.home' or 'navigation.about'
+        const keys = key.split('.');
+        let translation = translations;
         
-        // Replace parameters
+        // Navigate through nested translation object
+        for (const k of keys) {
+            if (translation && typeof translation === 'object' && k in translation) {
+                translation = translation[k];
+            } else {
+                // Key not found, return the key itself
+                return key;
+            }
+        }
+        
+        // If translation is not a string, return the key
+        if (typeof translation !== 'string') {
+            return key;
+        }
+        
+        // Replace parameters (support both :param and {param} syntax)
+        let result = translation;
         Object.keys(params).forEach((param) => {
-            translation = translation.replace(`:${param}`, params[param]);
+            result = result.replace(new RegExp(`:${param}`, 'g'), params[param]);
+            result = result.replace(new RegExp(`\\{${param}\\}`, 'g'), params[param]);
         });
         
-        return translation;
+        return result;
     };
 
     const value = {
@@ -64,6 +87,7 @@ export const LanguageProvider = ({ children }) => {
         translations,
         switchLanguage,
         t,
+        loading,
     };
 
     return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;

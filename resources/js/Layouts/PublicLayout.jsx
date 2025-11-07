@@ -30,33 +30,33 @@ export default function PublicLayout({ children }) {
             <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20 w-full">
-                        <Link to={route('home')} className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        <Link to={route('home')} className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
                             kamwaalay
                         </Link>
 
                         <div className="hidden lg:flex items-center space-x-8">
-                            <Link to={route('home')} className="text-gray-700 hover:text-purple-600 font-medium transition-colors">Home</Link>
+                            <Link to={route('home')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('common.home')}</Link>
                             {user?.role !== 'helper' && (
-                                <Link to={route('helpers.index')} className="text-gray-700 hover:text-purple-600 font-medium transition-colors">Find Help</Link>
+                                <Link to={route('helpers.index')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('navigation.find_help')}</Link>
                             )}
                             {(!user || user.role === 'helper') && (
-                                <Link to={route('service-requests.browse')} className="text-gray-700 hover:text-purple-600 font-medium transition-colors">Services Required</Link>
+                                <Link to={route('service-requests.browse')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('navigation.services_required')}</Link>
                             )}
 
                             {user ? (
                                 <>
                                     {(user.role === 'user' || user.role === 'business') && (
-                                        <Link to={route('bookings.create')} className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2.5 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg font-medium">
-                                            Post Service Request
+                                        <Link to={route('bookings.create')} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg font-medium">
+                                            {t('navigation.post_service_request')}
                                         </Link>
                                     )}
                                     {user.role === 'admin' && (
-                                        <Link to={route('admin.dashboard')} className="text-gray-700 hover:text-purple-600 font-medium transition-colors">Admin</Link>
+                                        <Link to={route('admin.dashboard')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('navigation.admin')}</Link>
                                     )}
                                     {user.role === 'business' && (
-                                        <Link to={route('business.dashboard')} className="text-gray-700 hover:text-purple-600 font-medium transition-colors">Business</Link>
+                                        <Link to={route('business.dashboard')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('navigation.business')}</Link>
                                     )}
-                                    <Link to={route('dashboard')} className="text-gray-700 hover:text-purple-600 font-medium transition-colors">Dashboard</Link>
+                                    <Link to={route('dashboard')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('common.dashboard')}</Link>
                                     <button
                                         onClick={async () => {
                                             try {
@@ -67,19 +67,19 @@ export default function PublicLayout({ children }) {
                                                 navigate('/login');
                                             }
                                         }}
-                                        className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                                        className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
                                     >
-                                        Logout
+                                        {t('common.logout')}
                                     </button>
-                                    <Link to={route('profile.edit')} className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2.5 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg font-medium">
-                                        Profile
+                                    <Link to={route('profile.edit')} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg font-medium">
+                                        {t('common.profile')}
                                     </Link>
                                 </>
                             ) : (
                                 <>
-                                    <Link to={route('login')} className="text-gray-700 hover:text-purple-600 font-medium transition-colors">Login</Link>
-                                    <Link to={route('register')} className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2.5 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg font-medium">
-                                        Get Started
+                                    <Link to={route('login')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('common.login')}</Link>
+                                    <Link to={route('register')} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg font-medium">
+                                        {t('navigation.get_started')}
                                     </Link>
                                 </>
                             )}
@@ -112,7 +112,7 @@ export default function PublicLayout({ children }) {
                             {user ? (
                                 <>
                                     {(user.role === 'user' || user.role === 'business') && (
-                                        <Link to={route('bookings.create')} className="block py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all font-medium text-center">
+                                        <Link to={route('bookings.create')} className="block py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium text-center">
                                             Post Service Request
                                         </Link>
                                     )}
@@ -155,7 +155,7 @@ export default function PublicLayout({ children }) {
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
                         <div className="col-span-1 md:col-span-2">
-                            <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">kamwaalay</h3>
+                            <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">kamwaalay</h3>
                             <p className="text-gray-400 mb-4 max-w-md">Connecting households with trusted domestic help. Your reliable partner for all home care services.</p>
                             <div className="flex space-x-4 mt-6">
                                 <a href="#" className="text-gray-400 hover:text-white transition-colors">Facebook</a>

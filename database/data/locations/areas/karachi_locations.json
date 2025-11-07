@@ -1,0 +1,4038 @@
+[
+  {
+    "name": "DHA Phase 6",
+    "id": 1
+  },
+  {
+    "name": "DHA Phase 8",
+    "id": 2
+  },
+  {
+    "name": "Askari 5 - Sector J",
+    "id": 3
+  },
+  {
+    "name": "Falcon Complex New Malir",
+    "id": 4
+  },
+  {
+    "name": "Askari 6",
+    "id": 5
+  },
+  {
+    "name": "DHA Phase 5",
+    "id": 6
+  },
+  {
+    "name": "HMR Waterfront",
+    "id": 7
+  },
+  {
+    "name": "PECHS Block 2",
+    "id": 8
+  },
+  {
+    "name": "DHA Phase 7",
+    "id": 9
+  },
+  {
+    "name": "Scheme 33",
+    "id": 10
+  },
+  {
+    "name": "DHA Phase 4",
+    "id": 11
+  },
+  {
+    "name": "DHA Phase 7 Extension",
+    "id": 12
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 14",
+    "id": 13
+  },
+  {
+    "name": "North Nazimabad - Block H",
+    "id": 14
+  },
+  {
+    "name": "Gulistan-e-Jauhar",
+    "id": 15
+  },
+  {
+    "name": "Clifton - Block 2",
+    "id": 16
+  },
+  {
+    "name": "Capital Cooperative Housing Society",
+    "id": 17
+  },
+  {
+    "name": "Naya Nazimabad",
+    "id": 18
+  },
+  {
+    "name": "North Nazimabad - Block F",
+    "id": 19
+  },
+  {
+    "name": "Bath Island",
+    "id": 20
+  },
+  {
+    "name": "Shaheed Millat Road",
+    "id": 21
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 15",
+    "id": 22
+  },
+  {
+    "name": "Callachi Cooperative Housing Society",
+    "id": 23
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 13",
+    "id": 24
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 3-A",
+    "id": 25
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 10-A",
+    "id": 26
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 17",
+    "id": 27
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 5",
+    "id": 28
+  },
+  {
+    "name": "North Nazimabad - Block L",
+    "id": 29
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 7",
+    "id": 30
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 12",
+    "id": 31
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 1",
+    "id": 32
+  },
+  {
+    "name": "Emaar Crescent Bay",
+    "id": 33
+  },
+  {
+    "name": "Bukhari Commercial Area",
+    "id": 34
+  },
+  {
+    "name": "Khalid Bin Walid Road",
+    "id": 35
+  },
+  {
+    "name": "PECHS Block 6",
+    "id": 36
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 2",
+    "id": 37
+  },
+  {
+    "name": "Clifton - Block 9",
+    "id": 38
+  },
+  {
+    "name": "Emaar Pearl Towers",
+    "id": 39
+  },
+  {
+    "name": "Gulshan-e-Maymar",
+    "id": 40
+  },
+  {
+    "name": "Bahadurabad",
+    "id": 41
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector R",
+    "id": 42
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 3",
+    "id": 43
+  },
+  {
+    "name": "Saadi Town",
+    "id": 44
+  },
+  {
+    "name": "Saima Arabian Villas",
+    "id": 45
+  },
+  {
+    "name": "Emaar Panorama",
+    "id": 46
+  },
+  {
+    "name": "DHA Phase 1",
+    "id": 47
+  },
+  {
+    "name": "DHA Phase 2 Extension",
+    "id": 48
+  },
+  {
+    "name": "North Nazimabad - Block B",
+    "id": 49
+  },
+  {
+    "name": "Dhoraji Colony",
+    "id": 50
+  },
+  {
+    "name": "Clifton - Block 8",
+    "id": 51
+  },
+  {
+    "name": "Bahria Apartments",
+    "id": 52
+  },
+  {
+    "name": "North Karachi",
+    "id": 53
+  },
+  {
+    "name": "Sector 31 - Punjabi Saudagar City Phase 2",
+    "id": 54
+  },
+  {
+    "name": "Clifton - Block 4",
+    "id": 55
+  },
+  {
+    "name": "Sharfabad",
+    "id": 56
+  },
+  {
+    "name": "DHA Phase 8 - Zone A",
+    "id": 57
+  },
+  {
+    "name": "Civil Lines",
+    "id": 58
+  },
+  {
+    "name": "North Nazimabad - Block N",
+    "id": 59
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 13-D2",
+    "id": 60
+  },
+  {
+    "name": "Bahria Town - Ali Block",
+    "id": 61
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 4",
+    "id": 62
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 13/D-1",
+    "id": 63
+  },
+  {
+    "name": "Saima Villas",
+    "id": 64
+  },
+  {
+    "name": "Clifton - Block 5",
+    "id": 65
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 7",
+    "id": 66
+  },
+  {
+    "name": "Lucky One Apartment",
+    "id": 67
+  },
+  {
+    "name": "Gulshan-e-Iqbal Town",
+    "id": 68
+  },
+  {
+    "name": "Navy Housing Scheme Karsaz",
+    "id": 69
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 18",
+    "id": 70
+  },
+  {
+    "name": "Emaar Reef Towers",
+    "id": 71
+  },
+  {
+    "name": "Metropolis Residency",
+    "id": 72
+  },
+  {
+    "name": "Creek Vista",
+    "id": 73
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 3",
+    "id": 74
+  },
+  {
+    "name": "Bahria Town - Precinct 10-A",
+    "id": 75
+  },
+  {
+    "name": "Clifton - Block 1",
+    "id": 76
+  },
+  {
+    "name": "Gwalior Cooperative Housing Society",
+    "id": 77
+  },
+  {
+    "name": "Gulshan-e-Iqbal",
+    "id": 78
+  },
+  {
+    "name": "Bahria Sports City",
+    "id": 79
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 2",
+    "id": 80
+  },
+  {
+    "name": "North Karachi - Sector 11A",
+    "id": 81
+  },
+  {
+    "name": "Federal B Area - Block 10",
+    "id": 82
+  },
+  {
+    "name": "Badar Commercial Area",
+    "id": 83
+  },
+  {
+    "name": "Falaknaz Harmony",
+    "id": 84
+  },
+  {
+    "name": "KDA Scheme 1",
+    "id": 85
+  },
+  {
+    "name": "Bahria Town - Precinct 1",
+    "id": 86
+  },
+  {
+    "name": "Frere Town",
+    "id": 87
+  },
+  {
+    "name": "Federal B Area - Block 12",
+    "id": 88
+  },
+  {
+    "name": "Karachi Administration Employees Society",
+    "id": 89
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 16",
+    "id": 90
+  },
+  {
+    "name": "Emaar Coral Towers",
+    "id": 91
+  },
+  {
+    "name": "Bahria Town - Precinct 11-A",
+    "id": 92
+  },
+  {
+    "name": "Falaknaz Presidency",
+    "id": 93
+  },
+  {
+    "name": "Sector 25-A - Punjabi Saudagar Multi Purpose Society",
+    "id": 94
+  },
+  {
+    "name": "Rahat Commercial Area",
+    "id": 95
+  },
+  {
+    "name": "Clifton - Block 7",
+    "id": 96
+  },
+  {
+    "name": "Pilibhit Cooperative Housing Society",
+    "id": 97
+  },
+  {
+    "name": "Daniyal Residency",
+    "id": 98
+  },
+  {
+    "name": "Bahria Town - Precinct 8",
+    "id": 99
+  },
+  {
+    "name": "Model Colony - Malir",
+    "id": 100
+  },
+  {
+    "name": "Falaknaz Dreams",
+    "id": 101
+  },
+  {
+    "name": "Bahria Town - Precinct 27",
+    "id": 102
+  },
+  {
+    "name": "Askari 5 - Sector H",
+    "id": 103
+  },
+  {
+    "name": "North Nazimabad - Block K",
+    "id": 104
+  },
+  {
+    "name": "Federal B Area - Block 15",
+    "id": 105
+  },
+  {
+    "name": "Bahria Town - Precinct 6",
+    "id": 106
+  },
+  {
+    "name": "Burj-Ul-Harmain",
+    "id": 107
+  },
+  {
+    "name": "Bahria Town - Precinct 31",
+    "id": 108
+  },
+  {
+    "name": "Askari 5",
+    "id": 109
+  },
+  {
+    "name": "Sea View Apartments",
+    "id": 110
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 6",
+    "id": 111
+  },
+  {
+    "name": "Defence View Society",
+    "id": 112
+  },
+  {
+    "name": "Lakhani Fantasia",
+    "id": 113
+  },
+  {
+    "name": "DHA Phase 2",
+    "id": 114
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 19",
+    "id": 115
+  },
+  {
+    "name": "Garden East",
+    "id": 116
+  },
+  {
+    "name": "Karachi University Housing Society",
+    "id": 117
+  },
+  {
+    "name": "University Road",
+    "id": 118
+  },
+  {
+    "name": "North Nazimabad",
+    "id": 119
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 13/D",
+    "id": 120
+  },
+  {
+    "name": "Bahria Town - Precinct 4",
+    "id": 121
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector X",
+    "id": 122
+  },
+  {
+    "name": "Clifton",
+    "id": 123
+  },
+  {
+    "name": "Federal B Area - Block 13",
+    "id": 124
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 13/A",
+    "id": 125
+  },
+  {
+    "name": "Emaar Park Edge",
+    "id": 126
+  },
+  {
+    "name": "Surjani Town",
+    "id": 127
+  },
+  {
+    "name": "Shahra-e-Faisal",
+    "id": 128
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 11",
+    "id": 129
+  },
+  {
+    "name": "Gulzar-e-Hijri",
+    "id": 130
+  },
+  {
+    "name": "Jamshed Road",
+    "id": 131
+  },
+  {
+    "name": "Federal B Area - Block 14",
+    "id": 132
+  },
+  {
+    "name": "Falaknaz Dynasty",
+    "id": 133
+  },
+  {
+    "name": "Ittehad Commercial Area",
+    "id": 134
+  },
+  {
+    "name": "North Nazimabad - Block M",
+    "id": 135
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector T",
+    "id": 136
+  },
+  {
+    "name": "North Town Residency",
+    "id": 137
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector Y",
+    "id": 138
+  },
+  {
+    "name": "Nazimabad",
+    "id": 139
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 13/C",
+    "id": 140
+  },
+  {
+    "name": "Bahria Town - Precinct 10-B",
+    "id": 141
+  },
+  {
+    "name": "PECHS",
+    "id": 142
+  },
+  {
+    "name": "Emaar The Views",
+    "id": 143
+  },
+  {
+    "name": "Government Teacher Housing Society - Sector 16-A",
+    "id": 144
+  },
+  {
+    "name": "Saima Elite Villas",
+    "id": 145
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 1",
+    "id": 146
+  },
+  {
+    "name": "Nishat Commercial Area",
+    "id": 147
+  },
+  {
+    "name": "Bahria Town - Precinct 11-B",
+    "id": 148
+  },
+  {
+    "name": "Defence View Phase 1",
+    "id": 149
+  },
+  {
+    "name": "Federal B Area - Block 9",
+    "id": 150
+  },
+  {
+    "name": "Adamjee Nagar",
+    "id": 151
+  },
+  {
+    "name": "Tariq Road",
+    "id": 152
+  },
+  {
+    "name": "Sania Corner",
+    "id": 153
+  },
+  {
+    "name": "Jinnah Avenue",
+    "id": 154
+  },
+  {
+    "name": "State Bank of Pakistan Housing Society",
+    "id": 155
+  },
+  {
+    "name": "Naya Nazimabad - Block A",
+    "id": 156
+  },
+  {
+    "name": "Saima Presidency",
+    "id": 157
+  },
+  {
+    "name": "Askari 5 - Sector F",
+    "id": 158
+  },
+  {
+    "name": "Shadman Town - Sector-14/B",
+    "id": 159
+  },
+  {
+    "name": "Meerut Society",
+    "id": 160
+  },
+  {
+    "name": "Amir Khusro",
+    "id": 161
+  },
+  {
+    "name": "KDA Officers Society",
+    "id": 162
+  },
+  {
+    "name": "Bahria Town Karachi",
+    "id": 163
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 20",
+    "id": 164
+  },
+  {
+    "name": "Naya Nazimabad - Block C",
+    "id": 165
+  },
+  {
+    "name": "Tulip Tower",
+    "id": 166
+  },
+  {
+    "name": "North Nazimabad - Block D",
+    "id": 167
+  },
+  {
+    "name": "Hansa Society",
+    "id": 168
+  },
+  {
+    "name": "Bahria Heights",
+    "id": 169
+  },
+  {
+    "name": "Bahria Homes - Iqbal Villas",
+    "id": 170
+  },
+  {
+    "name": "Muslim Commercial Area",
+    "id": 171
+  },
+  {
+    "name": "Shamsi Society",
+    "id": 172
+  },
+  {
+    "name": "North Nazimabad - Block A",
+    "id": 173
+  },
+  {
+    "name": "Bufferzone - Sector 15-A/5",
+    "id": 174
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 10",
+    "id": 175
+  },
+  {
+    "name": "North Karachi - Sector 11B",
+    "id": 176
+  },
+  {
+    "name": "Federal B Area",
+    "id": 177
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 4",
+    "id": 178
+  },
+  {
+    "name": "Sector 32 - Punjabi Saudagar City Phase 1",
+    "id": 179
+  },
+  {
+    "name": "North Nazimabad - Block I",
+    "id": 180
+  },
+  {
+    "name": "Saima Jinnah Avenue",
+    "id": 181
+  },
+  {
+    "name": "PECHS Block 3",
+    "id": 182
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 10",
+    "id": 183
+  },
+  {
+    "name": "Mohammad Ali Society",
+    "id": 184
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 4A",
+    "id": 185
+  },
+  {
+    "name": "Rafi Premier Residency",
+    "id": 186
+  },
+  {
+    "name": "Federal B Area - Block 8",
+    "id": 187
+  },
+  {
+    "name": "Shaz Residency",
+    "id": 188
+  },
+  {
+    "name": "Bahria Town - Quaid Villas",
+    "id": 189
+  },
+  {
+    "name": "Al-Murtaza Commercial Area",
+    "id": 190
+  },
+  {
+    "name": "Bahria Hills",
+    "id": 191
+  },
+  {
+    "name": "DHA Phase 8 - Zone B",
+    "id": 192
+  },
+  {
+    "name": "Saadi Garden",
+    "id": 193
+  },
+  {
+    "name": "Tipu Sultan Road",
+    "id": 194
+  },
+  {
+    "name": "Garden West",
+    "id": 195
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 13/D-3",
+    "id": 196
+  },
+  {
+    "name": "North Nazimabad - Block J",
+    "id": 197
+  },
+  {
+    "name": "Abul Hassan Isphani Road",
+    "id": 198
+  },
+  {
+    "name": "Saadi Garden - Block 5",
+    "id": 199
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 11",
+    "id": 200
+  },
+  {
+    "name": "Allahwala Town",
+    "id": 201
+  },
+  {
+    "name": "Quetta Town - Sector 18-A",
+    "id": 202
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector Z",
+    "id": 203
+  },
+  {
+    "name": "City Tower And Shopping Mall",
+    "id": 204
+  },
+  {
+    "name": "Harmain Royal Residency",
+    "id": 205
+  },
+  {
+    "name": "Sehar Commercial Area",
+    "id": 206
+  },
+  {
+    "name": "Saima Royal Residency",
+    "id": 207
+  },
+  {
+    "name": "DOHS Phase 1",
+    "id": 208
+  },
+  {
+    "name": "Allahwala Town - Sector 31-G",
+    "id": 209
+  },
+  {
+    "name": "Grey Noor Tower & Shopping Mall",
+    "id": 210
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 16",
+    "id": 211
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 17",
+    "id": 212
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector Q",
+    "id": 213
+  },
+  {
+    "name": "Bahria Town - Precinct 16",
+    "id": 214
+  },
+  {
+    "name": "Askari 4",
+    "id": 215
+  },
+  {
+    "name": "Roomi Residency",
+    "id": 216
+  },
+  {
+    "name": "Bufferzone - Sector 15-A/2",
+    "id": 217
+  },
+  {
+    "name": "Malir",
+    "id": 218
+  },
+  {
+    "name": "Saadi Town - Block 5",
+    "id": 219
+  },
+  {
+    "name": "Naya Nazimabad - Block B",
+    "id": 220
+  },
+  {
+    "name": "NHS Mauripur",
+    "id": 221
+  },
+  {
+    "name": "Bahria Paradise",
+    "id": 222
+  },
+  {
+    "name": "Amil Colony",
+    "id": 223
+  },
+  {
+    "name": "Gulshan-e-Roomi",
+    "id": 224
+  },
+  {
+    "name": "North Karachi - Sector 7D-2",
+    "id": 225
+  },
+  {
+    "name": "Diamond City",
+    "id": 226
+  },
+  {
+    "name": "Bufferzone - Sector 15-A/4",
+    "id": 227
+  },
+  {
+    "name": "Nazimabad 3",
+    "id": 228
+  },
+  {
+    "name": "Naya Nazimabad - Block D",
+    "id": 229
+  },
+  {
+    "name": "Chapal Courtyard",
+    "id": 230
+  },
+  {
+    "name": "Bahria Town - Precinct 12",
+    "id": 231
+  },
+  {
+    "name": "North Karachi - Sector 11-C/3",
+    "id": 232
+  },
+  {
+    "name": "Askari 5 - Sector G",
+    "id": 233
+  },
+  {
+    "name": "Askari 5 - Sector E",
+    "id": 234
+  },
+  {
+    "name": "KN Gohar Green City",
+    "id": 235
+  },
+  {
+    "name": "North Nazimabad - Block G",
+    "id": 236
+  },
+  {
+    "name": "Surjani Town - Sector 5D",
+    "id": 237
+  },
+  {
+    "name": "Federal B Area - Block 16",
+    "id": 238
+  },
+  {
+    "name": "Askari 5 - Sector B",
+    "id": 239
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 13/B",
+    "id": 240
+  },
+  {
+    "name": "Malir Cantonment",
+    "id": 241
+  },
+  {
+    "name": "Rufi Lake Drive Apartments",
+    "id": 242
+  },
+  {
+    "name": "Zeenatabad",
+    "id": 243
+  },
+  {
+    "name": "Sadaf Cooperative Housing Society",
+    "id": 244
+  },
+  {
+    "name": "Grove Residency",
+    "id": 245
+  },
+  {
+    "name": "Tauheed Commercial Area",
+    "id": 246
+  },
+  {
+    "name": "North Karachi - Sector 7-D3",
+    "id": 247
+  },
+  {
+    "name": "Falaknaz Twin Tower",
+    "id": 248
+  },
+  {
+    "name": "Federal B Area - Block 6",
+    "id": 249
+  },
+  {
+    "name": "Federal B Area - Block 11",
+    "id": 250
+  },
+  {
+    "name": "Bahria Town - Precinct 17",
+    "id": 251
+  },
+  {
+    "name": "Clifton - Block 3",
+    "id": 252
+  },
+  {
+    "name": "Federal B Area - Block 4",
+    "id": 253
+  },
+  {
+    "name": "Bufferzone - Sector 15-A/1",
+    "id": 254
+  },
+  {
+    "name": "North Karachi - Sector 10",
+    "id": 255
+  },
+  {
+    "name": "North Karachi - Sector 8",
+    "id": 256
+  },
+  {
+    "name": "Navy Housing Scheme Zamzama",
+    "id": 257
+  },
+  {
+    "name": "Al Hamra Society",
+    "id": 258
+  },
+  {
+    "name": "Musalmanan-E-Punjab Cooperative Housing Society",
+    "id": 259
+  },
+  {
+    "name": "Diamond Residency",
+    "id": 260
+  },
+  {
+    "name": "Aman Golf View",
+    "id": 261
+  },
+  {
+    "name": "Jamia Millia Road",
+    "id": 262
+  },
+  {
+    "name": "Saadi Town - Block 7",
+    "id": 263
+  },
+  {
+    "name": "Bahria Paradise - Precinct 51",
+    "id": 264
+  },
+  {
+    "name": "Zamzama Commercial Area",
+    "id": 265
+  },
+  {
+    "name": "Allahwala Town - Sector 31-B",
+    "id": 266
+  },
+  {
+    "name": "Cantt View Lodges",
+    "id": 267
+  },
+  {
+    "name": "The Court Regency",
+    "id": 268
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 14",
+    "id": 269
+  },
+  {
+    "name": "Shahra-e-Qaideen",
+    "id": 270
+  },
+  {
+    "name": "Gulshan-e-Kaneez Fatima",
+    "id": 271
+  },
+  {
+    "name": "Federal B Area - Block 20",
+    "id": 272
+  },
+  {
+    "name": "Jami Commercial Area",
+    "id": 273
+  },
+  {
+    "name": "Airport Road",
+    "id": 274
+  },
+  {
+    "name": "Bahria Town - Precinct 19",
+    "id": 275
+  },
+  {
+    "name": "Sindhi Muslim Society - Block A",
+    "id": 276
+  },
+  {
+    "name": "Bahria Town - Precinct 2",
+    "id": 277
+  },
+  {
+    "name": "SMCHS - Sindhi Muslim Society",
+    "id": 278
+  },
+  {
+    "name": "Madras Cooperative Housing Society",
+    "id": 279
+  },
+  {
+    "name": "Navy Housing Scheme Karsaz - Phase 3",
+    "id": 280
+  },
+  {
+    "name": "Saadi Town - Block 4",
+    "id": 281
+  },
+  {
+    "name": "Emaar Ocean Front",
+    "id": 282
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 13",
+    "id": 283
+  },
+  {
+    "name": "North Karachi - Sector 11-C/1",
+    "id": 284
+  },
+  {
+    "name": "Cotton Export Cooperative Housing Society",
+    "id": 285
+  },
+  {
+    "name": "Falcon Complex Faisal",
+    "id": 286
+  },
+  {
+    "name": "Golden Town",
+    "id": 287
+  },
+  {
+    "name": "Sawera Enclave",
+    "id": 288
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector W",
+    "id": 289
+  },
+  {
+    "name": "Paragon Tower",
+    "id": 290
+  },
+  {
+    "name": "Chapal Sun City",
+    "id": 291
+  },
+  {
+    "name": "Nazimabad 2",
+    "id": 292
+  },
+  {
+    "name": "Bahria Town - Precinct 15",
+    "id": 293
+  },
+  {
+    "name": "Saima Luxury Homes",
+    "id": 294
+  },
+  {
+    "name": "North Nazimabad - Block C",
+    "id": 295
+  },
+  {
+    "name": "Saddar Town",
+    "id": 296
+  },
+  {
+    "name": "Federal Government Employees Housing Foundation",
+    "id": 297
+  },
+  {
+    "name": "Sumaira Sky Tower",
+    "id": 298
+  },
+  {
+    "name": "Federal B Area - Block 21",
+    "id": 299
+  },
+  {
+    "name": "Chapal Uptown",
+    "id": 300
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector V",
+    "id": 301
+  },
+  {
+    "name": "Cosmopolitan Society",
+    "id": 302
+  },
+  {
+    "name": "Kings Classic",
+    "id": 303
+  },
+  {
+    "name": "Kings Presidency",
+    "id": 304
+  },
+  {
+    "name": "Defence Skyline",
+    "id": 305
+  },
+  {
+    "name": "Darul Aman Society",
+    "id": 306
+  },
+  {
+    "name": "Gulshan-e-Kaneez Fatima - Block 2",
+    "id": 307
+  },
+  {
+    "name": "Federal B Area - Block 18",
+    "id": 308
+  },
+  {
+    "name": "Navy Housing Scheme Karsaz - Phase 1",
+    "id": 309
+  },
+  {
+    "name": "DOHS Phase 2",
+    "id": 310
+  },
+  {
+    "name": "National Stadium Colony",
+    "id": 311
+  },
+  {
+    "name": "Shadman Town - Sector-14/A",
+    "id": 312
+  },
+  {
+    "name": "Defence View Phase 2",
+    "id": 313
+  },
+  {
+    "name": "New Lyari Cooperative Housing Society",
+    "id": 314
+  },
+  {
+    "name": "Gulshan-e-Jamal",
+    "id": 315
+  },
+  {
+    "name": "Fatima Golf Residency",
+    "id": 316
+  },
+  {
+    "name": "Saddar",
+    "id": 317
+  },
+  {
+    "name": "North Karachi - Sector 7-D1",
+    "id": 318
+  },
+  {
+    "name": "Saadi Garden - Block 1",
+    "id": 319
+  },
+  {
+    "name": "Dascon Tower",
+    "id": 320
+  },
+  {
+    "name": "Wasi Country Park",
+    "id": 321
+  },
+  {
+    "name": "Soomra Society",
+    "id": 322
+  },
+  {
+    "name": "DHA Phase 5 Extension",
+    "id": 323
+  },
+  {
+    "name": "North Karachi - Sector 11-C/2",
+    "id": 324
+  },
+  {
+    "name": "Cantt Bazar",
+    "id": 325
+  },
+  {
+    "name": "Guru Mandir Chorangi",
+    "id": 326
+  },
+  {
+    "name": "Pakistan Merchant Navy Society",
+    "id": 327
+  },
+  {
+    "name": "Hill Park",
+    "id": 328
+  },
+  {
+    "name": "Federal B Area - Block 7",
+    "id": 329
+  },
+  {
+    "name": "Federal B Area - Block 2",
+    "id": 330
+  },
+  {
+    "name": "North Karachi - Sector 9",
+    "id": 331
+  },
+  {
+    "name": "Government Teacher Society - Sector 19-A",
+    "id": 332
+  },
+  {
+    "name": "Sanober Twin Tower",
+    "id": 333
+  },
+  {
+    "name": "Soldier Bazar",
+    "id": 334
+  },
+  {
+    "name": "Clifton - Block 6",
+    "id": 335
+  },
+  {
+    "name": "Shahbaz Commercial Area",
+    "id": 336
+  },
+  {
+    "name": "Safari Enclave Apartments",
+    "id": 337
+  },
+  {
+    "name": "Gulshan-e-Kaneez Fatima - Block 4",
+    "id": 338
+  },
+  {
+    "name": "The Arkadians",
+    "id": 339
+  },
+  {
+    "name": "Saadi Town - Block 2",
+    "id": 340
+  },
+  {
+    "name": "Bufferzone - Sector 15-A/3",
+    "id": 341
+  },
+  {
+    "name": "Alize Garden",
+    "id": 342
+  },
+  {
+    "name": "Sadat-e-Amroha Coop Housing Society",
+    "id": 343
+  },
+  {
+    "name": "Lakhani Presidency",
+    "id": 344
+  },
+  {
+    "name": "Nazimabad - Block 5C",
+    "id": 345
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 9",
+    "id": 346
+  },
+  {
+    "name": "Ilyas Goth",
+    "id": 347
+  },
+  {
+    "name": "Federal B Area - Block 5",
+    "id": 348
+  },
+  {
+    "name": "Allama Iqbal Road",
+    "id": 349
+  },
+  {
+    "name": "Lateef Duplex Luxuria",
+    "id": 350
+  },
+  {
+    "name": "Suparco Road",
+    "id": 351
+  },
+  {
+    "name": "Noman Residencia",
+    "id": 352
+  },
+  {
+    "name": "Incholi Cooperative Housing Society",
+    "id": 353
+  },
+  {
+    "name": "Rafi Pride 2",
+    "id": 354
+  },
+  {
+    "name": "Rabia Enclave",
+    "id": 355
+  },
+  {
+    "name": "Alamgir Road",
+    "id": 356
+  },
+  {
+    "name": "Kings Garden",
+    "id": 357
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector U",
+    "id": 358
+  },
+  {
+    "name": "Bahria Town - Precinct 7",
+    "id": 359
+  },
+  {
+    "name": "Oasis Park Residencia",
+    "id": 360
+  },
+  {
+    "name": "Punjabi Saudagar Society Phase 2",
+    "id": 361
+  },
+  {
+    "name": "Kings Cottages",
+    "id": 362
+  },
+  {
+    "name": "Akhtar Colony",
+    "id": 363
+  },
+  {
+    "name": "Mehmoodabad Number 4",
+    "id": 364
+  },
+  {
+    "name": "Samrina Boulevard",
+    "id": 365
+  },
+  {
+    "name": "Gulshan-e-Kaneez Fatima - Block 1",
+    "id": 366
+  },
+  {
+    "name": "DHA City Karachi",
+    "id": 367
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 9",
+    "id": 368
+  },
+  {
+    "name": "Gulistan Society Phase 1",
+    "id": 369
+  },
+  {
+    "name": "Surjani Town - Sector 4D",
+    "id": 370
+  },
+  {
+    "name": "Navy Housing Scheme Karsaz - Phase 2",
+    "id": 371
+  },
+  {
+    "name": "Buffer Zone",
+    "id": 372
+  },
+  {
+    "name": "Delhi Colony",
+    "id": 373
+  },
+  {
+    "name": "Saima Green Valley",
+    "id": 374
+  },
+  {
+    "name": "Bisma Greens",
+    "id": 375
+  },
+  {
+    "name": "North Karachi - Sector 5-K",
+    "id": 376
+  },
+  {
+    "name": "Metroville 3",
+    "id": 377
+  },
+  {
+    "name": "Surjani Town - Sector 4A",
+    "id": 378
+  },
+  {
+    "name": "Muslimabad Society",
+    "id": 379
+  },
+  {
+    "name": "Central Information Cooperative Housing Society",
+    "id": 380
+  },
+  {
+    "name": "Darakhshan Villas",
+    "id": 381
+  },
+  {
+    "name": "Kolachi Cooperative Housing Society",
+    "id": 382
+  },
+  {
+    "name": "Nazimabad 1",
+    "id": 383
+  },
+  {
+    "name": "North Karachi - Sector 5-C/2",
+    "id": 384
+  },
+  {
+    "name": "Sohni Serenity Executive Apartments",
+    "id": 385
+  },
+  {
+    "name": "Aziz Broadway",
+    "id": 386
+  },
+  {
+    "name": "Aziz Excellency",
+    "id": 387
+  },
+  {
+    "name": "Delhi Mercantile Society",
+    "id": 388
+  },
+  {
+    "name": "Al-Jadeed Residency",
+    "id": 389
+  },
+  {
+    "name": "Rainbow Towers And Shopping Mall",
+    "id": 390
+  },
+  {
+    "name": "PTV Society",
+    "id": 391
+  },
+  {
+    "name": "Korangi Creek Cantonment",
+    "id": 392
+  },
+  {
+    "name": "Al Fatah Brishna Heights",
+    "id": 393
+  },
+  {
+    "name": "Shahnawaz Cooperative Housing Society",
+    "id": 394
+  },
+  {
+    "name": "DHA Phase 8 Extension",
+    "id": 395
+  },
+  {
+    "name": "Bahria Town - Precinct 9",
+    "id": 396
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 19",
+    "id": 397
+  },
+  {
+    "name": "PIA Housing Society",
+    "id": 398
+  },
+  {
+    "name": "Model Colony",
+    "id": 399
+  },
+  {
+    "name": "Shah Faisal Town",
+    "id": 400
+  },
+  {
+    "name": "Kashmir Colony",
+    "id": 401
+  },
+  {
+    "name": "Garden City - Block A",
+    "id": 402
+  },
+  {
+    "name": "KDA Employees Cooperative Housing Society",
+    "id": 403
+  },
+  {
+    "name": "Yaseenabad",
+    "id": 404
+  },
+  {
+    "name": "Scheme 33 - Sector 35-A",
+    "id": 405
+  },
+  {
+    "name": "Tipu Sultan Society",
+    "id": 406
+  },
+  {
+    "name": "North Nazimabad - Block T",
+    "id": 407
+  },
+  {
+    "name": "Aero Iconic Tower",
+    "id": 408
+  },
+  {
+    "name": "Saima Residencia",
+    "id": 409
+  },
+  {
+    "name": "Salafia Society",
+    "id": 410
+  },
+  {
+    "name": "Etawa Society",
+    "id": 411
+  },
+  {
+    "name": "Al-Falah Society",
+    "id": 412
+  },
+  {
+    "name": "Falcon Complex (AFOHS)",
+    "id": 413
+  },
+  {
+    "name": "Rok Cooperative Housing Society",
+    "id": 414
+  },
+  {
+    "name": "Pak Ideal Cooperative Housing Society",
+    "id": 415
+  },
+  {
+    "name": "National Cement Employees Housing",
+    "id": 416
+  },
+  {
+    "name": "Zulekha Residency",
+    "id": 417
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 5",
+    "id": 418
+  },
+  {
+    "name": "Safoora Goth",
+    "id": 419
+  },
+  {
+    "name": "Zulfiqar Commercial Area",
+    "id": 420
+  },
+  {
+    "name": "Mashraqi Society",
+    "id": 421
+  },
+  {
+    "name": "Korangi",
+    "id": 422
+  },
+  {
+    "name": "North Karachi - Sector 5L",
+    "id": 423
+  },
+  {
+    "name": "Ibrahim Heaven",
+    "id": 424
+  },
+  {
+    "name": "Scheme 33 - Sector 31",
+    "id": 425
+  },
+  {
+    "name": "Jamshed Town",
+    "id": 426
+  },
+  {
+    "name": "Al-Hilal Society",
+    "id": 427
+  },
+  {
+    "name": "Saba Commercial Area",
+    "id": 428
+  },
+  {
+    "name": "Mehmoodabad",
+    "id": 429
+  },
+  {
+    "name": "P & T Colony",
+    "id": 430
+  },
+  {
+    "name": "Federal B Area - Block 19",
+    "id": 431
+  },
+  {
+    "name": "North Karachi - Sector 11-H",
+    "id": 432
+  },
+  {
+    "name": "Fatima Ali Towers",
+    "id": 433
+  },
+  {
+    "name": "Askari 5 - Sector C",
+    "id": 434
+  },
+  {
+    "name": "Scheme 33 - Sector 51-A",
+    "id": 435
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 6",
+    "id": 436
+  },
+  {
+    "name": "Scheme 33 - Sector 17-A",
+    "id": 437
+  },
+  {
+    "name": "M.A. Jinnah Road",
+    "id": 438
+  },
+  {
+    "name": "Maymar Avenue",
+    "id": 439
+  },
+  {
+    "name": "Khayaban-e-Shahbaz",
+    "id": 440
+  },
+  {
+    "name": "Surjani Town - Sector 7B",
+    "id": 441
+  },
+  {
+    "name": "KDA Employees Society - Korangi",
+    "id": 442
+  },
+  {
+    "name": "PIB Colony",
+    "id": 443
+  },
+  {
+    "name": "North Karachi - Sector 5-C/4",
+    "id": 444
+  },
+  {
+    "name": "Central Govt Coop Housing Society",
+    "id": 445
+  },
+  {
+    "name": "Army Officers Housing Society",
+    "id": 446
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 18",
+    "id": 447
+  },
+  {
+    "name": "Bahria Town - Precinct 35",
+    "id": 448
+  },
+  {
+    "name": "Shah Latif Town",
+    "id": 449
+  },
+  {
+    "name": "Bahria Town - Precinct 11",
+    "id": 450
+  },
+  {
+    "name": "Airport",
+    "id": 451
+  },
+  {
+    "name": "Gulistan-e-Zafar",
+    "id": 452
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector P",
+    "id": 453
+  },
+  {
+    "name": "PHA Maymar Towers",
+    "id": 454
+  },
+  {
+    "name": "Country Apartment",
+    "id": 455
+  },
+  {
+    "name": "North Karachi - Sector 5-C",
+    "id": 456
+  },
+  {
+    "name": "Surjani Town - Sector 5B",
+    "id": 457
+  },
+  {
+    "name": "Saadi Road",
+    "id": 458
+  },
+  {
+    "name": "Parsi Colony",
+    "id": 459
+  },
+  {
+    "name": "Scheme 33 - Sector 32",
+    "id": 460
+  },
+  {
+    "name": "Dadabhoy Town",
+    "id": 461
+  },
+  {
+    "name": "Nazimabad 4",
+    "id": 462
+  },
+  {
+    "name": "Upper Gizri",
+    "id": 463
+  },
+  {
+    "name": "ARY Laguna",
+    "id": 464
+  },
+  {
+    "name": "P & T Housing Society",
+    "id": 465
+  },
+  {
+    "name": "Zamzama",
+    "id": 466
+  },
+  {
+    "name": "Chandni Chowk Society",
+    "id": 467
+  },
+  {
+    "name": "Askari 2",
+    "id": 468
+  },
+  {
+    "name": "Bahria Town - Precinct 18",
+    "id": 469
+  },
+  {
+    "name": "Nazimabad 5",
+    "id": 470
+  },
+  {
+    "name": "Federal B Area - Block 17",
+    "id": 471
+  },
+  {
+    "name": "North Karachi - Sector 11K",
+    "id": 472
+  },
+  {
+    "name": "Scheme 33 - Sector 15-A",
+    "id": 473
+  },
+  {
+    "name": "Faran Cooperative Housing Society",
+    "id": 474
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 8",
+    "id": 475
+  },
+  {
+    "name": "Scheme 33 - Sector 38-A",
+    "id": 476
+  },
+  {
+    "name": "Sindh Baloch Housing Society",
+    "id": 477
+  },
+  {
+    "name": "Liaquatabad - Block 7",
+    "id": 478
+  },
+  {
+    "name": "Sohni Golf View Apartments",
+    "id": 479
+  },
+  {
+    "name": "Kings Tower",
+    "id": 480
+  },
+  {
+    "name": "Green Town",
+    "id": 481
+  },
+  {
+    "name": "Gadap Town",
+    "id": 482
+  },
+  {
+    "name": "Scheme 33 - Sector 19-A",
+    "id": 483
+  },
+  {
+    "name": "Ahsanabad",
+    "id": 484
+  },
+  {
+    "name": "Al-Muslim Cooperative Housing Society Phase 1",
+    "id": 485
+  },
+  {
+    "name": "Nazimabad 4 - Block C",
+    "id": 486
+  },
+  {
+    "name": "Maqboolabad Society",
+    "id": 487
+  },
+  {
+    "name": "Scheme 33 - Sector 25-A",
+    "id": 488
+  },
+  {
+    "name": "KESC Housing Society",
+    "id": 489
+  },
+  {
+    "name": "Scheme 33 - Sector 34-A",
+    "id": 490
+  },
+  {
+    "name": "Gulshan-e-Shameem",
+    "id": 491
+  },
+  {
+    "name": "Nazimabad 3 - Block F",
+    "id": 492
+  },
+  {
+    "name": "CP Barar Society",
+    "id": 493
+  },
+  {
+    "name": "Firdous Colony",
+    "id": 494
+  },
+  {
+    "name": "Mehmoodabad Number 3",
+    "id": 495
+  },
+  {
+    "name": "North Karachi - Sector 4",
+    "id": 496
+  },
+  {
+    "name": "Maaz Garden",
+    "id": 497
+  },
+  {
+    "name": "Rim Jhim Towers",
+    "id": 498
+  },
+  {
+    "name": "Sindhi Muslim Society - Block B",
+    "id": 499
+  },
+  {
+    "name": "KAECHS - Block 4",
+    "id": 500
+  },
+  {
+    "name": "Ishaqabad",
+    "id": 501
+  },
+  {
+    "name": "DHA City - Sector 14B",
+    "id": 502
+  },
+  {
+    "name": "KDA Overseas Bungalows",
+    "id": 503
+  },
+  {
+    "name": "Police Society",
+    "id": 504
+  },
+  {
+    "name": "Bufferzone - Sector 15-B",
+    "id": 505
+  },
+  {
+    "name": "Garden City",
+    "id": 506
+  },
+  {
+    "name": "Rufi Greenland",
+    "id": 507
+  },
+  {
+    "name": "Nazimabad 2 - Block A",
+    "id": 508
+  },
+  {
+    "name": "Country Heights",
+    "id": 509
+  },
+  {
+    "name": "Gohar Complex",
+    "id": 510
+  },
+  {
+    "name": "DHA Defence",
+    "id": 511
+  },
+  {
+    "name": "Malir Link To Super Highway",
+    "id": 512
+  },
+  {
+    "name": "Manzoor Colony",
+    "id": 513
+  },
+  {
+    "name": "Bufferzone - Sector 16-A",
+    "id": 514
+  },
+  {
+    "name": "Shanzil Golf Residencia",
+    "id": 515
+  },
+  {
+    "name": "Kashmir Road",
+    "id": 516
+  },
+  {
+    "name": "Royal 8 Icon",
+    "id": 517
+  },
+  {
+    "name": "Rashid Minhas Road",
+    "id": 518
+  },
+  {
+    "name": "Punjabi Saudagaran Phase 1",
+    "id": 519
+  },
+  {
+    "name": "Pakistan Scientists Cooperative Housing Society",
+    "id": 520
+  },
+  {
+    "name": "Kings Grand Towers",
+    "id": 521
+  },
+  {
+    "name": "Bisma Avenue",
+    "id": 522
+  },
+  {
+    "name": "Pakistan Post Office Workers CHS",
+    "id": 523
+  },
+  {
+    "name": "Dalmia Cement Factory Road",
+    "id": 524
+  },
+  {
+    "name": "Maskan Chowrangi",
+    "id": 525
+  },
+  {
+    "name": "PS Heights",
+    "id": 526
+  },
+  {
+    "name": "Mehmoodabad Number 1",
+    "id": 527
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 16-A",
+    "id": 528
+  },
+  {
+    "name": "Mehmoodabad Number 2",
+    "id": 529
+  },
+  {
+    "name": "Samrina Grand",
+    "id": 530
+  },
+  {
+    "name": "Shayan Iconic Palace",
+    "id": 531
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 15",
+    "id": 532
+  },
+  {
+    "name": "KDA Scheme 1 Extension",
+    "id": 533
+  },
+  {
+    "name": "Azizabad",
+    "id": 534
+  },
+  {
+    "name": "Gulshan-e-Azeem",
+    "id": 535
+  },
+  {
+    "name": "PTV Society - Block B",
+    "id": 536
+  },
+  {
+    "name": "Pir Ahmed Zaman Town - Block 1",
+    "id": 537
+  },
+  {
+    "name": "Lawyers Colony - Karachi Bar Cooperative Housing Society",
+    "id": 538
+  },
+  {
+    "name": "Memon Goth",
+    "id": 539
+  },
+  {
+    "name": "The Dream Villas",
+    "id": 540
+  },
+  {
+    "name": "North Karachi - Sector 5-C/1",
+    "id": 541
+  },
+  {
+    "name": "Naya Nazimabad - Block M",
+    "id": 542
+  },
+  {
+    "name": "Delhi Saudagaran Society",
+    "id": 543
+  },
+  {
+    "name": "North Karachi - Sector 3",
+    "id": 544
+  },
+  {
+    "name": "KAECHS - Block 8",
+    "id": 545
+  },
+  {
+    "name": "Surjani Town - Sector 7A",
+    "id": 546
+  },
+  {
+    "name": "Bahria Liberty Commercial",
+    "id": 547
+  },
+  {
+    "name": "Malir Town Residency",
+    "id": 548
+  },
+  {
+    "name": "Korangi - Sector 31-G",
+    "id": 549
+  },
+  {
+    "name": "Askari 1",
+    "id": 550
+  },
+  {
+    "name": "Alaska Residency",
+    "id": 551
+  },
+  {
+    "name": "Jamshed Quarters",
+    "id": 552
+  },
+  {
+    "name": "KAECHS - Block 3",
+    "id": 553
+  },
+  {
+    "name": "New Rizvia Cooperative Housing Society",
+    "id": 554
+  },
+  {
+    "name": "Kings Shaes Residency",
+    "id": 555
+  },
+  {
+    "name": "Burj Al-Jinnah",
+    "id": 556
+  },
+  {
+    "name": "Tariq Bin Ziyad Housing Society",
+    "id": 557
+  },
+  {
+    "name": "Surjani Town - Sector 6B",
+    "id": 558
+  },
+  {
+    "name": "Shamim Sky Line",
+    "id": 559
+  },
+  {
+    "name": "Rainbow Classic Homes",
+    "id": 560
+  },
+  {
+    "name": "Mehmoodabad Number 5",
+    "id": 561
+  },
+  {
+    "name": "9th Commercial Street - DHA Phase 4",
+    "id": 562
+  },
+  {
+    "name": "Khalid Commercial Area",
+    "id": 563
+  },
+  {
+    "name": "Faraz Avenue Apartments",
+    "id": 564
+  },
+  {
+    "name": "Nazimabad 4 - Block A",
+    "id": 565
+  },
+  {
+    "name": "Surjani Town - Sector L1",
+    "id": 566
+  },
+  {
+    "name": "Rana Residency",
+    "id": 567
+  },
+  {
+    "name": "Nazimabad 1 - Block H",
+    "id": 568
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 13/G",
+    "id": 569
+  },
+  {
+    "name": "Cantt View Tower",
+    "id": 570
+  },
+  {
+    "name": "Mohsin Arcade",
+    "id": 571
+  },
+  {
+    "name": "Shah Faisal Town - Block 1",
+    "id": 572
+  },
+  {
+    "name": "Nazimabad 2 - Block E",
+    "id": 573
+  },
+  {
+    "name": "Malir Halt",
+    "id": 574
+  },
+  {
+    "name": "Nazimabad - Block 5E",
+    "id": 575
+  },
+  {
+    "name": "Shadman",
+    "id": 576
+  },
+  {
+    "name": "Siraj-ud-Daula Road",
+    "id": 577
+  },
+  {
+    "name": "Nazimabad 3 - Block D",
+    "id": 578
+  },
+  {
+    "name": "Gulshan-e-Jamal - Block C",
+    "id": 579
+  },
+  {
+    "name": "Abuzar Ghaffari Cooperative Housing Society",
+    "id": 580
+  },
+  {
+    "name": "Pink Residency",
+    "id": 581
+  },
+  {
+    "name": "Ahsan Dreamland",
+    "id": 582
+  },
+  {
+    "name": "Bahria Town - Precinct 14",
+    "id": 583
+  },
+  {
+    "name": "Surjani Town - Sector 7C",
+    "id": 584
+  },
+  {
+    "name": "Bangalore Town",
+    "id": 585
+  },
+  {
+    "name": "Shaaz Bungalows",
+    "id": 586
+  },
+  {
+    "name": "Saadi Garden - Block 2",
+    "id": 587
+  },
+  {
+    "name": "North Nazimabad - Block R",
+    "id": 588
+  },
+  {
+    "name": "Surjani Town - Sector 4B",
+    "id": 589
+  },
+  {
+    "name": "Gulshan-e-Usman Housing Society",
+    "id": 590
+  },
+  {
+    "name": "Saadabad Cooperative Housing Society",
+    "id": 591
+  },
+  {
+    "name": "Rufi Spring Flower",
+    "id": 592
+  },
+  {
+    "name": "Jahangir Town",
+    "id": 593
+  },
+  {
+    "name": "Nazimabad 3 - Block G",
+    "id": 594
+  },
+  {
+    "name": "ASF Tower",
+    "id": 595
+  },
+  {
+    "name": "Al Ghaffar Nagori City",
+    "id": 596
+  },
+  {
+    "name": "Euro Clock Tower",
+    "id": 597
+  },
+  {
+    "name": "HSJ Icon",
+    "id": 598
+  },
+  {
+    "name": "Malir Town Residency - Phase 2",
+    "id": 599
+  },
+  {
+    "name": "Shanzil Exclusive",
+    "id": 600
+  },
+  {
+    "name": "Scheme 33 - Sector 52-A",
+    "id": 601
+  },
+  {
+    "name": "Sector 32 - Punjabi Saudagar City Phase 3",
+    "id": 602
+  },
+  {
+    "name": "Kings Highrise Apartments",
+    "id": 603
+  },
+  {
+    "name": "Defence Garden",
+    "id": 604
+  },
+  {
+    "name": "Jamaluddin Afghani Road",
+    "id": 605
+  },
+  {
+    "name": "Burj Ul Imran Apartments",
+    "id": 606
+  },
+  {
+    "name": "Malik Co-operative Housing Society",
+    "id": 607
+  },
+  {
+    "name": "Nazimabad - Block 5B",
+    "id": 608
+  },
+  {
+    "name": "Gizri",
+    "id": 609
+  },
+  {
+    "name": "Dawood Society",
+    "id": 610
+  },
+  {
+    "name": "KAECHS - Block 5",
+    "id": 611
+  },
+  {
+    "name": "Surjani Town - Sector 6",
+    "id": 612
+  },
+  {
+    "name": "Pakistan Chowk",
+    "id": 613
+  },
+  {
+    "name": "Nazimabad 2 - Block J",
+    "id": 614
+  },
+  {
+    "name": "Sumsum Towers",
+    "id": 615
+  },
+  {
+    "name": "State Bank Employees Housing Society",
+    "id": 616
+  },
+  {
+    "name": "North Karachi - Sector 11E",
+    "id": 617
+  },
+  {
+    "name": "De Comforts",
+    "id": 618
+  },
+  {
+    "name": "New Karachi - Sector 5-A/2",
+    "id": 619
+  },
+  {
+    "name": "Chapal Skymark",
+    "id": 620
+  },
+  {
+    "name": "Shah Faisal Town - Block 2",
+    "id": 621
+  },
+  {
+    "name": "Country Terrace",
+    "id": 622
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector ZA",
+    "id": 623
+  },
+  {
+    "name": "Soldier Bazar No 2",
+    "id": 624
+  },
+  {
+    "name": "Askari 3",
+    "id": 625
+  },
+  {
+    "name": "Gharibabad",
+    "id": 626
+  },
+  {
+    "name": "Scheme 33 - Sector 20-A",
+    "id": 627
+  },
+  {
+    "name": "Quetta Town",
+    "id": 628
+  },
+  {
+    "name": "North Karachi - Sector 5-B2",
+    "id": 629
+  },
+  {
+    "name": "Commander Enclave",
+    "id": 630
+  },
+  {
+    "name": "Surjani Town - Sector 2",
+    "id": 631
+  },
+  {
+    "name": "Abul Qasim Mall & Residency",
+    "id": 632
+  },
+  {
+    "name": "West Garden",
+    "id": 633
+  },
+  {
+    "name": "Nazimabad 3 - Block A",
+    "id": 634
+  },
+  {
+    "name": "Memon Nagar",
+    "id": 635
+  },
+  {
+    "name": "North Karachi - Sector 11C",
+    "id": 636
+  },
+  {
+    "name": "Surjani Town - Sector 5C",
+    "id": 637
+  },
+  {
+    "name": "Taloo Gold Residency",
+    "id": 638
+  },
+  {
+    "name": "Khayaban-e-Ittehad Road",
+    "id": 639
+  },
+  {
+    "name": "Scheme 33 - Sector 18-A",
+    "id": 640
+  },
+  {
+    "name": "New Karachi - Sector 5-M",
+    "id": 641
+  },
+  {
+    "name": "Parsa City",
+    "id": 642
+  },
+  {
+    "name": "Anda Mor Road",
+    "id": 643
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 10-A",
+    "id": 644
+  },
+  {
+    "name": "Ayoubia Commercial Area",
+    "id": 645
+  },
+  {
+    "name": "Super Highway",
+    "id": 646
+  },
+  {
+    "name": "Shah Faisal Town - Block 3",
+    "id": 647
+  },
+  {
+    "name": "PCSIR Housing Society",
+    "id": 648
+  },
+  {
+    "name": "Al-Raheem Raza City Phase 2",
+    "id": 649
+  },
+  {
+    "name": "Saadi Town - Block 3",
+    "id": 650
+  },
+  {
+    "name": "Saadi Garden - Block 4",
+    "id": 651
+  },
+  {
+    "name": "Mehran Banglows Town",
+    "id": 652
+  },
+  {
+    "name": "DHA Phase 8 - Zone D",
+    "id": 653
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 9-A",
+    "id": 654
+  },
+  {
+    "name": "Pir Ahmed Zaman Town",
+    "id": 655
+  },
+  {
+    "name": "Karachi Motorway",
+    "id": 656
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 8-A",
+    "id": 657
+  },
+  {
+    "name": "Fatima Dream City",
+    "id": 658
+  },
+  {
+    "name": "Bhittai Colony - Block D",
+    "id": 659
+  },
+  {
+    "name": "North Karachi - Sector 5-C/3",
+    "id": 660
+  },
+  {
+    "name": "Khayaban-e-Qasim",
+    "id": 661
+  },
+  {
+    "name": "Maniya Cooperative Housing Society",
+    "id": 662
+  },
+  {
+    "name": "Gulshan-e-Usman Phase 1 - Block 2",
+    "id": 663
+  },
+  {
+    "name": "Rafah-e-Aam",
+    "id": 664
+  },
+  {
+    "name": "Rimjhim VIllas",
+    "id": 665
+  },
+  {
+    "name": "DHA Phase 8 - Zone E",
+    "id": 666
+  },
+  {
+    "name": "Bahria Town - Precinct 29",
+    "id": 667
+  },
+  {
+    "name": "Rohail Khand Society",
+    "id": 668
+  },
+  {
+    "name": "MBCHS - Makhdoom Bilawal Society",
+    "id": 669
+  },
+  {
+    "name": "Falcon Complex - Air Force Officers Housing Scheme (AFOHS)",
+    "id": 670
+  },
+  {
+    "name": "Nazimabad 2 - Block D",
+    "id": 671
+  },
+  {
+    "name": "Karachi Cantonment",
+    "id": 672
+  },
+  {
+    "name": "Silver Sands Tower",
+    "id": 673
+  },
+  {
+    "name": "Falaknaz Excellency",
+    "id": 674
+  },
+  {
+    "name": "Salman Farsi Society",
+    "id": 675
+  },
+  {
+    "name": "Azam Town",
+    "id": 676
+  },
+  {
+    "name": "Surjani Town - Sector 5",
+    "id": 677
+  },
+  {
+    "name": "North Karachi - Sector 5-B/3",
+    "id": 678
+  },
+  {
+    "name": "Diamond Tower & Shopping Mall",
+    "id": 679
+  },
+  {
+    "name": "Soldier Bazar No 3",
+    "id": 680
+  },
+  {
+    "name": "Al-Rauf Sky Towers",
+    "id": 681
+  },
+  {
+    "name": "Khudadad Colony",
+    "id": 682
+  },
+  {
+    "name": "Stadium Road",
+    "id": 683
+  },
+  {
+    "name": "North Karachi - Sector 7-D4",
+    "id": 684
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 8",
+    "id": 685
+  },
+  {
+    "name": "North Karachi - Sector 11I",
+    "id": 686
+  },
+  {
+    "name": "Premier One",
+    "id": 687
+  },
+  {
+    "name": "Saima Jinnah Icon",
+    "id": 688
+  },
+  {
+    "name": "Baloch Colony",
+    "id": 689
+  },
+  {
+    "name": "BMCHS",
+    "id": 690
+  },
+  {
+    "name": "Punjab Chowrangi",
+    "id": 691
+  },
+  {
+    "name": "Nagan Chowrangi",
+    "id": 692
+  },
+  {
+    "name": "Sir Syed Road",
+    "id": 693
+  },
+  {
+    "name": "Country Comforts Appartment",
+    "id": 694
+  },
+  {
+    "name": "Karachi Rajput Co-operative Housing Society",
+    "id": 695
+  },
+  {
+    "name": "Roomi Icon",
+    "id": 696
+  },
+  {
+    "name": "10th Commercial Street - DHA Phase 4",
+    "id": 697
+  },
+  {
+    "name": "Burj-Ul-Ohad",
+    "id": 698
+  },
+  {
+    "name": "Alize Garden - Block 1",
+    "id": 699
+  },
+  {
+    "name": "Nazimabad - Block 5D",
+    "id": 700
+  },
+  {
+    "name": "Al Rehman Residency",
+    "id": 701
+  },
+  {
+    "name": "Millennium Mall",
+    "id": 702
+  },
+  {
+    "name": "C.P & Berar Society",
+    "id": 703
+  },
+  {
+    "name": "Numaish Chowrangi",
+    "id": 704
+  },
+  {
+    "name": "North Karachi - Sector 5-H",
+    "id": 705
+  },
+  {
+    "name": "Manghopir Road",
+    "id": 706
+  },
+  {
+    "name": "Komal Heaven",
+    "id": 707
+  },
+  {
+    "name": "Old Jamia Millia Road",
+    "id": 708
+  },
+  {
+    "name": "Federal Government Employees - Sector 25B",
+    "id": 709
+  },
+  {
+    "name": "North Karachi - Sector 5M",
+    "id": 710
+  },
+  {
+    "name": "Mehran Town",
+    "id": 711
+  },
+  {
+    "name": "Saima Mall & Residency",
+    "id": 712
+  },
+  {
+    "name": "Garden City - Block B",
+    "id": 713
+  },
+  {
+    "name": "Kamran Chowrangi",
+    "id": 714
+  },
+  {
+    "name": "Ocean Gardens",
+    "id": 715
+  },
+  {
+    "name": "Royal Tower",
+    "id": 716
+  },
+  {
+    "name": "Blue Sky Residency",
+    "id": 717
+  },
+  {
+    "name": "I.I. Chundrigar Road",
+    "id": 718
+  },
+  {
+    "name": "Fariha Excellency",
+    "id": 719
+  },
+  {
+    "name": "Al-Ghazi Villas",
+    "id": 720
+  },
+  {
+    "name": "State Bank of Pakistan Staff Co-Operative Housing Society",
+    "id": 721
+  },
+  {
+    "name": "Shah Faisal Town - Block 3A",
+    "id": 722
+  },
+  {
+    "name": "Shah Faisal Town - Block 4",
+    "id": 723
+  },
+  {
+    "name": "Shah Faisal Town - Block 5",
+    "id": 724
+  },
+  {
+    "name": "Euro Regent Park",
+    "id": 725
+  },
+  {
+    "name": "Jauhar Chowrangi Road",
+    "id": 726
+  },
+  {
+    "name": "Metrovil Colony",
+    "id": 727
+  },
+  {
+    "name": "Safari Signature",
+    "id": 728
+  },
+  {
+    "name": "Al Raheem Raza Phase 1",
+    "id": 729
+  },
+  {
+    "name": "Lalazar Society",
+    "id": 730
+  },
+  {
+    "name": "Gulshan-e-Mustafa",
+    "id": 731
+  },
+  {
+    "name": "Lucknow Society",
+    "id": 732
+  },
+  {
+    "name": "Azam Basti",
+    "id": 733
+  },
+  {
+    "name": "Custom Preventive Cooperative Housing Society",
+    "id": 734
+  },
+  {
+    "name": "Saadi Town - Block 1",
+    "id": 735
+  },
+  {
+    "name": "Landhi",
+    "id": 736
+  },
+  {
+    "name": "Kazimabad",
+    "id": 737
+  },
+  {
+    "name": "Pak Kausar Town",
+    "id": 738
+  },
+  {
+    "name": "Ali Garh Society - Sector 9A1",
+    "id": 739
+  },
+  {
+    "name": "Latifi Cooperative Housing Society",
+    "id": 740
+  },
+  {
+    "name": "Works Cooperative Housing Society",
+    "id": 741
+  },
+  {
+    "name": "Sector 25-A - Karachi Bar Association Cooperative Housing Society",
+    "id": 742
+  },
+  {
+    "name": "Dream City",
+    "id": 743
+  },
+  {
+    "name": "KAECHS - Block 2",
+    "id": 744
+  },
+  {
+    "name": "Scheme 33 - Sector 24-A",
+    "id": 745
+  },
+  {
+    "name": "Khayaban-e-Khalid",
+    "id": 746
+  },
+  {
+    "name": "PAF Housing Scheme",
+    "id": 747
+  },
+  {
+    "name": "Karachi Revenue Judicial CHS",
+    "id": 748
+  },
+  {
+    "name": "Garden City - Block C",
+    "id": 749
+  },
+  {
+    "name": "Bhittai Colony",
+    "id": 750
+  },
+  {
+    "name": "North Nazimabad - Block P",
+    "id": 751
+  },
+  {
+    "name": "Overseas Society",
+    "id": 752
+  },
+  {
+    "name": "Al-Noor Multipurpose Cooperative Society Limited - Sector 54-A",
+    "id": 753
+  },
+  {
+    "name": "Anwar-e-Ibrahim",
+    "id": 754
+  },
+  {
+    "name": "Darusslam Society",
+    "id": 755
+  },
+  {
+    "name": "Kehkashan Homes",
+    "id": 756
+  },
+  {
+    "name": "North Karachi - Sector 14A",
+    "id": 757
+  },
+  {
+    "name": "Bahria Town - Precinct 3",
+    "id": 758
+  },
+  {
+    "name": "North Nazimabad - Block S",
+    "id": 759
+  },
+  {
+    "name": "Suparco Cooperative Housing Society",
+    "id": 760
+  },
+  {
+    "name": "Muhammad Bin Qasim Society - Phase 2",
+    "id": 761
+  },
+  {
+    "name": "Al Noor Society",
+    "id": 762
+  },
+  {
+    "name": "Gulistan-e-Jauhar - Block 1-A",
+    "id": 763
+  },
+  {
+    "name": "Gulshan-e-Usman Phase 1",
+    "id": 764
+  },
+  {
+    "name": "Gulmohar City",
+    "id": 765
+  },
+  {
+    "name": "Orangi Town - Sector 11",
+    "id": 766
+  },
+  {
+    "name": "Gulshan-e-Jamal - Block B",
+    "id": 767
+  },
+  {
+    "name": "Gulshan-e-Hadeed - Phase 2",
+    "id": 768
+  },
+  {
+    "name": "Kokan Society",
+    "id": 769
+  },
+  {
+    "name": "AQ Bazar",
+    "id": 770
+  },
+  {
+    "name": "Rufi Dream Land Bungalows",
+    "id": 771
+  },
+  {
+    "name": "Haider Ali Road",
+    "id": 772
+  },
+  {
+    "name": "KDA Employees Society - Sector 31-C1",
+    "id": 773
+  },
+  {
+    "name": "Saadi Garden - Block 3",
+    "id": 774
+  },
+  {
+    "name": "Sumaira Bungalows",
+    "id": 775
+  },
+  {
+    "name": "Al Muslim Society",
+    "id": 776
+  },
+  {
+    "name": "Punjabi Saudagar Society",
+    "id": 777
+  },
+  {
+    "name": "Alize Garden - Block 2",
+    "id": 778
+  },
+  {
+    "name": "North Nazimabad - Block Q",
+    "id": 779
+  },
+  {
+    "name": "Gulshan-e-Mehran",
+    "id": 780
+  },
+  {
+    "name": "Gulshan-e-Noor",
+    "id": 781
+  },
+  {
+    "name": "Sharifabad",
+    "id": 782
+  },
+  {
+    "name": "Pakistan Writers Guild Co-operative Housing Society",
+    "id": 783
+  },
+  {
+    "name": "Mashriq Society",
+    "id": 784
+  },
+  {
+    "name": "Dua Green Farmhouse",
+    "id": 785
+  },
+  {
+    "name": "Gadap Road",
+    "id": 786
+  },
+  {
+    "name": "DHA City - Sector 1",
+    "id": 787
+  },
+  {
+    "name": "Nazimabad 3 - Block H",
+    "id": 788
+  },
+  {
+    "name": "Nazimabad 2 - Block F",
+    "id": 789
+  },
+  {
+    "name": "Aswan Town",
+    "id": 790
+  },
+  {
+    "name": "Mithadar",
+    "id": 791
+  },
+  {
+    "name": "Khayaban-e-Iqbal",
+    "id": 792
+  },
+  {
+    "name": "Surjani Town - Sector 1",
+    "id": 793
+  },
+  {
+    "name": "Liaquatabad - Block 10",
+    "id": 794
+  },
+  {
+    "name": "Serena Mobile Mall",
+    "id": 795
+  },
+  {
+    "name": "Saima Pari Star",
+    "id": 796
+  },
+  {
+    "name": "Sawera Grand",
+    "id": 797
+  },
+  {
+    "name": "Kathiawar Society",
+    "id": 798
+  },
+  {
+    "name": "Shaheed-e-Millat Expressway",
+    "id": 799
+  },
+  {
+    "name": "Zainab Luxuria",
+    "id": 800
+  },
+  {
+    "name": "Federal Government Employees - Sector 24B",
+    "id": 801
+  },
+  {
+    "name": "Sector 49-A - Punjabi Saudagar Residency",
+    "id": 802
+  },
+  {
+    "name": "Farhan Dream Land",
+    "id": 803
+  },
+  {
+    "name": "Dr Daud Pota Road",
+    "id": 804
+  },
+  {
+    "name": "Gulshan-e-Amin",
+    "id": 805
+  },
+  {
+    "name": "Federal Government Employees - Sector 4C",
+    "id": 806
+  },
+  {
+    "name": "Surjani Town - Sector 12",
+    "id": 807
+  },
+  {
+    "name": "Nishtar Road (Lawrence Road)",
+    "id": 808
+  },
+  {
+    "name": "Punjab Colony",
+    "id": 809
+  },
+  {
+    "name": "Ahsanabad Phase 1",
+    "id": 810
+  },
+  {
+    "name": "Khayaban-e-Iqbal",
+    "id": 811
+  },
+  {
+    "name": "DHA City - Sector 3B",
+    "id": 812
+  },
+  {
+    "name": "DHA City - Sector 3",
+    "id": 813
+  },
+  {
+    "name": "Ali Garh Society",
+    "id": 814
+  },
+  {
+    "name": "City Comfort",
+    "id": 815
+  },
+  {
+    "name": "New Chali",
+    "id": 816
+  },
+  {
+    "name": "DHA City - Sector 3C",
+    "id": 817
+  },
+  {
+    "name": "Kathiawar Society - Block 1",
+    "id": 818
+  },
+  {
+    "name": "DHA Phase 3",
+    "id": 819
+  },
+  {
+    "name": "DHA Phase 2 - Sunset Boulevard Commercial Area",
+    "id": 820
+  },
+  {
+    "name": "Korangi - Sector 32-A",
+    "id": 821
+  },
+  {
+    "name": "New Karachi - Sector 5-E",
+    "id": 822
+  },
+  {
+    "name": "Chandio Village",
+    "id": 823
+  },
+  {
+    "name": "Gulshan-e-Iqbal - Block 12",
+    "id": 824
+  },
+  {
+    "name": "Hussainabad",
+    "id": 825
+  },
+  {
+    "name": "Ayaz Town",
+    "id": 826
+  },
+  {
+    "name": "Nazimabad 1 - Block J",
+    "id": 827
+  },
+  {
+    "name": "Gulshan-e-Mehran - Block 1C",
+    "id": 828
+  },
+  {
+    "name": "LaCasaOne",
+    "id": 829
+  },
+  {
+    "name": "Al Fatah Icon",
+    "id": 830
+  },
+  {
+    "name": "Etawa Society",
+    "id": 831
+  },
+  {
+    "name": "Emaar Pearl Tower 3",
+    "id": 832
+  },
+  {
+    "name": "Nazimabad 3 - Block B",
+    "id": 833
+  },
+  {
+    "name": "Askari 5 - Sector D",
+    "id": 834
+  },
+  {
+    "name": "Nazimabad 1 - Block A",
+    "id": 835
+  },
+  {
+    "name": "Orangi Town",
+    "id": 836
+  },
+  {
+    "name": "Pak Colony",
+    "id": 837
+  },
+  {
+    "name": "Kharadar",
+    "id": 838
+  },
+  {
+    "name": "KAECHS - Block 9",
+    "id": 839
+  },
+  {
+    "name": "Dominion Shopping Mall",
+    "id": 840
+  },
+  {
+    "name": "Mateen Complex",
+    "id": 841
+  },
+  {
+    "name": "Gulshan-e-Rafi",
+    "id": 842
+  },
+  {
+    "name": "PIDC",
+    "id": 843
+  },
+  {
+    "name": "Khaliq-uz-Zaman Road",
+    "id": 844
+  },
+  {
+    "name": "Raza Residency",
+    "id": 845
+  },
+  {
+    "name": "Surjani Town - Sector 11A",
+    "id": 846
+  },
+  {
+    "name": "Moria Goth",
+    "id": 847
+  },
+  {
+    "name": "Scheme 33 - Sector 36-A",
+    "id": 848
+  },
+  {
+    "name": "Bahria Central Park Apartments",
+    "id": 849
+  },
+  {
+    "name": "Dominion Twin Towers",
+    "id": 850
+  },
+  {
+    "name": "Lania Arcadia",
+    "id": 851
+  },
+  {
+    "name": "Remco Towers",
+    "id": 852
+  },
+  {
+    "name": "Haseen Grandville",
+    "id": 853
+  },
+  {
+    "name": "Cantt",
+    "id": 854
+  },
+  {
+    "name": "Commander Heights",
+    "id": 855
+  },
+  {
+    "name": "Saadi Town - Block 6",
+    "id": 856
+  },
+  {
+    "name": "Gulshan-e-Mehran - Block 3A",
+    "id": 857
+  },
+  {
+    "name": "Pearl Residency",
+    "id": 858
+  },
+  {
+    "name": "North Karachi - Sector 1-A/4",
+    "id": 859
+  },
+  {
+    "name": "Grey Stylux Residences",
+    "id": 860
+  },
+  {
+    "name": "Stadium Commercial Area",
+    "id": 861
+  },
+  {
+    "name": "Sarah Enclave",
+    "id": 862
+  },
+  {
+    "name": "Euro Hi-Tech Residency",
+    "id": 863
+  },
+  {
+    "name": "Murad Memon Goth",
+    "id": 864
+  },
+  {
+    "name": "Kings Galaxy",
+    "id": 865
+  },
+  {
+    "name": "Royal Defence Tower",
+    "id": 866
+  },
+  {
+    "name": "Shahrah-e-Pakistan",
+    "id": 867
+  },
+  {
+    "name": "Dominion The Grand",
+    "id": 868
+  },
+  {
+    "name": "Natha Khan Goth",
+    "id": 869
+  },
+  {
+    "name": "KAECHS - Block 7",
+    "id": 870
+  },
+  {
+    "name": "Kemari Town",
+    "id": 871
+  },
+  {
+    "name": "Metrovil Colony - Block 3/2",
+    "id": 872
+  },
+  {
+    "name": "Old Clifton",
+    "id": 873
+  },
+  {
+    "name": "KDA Employees Society - Sector 31-C2",
+    "id": 874
+  },
+  {
+    "name": "Bahria Tower",
+    "id": 875
+  },
+  {
+    "name": "Labour Square",
+    "id": 876
+  },
+  {
+    "name": "Hyderabad Colony",
+    "id": 877
+  },
+  {
+    "name": "Nanak Wara",
+    "id": 878
+  },
+  {
+    "name": "Katchi Memon Cooperative Housing Society",
+    "id": 879
+  },
+  {
+    "name": "DHA City - Sector 14",
+    "id": 880
+  },
+  {
+    "name": "Gulshan-e-Umair",
+    "id": 881
+  },
+  {
+    "name": "Darakhshan Society",
+    "id": 882
+  },
+  {
+    "name": "Liaquatabad",
+    "id": 883
+  },
+  {
+    "name": "Pilibhit",
+    "id": 884
+  },
+  {
+    "name": "North Karachi - Sector 14-B",
+    "id": 885
+  },
+  {
+    "name": "Surjani Town - Sector 4C",
+    "id": 886
+  },
+  {
+    "name": "Safari Sunley Cottages",
+    "id": 887
+  },
+  {
+    "name": "Bin Qasim Town",
+    "id": 888
+  },
+  {
+    "name": "Government Teacher Society - Sector 21-A",
+    "id": 889
+  },
+  {
+    "name": "Bhittai Colony - Block H",
+    "id": 890
+  },
+  {
+    "name": "Zohra Nagar",
+    "id": 891
+  },
+  {
+    "name": "Seven Wonders Enclave",
+    "id": 892
+  },
+  {
+    "name": "North Karachi - Sector 11D",
+    "id": 893
+  },
+  {
+    "name": "Gulshan-e-Ghazian",
+    "id": 894
+  },
+  {
+    "name": "Old Ravians Co-Operative Housing Society",
+    "id": 895
+  },
+  {
+    "name": "Iqbal Commercial Area",
+    "id": 896
+  },
+  {
+    "name": "Al-Jadeed Greens",
+    "id": 897
+  },
+  {
+    "name": "Pearl Villas",
+    "id": 898
+  },
+  {
+    "name": "Commander City",
+    "id": 899
+  },
+  {
+    "name": "Defence View Phase 3",
+    "id": 900
+  },
+  {
+    "name": "White House Garden Society",
+    "id": 901
+  },
+  {
+    "name": "Gulshan-e-Jiwan Cooperative Housing Society",
+    "id": 902
+  },
+  {
+    "name": "Ancholi",
+    "id": 903
+  },
+  {
+    "name": "Qayyumabad - D Area",
+    "id": 904
+  },
+  {
+    "name": "Pir Gul Hassan Town",
+    "id": 905
+  },
+  {
+    "name": "Gulshan-e-Maymar - Sector S",
+    "id": 906
+  },
+  {
+    "name": "Gulshan-e-Kaneez Fatima Society - Surjani",
+    "id": 907
+  },
+  {
+    "name": "Quaidabad",
+    "id": 908
+  },
+  {
+    "name": "Moinabad",
+    "id": 909
+  },
+  {
+    "name": "Rehman Villas",
+    "id": 910
+  },
+  {
+    "name": "Nasir Colony",
+    "id": 911
+  },
+  {
+    "name": "Bahria Town - Precinct 10",
+    "id": 912
+  },
+  {
+    "name": "Rafi Bungalows",
+    "id": 913
+  },
+  {
+    "name": "Ali Garh Society - Sector 5A",
+    "id": 914
+  },
+  {
+    "name": "Dural Aman Society",
+    "id": 915
+  },
+  {
+    "name": "Rafi Garden",
+    "id": 916
+  },
+  {
+    "name": "Bagh-e-Malir",
+    "id": 917
+  },
+  {
+    "name": "Ahsanabad Phase 4",
+    "id": 918
+  },
+  {
+    "name": "Bahria Town - Precinct 20",
+    "id": 919
+  },
+  {
+    "name": "Karachi Bar Cooperative Housing Society",
+    "id": 920
+  },
+  {
+    "name": "Alamgir Society",
+    "id": 921
+  },
+  {
+    "name": "Liaquatabad - Block 9",
+    "id": 922
+  },
+  {
+    "name": "KAECHS - Block 1",
+    "id": 923
+  },
+  {
+    "name": "Gulshan-E-Amna",
+    "id": 924
+  },
+  {
+    "name": "North Karachi - Sector 15A",
+    "id": 925
+  },
+  {
+    "name": "North Karachi - Sector 11L",
+    "id": 926
+  },
+  {
+    "name": "Pakistan Air Crew Cooperative Housing Society",
+    "id": 927
+  },
+  {
+    "name": "Orangi Town - Sector 8",
+    "id": 928
+  },
+  {
+    "name": "Bahria Town - Precinct 30",
+    "id": 929
+  },
+  {
+    "name": "Khokhrapar",
+    "id": 930
+  },
+  {
+    "name": "Zamanabad Housing Society",
+    "id": 931
+  },
+  {
+    "name": "Gulshan-e-Zahoor",
+    "id": 932
+  },
+  {
+    "name": "Gulbai",
+    "id": 933
+  },
+  {
+    "name": "Petal Residency",
+    "id": 934
+  },
+  {
+    "name": "Sector 31 - Punjabi Saudagar City Phase 4",
+    "id": 935
+  },
+  {
+    "name": "Karsaz",
+    "id": 936
+  },
+  {
+    "name": "Rufi Rose Petals",
+    "id": 937
+  },
+  {
+    "name": "Pir Ahmed Zaman Town - Block 4",
+    "id": 938
+  },
+  {
+    "name": "Comissioner Coop Housing Society",
+    "id": 939
+  },
+  {
+    "name": "New Karachi - Sector 5-G",
+    "id": 940
+  },
+  {
+    "name": "New Karachi - Sector 5-A/1",
+    "id": 941
+  },
+  {
+    "name": "Delhi Raiyan Cooperative Housing Society",
+    "id": 942
+  },
+  {
+    "name": "Rizwan Cooperative Housing Scheme",
+    "id": 943
+  },
+  {
+    "name": "Azeem Pura",
+    "id": 944
+  },
+  {
+    "name": "Bahria Golf City",
+    "id": 945
+  },
+  {
+    "name": "A One Villas",
+    "id": 946
+  },
+  {
+    "name": "Business & Professional Housing Society",
+    "id": 947
+  },
+  {
+    "name": "Gulshan-e-Jamal - Block F",
+    "id": 948
+  },
+  {
+    "name": "Rashidi Goth",
+    "id": 949
+  },
+  {
+    "name": "Rab Razi Cooperative Society",
+    "id": 950
+  },
+  {
+    "name": "Metrovil Colony - Block 2/2",
+    "id": 951
+  },
+  {
+    "name": "New Karachi - Sector 5-F",
+    "id": 952
+  },
+  {
+    "name": "Memon Goth Road",
+    "id": 953
+  },
+  {
+    "name": "Sindh Secretariat Housing Society - Sector 7A/2",
+    "id": 954
+  },
+  {
+    "name": "Gulshan-e-Jamal - Block D",
+    "id": 955
+  },
+  {
+    "name": "Jinnah Society",
+    "id": 956
+  },
+  {
+    "name": "Liaquatabad - Block 3",
+    "id": 957
+  },
+  {
+    "name": "Arisha Society",
+    "id": 958
+  },
+  {
+    "name": "North Karachi - Sector 15-A/3",
+    "id": 959
+  },
+  {
+    "name": "Federal B Area - Block 1",
+    "id": 960
+  },
+  {
+    "name": "Qayyumabad",
+    "id": 961
+  },
+  {
+    "name": "Scheme 33 - Sector 48-A",
+    "id": 962
+  },
+  {
+    "name": "Atap City",
+    "id": 963
+  },
+  {
+    "name": "Metrovil Colony - Block 3/1",
+    "id": 964
+  },
+  {
+    "name": "River Valley Phase 2",
+    "id": 965
+  },
+  {
+    "name": "Drigh Colony",
+    "id": 966
+  },
+  {
+    "name": "Noman Garden",
+    "id": 967
+  },
+  {
+    "name": "Bahria Town - Precinct 23",
+    "id": 968
+  },
+  {
+    "name": "Bahria Town - Precinct 25",
+    "id": 969
+  },
+  {
+    "name": "Bahria Town - Precinct 32",
+    "id": 970
+  },
+  {
+    "name": "Bahria Town - Precinct 33",
+    "id": 971
+  },
+  {
+    "name": "PN Welfare Housing Scheme",
+    "id": 972
+  },
+  {
+    "name": "Falaknaz Golden Pebbles",
+    "id": 973
+  },
+  {
+    "name": "Shah Town",
+    "id": 974
+  },
+  {
+    "name": "Surjani Town - Sector 3",
+    "id": 975
+  },
+  {
+    "name": "Nazimabad 2 - Block B",
+    "id": 976
+  },
+  {
+    "name": "Gulberg Town",
+    "id": 977
+  },
+  {
+    "name": "Journalist Society",
+    "id": 978
+  },
+  {
+    "name": "Ghazi Town - Block 2",
+    "id": 979
+  },
+  {
+    "name": "Liaquatabad - Block 1",
+    "id": 980
+  },
+  {
+    "name": "Corniche Society",
+    "id": 981
+  },
+  {
+    "name": "Korangi - Sector 50-C",
+    "id": 982
+  },
+  {
+    "name": "Radio Pakistan Employees Cooperative Society",
+    "id": 983
+  },
+  {
+    "name": "Al-Mehran Cooperative Housing Scheme",
+    "id": 984
+  },
+  {
+    "name": "Rasheedabad",
+    "id": 985
+  },
+  {
+    "name": "Qasimabad",
+    "id": 986
+  },
+  {
+    "name": "Qureshi Society",
+    "id": 987
+  },
+  {
+    "name": "Modern Society PECHS",
+    "id": 988
+  },
+  {
+    "name": "Zafar Town",
+    "id": 989
+  },
+  {
+    "name": "Bahria Farm House",
+    "id": 990
+  },
+  {
+    "name": "Surjani Town - Sector 9",
+    "id": 991
+  },
+  {
+    "name": "Shahmir Residency",
+    "id": 992
+  },
+  {
+    "name": "Hawks Bay",
+    "id": 993
+  },
+  {
+    "name": "Steel Town",
+    "id": 994
+  },
+  {
+    "name": "Nazimabad 4 - Block D",
+    "id": 995
+  },
+  {
+    "name": "Khokan Cooperative Housing Society",
+    "id": 996
+  },
+  {
+    "name": "North Nazimabad - Block E",
+    "id": 997
+  },
+  {
+    "name": "North Karachi - Sector 7-D",
+    "id": 998
+  },
+  {
+    "name": "Liaquatabad - Block 4",
+    "id": 999
+  },
+  {
+    "name": "Karachi Memon Cooperative Housing Society",
+    "id": 1000
+  },
+  {
+    "name": "Shahra-e-Liaquat",
+    "id": 1001
+  },
+  {
+    "name": "North Karachi - Sector 2",
+    "id": 1002
+  },
+  {
+    "name": "Railway Society",
+    "id": 1003
+  },
+  {
+    "name": "Tahir Villa",
+    "id": 1004
+  },
+  {
+    "name": "Gulshan-e-Sikandar",
+    "id": 1005
+  },
+  {
+    "name": "Shabirabad Society",
+    "id": 1006
+  },
+  {
+    "name": "Surjani Town - Sector 7D",
+    "id": 1007
+  },
+  {
+    "name": "Nazimabad 4 - Block F",
+    "id": 1008
+  },
+  {
+    "name": "Bagh-e-Ibrahim Society",
+    "id": 1009
+  }
+]

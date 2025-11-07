@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\PhoneOtpController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\LanguageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,6 +31,10 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+// Language routes
+Route::post('/locale/{locale}', [LanguageController::class, 'switch']);
+Route::get('/translations/{locale?}', [LanguageController::class, 'translations']);
 
 // Public routes
 Route::get('/home', [HomeController::class, 'index']);

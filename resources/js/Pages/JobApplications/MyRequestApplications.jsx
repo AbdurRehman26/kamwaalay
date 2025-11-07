@@ -64,7 +64,7 @@ export default function MyRequestApplications() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Applications to My Requests</h1>
                     <p className="text-xl text-white/90">Review and manage applications for your service requests</p>
@@ -147,7 +147,7 @@ export default function MyRequestApplications() {
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                 link.active
-                                                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                                                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                                                     : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
                                             } ${!link.url && 'cursor-not-allowed opacity-50'}`}
                                         />

@@ -260,10 +260,10 @@ export default function OnboardingHelper() {
                     {...getRootProps()}
                     className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                         isDragActive
-                            ? 'border-purple-500 bg-purple-50'
+                            ? 'border-blue-500 bg-blue-50'
                             : error
                             ? 'border-red-300 bg-red-50'
-                            : 'border-gray-300 hover:border-purple-400 hover:bg-gray-50'
+                            : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
                     }`}
                 >
                     <input {...getInputProps()} required />
@@ -314,10 +314,10 @@ export default function OnboardingHelper() {
                     {...getRootProps()}
                     className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                         isDragActive
-                            ? 'border-purple-500 bg-purple-50'
+                            ? 'border-blue-500 bg-blue-50'
                             : error
                             ? 'border-red-300 bg-red-50'
-                            : 'border-gray-300 hover:border-purple-400 hover:bg-gray-50'
+                            : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
                     }`}
                 >
                     <input {...getInputProps()} />
@@ -350,7 +350,7 @@ export default function OnboardingHelper() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Complete Your Helper Profile</h1>
                     <p className="text-xl text-white/90">Tell us about the services you offer</p>
@@ -360,7 +360,7 @@ export default function OnboardingHelper() {
                 <div className="max-w-4xl mx-auto">
                     <form onSubmit={submit} className="space-y-8">
                         {offers.map((offer, offerIndex) => (
-                            <div key={offerIndex} className="bg-white rounded-lg shadow-md p-8 border-2 border-purple-200">
+                            <div key={offerIndex} className="bg-white rounded-lg shadow-md p-8 border-2 border-blue-200">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-2xl font-bold text-gray-900">Service Offer {offerIndex + 1}</h2>
                                     {offers.length > 1 && (
@@ -388,14 +388,14 @@ export default function OnboardingHelper() {
                                                     return (
                                                         <span
                                                             key={serviceType}
-                                                            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold"
+                                                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold"
                                                         >
                                                             <span>{service?.icon}</span>
                                                             <span>{service?.label}</span>
                                                             <button
                                                                 type="button"
                                                                 onClick={() => removeServiceTypeFromOffer(offerIndex, serviceType)}
-                                                                className="ml-1 text-purple-600 hover:text-purple-800 font-bold"
+                                                                className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
                                                             >
                                                                 ×
                                                             </button>
@@ -416,8 +416,8 @@ export default function OnboardingHelper() {
                                                 disabled={offer.selectedServiceTypes.includes(service.value)}
                                                 className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
                                                     offer.selectedServiceTypes.includes(service.value)
-                                                        ? 'border-purple-500 bg-purple-50 opacity-50 cursor-not-allowed'
-                                                        : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50 cursor-pointer'
+                                                        ? 'border-blue-500 bg-blue-50 opacity-50 cursor-not-allowed'
+                                                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer'
                                                 }`}
                                             >
                                                 <div className="text-3xl mb-2">{service.icon}</div>
@@ -473,7 +473,7 @@ export default function OnboardingHelper() {
                                                     setShowLocationSuggestions(newShow);
                                                 }
                                             }}
-                                            className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 px-4 py-3"
+                                            className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
                                             placeholder="Search location (e.g., Karachi, Clifton or type area name)..."
                                         />
                                         {showLocationSuggestions[offerIndex] && locationSuggestions[offerIndex]?.length > 0 && (
@@ -484,7 +484,7 @@ export default function OnboardingHelper() {
                                                         <div
                                                             key={idx}
                                                             onClick={() => handleLocationSelect(suggestion, offerIndex)}
-                                                            className="px-4 py-2 hover:bg-purple-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                            className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                                                         >
                                                             {suggestion.display_text}
                                                         </div>
@@ -501,7 +501,7 @@ export default function OnboardingHelper() {
                                         <select
                                             value={offer.work_type}
                                             onChange={(e) => updateOffer(offerIndex, 'work_type', e.target.value)}
-                                            className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                             required
                                         >
                                             <option value="">Select Type</option>
@@ -517,7 +517,7 @@ export default function OnboardingHelper() {
                                             step="0.01"
                                             value={offer.monthly_rate}
                                             onChange={(e) => updateOffer(offerIndex, 'monthly_rate', e.target.value)}
-                                            className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                             placeholder="e.g., 15000"
                                         />
                                     </div>
@@ -528,7 +528,7 @@ export default function OnboardingHelper() {
                                             value={offer.description}
                                             onChange={(e) => updateOffer(offerIndex, 'description', e.target.value)}
                                             rows={4}
-                                            className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                             placeholder="Describe this service offer..."
                                         />
                                     </div>
@@ -536,11 +536,11 @@ export default function OnboardingHelper() {
 
                                 {/* Preview for this offer */}
                                 {offer.selectedServiceTypes.length > 0 && offer.selectedLocations.length > 0 && offer.work_type && (
-                                    <div className="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                                        <p className="text-sm font-semibold text-purple-900 mb-2">
+                                    <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                        <p className="text-sm font-semibold text-blue-900 mb-2">
                                             This offer will create 1 service listing with:
                                         </p>
-                                        <div className="text-xs text-purple-700 space-y-1">
+                                        <div className="text-xs text-blue-700 space-y-1">
                                             <div>
                                                 <span className="font-semibold">{offer.selectedServiceTypes.length}</span> service type(s): {offer.selectedServiceTypes.map((st) => {
                                                     const service = serviceTypes.find(s => s.value === st);
@@ -561,7 +561,7 @@ export default function OnboardingHelper() {
                             <button
                                 type="button"
                                 onClick={addOffer}
-                                className="w-full border-2 border-dashed border-purple-300 text-purple-600 py-4 rounded-lg hover:bg-purple-50 transition font-semibold"
+                                className="w-full border-2 border-dashed border-blue-300 text-blue-600 py-4 rounded-lg hover:bg-blue-50 transition font-semibold"
                             >
                                 + Add Another Service Offer
                             </button>
@@ -593,7 +593,7 @@ export default function OnboardingHelper() {
                                         type="text"
                                         value={profileData.nic_number}
                                         onChange={(e) => setProfileData({ ...profileData, nic_number: e.target.value })}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g., 42101-1234567-1"
                                         required
                                     />
@@ -627,7 +627,7 @@ export default function OnboardingHelper() {
                                         type="text"
                                         value={profileData.skills}
                                         onChange={(e) => setProfileData({ ...profileData, skills: e.target.value })}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g., Cooking, Cleaning, Childcare"
                                     />
                                     {errors.skills && <div className="text-red-500 text-sm mt-1">{errors.skills}</div>}
@@ -640,7 +640,7 @@ export default function OnboardingHelper() {
                                         min="0"
                                         value={profileData.experience_years}
                                         onChange={(e) => setProfileData({ ...profileData, experience_years: e.target.value })}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g., 5"
                                     />
                                     {errors.experience_years && <div className="text-red-500 text-sm mt-1">{errors.experience_years}</div>}
@@ -652,7 +652,7 @@ export default function OnboardingHelper() {
                                         value={profileData.bio}
                                         onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                                         rows={4}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="Tell us about yourself..."
                                     />
                                     {errors.bio && <div className="text-red-500 text-sm mt-1">{errors.bio}</div>}
@@ -665,7 +665,7 @@ export default function OnboardingHelper() {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-300 font-semibold disabled:opacity-50"
+                                className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold disabled:opacity-50"
                             >
                                 {processing ? 'Completing Profile...' : 'Complete Profile'}
                             </button>

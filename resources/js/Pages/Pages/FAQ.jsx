@@ -35,7 +35,7 @@ export default function FAQ() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Frequently Asked Questions</h1>
                 </div>
@@ -49,7 +49,7 @@ export default function FAQ() {
                                 className="w-full text-left p-6 flex justify-between items-center hover:bg-gray-50 transition duration-300"
                             >
                                 <span className="font-semibold text-lg">{faq.q}</span>
-                                <span className="text-purple-600 text-2xl">
+                                <span className="text-blue-600 text-2xl">
                                     {openIndex === index ? '−' : '+'}
                                 </span>
                             </button>

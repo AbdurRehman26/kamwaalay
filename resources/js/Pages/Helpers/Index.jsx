@@ -156,10 +156,10 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
             sort_by: sortBy,
             user_type: userType,
         };
-        
+
         // Remove undefined values
         Object.keys(params).forEach(key => params[key] === undefined && delete params[key]);
-        
+
         setLoading(true);
         helpersService.getHelpers(params)
             .then((data) => {
@@ -188,7 +188,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         e.preventDefault();
         setProcessing(true);
         setFormErrors({});
-        
+
         try {
             await bookingsService.createBooking(formData);
             // Reset form
@@ -223,7 +223,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
     return (
         <PublicLayout>
 
-            <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-16">
+            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-orange-500 text-white py-16">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Find Your Perfect Helper</h1>
                     <p className="text-xl text-white/90">Browse through verified domestic helpers</p>
@@ -255,9 +255,9 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         <h2 className="text-2xl font-bold text-gray-900">Filter Helpers</h2>
                         <button
                             onClick={() => setShowBookingForm(!showBookingForm)}
-                            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
+                            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                         >
-                            {showBookingForm ? 'Cancel Booking' : 'Book a Helper'}
+                            {showBookingForm ? 'Cancel Booking' : 'Post Service Request'}
                         </button>
                     </div>
 
@@ -267,9 +267,9 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             <select
                                 value={userType}
                                 onChange={(e) => setUserType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
                             >
-                                <option value="all">All (Helpers & Businesses)</option>
+                                <option value="all">All</option>
                                 <option value="helper">Helpers Only</option>
                                 <option value="business">Businesses Only</option>
                             </select>
@@ -279,7 +279,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             <select
                                 value={serviceType}
                                 onChange={(e) => setServiceType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
                             >
                                 {serviceTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
@@ -305,7 +305,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         setShowLocationSuggestions(true);
                                     }
                                 }}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
                                 placeholder="Search location..."
                             />
                             {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
@@ -314,7 +314,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         <div
                                             key={index}
                                             onClick={() => handleLocationSelect(suggestion)}
-                                            className="px-4 py-2 hover:bg-purple-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                            className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                                         >
                                             {suggestion.display_text}
                                         </div>
@@ -327,7 +327,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
                             >
                                 <option value="rating">Rating</option>
                                 <option value="experience">Experience</option>
@@ -336,7 +336,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         <div className="flex items-end">
                             <button
                                 onClick={handleFilter}
-                                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
+                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                             >
                                 Apply Filters
                             </button>
@@ -347,7 +347,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 {/* Booking Form */}
                 {showBookingForm && (
                     <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                        <h2 className="text-2xl font-bold mb-6 text-gray-900">Book a Helper</h2>
+                        <h2 className="text-2xl font-bold mb-6 text-gray-900">Post Service Request</h2>
                         <form onSubmit={handleBookingSubmit}>
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
@@ -355,7 +355,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                     <select
                                         value={formData.service_type}
                                         onChange={(e) => setFormData(prev => ({ ...prev, service_type: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         required
                                     >
                                         <option value="">Select Service</option>
@@ -373,7 +373,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                     <select
                                         value={formData.work_type}
                                         onChange={(e) => setFormData(prev => ({ ...prev, work_type: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         required
                                     >
                                         <option value="">Select Type</option>
@@ -410,7 +410,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 setShowSuggestions(true);
                                             }
                                         }}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="Type to search area..."
                                         required
                                     />
@@ -420,7 +420,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 <div
                                                     key={index}
                                                     onClick={() => handleAreaSelect(suggestion)}
-                                                    className="px-4 py-2 hover:bg-purple-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                                                 >
                                                     {suggestion}
                                                 </div>
@@ -436,7 +436,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         type="date"
                                         value={formData.start_date}
                                         onChange={(e) => setFormData(prev => ({ ...prev, start_date: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                     />
                                     {formErrors.start_date && <div className="text-red-500 text-sm mt-1">{formErrors.start_date}</div>}
                                 </div>
@@ -447,7 +447,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         type="time"
                                         value={formData.start_time}
                                         onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                     />
                                     {formErrors.start_time && <div className="text-red-500 text-sm mt-1">{formErrors.start_time}</div>}
                                 </div>
@@ -458,7 +458,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         required
                                     />
                                     {formErrors.name && <div className="text-red-500 text-sm mt-1">{formErrors.name}</div>}
@@ -470,7 +470,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         type="tel"
                                         value={formData.phone}
                                         onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         required
                                     />
                                     {formErrors.phone && <div className="text-red-500 text-sm mt-1">{formErrors.phone}</div>}
@@ -482,7 +482,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         type="email"
                                         value={formData.email}
                                         onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         required
                                     />
                                     {formErrors.email && <div className="text-red-500 text-sm mt-1">{formErrors.email}</div>}
@@ -494,7 +494,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         value={formData.address}
                                         onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                                         rows={3}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                     />
                                     {formErrors.address && <div className="text-red-500 text-sm mt-1">{formErrors.address}</div>}
                                 </div>
@@ -505,7 +505,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         value={formData.special_requirements}
                                         onChange={(e) => setFormData(prev => ({ ...prev, special_requirements: e.target.value }))}
                                         rows={4}
-                                        className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="Any special requirements or preferences..."
                                     />
                                     {formErrors.special_requirements && <div className="text-red-500 text-sm mt-1">{formErrors.special_requirements}</div>}
@@ -516,7 +516,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
+                                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                                 >
                                     {processing ? 'Submitting...' : 'Submit Booking'}
                                 </button>
@@ -566,14 +566,14 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                     return null;
                                 }
                                 const profileRoute = isBusiness ? route('businesses.show', helper.id) : route('helpers.show', helper.id);
-                                
+
                                 return (
                                     <Link
                                         key={helper.id}
                                         to={profileRoute}
                                         className={`group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${isBusiness ? 'border-2 border-blue-200' : ''}`}
                                     >
-                                        <div className={`h-56 flex items-center justify-center overflow-hidden ${isBusiness ? 'bg-gradient-to-br from-blue-400 to-purple-400' : 'bg-gradient-to-br from-purple-400 to-pink-400'}`}>
+                                        <div className={`h-56 flex items-center justify-center overflow-hidden ${isBusiness ? 'bg-gradient-to-br from-blue-400 to-blue-500' : 'bg-gradient-to-br from-blue-400 to-blue-500'}`}>
                                             {isBusiness ? (
                                                 <div className="text-7xl text-white">🏢</div>
                                             ) : helper.photo ? (
@@ -584,7 +584,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         </div>
                                         <div className="p-6">
                                             <div className="flex items-center justify-between mb-2">
-                                                <h3 className="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors">{helper.name}</h3>
+                                                <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{helper.name}</h3>
                                                 {isBusiness && (
                                                     <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold">🏢 Business</span>
                                                 )}
@@ -615,7 +615,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                         {helper.service_listings.slice(0, 3).map((listing, idx) => (
                                                             listing.service_types && listing.service_types.length > 0 ? (
                                                                 listing.service_types.slice(0, 1).map((st, stIdx) => (
-                                                                    <span key={`${idx}-${stIdx}`} className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full font-semibold capitalize">
+                                                                    <span key={`${idx}-${stIdx}`} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold capitalize">
                                                                         {st?.service_type?.replace('_', ' ') || 'Service'}
                                                                     </span>
                                                                 ))
@@ -661,7 +661,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
-                                                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                                                         : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
                                                 } ${!link.url && 'cursor-not-allowed opacity-50'}`}
                                             />
@@ -686,7 +686,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 setSortBy('rating');
                                 handleFilter();
                             }}
-                            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg font-semibold"
+                            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
                         >
                             Clear Filters
                         </button>

@@ -60,7 +60,7 @@ export default function ServiceListingShow() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">{listing.service_type_label}</h1>
                     <p className="text-xl text-white/90">Service offered by {listing.user?.name}</p>
@@ -114,7 +114,7 @@ export default function ServiceListingShow() {
                                     city: listing.locations && listing.locations.length > 0 ? listing.locations[0].city : null,
                                     area: listing.locations && listing.locations.length > 0 ? listing.locations[0].area : null,
                                 })}
-                                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-lg inline-block"
+                                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-lg inline-block"
                             >
                                 Request This Service
                             </Link>
@@ -146,7 +146,7 @@ export default function ServiceListingShow() {
                             )}
                             <Link
                                 to={route('login')}
-                                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-lg inline-block"
+                                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-lg inline-block"
                             >
                                 Login to Request This Service
                             </Link>
@@ -162,18 +162,18 @@ export default function ServiceListingShow() {
                                     <Link
                                         key={otherListing.id}
                                         to={route('service-listings.show', otherListing.id)}
-                                        className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-purple-500"
+                                        className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-blue-500"
                                     >
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="flex flex-wrap gap-2">
                                                 {otherListing.service_types && otherListing.service_types.length > 0 ? (
                                                     otherListing.service_types.slice(0, 2).map((st, idx) => (
-                                                        <span key={idx} className="bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
+                                                        <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
                                                             {st?.service_type?.replace('_', ' ') || 'Service'}
                                                         </span>
                                                     ))
                                                 ) : (
-                                                    <span className="bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
+                                                    <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
                                                         Service
                                                     </span>
                                                 )}
@@ -192,7 +192,7 @@ export default function ServiceListingShow() {
                                                 {otherListing.description}
                                             </p>
                                         )}
-                                        <span className="text-purple-600 font-semibold text-sm">View Details →</span>
+                                        <span className="text-blue-600 font-semibold text-sm">View Details →</span>
                                     </Link>
                                 ))}
                             </div>
@@ -200,7 +200,7 @@ export default function ServiceListingShow() {
                                 {listing.user?.role === 'helper' && listing.user?.id && (
                                     <Link
                                         to={route('helpers.show', listing.user.id)}
-                                        className="text-purple-600 hover:text-purple-800 font-semibold"
+                                        className="text-blue-600 hover:text-blue-800 font-semibold"
                                     >
                                         View All Services from {listing.user?.name} →
                                     </Link>

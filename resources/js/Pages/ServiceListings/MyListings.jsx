@@ -34,7 +34,7 @@ export default function MyServiceListings() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <div className="flex justify-between items-center">
                         <div>
@@ -46,7 +46,7 @@ export default function MyServiceListings() {
                         </div>
                         <Link
                             to={route('service-listings.create')}
-                            className="bg-white text-purple-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition duration-300 font-semibold"
+                            className="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition duration-300 font-semibold"
                         >
                             + Add New Listing
                         </Link>
@@ -83,7 +83,7 @@ export default function MyServiceListings() {
                                     <div className="flex gap-2 ml-4">
                                         <Link
                                             to={route('service-listings.show', listing.id)}
-                                            className="bg-purple-100 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-200 transition duration-300 font-medium text-sm"
+                                            className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-300 font-medium text-sm"
                                         >
                                             View
                                         </Link>
@@ -108,7 +108,7 @@ export default function MyServiceListings() {
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                 link.active
-                                                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                                                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                                                     : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
                                             } ${!link.url && 'cursor-not-allowed opacity-50'}`}
                                         />
@@ -124,7 +124,7 @@ export default function MyServiceListings() {
                         <p className="text-gray-500 mb-8">Create your first service listing to get started</p>
                         <Link
                             to={route('service-listings.create')}
-                            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg font-semibold inline-block"
+                            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold inline-block"
                         >
                             Create Service Listing
                         </Link>

@@ -130,7 +130,7 @@ export default function ServiceRequestsBrowse() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-16">
+            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-orange-500 text-white py-16">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Services Required</h1>
                     <p className="text-xl text-white/90">Browse services required by customers looking to hire helpers or businesses</p>
@@ -164,7 +164,7 @@ export default function ServiceRequestsBrowse() {
                             <select
                                 value={serviceType}
                                 onChange={(e) => setServiceType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
                             >
                                 {serviceTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
@@ -178,7 +178,7 @@ export default function ServiceRequestsBrowse() {
                             <select
                                 value={workType}
                                 onChange={(e) => setWorkType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
                             >
                                 {workTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
@@ -204,7 +204,7 @@ export default function ServiceRequestsBrowse() {
                                         setShowLocationSuggestions(true);
                                     }
                                 }}
-                                className="w-full border-gray-300 rounded-lg focus:border-purple-500 focus:ring-purple-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
                                 placeholder="Search location..."
                             />
                             {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
@@ -213,7 +213,7 @@ export default function ServiceRequestsBrowse() {
                                         <div
                                             key={index}
                                             onClick={() => handleLocationSelect(suggestion)}
-                                            className="px-4 py-2 hover:bg-purple-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                            className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                                         >
                                             {suggestion.display_text}
                                         </div>
@@ -224,7 +224,7 @@ export default function ServiceRequestsBrowse() {
                         <div className="flex items-end">
                             <button
                                 onClick={handleFilter}
-                                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
+                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                             >
                                 Apply Filters
                             </button>
@@ -266,7 +266,7 @@ export default function ServiceRequestsBrowse() {
                                     <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                                         <div className="p-6">
                                             <div className="flex items-center justify-between mb-4">
-                                                <span className="bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
+                                                <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
                                                     {booking.service_type?.replace('_', ' ') || 'N/A'}
                                                 </span>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
@@ -293,7 +293,7 @@ export default function ServiceRequestsBrowse() {
                                                 <span>👤 Posted by: {booking.user?.name || 'Customer'}</span>
                                             </div>
                                             {booking.job_applications && booking.job_applications.length > 0 && (
-                                                <p className="text-sm text-purple-600 mb-3">
+                                                <p className="text-sm text-blue-600 mb-3">
                                                     📋 {booking.job_applications.length} application{booking.job_applications.length !== 1 ? 's' : ''} received
                                                 </p>
                                             )}
@@ -309,7 +309,7 @@ export default function ServiceRequestsBrowse() {
                                                     ) : (
                                                         <Link
                                                             to={route('job-applications.create', booking.id)}
-                                                            className="block w-full text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg font-semibold"
+                                                            className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
                                                         >
                                                             Apply Now
                                                         </Link>
@@ -317,7 +317,7 @@ export default function ServiceRequestsBrowse() {
                                                 ) : (
                                                     <Link
                                                         to={route('service-requests.show', booking.id)}
-                                                        className="block w-full text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg font-semibold"
+                                                        className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
                                                     >
                                                         View Details
                                                     </Link>
@@ -349,7 +349,7 @@ export default function ServiceRequestsBrowse() {
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
-                                                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                                                         : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
                                                 } ${!link.url && 'cursor-not-allowed opacity-50'}`}
                                             />
@@ -367,7 +367,7 @@ export default function ServiceRequestsBrowse() {
                         {user && (user.role === 'user') && (
                             <Link
                                 to={route('bookings.create')}
-                                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg font-semibold inline-block"
+                                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold inline-block"
                             >
                                 Post a Service Request
                             </Link>

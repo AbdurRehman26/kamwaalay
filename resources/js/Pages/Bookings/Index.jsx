@@ -38,7 +38,7 @@ export default function BookingsIndex() {
 
     return (
         <PublicLayout>
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <div className="flex justify-between items-center">
                         <div>
@@ -47,7 +47,7 @@ export default function BookingsIndex() {
                         </div>
                         <Link
                             to={route('bookings.create')}
-                            className="bg-white text-purple-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition duration-300 font-semibold"
+                            className="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition duration-300 font-semibold"
                         >
                             + New Request
                         </Link>
@@ -108,7 +108,7 @@ export default function BookingsIndex() {
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                 link.active
-                                                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                                                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                                                     : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
                                             } ${!link.url && 'cursor-not-allowed opacity-50'}`}
                                         />
@@ -124,7 +124,7 @@ export default function BookingsIndex() {
                         <p className="text-gray-500 mb-8">Post your first service request to get started</p>
                         <Link
                             to={route('bookings.create')}
-                            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg font-semibold inline-block"
+                            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold inline-block"
                         >
                             Post Service Request
                         </Link>

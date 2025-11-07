@@ -58,7 +58,7 @@ export default function BusinessShow() {
             
             
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-16">
+            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white py-16">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row gap-8 items-center">
                         <div className="flex-shrink-0">
@@ -79,12 +79,12 @@ export default function BusinessShow() {
                                     </span>
                                 )}
                                 {serviceListings.length > 0 && (
-                                    <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                    <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                                         📋 {serviceListings.length} Service{serviceListings.length !== 1 ? 's' : ''}
                                     </span>
                                 )}
                                 {workers.length > 0 && (
-                                    <span className="bg-pink-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                    <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                                         👥 {workers.length} Worker{workers.length !== 1 ? 's' : ''}
                                     </span>
                                 )}
@@ -107,18 +107,18 @@ export default function BusinessShow() {
                                         <Link
                                             key={listing.id}
                                             to={route('service-listings.show', listing.id)}
-                                            className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-purple-300"
+                                            className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-blue-300"
                                         >
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex flex-wrap gap-2">
                                                     {listing.service_types && listing.service_types.length > 0 ? (
                                                         listing.service_types.slice(0, 2).map((st, idx) => (
-                                                            <span key={idx} className="bg-purple-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
+                                                            <span key={idx} className="bg-blue-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
                                                                 {st?.service_type?.replace('_', ' ') || 'Service'}
                                                             </span>
                                                         ))
                                                     ) : (
-                                                        <span className="bg-purple-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
+                                                        <span className="bg-blue-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
                                                             Service
                                                         </span>
                                                     )}
@@ -144,7 +144,7 @@ export default function BusinessShow() {
                                                 <span className="text-xs text-gray-500 capitalize">
                                                     {listing.work_type?.replace('_', ' ') || 'N/A'}
                                                 </span>
-                                                <span className="text-purple-600 font-semibold text-sm">View Details →</span>
+                                                <span className="text-blue-600 font-semibold text-sm">View Details →</span>
                                             </div>
                                         </Link>
                                     ))}
@@ -172,17 +172,17 @@ export default function BusinessShow() {
                                         <Link
                                             key={worker.id}
                                             to={route('helpers.show', worker.id)}
-                                            className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-purple-300"
+                                            className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-blue-300"
                                         >
                                             <div className="flex items-center gap-4 mb-4">
                                                 {worker.photo ? (
                                                     <img 
                                                         src={`/storage/${worker.photo}`} 
                                                         alt={worker.name} 
-                                                        className="w-16 h-16 rounded-full object-cover border-2 border-purple-300"
+                                                        className="w-16 h-16 rounded-full object-cover border-2 border-blue-300"
                                                     />
                                                 ) : (
-                                                    <div className="w-16 h-16 rounded-full bg-purple-300 flex items-center justify-center text-2xl">
+                                                    <div className="w-16 h-16 rounded-full bg-blue-300 flex items-center justify-center text-2xl">
                                                         👤
                                                     </div>
                                                 )}
@@ -217,7 +217,7 @@ export default function BusinessShow() {
                                                     📋 {worker.service_listings.length} service listing{worker.service_listings.length !== 1 ? 's' : ''}
                                                 </p>
                                             )}
-                                            <span className="text-purple-600 font-semibold text-sm mt-2 block">View Profile →</span>
+                                            <span className="text-blue-600 font-semibold text-sm mt-2 block">View Profile →</span>
                                         </Link>
                                         );
                                     })}
@@ -226,7 +226,7 @@ export default function BusinessShow() {
                                     <div className="mt-6 text-center">
                                         <p className="text-sm text-gray-600">
                                             Showing 10 of {business.helpers_count || workers.length} workers. 
-                                            <Link to={route('business.workers')} className="text-purple-600 hover:text-purple-800 ml-1 font-semibold">
+                                            <Link to={route('business.workers')} className="text-blue-600 hover:text-blue-800 ml-1 font-semibold">
                                                 View All →
                                             </Link>
                                         </p>
@@ -270,16 +270,16 @@ export default function BusinessShow() {
                         </div>
 
                         {/* Stats Card */}
-                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg shadow-md p-6">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-md p-6">
                             <h3 className="text-xl font-bold text-gray-900 mb-4">Business Stats</h3>
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <span className="text-gray-600">Total Services</span>
-                                    <span className="font-bold text-purple-600 text-lg">{serviceListings.length}</span>
+                                    <span className="font-bold text-blue-600 text-lg">{serviceListings.length}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <span className="text-gray-600">Active Workers</span>
-                                    <span className="font-bold text-purple-600 text-lg">{workers.length}</span>
+                                    <span className="font-bold text-blue-600 text-lg">{workers.length}</span>
                                 </div>
                             </div>
                         </div>
@@ -291,7 +291,7 @@ export default function BusinessShow() {
                                     to={route('service-listings.index', {
                                         user_id: business.id,
                                     })}
-                                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
+                                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
                                 >
                                     View All Services
                                 </Link>

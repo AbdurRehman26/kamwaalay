@@ -17,7 +17,7 @@ export default function Dashboard() {
                             <>
                                 <Link
                                     to={route('bookings.create')}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-purple-500"
+                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">📝</div>
                                     <h3 className="text-xl font-bold mb-2 text-gray-900">Post Service Request</h3>
@@ -25,7 +25,7 @@ export default function Dashboard() {
                                 </Link>
                                 <Link
                                     to={route('job-applications.my-request-applications')}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-purple-500"
+                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">📋</div>
                                     <h3 className="text-xl font-bold mb-2 text-gray-900">My Request Applications</h3>
@@ -33,7 +33,7 @@ export default function Dashboard() {
                                 </Link>
                                 <Link
                                     to={route('bookings.index')}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-purple-500"
+                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">📅</div>
                                     <h3 className="text-xl font-bold mb-2 text-gray-900">My Bookings</h3>
@@ -47,7 +47,7 @@ export default function Dashboard() {
                             <>
                                 <Link
                                     to={route('service-listings.create')}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-purple-500"
+                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">➕</div>
                                     <h3 className="text-xl font-bold mb-2 text-gray-900">Create Service Listing</h3>
@@ -55,7 +55,7 @@ export default function Dashboard() {
                                 </Link>
                                 <Link
                                     to={route('service-listings.my-listings')}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-purple-500"
+                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">📋</div>
                                     <h3 className="text-xl font-bold mb-2 text-gray-900">My Service Listings</h3>
@@ -64,7 +64,7 @@ export default function Dashboard() {
                                 {user?.role === 'business' && (
                                     <Link
                                         to={route('job-applications.index')}
-                                        className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-purple-500"
+                                        className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                     >
                                         <div className="text-4xl mb-4">🔍</div>
                                         <h3 className="text-xl font-bold mb-2 text-gray-900">Browse Job Requests</h3>
@@ -73,7 +73,7 @@ export default function Dashboard() {
                                 )}
                                 <Link
                                     to={route('job-applications.my-applications')}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-purple-500"
+                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">📝</div>
                                     <h3 className="text-xl font-bold mb-2 text-gray-900">My Applications</h3>
@@ -87,7 +87,7 @@ export default function Dashboard() {
                             <>
                                 <Link
                                     to={route('admin.dashboard')}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-purple-500"
+                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">⚙️</div>
                                     <h3 className="text-xl font-bold mb-2 text-gray-900">Admin Dashboard</h3>

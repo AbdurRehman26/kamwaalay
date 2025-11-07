@@ -79,7 +79,7 @@ export default function BookingShow() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Service Request Details</h1>
                 </div>
@@ -88,7 +88,7 @@ export default function BookingShow() {
                 <div className="max-w-4xl mx-auto">
                     <div className="bg-white rounded-lg shadow-md p-8 mb-8">
                         <div className="flex items-center gap-3 mb-6">
-                            <span className="bg-purple-100 text-purple-800 px-4 py-2 rounded-full font-semibold capitalize">
+                            <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold capitalize">
                                 {booking.service_type?.replace('_', ' ') || 'N/A'}
                             </span>
                             <span className={`px-4 py-2 rounded-full font-semibold ${getStatusColor(booking.status)}`}>
@@ -146,11 +146,11 @@ export default function BookingShow() {
                         )}
 
                         {!booking.assigned_user_id && isHelper && booking.status === 'pending' && (
-                            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
-                                <p className="text-purple-800 mb-4">This service request is open for applications.</p>
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                                <p className="text-blue-800 mb-4">This service request is open for applications.</p>
                                 <Link
                                     to={route('job-applications.create', booking.id)}
-                                    className="inline-block bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition duration-300 font-semibold"
+                                    className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold"
                                 >
                                     Apply Now
                                 </Link>
@@ -170,7 +170,7 @@ export default function BookingShow() {
                                 {isHelper && !booking.assigned_user_id && booking.status === 'pending' && (
                                     <Link
                                         to={route('job-applications.create', booking.id)}
-                                        className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg font-semibold text-center"
+                                        className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold text-center"
                                     >
                                         Apply to This Request
                                     </Link>
@@ -186,7 +186,7 @@ export default function BookingShow() {
                                 </Link>
                                 <Link
                                     to={route('login')}
-                                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg font-semibold text-center"
+                                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold text-center"
                                 >
                                     Login to Apply
                                 </Link>
