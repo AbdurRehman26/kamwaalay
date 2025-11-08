@@ -1,4 +1,4 @@
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function LanguageSwitcher() {
     const { locale, switchLanguage } = useLanguage();
@@ -14,21 +14,21 @@ export default function LanguageSwitcher() {
     return (
         <div className="flex items-center space-x-2">
             <button
-                onClick={() => handleSwitchLanguage('en')}
+                onClick={() => handleSwitchLanguage("en")}
                 className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                    locale === 'en'
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                    locale === "en"
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
                 }`}
             >
                 English
             </button>
             <button
-                onClick={() => handleSwitchLanguage('ur')}
+                onClick={() => handleSwitchLanguage("ur")}
                 className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                    locale === 'ur'
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                    locale === "ur"
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
                 }`}
             >
                 اردو

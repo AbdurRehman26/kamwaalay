@@ -1,26 +1,26 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Link } from 'react-router-dom'; import { useNavigate } from 'react-router-dom';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState } from 'react';
-import { authService } from '@/services/auth';
-import { route } from '@/utils/routes';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import { Link } from "react-router-dom"; import { useNavigate } from "react-router-dom";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState } from "react";
+import { authService } from "@/services/auth";
+import { route } from "@/utils/routes";
 
 export default function Register() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-        role: 'user',
-        phone: '',
-        address: '',
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
+        role: "user",
+        phone: "",
+        address: "",
     });
-    const [selectedRole, setSelectedRole] = useState('user');
-    const [signupMethod, setSignupMethod] = useState('email'); // 'email' or 'phone'
+    const [selectedRole, setSelectedRole] = useState("user");
+    const [signupMethod, setSignupMethod] = useState("email"); // 'email' or 'phone'
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -55,10 +55,10 @@ export default function Register() {
                 if (response.verification_token) {
                     authService.setVerificationToken(response.verification_token);
                 }
-                navigate('/verify-otp');
+                navigate("/verify-otp");
             } else if (response.token) {
                 // Direct registration success (shouldn't happen, but handle it)
-                navigate('/dashboard');
+                navigate("/dashboard");
             }
         } catch (error) {
             if (error.response?.data?.errors) {
@@ -68,12 +68,12 @@ export default function Register() {
                     const firstErrorField = Object.keys(error.response.data.errors)[0];
                     const errorElement = document.querySelector(`[name="${firstErrorField}"], #${firstErrorField}`);
                     if (errorElement) {
-                        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
                         errorElement.focus();
                     }
                 }, 100);
             } else {
-                setErrors({ error: [error.response?.data?.message || 'Registration failed. Please try again.'] });
+                setErrors({ error: [error.response?.data?.message || "Registration failed. Please try again."] });
             }
         } finally {
             setProcessing(false);
@@ -89,9 +89,9 @@ export default function Register() {
                             Create Your Account
                         </h2>
                         <p className="mt-2 text-center text-sm text-gray-600">
-                            Already have an account?{' '}
+                            Already have an account?{" "}
                             <Link
-                                to={route('login')}
+                                to={route("login")}
                                 className="font-medium text-blue-600 hover:text-blue-500"
                             >
                                 Sign in
@@ -123,14 +123,14 @@ export default function Register() {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        setSignupMethod('email');
-                                        handleInputChange('email', '');
-                                        handleInputChange('phone', '');
+                                        setSignupMethod("email");
+                                        handleInputChange("email", "");
+                                        handleInputChange("phone", "");
                                     }}
                                     className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                                        signupMethod === 'email'
-                                            ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                            : 'border-gray-200 hover:border-blue-300 bg-white'
+                                        signupMethod === "email"
+                                            ? "border-blue-500 bg-blue-50 shadow-lg"
+                                            : "border-gray-200 hover:border-blue-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">📧</div>
@@ -139,14 +139,14 @@ export default function Register() {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        setSignupMethod('phone');
-                                        handleInputChange('email', '');
-                                        handleInputChange('phone', '');
+                                        setSignupMethod("phone");
+                                        handleInputChange("email", "");
+                                        handleInputChange("phone", "");
                                     }}
                                     className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                                        signupMethod === 'phone'
-                                            ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                            : 'border-gray-200 hover:border-blue-300 bg-white'
+                                        signupMethod === "phone"
+                                            ? "border-blue-500 bg-blue-50 shadow-lg"
+                                            : "border-gray-200 hover:border-blue-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">📱</div>
@@ -161,11 +161,11 @@ export default function Register() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <button
                                     type="button"
-                                    onClick={() => handleRoleChange('user')}
+                                    onClick={() => handleRoleChange("user")}
                                     className={`p-6 rounded-xl border-2 transition-all duration-300 ${
-                                        selectedRole === 'user'
-                                            ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                            : 'border-gray-200 hover:border-blue-300 bg-white'
+                                        selectedRole === "user"
+                                            ? "border-blue-500 bg-blue-50 shadow-lg"
+                                            : "border-gray-200 hover:border-blue-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-4xl mb-3">👤</div>
@@ -174,11 +174,11 @@ export default function Register() {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => handleRoleChange('helper')}
+                                    onClick={() => handleRoleChange("helper")}
                                     className={`p-6 rounded-xl border-2 transition-all duration-300 ${
-                                        selectedRole === 'helper'
-                                            ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                            : 'border-gray-200 hover:border-blue-300 bg-white'
+                                        selectedRole === "helper"
+                                            ? "border-blue-500 bg-blue-50 shadow-lg"
+                                            : "border-gray-200 hover:border-blue-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-4xl mb-3">💼</div>
@@ -187,11 +187,11 @@ export default function Register() {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => handleRoleChange('business')}
+                                    onClick={() => handleRoleChange("business")}
                                     className={`p-6 rounded-xl border-2 transition-all duration-300 ${
-                                        selectedRole === 'business'
-                                            ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                            : 'border-gray-200 hover:border-blue-300 bg-white'
+                                        selectedRole === "business"
+                                            ? "border-blue-500 bg-blue-50 shadow-lg"
+                                            : "border-gray-200 hover:border-blue-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-4xl mb-3">🏢</div>
@@ -212,13 +212,13 @@ export default function Register() {
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     autoComplete="name"
                                     isFocused={true}
-                                    onChange={(e) => handleInputChange('name', e.target.value)}
+                                    onChange={(e) => handleInputChange("name", e.target.value)}
                                     required
                                 />
                                 <InputError message={errors.name} className="mt-2" />
                             </div>
 
-                            {signupMethod === 'email' ? (
+                            {signupMethod === "email" ? (
                                 <div>
                                     <InputLabel htmlFor="email" value="Email Address" className="text-gray-700 font-medium" />
                                     <TextInput
@@ -228,7 +228,7 @@ export default function Register() {
                                         value={formData.email}
                                         className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         autoComplete="username"
-                                        onChange={(e) => handleInputChange('email', e.target.value)}
+                                        onChange={(e) => handleInputChange("email", e.target.value)}
                                         required
                                     />
                                     <InputError message={errors.email} className="mt-2" />
@@ -243,7 +243,7 @@ export default function Register() {
                                         value={formData.phone}
                                         className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         autoComplete="tel"
-                                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                                        onChange={(e) => handleInputChange("phone", e.target.value)}
                                         placeholder="+92 300 1234567"
                                         required
                                     />
@@ -260,7 +260,7 @@ export default function Register() {
                                     value={formData.address}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     autoComplete="street-address"
-                                    onChange={(e) => handleInputChange('address', e.target.value)}
+                                    onChange={(e) => handleInputChange("address", e.target.value)}
                                     placeholder="Your address (optional)"
                                 />
                                 <InputError message={errors.address} className="mt-2" />
@@ -275,7 +275,7 @@ export default function Register() {
                                     value={formData.password}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     autoComplete="new-password"
-                                    onChange={(e) => handleInputChange('password', e.target.value)}
+                                    onChange={(e) => handleInputChange("password", e.target.value)}
                                     required
                                 />
                                 <InputError message={errors.password} className="mt-2" />
@@ -294,7 +294,7 @@ export default function Register() {
                                     value={formData.password_confirmation}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     autoComplete="new-password"
-                                    onChange={(e) => handleInputChange('password_confirmation', e.target.value)}
+                                    onChange={(e) => handleInputChange("password_confirmation", e.target.value)}
                                     required
                                 />
                                 <InputError
@@ -318,7 +318,7 @@ export default function Register() {
                                         Creating Account...
                                     </span>
                                 ) : (
-                                    'Create Account'
+                                    "Create Account"
                                 )}
                             </PrimaryButton>
                             
@@ -332,12 +332,12 @@ export default function Register() {
 
                         <div className="text-center">
                             <p className="text-sm text-gray-600">
-                                By registering, you agree to our{' '}
-                                <Link to={route('terms')} className="text-blue-600 hover:text-blue-500">
+                                By registering, you agree to our{" "}
+                                <Link to={route("terms")} className="text-blue-600 hover:text-blue-500">
                                     Terms
-                                </Link>{' '}
-                                and{' '}
-                                <Link to={route('privacy')} className="text-blue-600 hover:text-blue-500">
+                                </Link>{" "}
+                                and{" "}
+                                <Link to={route("privacy")} className="text-blue-600 hover:text-blue-500">
                                     Privacy Policy
                                 </Link>
                             </p>

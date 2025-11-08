@@ -1,18 +1,18 @@
-import DangerButton from '@/Components/DangerButton';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import Modal from '@/Components/Modal';
-import SecondaryButton from '@/Components/SecondaryButton';
-import TextInput from '@/Components/TextInput';
-import { router } from '@inertiajs/react';
-import { useRef, useState } from 'react';
-import { profileService } from '@/services/profile';
-import { authService } from '@/services/auth';
+import DangerButton from "@/Components/DangerButton";
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import Modal from "@/Components/Modal";
+import SecondaryButton from "@/Components/SecondaryButton";
+import TextInput from "@/Components/TextInput";
+import { router } from "@inertiajs/react";
+import { useRef, useState } from "react";
+import { profileService } from "@/services/profile";
+import { authService } from "@/services/auth";
 
-export default function DeleteUserForm({ className = '' }) {
+export default function DeleteUserForm({ className = "" }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
     const passwordInput = useRef();
-    const [data, setData] = useState({ password: '' });
+    const [data, setData] = useState({ password: "" });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -29,13 +29,13 @@ export default function DeleteUserForm({ className = '' }) {
             await profileService.deleteProfile(data.password);
             // Logout and redirect to home
             authService.removeToken();
-            router.visit('/', { method: 'get' });
+            router.visit("/", { method: "get" });
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
                 passwordInput.current?.focus();
             } else {
-                setErrors({ password: [error.response?.data?.message || 'Failed to delete account'] });
+                setErrors({ password: [error.response?.data?.message || "Failed to delete account"] });
                 passwordInput.current?.focus();
             }
         } finally {
@@ -46,7 +46,7 @@ export default function DeleteUserForm({ className = '' }) {
     const closeModal = () => {
         setConfirmingUserDeletion(false);
         setErrors({});
-        setData({ password: '' });
+        setData({ password: "" });
     };
 
     return (

@@ -1,45 +1,45 @@
-import '../css/app.css';
-import './bootstrap';
+import "../css/app.css";
+import "./bootstrap";
 
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { LanguageProvider } from './contexts/LanguageContext';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 // Pages
-import Home from './Pages/Home';
-import Login from './Pages/Auth/Login';
-import Register from './Pages/Auth/Register';
-import Verify from './Pages/Auth/Verify';
-import Dashboard from './Pages/Dashboard';
-import ProfileEdit from './Pages/Profile/Edit';
-import HelpersIndex from './Pages/Helpers/Index';
-import HelpersShow from './Pages/Helpers/Show';
-import BusinessesShow from './Pages/Businesses/Show';
-import BookingsIndex from './Pages/Bookings/Index';
-import BookingsShow from './Pages/Bookings/Show';
-import BookingsCreate from './Pages/Bookings/Create';
-import ServiceListingsIndex from './Pages/ServiceListings/Index';
-import ServiceListingsShow from './Pages/ServiceListings/Show';
-import ServiceListingsCreate from './Pages/ServiceListings/Create';
-import ServiceListingsEdit from './Pages/ServiceListings/Edit';
-import ServiceListingsMyListings from './Pages/ServiceListings/MyListings';
-import ServiceRequestsBrowse from './Pages/ServiceRequests/Browse';
-import JobApplicationsIndex from './Pages/JobApplications/Index';
-import JobApplicationsCreate from './Pages/JobApplications/Create';
-import JobApplicationsShow from './Pages/JobApplications/Show';
-import JobApplicationsMyApplications from './Pages/JobApplications/MyApplications';
-import JobApplicationsMyRequestApplications from './Pages/JobApplications/MyRequestApplications';
-import BusinessDashboard from './Pages/Business/Dashboard';
-import BusinessWorkers from './Pages/Business/Workers';
-import OnboardingHelper from './Pages/Onboarding/Helper';
-import OnboardingBusiness from './Pages/Onboarding/Business';
-import PageAbout from './Pages/Pages/About';
-import PageContact from './Pages/Pages/Contact';
-import PageFAQ from './Pages/Pages/FAQ';
-import PageTerms from './Pages/Pages/Terms';
-import PagePrivacy from './Pages/Pages/Privacy';
+import Home from "./Pages/Home";
+import Login from "./Pages/Auth/Login";
+import Register from "./Pages/Auth/Register";
+import Verify from "./Pages/Auth/Verify";
+import Dashboard from "./Pages/Dashboard";
+import ProfileEdit from "./Pages/Profile/Edit";
+import HelpersIndex from "./Pages/Helpers/Index";
+import HelpersShow from "./Pages/Helpers/Show";
+import BusinessesShow from "./Pages/Businesses/Show";
+import BookingsIndex from "./Pages/Bookings/Index";
+import BookingsShow from "./Pages/Bookings/Show";
+import BookingsCreate from "./Pages/Bookings/Create";
+import ServiceListingsIndex from "./Pages/ServiceListings/Index";
+import ServiceListingsShow from "./Pages/ServiceListings/Show";
+import ServiceListingsCreate from "./Pages/ServiceListings/Create";
+import ServiceListingsEdit from "./Pages/ServiceListings/Edit";
+import ServiceListingsMyListings from "./Pages/ServiceListings/MyListings";
+import ServiceRequestsBrowse from "./Pages/ServiceRequests/Browse";
+import JobApplicationsIndex from "./Pages/JobApplications/Index";
+import JobApplicationsCreate from "./Pages/JobApplications/Create";
+import JobApplicationsShow from "./Pages/JobApplications/Show";
+import JobApplicationsMyApplications from "./Pages/JobApplications/MyApplications";
+import JobApplicationsMyRequestApplications from "./Pages/JobApplications/MyRequestApplications";
+import BusinessDashboard from "./Pages/Business/Dashboard";
+import BusinessWorkers from "./Pages/Business/Workers";
+import OnboardingHelper from "./Pages/Onboarding/Helper";
+import OnboardingBusiness from "./Pages/Onboarding/Business";
+import PageAbout from "./Pages/Pages/About";
+import PageContact from "./Pages/Pages/Contact";
+import PageFAQ from "./Pages/Pages/FAQ";
+import PageTerms from "./Pages/Pages/Terms";
+import PagePrivacy from "./Pages/Pages/Privacy";
 
 // Routes Component (inside providers)
 function AppRoutes() {
@@ -178,7 +178,7 @@ function App() {
 }
 
 // Render the app
-const container = document.getElementById('app');
+const container = document.getElementById("app");
 const root = createRoot(container);
 
 root.render(

@@ -1,9 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import LanguageSwitcher from '@/Components/LanguageSwitcher';
-import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { route } from '@/utils/routes';
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { route } from "@/utils/routes";
 
 export default function PublicLayout({ children }) {
     const { user, logout } = useAuth();
@@ -15,71 +15,71 @@ export default function PublicLayout({ children }) {
     // Handle RTL for Urdu
     useEffect(() => {
         const html = document.documentElement;
-        if (locale === 'ur') {
-            html.setAttribute('dir', 'rtl');
-            html.setAttribute('lang', 'ur');
+        if (locale === "ur") {
+            html.setAttribute("dir", "rtl");
+            html.setAttribute("lang", "ur");
         } else {
-            html.setAttribute('dir', 'ltr');
-            html.setAttribute('lang', 'en');
+            html.setAttribute("dir", "ltr");
+            html.setAttribute("lang", "en");
         }
     }, [locale]);
 
     return (
-        <div className={`min-h-screen bg-gray-50 ${locale === 'ur' ? 'font-urdu' : ''}`}>
+        <div className={`min-h-screen bg-gray-50 ${locale === "ur" ? "font-urdu" : ""}`}>
             {/* Navigation */}
             <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20 w-full">
-                        <Link to={route('home')} className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                        <Link to={route("home")} className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
                             kamwaalay
                         </Link>
 
                         <div className="hidden lg:flex items-center space-x-8">
-                            <Link to={route('home')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('common.home')}</Link>
-                            {user?.role !== 'helper' && (
-                                <Link to={route('helpers.index')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('navigation.find_help')}</Link>
+                            <Link to={route("home")} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t("common.home")}</Link>
+                            {user?.role !== "helper" && (
+                                <Link to={route("helpers.index")} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t("navigation.find_help")}</Link>
                             )}
-                            {(!user || user.role === 'helper') && (
-                                <Link to={route('service-requests.browse')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('navigation.services_required')}</Link>
+                            {(!user || user.role === "helper") && (
+                                <Link to={route("service-requests.browse")} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t("navigation.services_required")}</Link>
                             )}
 
                             {user ? (
                                 <>
-                                    {(user.role === 'user' || user.role === 'business') && (
-                                        <Link to={route('bookings.create')} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg font-medium">
-                                            {t('navigation.post_service_request')}
+                                    {(user.role === "user" || user.role === "business") && (
+                                        <Link to={route("bookings.create")} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg font-medium">
+                                            {t("navigation.post_service_request")}
                                         </Link>
                                     )}
-                                    {user.role === 'admin' && (
-                                        <Link to={route('admin.dashboard')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('navigation.admin')}</Link>
+                                    {user.role === "admin" && (
+                                        <Link to={route("admin.dashboard")} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t("navigation.admin")}</Link>
                                     )}
-                                    {user.role === 'business' && (
-                                        <Link to={route('business.dashboard')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('navigation.business')}</Link>
+                                    {user.role === "business" && (
+                                        <Link to={route("business.dashboard")} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t("navigation.business")}</Link>
                                     )}
-                                    <Link to={route('dashboard')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('common.dashboard')}</Link>
+                                    <Link to={route("dashboard")} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t("common.dashboard")}</Link>
                                     <button
                                         onClick={async () => {
                                             try {
                                                 await logout();
-                                                navigate('/login');
+                                                navigate("/login");
                                             } catch (error) {
-                                                console.error('Logout error:', error);
-                                                navigate('/login');
+                                                console.error("Logout error:", error);
+                                                navigate("/login");
                                             }
                                         }}
                                         className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
                                     >
-                                        {t('common.logout')}
+                                        {t("common.logout")}
                                     </button>
-                                    <Link to={route('profile.edit')} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg font-medium">
-                                        {t('common.profile')}
+                                    <Link to={route("profile.edit")} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg font-medium">
+                                        {t("common.profile")}
                                     </Link>
                                 </>
                             ) : (
                                 <>
-                                    <Link to={route('login')} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t('common.login')}</Link>
-                                    <Link to={route('register')} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg font-medium">
-                                        {t('navigation.get_started')}
+                                    <Link to={route("login")} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">{t("common.login")}</Link>
+                                    <Link to={route("register")} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg font-medium">
+                                        {t("navigation.get_started")}
                                     </Link>
                                 </>
                             )}
@@ -102,41 +102,41 @@ export default function PublicLayout({ children }) {
                     {/* Mobile Menu */}
                     {mobileMenuOpen && (
                         <div className="lg:hidden py-4 space-y-2 border-t border-gray-100">
-                                    <Link to={route('home')} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Home</Link>
-                                    {user?.role !== 'helper' && (
-                                        <Link to={route('helpers.index')} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Find Help</Link>
+                                    <Link to={route("home")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Home</Link>
+                                    {user?.role !== "helper" && (
+                                        <Link to={route("helpers.index")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Find Help</Link>
                                     )}
-                                    {(!user || user.role === 'helper') && (
-                                        <Link to={route('service-requests.browse')} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Services Required</Link>
+                                    {(!user || user.role === "helper") && (
+                                        <Link to={route("service-requests.browse")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Services Required</Link>
                                     )}
                             {user ? (
                                 <>
-                                    {(user.role === 'user' || user.role === 'business') && (
-                                        <Link to={route('bookings.create')} className="block py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium text-center">
+                                    {(user.role === "user" || user.role === "business") && (
+                                        <Link to={route("bookings.create")} className="block py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium text-center">
                                             Post Service Request
                                         </Link>
                                     )}
-                                    <Link to={route('dashboard')} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Dashboard</Link>
+                                    <Link to={route("dashboard")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Dashboard</Link>
                                     <button
                                         onClick={async () => {
                                             try {
                                                 await logout();
-                                                navigate('/login');
+                                                navigate("/login");
                                             } catch (error) {
-                                                console.error('Logout error:', error);
-                                                navigate('/login');
+                                                console.error("Logout error:", error);
+                                                navigate("/login");
                                             }
                                         }}
                                         className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors w-full text-left"
                                     >
                                         Logout
                                     </button>
-                                    <Link to={route('profile.edit')} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Profile</Link>
+                                    <Link to={route("profile.edit")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Profile</Link>
                                 </>
                             ) : (
                                 <>
-                                    <Link to={route('login')} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Login</Link>
-                                    <Link to={route('register')} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Register</Link>
+                                    <Link to={route("login")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Login</Link>
+                                    <Link to={route("register")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Register</Link>
                                 </>
                             )}
                             <div className="px-4 py-2 border-t border-gray-200 mt-4">
@@ -166,18 +166,18 @@ export default function PublicLayout({ children }) {
                         <div>
                             <h4 className="font-semibold mb-4 text-lg">Services</h4>
                                     <ul className="space-y-3 text-gray-400">
-                                        <li><Link to={route('helpers.index')} className="hover:text-white transition-colors">Find Helpers</Link></li>
-                                        <li><Link to={route('bookings.create')} className="hover:text-white transition-colors">Post Service Request</Link></li>
+                                        <li><Link to={route("helpers.index")} className="hover:text-white transition-colors">Find Helpers</Link></li>
+                                        <li><Link to={route("bookings.create")} className="hover:text-white transition-colors">Post Service Request</Link></li>
                                     </ul>
                         </div>
                         <div>
                             <h4 className="font-semibold mb-4 text-lg">Company</h4>
                             <ul className="space-y-3 text-gray-400">
-                                <li><Link to={route('about')} className="hover:text-white transition-colors">About Us</Link></li>
-                                <li><Link to={route('contact')} className="hover:text-white transition-colors">Contact</Link></li>
-                                <li><Link to={route('faq')} className="hover:text-white transition-colors">FAQ</Link></li>
-                                <li><Link to={route('terms')} className="hover:text-white transition-colors">Terms</Link></li>
-                                <li><Link to={route('privacy')} className="hover:text-white transition-colors">Privacy</Link></li>
+                                <li><Link to={route("about")} className="hover:text-white transition-colors">About Us</Link></li>
+                                <li><Link to={route("contact")} className="hover:text-white transition-colors">Contact</Link></li>
+                                <li><Link to={route("faq")} className="hover:text-white transition-colors">FAQ</Link></li>
+                                <li><Link to={route("terms")} className="hover:text-white transition-colors">Terms</Link></li>
+                                <li><Link to={route("privacy")} className="hover:text-white transition-colors">Privacy</Link></li>
                             </ul>
                         </div>
                     </div>

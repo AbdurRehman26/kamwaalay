@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { homeService } from '@/services/home';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { homeService } from "@/services/home";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function Home() {
     const { user } = useAuth();
@@ -20,58 +20,58 @@ export default function Home() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.error('Error fetching home data:', error);
+                console.error("Error fetching home data:", error);
                 setLoading(false);
             });
     }, []);
     const services = [
-        { name: 'Maid', icon: '🧹', color: 'from-blue-500 to-blue-600' },
-        { name: 'Cook', icon: '👨‍🍳', color: 'from-orange-500 to-orange-600' },
-        { name: 'Babysitter', icon: '👶', color: 'from-pink-500 to-pink-600' },
-        { name: 'Caregiver', icon: '👵', color: 'from-green-500 to-green-600' },
-        { name: 'Cleaner', icon: '✨', color: 'from-blue-500 to-blue-600' },
-        { name: 'All Rounder', icon: '🌟', color: 'from-yellow-500 to-yellow-600' },
+        { name: "Maid", icon: "🧹", color: "from-blue-500 to-blue-600" },
+        { name: "Cook", icon: "👨‍🍳", color: "from-orange-500 to-orange-600" },
+        { name: "Babysitter", icon: "👶", color: "from-pink-500 to-pink-600" },
+        { name: "Caregiver", icon: "👵", color: "from-green-500 to-green-600" },
+        { name: "Cleaner", icon: "✨", color: "from-blue-500 to-blue-600" },
+        { name: "All Rounder", icon: "🌟", color: "from-yellow-500 to-yellow-600" },
     ];
 
     const steps = [
         {
-            number: '1',
-            title: 'Book',
-            description: 'Choose your service and preferred helper',
-            icon: '📅',
+            number: "1",
+            title: "Book",
+            description: "Choose your service and preferred helper",
+            icon: "📅",
         },
         {
-            number: '2',
-            title: 'Verify',
-            description: 'We verify all helpers with background checks',
-            icon: '✅',
+            number: "2",
+            title: "Verify",
+            description: "We verify all helpers with background checks",
+            icon: "✅",
         },
         {
-            number: '3',
-            title: 'Relax',
-            description: 'Sit back and enjoy quality home care',
-            icon: '😌',
+            number: "3",
+            title: "Relax",
+            description: "Sit back and enjoy quality home care",
+            icon: "😌",
         },
     ];
 
     const testimonials = [
         {
-            name: 'Priya Sharma',
-            service: 'Maid',
+            name: "Priya Sharma",
+            service: "Maid",
             rating: 5,
-            comment: 'Excellent service! Found a reliable maid within minutes.',
+            comment: "Excellent service! Found a reliable maid within minutes.",
         },
         {
-            name: 'Raj Kumar',
-            service: 'Cook',
+            name: "Raj Kumar",
+            service: "Cook",
             rating: 5,
-            comment: 'Best cook we ever had. Highly recommended!',
+            comment: "Best cook we ever had. Highly recommended!",
         },
         {
-            name: 'Anjali Mehta',
-            service: 'Babysitter',
+            name: "Anjali Mehta",
+            service: "Babysitter",
             rating: 5,
-            comment: 'Trustworthy and professional. My kids love her!',
+            comment: "Trustworthy and professional. My kids love her!",
         },
     ];
 
@@ -93,31 +93,31 @@ export default function Home() {
                             Connect with verified domestic helpers - maids, cooks, babysitters, and more. Your trusted partner for quality home care.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            {user?.role !== 'helper' && (
+                            {user?.role !== "helper" && (
                                 <Link
-                                    to={route('helpers.index')}
+                                    to={route("helpers.index")}
                                     className="bg-white text-blue-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
                                 >
                                     Browse Helpers
                                 </Link>
                             )}
                             <Link
-                                to={route('service-requests.browse')}
+                                to={route("service-requests.browse")}
                                 className="bg-white text-blue-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
                             >
                                 Services Required
                             </Link>
-                            {user?.role !== 'helper' && (
+                            {user?.role !== "helper" && (
                                 <Link
-                                    to={route('bookings.create')}
+                                    to={route("bookings.create")}
                                     className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 min-w-[200px] text-center"
                                 >
                                     Post Request
                                 </Link>
                             )}
-                            {user && (user.role === 'helper' || user.role === 'business') && (
+                            {user && (user.role === "helper" || user.role === "business") && (
                                 <Link
-                                    to={route('service-listings.create')}
+                                    to={route("service-listings.create")}
                                     className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 min-w-[200px] text-center"
                                 >
                                     Offer Service
@@ -165,10 +165,10 @@ export default function Home() {
                         {services.map((service) => (
                             <Link
                                 key={service.name}
-                                to={route('helpers.index') + `?service_type=${service.name.toLowerCase().replace(' ', '_')}`}
+                                to={route("helpers.index") + `?service_type=${service.name.toLowerCase().replace(" ", "_")}`}
                                 className="group bg-white p-8 rounded-2xl text-center hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-blue-200"
                             >
-                                <div className={`text-7xl mb-6 transform group-hover:scale-110 transition-transform duration-300`}>{service.icon}</div>
+                                <div className={"text-7xl mb-6 transform group-hover:scale-110 transition-transform duration-300"}>{service.icon}</div>
                                 <h3 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">{service.name}</h3>
                             </Link>
                         ))}
@@ -242,13 +242,13 @@ export default function Home() {
                             {featuredHelpers && featuredHelpers.length > 0 ? featuredHelpers.map((helper) => {
                                 // Ensure helper.id exists before creating route
                                 if (!helper.id) {
-                                    console.warn('Helper missing id:', helper);
+                                    console.warn("Helper missing id:", helper);
                                     return null;
                                 }
                                 return (
                                     <Link
                                         key={helper.id}
-                                        to={route('helpers.show', helper.id)}
+                                        to={route("helpers.show", helper.id)}
                                         className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                                     >
                                         <div className="h-64 bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center overflow-hidden">
@@ -262,15 +262,15 @@ export default function Home() {
                                             <h3 className="text-2xl font-bold mb-2 text-gray-900">{helper.name}</h3>
                                             <p className="text-gray-600 mb-3 capitalize">
                                                 {helper.service_listings && helper.service_listings.length > 0 && helper.service_listings[0].service_types && helper.service_listings[0].service_types.length > 0
-                                                    ? helper.service_listings?.[0]?.service_types?.[0]?.service_type?.replace('_', ' ') || 'Helper'
-                                                    : 'Helper'}
+                                                    ? helper.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "Helper"
+                                                    : "Helper"}
                                             </p>
                                             <div className="flex items-center mb-3">
                                                 <span className="text-yellow-500 text-2xl mr-2">⭐</span>
                                                 <span className="font-semibold text-lg">{helper.rating || 0}</span>
                                                 <span className="text-gray-500 ml-2">({helper.total_reviews || 0} reviews)</span>
                                             </div>
-                                            <p className="text-sm text-gray-500">{helper.city || 'N/A'}, {helper.area || 'N/A'}</p>
+                                            <p className="text-sm text-gray-500">{helper.city || "N/A"}, {helper.area || "N/A"}</p>
                                         </div>
                                     </Link>
                                 );
@@ -282,7 +282,7 @@ export default function Home() {
                         </div>
                         <div className="text-center mt-12">
                             <Link
-                                to={route('helpers.index')}
+                                to={route("helpers.index")}
                                 className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl inline-block"
                             >
                                 View All Helpers
@@ -325,19 +325,19 @@ export default function Home() {
                     {!user && (
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link
-                                to={route('register')}
+                                to={route("register")}
                                 className="bg-white text-blue-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px]"
                             >
                                 Get Started
                             </Link>
                             <Link
-                                to={route('helpers.index')}
+                                to={route("helpers.index")}
                                 className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 min-w-[200px]"
                             >
                                 Browse Helpers
                             </Link>
                             <Link
-                                to={route('service-requests.browse')}
+                                to={route("service-requests.browse")}
                                 className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 min-w-[200px]"
                             >
                                 Services Required
@@ -346,17 +346,17 @@ export default function Home() {
                     )}
                     {user && (
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            {(user.role === 'helper' || user.role === 'business') && (
+                            {(user.role === "helper" || user.role === "business") && (
                                 <Link
-                                    to={route('service-listings.create')}
+                                    to={route("service-listings.create")}
                                     className="bg-white text-blue-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px]"
                                 >
                                     Offer Your Service
                                 </Link>
                             )}
-                            {user.role !== 'helper' && (
+                            {user.role !== "helper" && (
                                 <Link
-                                    to={route('bookings.create')}
+                                    to={route("bookings.create")}
                                     className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 min-w-[200px]"
                                 >
                                     Post Service Request

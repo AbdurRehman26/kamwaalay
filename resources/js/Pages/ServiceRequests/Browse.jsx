@@ -1,40 +1,40 @@
-import { Link } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
-import PublicLayout from '@/Layouts/PublicLayout';
-import axios from 'axios';
-import { bookingsService } from '@/services/bookings';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import axios from "axios";
+import { bookingsService } from "@/services/bookings";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function ServiceRequestsBrowse() {
     const { user } = useAuth();
     const [bookings, setBookings] = useState({ data: [], links: [], meta: {} });
     const [filters, setFilters] = useState({});
     const [loading, setLoading] = useState(true);
-    const [serviceType, setServiceType] = useState('');
-    const [workType, setWorkType] = useState('');
-    const [locationId, setLocationId] = useState('');
-    const [locationDisplay, setLocationDisplay] = useState('');
-    const [locationFilterQuery, setLocationFilterQuery] = useState('');
+    const [serviceType, setServiceType] = useState("");
+    const [workType, setWorkType] = useState("");
+    const [locationId, setLocationId] = useState("");
+    const [locationDisplay, setLocationDisplay] = useState("");
+    const [locationFilterQuery, setLocationFilterQuery] = useState("");
     const [locationFilterSuggestions, setLocationFilterSuggestions] = useState([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
     const locationFilterRef = useRef(null);
     const searchTimeoutRef = useRef(null);
 
     const serviceTypes = [
-        { value: '', label: 'All Services' },
-        { value: 'maid', label: 'Maid' },
-        { value: 'cook', label: 'Cook' },
-        { value: 'babysitter', label: 'Babysitter' },
-        { value: 'caregiver', label: 'Caregiver' },
-        { value: 'cleaner', label: 'Cleaner' },
-        { value: 'all_rounder', label: 'All Rounder' },
+        { value: "", label: "All Services" },
+        { value: "maid", label: "Maid" },
+        { value: "cook", label: "Cook" },
+        { value: "babysitter", label: "Babysitter" },
+        { value: "caregiver", label: "Caregiver" },
+        { value: "cleaner", label: "Cleaner" },
+        { value: "all_rounder", label: "All Rounder" },
     ];
 
     const workTypes = [
-        { value: '', label: 'All Types' },
-        { value: 'full_time', label: 'Full Time' },
-        { value: 'part_time', label: 'Part Time' },
+        { value: "", label: "All Types" },
+        { value: "full_time", label: "Full Time" },
+        { value: "part_time", label: "Part Time" },
     ];
 
     // Fetch location suggestions for filter
@@ -45,7 +45,7 @@ export default function ServiceRequestsBrowse() {
             }
             searchTimeoutRef.current = setTimeout(() => {
                 axios
-                    .get('/api/locations/search', {
+                    .get("/api/locations/search", {
                         params: { q: locationFilterQuery },
                     })
                     .then((response) => {
@@ -53,7 +53,7 @@ export default function ServiceRequestsBrowse() {
                         setShowLocationSuggestions(true);
                     })
                     .catch((error) => {
-                        console.error('Error fetching locations:', error);
+                        console.error("Error fetching locations:", error);
                         setLocationFilterSuggestions([]);
                     });
             }, 300);
@@ -75,14 +75,14 @@ export default function ServiceRequestsBrowse() {
                 setShowLocationSuggestions(false);
             }
         };
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
 
     const handleLocationSelect = (location) => {
-        setLocationId(location.id || '');
+        setLocationId(location.id || "");
         setLocationDisplay(location.display_text);
         setLocationFilterQuery(location.display_text);
         setShowLocationSuggestions(false);
@@ -107,7 +107,7 @@ export default function ServiceRequestsBrowse() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.error('Error fetching bookings:', error);
+                console.error("Error fetching bookings:", error);
                 setLoading(false);
             });
     }, [serviceType, workType, locationId]);
@@ -118,12 +118,12 @@ export default function ServiceRequestsBrowse() {
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'pending':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'confirmed':
-                return 'bg-green-100 text-green-800';
+            case "pending":
+                return "bg-yellow-100 text-yellow-800";
+            case "confirmed":
+                return "bg-green-100 text-green-800";
             default:
-                return 'bg-gray-100 text-gray-800';
+                return "bg-gray-100 text-gray-800";
         }
     };
 
@@ -195,8 +195,8 @@ export default function ServiceRequestsBrowse() {
                                 onChange={(e) => {
                                     setLocationFilterQuery(e.target.value);
                                     if (!e.target.value) {
-                                        setLocationId('');
-                                        setLocationDisplay('');
+                                        setLocationId("");
+                                        setLocationDisplay("");
                                     }
                                 }}
                                 onFocus={() => {
@@ -233,11 +233,11 @@ export default function ServiceRequestsBrowse() {
                             <div className="flex items-end">
                                 <button
                                     onClick={() => {
-                                        setServiceType('');
-                                        setWorkType('');
-                                        setLocationId('');
-                                        setLocationDisplay('');
-                                        setLocationFilterQuery('');
+                                        setServiceType("");
+                                        setWorkType("");
+                                        setLocationId("");
+                                        setLocationDisplay("");
+                                        setLocationFilterQuery("");
                                         handleFilter();
                                     }}
                                     className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-300 font-semibold"
@@ -260,24 +260,24 @@ export default function ServiceRequestsBrowse() {
                             {bookings.data.map((booking) => {
                                 const hasApplied = user && booking.job_applications && 
                                     booking.job_applications.some(app => app.user_id === user.id);
-                                const isHelper = user && (user.role === 'helper' || user.role === 'business');
+                                const isHelper = user && (user.role === "helper" || user.role === "business");
                                 
                                 return (
                                     <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                                         <div className="p-6">
                                             <div className="flex items-center justify-between mb-4">
                                                 <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
-                                                    {booking.service_type?.replace('_', ' ') || 'N/A'}
+                                                    {booking.service_type?.replace("_", " ") || "N/A"}
                                                 </span>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
-                                                    {booking.status?.replace('_', ' ') || 'N/A'}
+                                                    {booking.status?.replace("_", " ") || "N/A"}
                                                 </span>
                                             </div>
                                             <h3 className="text-xl font-bold mb-2 text-gray-900">
-                                                {booking.service_type_label || booking.service_type?.replace('_', ' ') || 'Service'} Service
+                                                {booking.service_type_label || booking.service_type?.replace("_", " ") || "Service"} Service
                                             </h3>
                                             <p className="text-gray-600 mb-3 capitalize text-sm">
-                                                {booking.work_type?.replace('_', ' ') || 'N/A'} • {booking.city || 'N/A'}, {booking.area || 'N/A'}
+                                                {booking.work_type?.replace("_", " ") || "N/A"} • {booking.city || "N/A"}, {booking.area || "N/A"}
                                             </p>
                                             {booking.start_date && (
                                                 <p className="text-gray-500 text-sm mb-2">
@@ -290,25 +290,25 @@ export default function ServiceRequestsBrowse() {
                                                 </p>
                                             )}
                                             <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
-                                                <span>👤 Posted by: {booking.user?.name || 'Customer'}</span>
+                                                <span>👤 Posted by: {booking.user?.name || "Customer"}</span>
                                             </div>
                                             {booking.job_applications && booking.job_applications.length > 0 && (
                                                 <p className="text-sm text-blue-600 mb-3">
-                                                    📋 {booking.job_applications.length} application{booking.job_applications.length !== 1 ? 's' : ''} received
+                                                    📋 {booking.job_applications.length} application{booking.job_applications.length !== 1 ? "s" : ""} received
                                                 </p>
                                             )}
                                             <div className="mt-4">
                                                 {isHelper ? (
                                                     hasApplied ? (
                                                         <Link
-                                                            to={route('job-applications.my-applications')}
+                                                            to={route("job-applications.my-applications")}
                                                             className="block w-full text-center bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold cursor-not-allowed"
                                                         >
                                                             Already Applied
                                                         </Link>
                                                     ) : (
                                                         <Link
-                                                            to={route('job-applications.create', booking.id)}
+                                                            to={route("job-applications.create", booking.id)}
                                                             className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
                                                         >
                                                             Apply Now
@@ -316,7 +316,7 @@ export default function ServiceRequestsBrowse() {
                                                     )
                                                 ) : (
                                                     <Link
-                                                        to={route('service-requests.show', booking.id)}
+                                                        to={route("service-requests.show", booking.id)}
                                                         className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
                                                     >
                                                         View Details
@@ -345,13 +345,13 @@ export default function ServiceRequestsBrowse() {
                                         {bookings.links.map((link, index) => (
                                             <Link
                                                 key={index}
-                                                to={link.url || '#'}
+                                                to={link.url || "#"}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
-                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                                                        : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
-                                                } ${!link.url && 'cursor-not-allowed opacity-50'}`}
+                                                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                        : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                                                } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                             />
                                         ))}
                                     </div>
@@ -364,9 +364,9 @@ export default function ServiceRequestsBrowse() {
                         <div className="text-6xl mb-4">🔍</div>
                         <p className="text-gray-600 text-xl mb-6">No services required found</p>
                         <p className="text-gray-500 mb-8">Try adjusting your filters or check back later</p>
-                        {user && (user.role === 'user') && (
+                        {user && (user.role === "user") && (
                             <Link
-                                to={route('bookings.create')}
+                                to={route("bookings.create")}
                                 className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold inline-block"
                             >
                                 Post a Service Request

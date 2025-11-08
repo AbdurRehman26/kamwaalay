@@ -1,9 +1,9 @@
-import { Link, useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { businessesService } from '@/services/businesses';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import { Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { businessesService } from "@/services/businesses";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function BusinessShow() {
     const { businessId } = useParams();
@@ -24,8 +24,8 @@ export default function BusinessShow() {
                     setLoading(false);
                 })
                 .catch((err) => {
-                    console.error('Error fetching business:', err);
-                    setError(err.response?.data?.message || 'Failed to load business');
+                    console.error("Error fetching business:", err);
+                    setError(err.response?.data?.message || "Failed to load business");
                     setLoading(false);
                 });
         }
@@ -47,7 +47,7 @@ export default function BusinessShow() {
             <PublicLayout>
                 
                 <div className="container mx-auto px-4 py-12 text-center">
-                    <p className="text-red-600">{error || 'Business not found'}</p>
+                    <p className="text-red-600">{error || "Business not found"}</p>
                 </div>
             </PublicLayout>
         );
@@ -68,7 +68,7 @@ export default function BusinessShow() {
                         </div>
                         <div className="flex-1">
                             <h1 className="text-4xl font-bold mb-2">{business.name}</h1>
-                            <p className="text-xl text-white/90 mb-4">{business.bio || 'Professional service agency'}</p>
+                            <p className="text-xl text-white/90 mb-4">{business.bio || "Professional service agency"}</p>
                             <div className="flex items-center gap-4 flex-wrap">
                                 <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                                     🏢 Business Agency
@@ -80,12 +80,12 @@ export default function BusinessShow() {
                                 )}
                                 {serviceListings.length > 0 && (
                                     <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                        📋 {serviceListings.length} Service{serviceListings.length !== 1 ? 's' : ''}
+                                        📋 {serviceListings.length} Service{serviceListings.length !== 1 ? "s" : ""}
                                     </span>
                                 )}
                                 {workers.length > 0 && (
                                     <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                        👥 {workers.length} Worker{workers.length !== 1 ? 's' : ''}
+                                        👥 {workers.length} Worker{workers.length !== 1 ? "s" : ""}
                                     </span>
                                 )}
                             </div>
@@ -106,7 +106,7 @@ export default function BusinessShow() {
                                     {serviceListings.map((listing) => (
                                         <Link
                                             key={listing.id}
-                                            to={route('service-listings.show', listing.id)}
+                                            to={route("service-listings.show", listing.id)}
                                             className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-blue-300"
                                         >
                                             <div className="flex items-center justify-between mb-4">
@@ -114,7 +114,7 @@ export default function BusinessShow() {
                                                     {listing.service_types && listing.service_types.length > 0 ? (
                                                         listing.service_types.slice(0, 2).map((st, idx) => (
                                                             <span key={idx} className="bg-blue-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
-                                                                {st?.service_type?.replace('_', ' ') || 'Service'}
+                                                                {st?.service_type?.replace("_", " ") || "Service"}
                                                             </span>
                                                         ))
                                                     ) : (
@@ -130,10 +130,10 @@ export default function BusinessShow() {
                                                 )}
                                             </div>
                                             <h3 className="text-lg font-bold text-gray-900 mb-2 capitalize">
-                                                {listing.work_type?.replace('_', ' ') || 'Service'} Service
+                                                {listing.work_type?.replace("_", " ") || "Service"} Service
                                             </h3>
                                             <p className="text-sm text-gray-600 mb-3">
-                                                📍 {listing.locations && listing.locations.length > 0 ? `${listing.locations[0].city}, ${listing.locations[0].area}` : 'Location not specified'}
+                                                📍 {listing.locations && listing.locations.length > 0 ? `${listing.locations[0].city}, ${listing.locations[0].area}` : "Location not specified"}
                                             </p>
                                             {listing.description && (
                                                 <p className="text-gray-600 text-sm line-clamp-2 mb-3">
@@ -142,7 +142,7 @@ export default function BusinessShow() {
                                             )}
                                             <div className="flex items-center justify-between">
                                                 <span className="text-xs text-gray-500 capitalize">
-                                                    {listing.work_type?.replace('_', ' ') || 'N/A'}
+                                                    {listing.work_type?.replace("_", " ") || "N/A"}
                                                 </span>
                                                 <span className="text-blue-600 font-semibold text-sm">View Details →</span>
                                             </div>
@@ -165,13 +165,13 @@ export default function BusinessShow() {
                                     {workers.map((worker) => {
                                         // Ensure worker.id exists before creating route
                                         if (!worker.id) {
-                                            console.warn('Worker missing id:', worker);
+                                            console.warn("Worker missing id:", worker);
                                             return null;
                                         }
                                         return (
                                         <Link
                                             key={worker.id}
-                                            to={route('helpers.show', worker.id)}
+                                            to={route("helpers.show", worker.id)}
                                             className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-blue-300"
                                         >
                                             <div className="flex items-center gap-4 mb-4">
@@ -190,7 +190,7 @@ export default function BusinessShow() {
                                                     <h3 className="font-bold text-gray-900">{worker.name}</h3>
                                                     {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].service_types && worker.service_listings[0].service_types.length > 0 && (
                                                         <p className="text-sm text-gray-600 capitalize">
-                                                            {worker.service_listings?.[0]?.service_types?.[0]?.service_type?.replace('_', ' ') || 'No service type'}
+                                                            {worker.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "No service type"}
                                                         </p>
                                                     )}
                                                 </div>
@@ -201,7 +201,7 @@ export default function BusinessShow() {
                                                     <span className="font-semibold">{worker.rating || 0}</span>
                                                     <span className="text-gray-500 text-sm ml-1">({worker.total_reviews || 0})</span>
                                                 </div>
-                                                {worker.verification_status === 'verified' && (
+                                                {worker.verification_status === "verified" && (
                                                     <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">
                                                         ✓ Verified
                                                     </span>
@@ -214,7 +214,7 @@ export default function BusinessShow() {
                                             )}
                                             {worker.service_listings && worker.service_listings.length > 0 && (
                                                 <p className="text-xs text-gray-500">
-                                                    📋 {worker.service_listings.length} service listing{worker.service_listings.length !== 1 ? 's' : ''}
+                                                    📋 {worker.service_listings.length} service listing{worker.service_listings.length !== 1 ? "s" : ""}
                                                 </p>
                                             )}
                                             <span className="text-blue-600 font-semibold text-sm mt-2 block">View Profile →</span>
@@ -226,7 +226,7 @@ export default function BusinessShow() {
                                     <div className="mt-6 text-center">
                                         <p className="text-sm text-gray-600">
                                             Showing 10 of {business.helpers_count || workers.length} workers. 
-                                            <Link to={route('business.workers')} className="text-blue-600 hover:text-blue-800 ml-1 font-semibold">
+                                            <Link to={route("business.workers")} className="text-blue-600 hover:text-blue-800 ml-1 font-semibold">
                                                 View All →
                                             </Link>
                                         </p>
@@ -263,7 +263,7 @@ export default function BusinessShow() {
                                 {business.city && (
                                     <div>
                                         <p className="text-sm text-gray-600">Location</p>
-                                        <p className="font-semibold text-gray-900">{business.city}, {business.area || 'N/A'}</p>
+                                        <p className="font-semibold text-gray-900">{business.city}, {business.area || "N/A"}</p>
                                     </div>
                                 )}
                             </div>
@@ -288,7 +288,7 @@ export default function BusinessShow() {
                         {auth?.user && (
                             <div className="bg-white rounded-lg shadow-md p-6">
                                 <Link
-                                    to={route('service-listings.index', {
+                                    to={route("service-listings.index", {
                                         user_id: business.id,
                                     })}
                                     className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
@@ -296,7 +296,7 @@ export default function BusinessShow() {
                                     View All Services
                                 </Link>
                                 <Link
-                                    to={route('bookings.create')}
+                                    to={route("bookings.create")}
                                     className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-300 font-semibold text-center block"
                                 >
                                     Request Service

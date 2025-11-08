@@ -1,19 +1,19 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Transition } from '@headlessui/react';
-import { useRef, useState } from 'react';
-import { profileService } from '@/services/profile';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import { Transition } from "@headlessui/react";
+import { useRef, useState } from "react";
+import { profileService } from "@/services/profile";
 
-export default function UpdatePasswordForm({ className = '' }) {
+export default function UpdatePasswordForm({ className = "" }) {
     const passwordInput = useRef();
     const currentPasswordInput = useRef();
 
     const [data, setData] = useState({
-        current_password: '',
-        password: '',
-        password_confirmation: '',
+        current_password: "",
+        password: "",
+        password_confirmation: "",
     });
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
@@ -30,9 +30,9 @@ export default function UpdatePasswordForm({ className = '' }) {
             setRecentlySuccessful(true);
             // Reset form on success
             setData({
-                current_password: '',
-                password: '',
-                password_confirmation: '',
+                current_password: "",
+                password: "",
+                password_confirmation: "",
             });
             // Hide success message after 2 seconds
             setTimeout(() => setRecentlySuccessful(false), 2000);
@@ -47,7 +47,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                     currentPasswordInput.current?.focus();
                 }
             } else {
-                setErrors({ submit: [error.response?.data?.message || 'Failed to update password'] });
+                setErrors({ submit: [error.response?.data?.message || "Failed to update password"] });
             }
         } finally {
             setProcessing(false);

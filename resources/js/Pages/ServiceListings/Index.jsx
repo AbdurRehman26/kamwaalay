@@ -1,33 +1,33 @@
-import { Link } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { route } from '@/utils/routes';
-import axios from 'axios';
-import { serviceListingsService } from '@/services/serviceListings';
+import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { route } from "@/utils/routes";
+import axios from "axios";
+import { serviceListingsService } from "@/services/serviceListings";
 
 export default function ServiceListingsIndex() {
     const [listings, setListings] = useState({ data: [], links: [], meta: {} });
     const [filters, setFilters] = useState({});
     const [loading, setLoading] = useState(true);
-    const [serviceType, setServiceType] = useState('');
-    const [workType, setWorkType] = useState('');
-    const [sortBy, setSortBy] = useState('created_at');
-    const [locationId, setLocationId] = useState('');
-    const [locationDisplay, setLocationDisplay] = useState('');
-    const [locationFilterQuery, setLocationFilterQuery] = useState('');
+    const [serviceType, setServiceType] = useState("");
+    const [workType, setWorkType] = useState("");
+    const [sortBy, setSortBy] = useState("created_at");
+    const [locationId, setLocationId] = useState("");
+    const [locationDisplay, setLocationDisplay] = useState("");
+    const [locationFilterQuery, setLocationFilterQuery] = useState("");
     const [locationFilterSuggestions, setLocationFilterSuggestions] = useState([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
     const locationFilterRef = useRef(null);
     const searchTimeoutRef = useRef(null);
 
     const serviceTypes = [
-        { value: '', label: 'All Services' },
-        { value: 'maid', label: 'Maid' },
-        { value: 'cook', label: 'Cook' },
-        { value: 'babysitter', label: 'Babysitter' },
-        { value: 'caregiver', label: 'Caregiver' },
-        { value: 'cleaner', label: 'Cleaner' },
-        { value: 'all_rounder', label: 'All Rounder' },
+        { value: "", label: "All Services" },
+        { value: "maid", label: "Maid" },
+        { value: "cook", label: "Cook" },
+        { value: "babysitter", label: "Babysitter" },
+        { value: "caregiver", label: "Caregiver" },
+        { value: "cleaner", label: "Cleaner" },
+        { value: "all_rounder", label: "All Rounder" },
     ];
 
     // Fetch location suggestions for filter
@@ -38,7 +38,7 @@ export default function ServiceListingsIndex() {
             }
             searchTimeoutRef.current = setTimeout(() => {
                 axios
-                    .get('/api/locations/search', {
+                    .get("/api/locations/search", {
                         params: { q: locationFilterQuery },
                     })
                     .then((response) => {
@@ -46,7 +46,7 @@ export default function ServiceListingsIndex() {
                         setShowLocationSuggestions(true);
                     })
                     .catch((error) => {
-                        console.error('Error fetching locations:', error);
+                        console.error("Error fetching locations:", error);
                         setLocationFilterSuggestions([]);
                     });
             }, 300);
@@ -68,14 +68,14 @@ export default function ServiceListingsIndex() {
                 setShowLocationSuggestions(false);
             }
         };
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
 
     const handleLocationSelect = (location) => {
-        setLocationId(location.id || '');
+        setLocationId(location.id || "");
         setLocationDisplay(location.display_text);
         setLocationFilterQuery(location.display_text);
         setShowLocationSuggestions(false);
@@ -101,7 +101,7 @@ export default function ServiceListingsIndex() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.error('Error fetching listings:', error);
+                console.error("Error fetching listings:", error);
                 setLoading(false);
             });
     }, [serviceType, workType, locationId, sortBy]);
@@ -167,8 +167,8 @@ export default function ServiceListingsIndex() {
                                 onChange={(e) => {
                                     setLocationFilterQuery(e.target.value);
                                     if (!e.target.value) {
-                                        setLocationId('');
-                                        setLocationDisplay('');
+                                        setLocationId("");
+                                        setLocationDisplay("");
                                     }
                                 }}
                                 onFocus={() => {
@@ -230,7 +230,7 @@ export default function ServiceListingsIndex() {
                                     className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                                 >
                                     <Link
-                                        to={route('service-listings.show', listing.id)}
+                                        to={route("service-listings.show", listing.id)}
                                         className="block"
                                     >
                                         <div className="p-6">
@@ -255,10 +255,10 @@ export default function ServiceListingsIndex() {
                                                 )}
                                             </div>
                                             <h3 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-blue-600 transition-colors">
-                                                {listing.user?.name || 'Helper'}
+                                                {listing.user?.name || "Helper"}
                                             </h3>
                                             <p className="text-sm text-gray-600 mb-3 capitalize">
-                                                {listing.work_type?.replace('_', ' ') || 'Service'} • {listing.locations && listing.locations.length > 0 ? `${listing.locations[0].city}, ${listing.locations[0].area}` : 'Location not specified'}
+                                                {listing.work_type?.replace("_", " ") || "Service"} • {listing.locations && listing.locations.length > 0 ? `${listing.locations[0].city}, ${listing.locations[0].area}` : "Location not specified"}
                                             </p>
                                             {listing.description && (
                                                 <p className="text-gray-600 text-sm mb-4 line-clamp-2">
@@ -267,7 +267,7 @@ export default function ServiceListingsIndex() {
                                             )}
                                             <div className="flex items-center justify-between mb-3">
                                                 <span className="text-xs text-gray-500 capitalize">
-                                                    {listing.work_type?.replace('_', ' ') || 'Available'}
+                                                    {listing.work_type?.replace("_", " ") || "Available"}
                                                 </span>
                                                 <span className="text-blue-600 font-semibold text-sm">View Details →</span>
                                             </div>
@@ -307,13 +307,13 @@ export default function ServiceListingsIndex() {
                                         {listings.links.map((link, index) => (
                                             <Link
                                                 key={index}
-                                                to={link.url || '#'}
+                                                to={link.url || "#"}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
-                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                                                        : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
-                                                } ${!link.url && 'cursor-not-allowed opacity-50'}`}
+                                                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                        : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                                                } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                             />
                                         ))}
                                     </div>

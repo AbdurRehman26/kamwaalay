@@ -1,22 +1,22 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Transition } from '@headlessui/react';
-import { useState, useEffect } from 'react';
-import { profileService } from '@/services/profile';
-import { useAuth } from '@/contexts/AuthContext';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import { Transition } from "@headlessui/react";
+import { useState, useEffect } from "react";
+import { profileService } from "@/services/profile";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
     status,
-    className = '',
+    className = "",
 }) {
     const { user, updateUser } = useAuth();
 
     const [data, setData] = useState({
-        name: user?.name || '',
-        email: user?.email || '',
+        name: user?.name || "",
+        email: user?.email || "",
     });
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
@@ -27,8 +27,8 @@ export default function UpdateProfileInformation({
     useEffect(() => {
         if (user) {
             setData({
-                name: user.name || '',
-                email: user.email || '',
+                name: user.name || "",
+                email: user.email || "",
             });
         }
     }, [user]);
@@ -52,7 +52,7 @@ export default function UpdateProfileInformation({
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
-                setErrors({ submit: [error.response?.data?.message || 'Failed to update profile'] });
+                setErrors({ submit: [error.response?.data?.message || "Failed to update profile"] });
             }
         } finally {
             setProcessing(false);
@@ -114,9 +114,9 @@ export default function UpdateProfileInformation({
                                     try {
                                         // TODO: Implement email verification resend endpoint
                                         // await api.post('/email/verification-notification');
-                                        setVerificationStatus('verification-link-sent');
+                                        setVerificationStatus("verification-link-sent");
                                     } catch (error) {
-                                        console.error('Failed to send verification email:', error);
+                                        console.error("Failed to send verification email:", error);
                                     }
                                 }}
                                 className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -125,7 +125,7 @@ export default function UpdateProfileInformation({
                             </button>
                         </p>
 
-                        {verificationStatus === 'verification-link-sent' && (
+                        {verificationStatus === "verification-link-sent" && (
                             <div className="mt-2 text-sm font-medium text-green-600">
                                 A new verification link has been sent to your
                                 email address.

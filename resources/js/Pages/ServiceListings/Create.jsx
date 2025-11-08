@@ -1,13 +1,13 @@
 // Head removed
-import { useState, useEffect, useRef } from 'react';
-import PublicLayout from '@/Layouts/PublicLayout';
-import axios from 'axios';
-import { serviceListingsService } from '@/services/serviceListings';
+import { useState, useEffect, useRef } from "react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import axios from "axios";
+import { serviceListingsService } from "@/services/serviceListings";
 
 export default function ServiceListingCreate() {
     const [selectedServiceTypes, setSelectedServiceTypes] = useState([]);
     const [selectedLocations, setSelectedLocations] = useState([]);
-    const [locationQuery, setLocationQuery] = useState('');
+    const [locationQuery, setLocationQuery] = useState("");
     const [locationSuggestions, setLocationSuggestions] = useState([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
     const locationRef = useRef(null);
@@ -17,18 +17,18 @@ export default function ServiceListingCreate() {
 
     // Common fields for all listings
     const [commonFields, setCommonFields] = useState({
-        work_type: '',
-        monthly_rate: '',
-        description: '',
+        work_type: "",
+        monthly_rate: "",
+        description: "",
     });
 
     const serviceTypes = [
-        { value: 'maid', label: 'Maid', icon: '🧹' },
-        { value: 'cook', label: 'Cook', icon: '👨‍🍳' },
-        { value: 'babysitter', label: 'Babysitter', icon: '👶' },
-        { value: 'caregiver', label: 'Caregiver', icon: '👵' },
-        { value: 'cleaner', label: 'Cleaner', icon: '✨' },
-        { value: 'all_rounder', label: 'All Rounder', icon: '🌟' },
+        { value: "maid", label: "Maid", icon: "🧹" },
+        { value: "cook", label: "Cook", icon: "👨‍🍳" },
+        { value: "babysitter", label: "Babysitter", icon: "👶" },
+        { value: "caregiver", label: "Caregiver", icon: "👵" },
+        { value: "cleaner", label: "Cleaner", icon: "✨" },
+        { value: "all_rounder", label: "All Rounder", icon: "🌟" },
     ];
 
     // Fetch location suggestions
@@ -39,7 +39,7 @@ export default function ServiceListingCreate() {
             }
             searchTimeoutRef.current = setTimeout(() => {
                 axios
-                    .get('/api/locations/search', {
+                    .get("/api/locations/search", {
                         params: { q: locationQuery },
                     })
                     .then((response) => {
@@ -47,7 +47,7 @@ export default function ServiceListingCreate() {
                         setShowLocationSuggestions(true);
                     })
                     .catch((error) => {
-                        console.error('Error fetching locations:', error);
+                        console.error("Error fetching locations:", error);
                         setLocationSuggestions([]);
                     });
             }, 300);
@@ -70,10 +70,10 @@ export default function ServiceListingCreate() {
                 id: location.id || location.display_text,
                 display_text: location.display_text,
                 city_name: location.city_name,
-                area: location.area || '',
+                area: location.area || "",
             }]);
         }
-        setLocationQuery('');
+        setLocationQuery("");
         setShowLocationSuggestions(false);
     };
 
@@ -97,9 +97,9 @@ export default function ServiceListingCreate() {
                 setShowLocationSuggestions(false);
             }
         };
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
 
@@ -110,19 +110,19 @@ export default function ServiceListingCreate() {
 
         // Validation
         if (selectedServiceTypes.length === 0) {
-            setErrors({ service_types: 'Please select at least one service type.' });
+            setErrors({ service_types: "Please select at least one service type." });
             setProcessing(false);
             return;
         }
 
         if (selectedLocations.length === 0) {
-            setErrors({ locations: 'Please select at least one location.' });
+            setErrors({ locations: "Please select at least one location." });
             setProcessing(false);
             return;
         }
 
         if (!commonFields.work_type) {
-            setErrors({ work_type: 'Work type is required.' });
+            setErrors({ work_type: "Work type is required." });
             setProcessing(false);
             return;
         }
@@ -159,15 +159,15 @@ export default function ServiceListingCreate() {
             .then((response) => {
                 setProcessing(false);
                 // Redirect to my listings or show success
-                router.visit(route('service-listings.my-listings'), {
-                    method: 'get',
+                router.visit(route("service-listings.my-listings"), {
+                    method: "get",
                 });
             })
             .catch((error) => {
                 if (error.response?.data?.errors) {
                     setErrors(error.response.data.errors);
                 } else {
-                    setErrors({ submit: [error.response?.data?.message || 'Failed to create listing'] });
+                    setErrors({ submit: [error.response?.data?.message || "Failed to create listing"] });
                 }
                 setProcessing(false);
             });
@@ -232,8 +232,8 @@ export default function ServiceListingCreate() {
                                         disabled={selectedServiceTypes.includes(service.value)}
                                         className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
                                             selectedServiceTypes.includes(service.value)
-                                                ? 'border-blue-500 bg-blue-50 opacity-50 cursor-not-allowed'
-                                                : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer'
+                                                ? "border-blue-500 bg-blue-50 opacity-50 cursor-not-allowed"
+                                                : "border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
                                         }`}
                                     >
                                         <div className="text-3xl mb-2">{service.icon}</div>
@@ -384,10 +384,10 @@ export default function ServiceListingCreate() {
                                             <span className="font-semibold">Service Types:</span> {selectedServiceTypes.map((serviceType) => {
                                                 const service = serviceTypes.find(st => st.value === serviceType);
                                                 return service?.label;
-                                            }).join(', ')}
+                                            }).join(", ")}
                                         </div>
                                         <div>
-                                            <span className="font-semibold">Locations:</span> {selectedLocations.map(loc => loc.display_text).join(', ')}
+                                            <span className="font-semibold">Locations:</span> {selectedLocations.map(loc => loc.display_text).join(", ")}
                                         </div>
                                     </div>
                                 </div>
@@ -403,12 +403,12 @@ export default function ServiceListingCreate() {
                                     className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold disabled:opacity-50"
                                 >
                                     {processing 
-                                        ? 'Creating...' 
-                                        : 'Create Service Listing'
+                                        ? "Creating..." 
+                                        : "Create Service Listing"
                                     }
                                 </button>
                                 <Link
-                                    to={route('service-listings.my-listings')}
+                                    to={route("service-listings.my-listings")}
                                     className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold text-center flex items-center justify-center"
                                 >
                                     View My Listings
@@ -423,7 +423,7 @@ export default function ServiceListingCreate() {
                                 <p className="text-sm text-gray-600">
                                     {selectedServiceTypes.length > 0 && selectedLocations.length > 0
                                         ? `One service listing will be created with ${selectedServiceTypes.length} service type(s) and ${selectedLocations.length} location(s).`
-                                        : 'Select at least one service type and one location to create a listing.'
+                                        : "Select at least one service type and one location to create a listing."
                                     }
                                 </p>
                             </div>

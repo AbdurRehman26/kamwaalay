@@ -1,7 +1,7 @@
 // Head removed
-import { useState, useEffect } from 'react';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { businessesService } from '@/services/businesses';
+import { useState, useEffect } from "react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { businessesService } from "@/services/businesses";
 
 export default function Workers() {
     const [workers, setWorkers] = useState(null);
@@ -15,22 +15,22 @@ export default function Workers() {
                 setLoading(false);
             })
             .catch((err) => {
-                console.error('Error fetching workers:', err);
-                setError(err.response?.data?.message || 'Failed to load workers');
+                console.error("Error fetching workers:", err);
+                setError(err.response?.data?.message || "Failed to load workers");
                 setLoading(false);
             });
     }, []);
 
     const handleDelete = async (workerId) => {
-        if (confirm('Are you sure you want to remove this worker?')) {
+        if (confirm("Are you sure you want to remove this worker?")) {
             try {
                 await businessesService.deleteWorker(workerId);
                 // Refresh workers list
                 const response = await businessesService.getWorkers();
                 setWorkers(response.workers || { data: [], links: [] });
             } catch (err) {
-                console.error('Error deleting worker:', err);
-                alert(err.response?.data?.message || 'Failed to delete worker');
+                console.error("Error deleting worker:", err);
+                alert(err.response?.data?.message || "Failed to delete worker");
             }
         }
     };
@@ -72,7 +72,7 @@ export default function Workers() {
                             <p className="mt-2 text-gray-600">Add and manage workers in your agency</p>
                         </div>
                         <Link
-                            to={route('business.workers.create')}
+                            to={route("business.workers.create")}
                             className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
                         >
                             ➕ Add Worker
@@ -92,15 +92,15 @@ export default function Workers() {
                                                     <div className="text-4xl text-white">👤</div>
                                                 )}
                                             </div>
-                                            {worker.verification_status === 'verified' && (
+                                            {worker.verification_status === "verified" && (
                                                 <span className="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-semibold">✓ Verified</span>
                                             )}
                                         </div>
                                         <h3 className="text-xl font-bold mb-2">{worker.user?.name}</h3>
                                         <p className="text-gray-600 mb-2 capitalize">
                                             {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].service_types && worker.service_listings[0].service_types.length > 0
-                                                ? worker.service_listings?.[0]?.service_types?.[0]?.service_type?.replace('_', ' ') || 'No service type'
-                                                : 'No service type'}
+                                                ? worker.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "No service type"
+                                                : "No service type"}
                                         </p>
                                         <div className="flex items-center mb-2">
                                             <span className="text-yellow-500 mr-2">⭐</span>
@@ -110,7 +110,7 @@ export default function Workers() {
                                         <p className="text-sm text-gray-500 mb-4">{worker.city}, {worker.area}</p>
                                         <div className="flex gap-2">
                                             <Link
-                                                to={route('business.workers.edit', worker.id)}
+                                                to={route("business.workers.edit", worker.id)}
                                                 className="flex-1 text-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                                             >
                                                 Edit
@@ -133,13 +133,13 @@ export default function Workers() {
                                         {workers.links.map((link, index) => (
                                             <Link
                                                 key={index}
-                                                to={link.url || '#'}
+                                                to={link.url || "#"}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
-                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                                                        : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
-                                                } ${!link.url && 'cursor-not-allowed opacity-50'}`}
+                                                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                        : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                                                } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                             />
                                         ))}
                                     </div>
@@ -152,7 +152,7 @@ export default function Workers() {
                             <h3 className="text-xl font-semibold mb-2 text-gray-900">No Workers Yet</h3>
                             <p className="text-gray-600 mb-6">Start building your agency by adding your first worker</p>
                             <Link
-                                to={route('business.workers.create')}
+                                to={route("business.workers.create")}
                                 className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
                             >
                                 Add Your First Worker

@@ -1,11 +1,11 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import ApplicationLogo from "@/Components/ApplicationLogo";
+import Dropdown from "@/Components/Dropdown";
+import NavLink from "@/Components/NavLink";
+import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function AuthenticatedLayout({ header, children }) {
     const { user, logout } = useAuth();
@@ -29,44 +29,44 @@ export default function AuthenticatedLayout({ header, children }) {
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
-                                    href={route('dashboard')}
-                                    active={location.pathname === route('dashboard')}
+                                    href={route("dashboard")}
+                                    active={location.pathname === route("dashboard")}
                                 >
                                     Dashboard
                                 </NavLink>
-                                {user && (user.role === 'helper' || user.role === 'business') && (
+                                {user && (user.role === "helper" || user.role === "business") && (
                                     <>
                                         <NavLink
-                                            href={route('service-listings.my-listings')}
-                                            active={location.pathname === route('service-listings.my-listings')}
+                                            href={route("service-listings.my-listings")}
+                                            active={location.pathname === route("service-listings.my-listings")}
                                         >
                                             My Listings
                                         </NavLink>
                                         <NavLink
-                                            href={route('job-applications.index')}
-                                            active={location.pathname === route('job-applications.index')}
+                                            href={route("job-applications.index")}
+                                            active={location.pathname === route("job-applications.index")}
                                         >
                                             Browse Requests
                                         </NavLink>
                                         <NavLink
-                                            href={route('job-applications.my-applications')}
-                                            active={location.pathname === route('job-applications.my-applications')}
+                                            href={route("job-applications.my-applications")}
+                                            active={location.pathname === route("job-applications.my-applications")}
                                         >
                                             My Applications
                                         </NavLink>
                                     </>
                                 )}
-                                {user && user.role === 'user' && (
+                                {user && user.role === "user" && (
                                     <>
                                         <NavLink
-                                            href={route('service-listings.index')}
-                                            active={location.pathname === route('service-listings.index')}
+                                            href={route("service-listings.index")}
+                                            active={location.pathname === route("service-listings.index")}
                                         >
                                             Browse Services
                                         </NavLink>
                                         <NavLink
-                                            href={route('job-applications.my-request-applications')}
-                                            active={location.pathname === route('job-applications.my-request-applications')}
+                                            href={route("job-applications.my-request-applications")}
+                                            active={location.pathname === route("job-applications.my-request-applications")}
                                         >
                                             Applications
                                         </NavLink>
@@ -104,7 +104,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                     <Dropdown.Content>
                                         <Dropdown.Link
-                                            href={route('profile.edit')}
+                                            href={route("profile.edit")}
                                         >
                                             Profile
                                         </Dropdown.Link>
@@ -112,10 +112,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                             onClick={async () => {
                                                 try {
                                                     await logout();
-                                                    navigate('/login');
+                                                    navigate("/login");
                                                 } catch (error) {
-                                                    console.error('Logout error:', error);
-                                                    navigate('/login');
+                                                    console.error("Logout error:", error);
+                                                    navigate("/login");
                                                 }
                                             }}
                                             className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
@@ -145,8 +145,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <path
                                         className={
                                             !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
+                                                ? "inline-flex"
+                                                : "hidden"
                                         }
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
@@ -156,8 +156,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <path
                                         className={
                                             showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
+                                                ? "inline-flex"
+                                                : "hidden"
                                         }
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
@@ -172,50 +172,50 @@ export default function AuthenticatedLayout({ header, children }) {
 
                 <div
                     className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
+                        (showingNavigationDropdown ? "block" : "hidden") +
+                        " sm:hidden"
                     }
                 >
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={location.pathname === route('dashboard')}
+                            href={route("dashboard")}
+                            active={location.pathname === route("dashboard")}
                         >
                             Dashboard
                         </ResponsiveNavLink>
-                        {user && (user.role === 'helper' || user.role === 'business') && (
+                        {user && (user.role === "helper" || user.role === "business") && (
                             <>
                                 <ResponsiveNavLink
-                                    href={route('service-listings.my-listings')}
-                                    active={location.pathname === route('service-listings.my-listings')}
+                                    href={route("service-listings.my-listings")}
+                                    active={location.pathname === route("service-listings.my-listings")}
                                 >
                                     My Listings
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink
-                                    href={route('job-applications.index')}
-                                    active={location.pathname === route('job-applications.index')}
+                                    href={route("job-applications.index")}
+                                    active={location.pathname === route("job-applications.index")}
                                 >
                                     Browse Requests
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink
-                                    href={route('job-applications.my-applications')}
-                                    active={location.pathname === route('job-applications.my-applications')}
+                                    href={route("job-applications.my-applications")}
+                                    active={location.pathname === route("job-applications.my-applications")}
                                 >
                                     My Applications
                                 </ResponsiveNavLink>
                             </>
                         )}
-                        {user && user.role === 'user' && (
+                        {user && user.role === "user" && (
                             <>
                                 <ResponsiveNavLink
-                                    href={route('service-listings.index')}
-                                    active={location.pathname === route('service-listings.index')}
+                                    href={route("service-listings.index")}
+                                    active={location.pathname === route("service-listings.index")}
                                 >
                                     Browse Services
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink
-                                    href={route('job-applications.my-request-applications')}
-                                    active={location.pathname === route('job-applications.my-request-applications')}
+                                    href={route("job-applications.my-request-applications")}
+                                    active={location.pathname === route("job-applications.my-request-applications")}
                                 >
                                     Applications
                                 </ResponsiveNavLink>
@@ -234,17 +234,17 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
+                            <ResponsiveNavLink href={route("profile.edit")}>
                                 Profile
                             </ResponsiveNavLink>
                             <button
                                 onClick={async () => {
                                     try {
                                         await logout();
-                                        navigate('/login');
+                                        navigate("/login");
                                     } catch (error) {
-                                        console.error('Logout error:', error);
-                                        navigate('/login');
+                                        console.error("Logout error:", error);
+                                        navigate("/login");
                                     }
                                 }}
                                 className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"

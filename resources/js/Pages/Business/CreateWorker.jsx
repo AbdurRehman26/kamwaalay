@@ -1,40 +1,40 @@
 // Head removed
-import PublicLayout from '@/Layouts/PublicLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import TextInput from '@/Components/TextInput';
-import PrimaryButton from '@/Components/PrimaryButton';
+import PublicLayout from "@/Layouts/PublicLayout";
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import TextInput from "@/Components/TextInput";
+import PrimaryButton from "@/Components/PrimaryButton";
 
 export default function CreateWorker() {
     const { data, setData, post, processing, errors } = useForm({
-        name: '',
-        email: '',
-        phone: '',
+        name: "",
+        email: "",
+        phone: "",
         photo: null,
-        service_type: '',
-        skills: '',
+        service_type: "",
+        skills: "",
         experience_years: 0,
-        city: '',
-        area: '',
-        availability: 'available',
-        monthly_rate: '',
-        bio: '',
-        password: '',
-        password_confirmation: '',
+        city: "",
+        area: "",
+        availability: "available",
+        monthly_rate: "",
+        bio: "",
+        password: "",
+        password_confirmation: "",
     });
 
     const serviceTypes = [
-        { value: 'maid', label: 'Maid' },
-        { value: 'cook', label: 'Cook' },
-        { value: 'babysitter', label: 'Babysitter' },
-        { value: 'caregiver', label: 'Caregiver' },
-        { value: 'cleaner', label: 'Cleaner' },
-        { value: 'all_rounder', label: 'All Rounder' },
+        { value: "maid", label: "Maid" },
+        { value: "cook", label: "Cook" },
+        { value: "babysitter", label: "Babysitter" },
+        { value: "caregiver", label: "Caregiver" },
+        { value: "cleaner", label: "Cleaner" },
+        { value: "all_rounder", label: "All Rounder" },
     ];
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('business.workers.store'));
+        post(route("business.workers.store"));
     };
 
     return (
@@ -56,7 +56,7 @@ export default function CreateWorker() {
                                     id="name"
                                     type="text"
                                     value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
+                                    onChange={(e) => setData("name", e.target.value)}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
@@ -69,7 +69,7 @@ export default function CreateWorker() {
                                     id="email"
                                     type="email"
                                     value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
+                                    onChange={(e) => setData("email", e.target.value)}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
@@ -82,7 +82,7 @@ export default function CreateWorker() {
                                     id="phone"
                                     type="tel"
                                     value={data.phone}
-                                    onChange={(e) => setData('phone', e.target.value)}
+                                    onChange={(e) => setData("phone", e.target.value)}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
@@ -94,7 +94,7 @@ export default function CreateWorker() {
                                 <select
                                     id="service_type"
                                     value={data.service_type}
-                                    onChange={(e) => setData('service_type', e.target.value)}
+                                    onChange={(e) => setData("service_type", e.target.value)}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 >
@@ -114,7 +114,7 @@ export default function CreateWorker() {
                                     id="city"
                                     type="text"
                                     value={data.city}
-                                    onChange={(e) => setData('city', e.target.value)}
+                                    onChange={(e) => setData("city", e.target.value)}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
@@ -127,7 +127,7 @@ export default function CreateWorker() {
                                     id="area"
                                     type="text"
                                     value={data.area}
-                                    onChange={(e) => setData('area', e.target.value)}
+                                    onChange={(e) => setData("area", e.target.value)}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
@@ -141,7 +141,7 @@ export default function CreateWorker() {
                                     type="number"
                                     min="0"
                                     value={data.experience_years}
-                                    onChange={(e) => setData('experience_years', parseInt(e.target.value))}
+                                    onChange={(e) => setData("experience_years", parseInt(e.target.value))}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
@@ -153,7 +153,7 @@ export default function CreateWorker() {
                                 <select
                                     id="availability"
                                     value={data.availability}
-                                    onChange={(e) => setData('availability', e.target.value)}
+                                    onChange={(e) => setData("availability", e.target.value)}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 >
@@ -172,7 +172,7 @@ export default function CreateWorker() {
                                     step="0.01"
                                     min="0"
                                     value={data.monthly_rate}
-                                    onChange={(e) => setData('monthly_rate', e.target.value)}
+                                    onChange={(e) => setData("monthly_rate", e.target.value)}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 />
                                 <InputError message={errors.monthly_rate} className="mt-2" />
@@ -184,7 +184,7 @@ export default function CreateWorker() {
                                     id="photo"
                                     type="file"
                                     accept="image/*"
-                                    onChange={(e) => setData('photo', e.target.files[0])}
+                                    onChange={(e) => setData("photo", e.target.files[0])}
                                     className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                 />
                                 <InputError message={errors.photo} className="mt-2" />
@@ -195,7 +195,7 @@ export default function CreateWorker() {
                                 <textarea
                                     id="skills"
                                     value={data.skills}
-                                    onChange={(e) => setData('skills', e.target.value)}
+                                    onChange={(e) => setData("skills", e.target.value)}
                                     rows={3}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     placeholder="Enter skills separated by commas..."
@@ -208,7 +208,7 @@ export default function CreateWorker() {
                                 <textarea
                                     id="bio"
                                     value={data.bio}
-                                    onChange={(e) => setData('bio', e.target.value)}
+                                    onChange={(e) => setData("bio", e.target.value)}
                                     rows={4}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     placeholder="Brief description about the worker..."
@@ -222,7 +222,7 @@ export default function CreateWorker() {
                                     id="password"
                                     type="password"
                                     value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
+                                    onChange={(e) => setData("password", e.target.value)}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
@@ -235,7 +235,7 @@ export default function CreateWorker() {
                                     id="password_confirmation"
                                     type="password"
                                     value={data.password_confirmation}
-                                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    onChange={(e) => setData("password_confirmation", e.target.value)}
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
@@ -248,10 +248,10 @@ export default function CreateWorker() {
                                 disabled={processing}
                                 className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-lg font-semibold shadow-lg"
                             >
-                                {processing ? 'Adding Worker...' : 'Add Worker'}
+                                {processing ? "Adding Worker..." : "Add Worker"}
                             </PrimaryButton>
                             <Link
-                                to={route('business.workers')}
+                                to={route("business.workers")}
                                 className="flex-1 text-center bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
                             >
                                 Cancel

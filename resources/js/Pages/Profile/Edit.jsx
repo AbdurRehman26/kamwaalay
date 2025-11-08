@@ -1,9 +1,9 @@
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState, useEffect } from 'react';
-import DeleteUserForm from './Partials/DeleteUserForm';
-import UpdatePasswordForm from './Partials/UpdatePasswordForm';
-import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
-import { profileService } from '@/services/profile';
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState, useEffect } from "react";
+import DeleteUserForm from "./Partials/DeleteUserForm";
+import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
+import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
+import { profileService } from "@/services/profile";
 
 export default function Edit() {
     const [profileData, setProfileData] = useState(null);
@@ -17,8 +17,8 @@ export default function Edit() {
                 setLoading(false);
             })
             .catch((err) => {
-                console.error('Error fetching profile:', err);
-                setError(err.response?.data?.message || 'Failed to load profile');
+                console.error("Error fetching profile:", err);
+                setError(err.response?.data?.message || "Failed to load profile");
                 setLoading(false);
             });
     }, []);
@@ -40,7 +40,7 @@ export default function Edit() {
             <PublicLayout>
                 <div className="py-12">
                     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 text-center">
-                        <p className="text-red-600">{error || 'Failed to load profile'}</p>
+                        <p className="text-red-600">{error || "Failed to load profile"}</p>
                     </div>
                 </div>
             </PublicLayout>

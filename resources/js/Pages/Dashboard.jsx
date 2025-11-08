@@ -1,7 +1,7 @@
-import PublicLayout from '@/Layouts/PublicLayout';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import PublicLayout from "@/Layouts/PublicLayout";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -13,10 +13,10 @@ export default function Dashboard() {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Service Requests (Users) */}
-                        {user && user.role === 'user' && (
+                        {user && user.role === "user" && (
                             <>
                                 <Link
-                                    to={route('bookings.create')}
+                                    to={route("bookings.create")}
                                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">📝</div>
@@ -24,7 +24,7 @@ export default function Dashboard() {
                                     <p className="text-gray-600">Post a service request and get help from verified helpers</p>
                                 </Link>
                                 <Link
-                                    to={route('job-applications.my-request-applications')}
+                                    to={route("job-applications.my-request-applications")}
                                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">📋</div>
@@ -32,7 +32,7 @@ export default function Dashboard() {
                                     <p className="text-gray-600">View and manage applications to your service requests</p>
                                 </Link>
                                 <Link
-                                    to={route('bookings.index')}
+                                    to={route("bookings.index")}
                                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">📅</div>
@@ -43,10 +43,10 @@ export default function Dashboard() {
                         )}
 
                         {/* Service Offerings (Helpers/Businesses) */}
-                        {(user?.role === 'helper' || user?.role === 'business') && (
+                        {(user?.role === "helper" || user?.role === "business") && (
                             <>
                                 <Link
-                                    to={route('service-listings.create')}
+                                    to={route("service-listings.create")}
                                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">➕</div>
@@ -54,16 +54,16 @@ export default function Dashboard() {
                                     <p className="text-gray-600">Post a service you offer and get clients</p>
                                 </Link>
                                 <Link
-                                    to={route('service-listings.my-listings')}
+                                    to={route("service-listings.my-listings")}
                                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">📋</div>
                                     <h3 className="text-xl font-bold mb-2 text-gray-900">My Service Listings</h3>
                                     <p className="text-gray-600">Manage your service offerings</p>
                                 </Link>
-                                {user?.role === 'business' && (
+                                {user?.role === "business" && (
                                     <Link
-                                        to={route('job-applications.index')}
+                                        to={route("job-applications.index")}
                                         className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                     >
                                         <div className="text-4xl mb-4">🔍</div>
@@ -72,7 +72,7 @@ export default function Dashboard() {
                                     </Link>
                                 )}
                                 <Link
-                                    to={route('job-applications.my-applications')}
+                                    to={route("job-applications.my-applications")}
                                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">📝</div>
@@ -83,10 +83,10 @@ export default function Dashboard() {
                         )}
 
                         {/* Admin */}
-                        {user?.role === 'admin' && (
+                        {user?.role === "admin" && (
                             <>
                                 <Link
-                                    to={route('admin.dashboard')}
+                                    to={route("admin.dashboard")}
                                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-blue-500"
                                 >
                                     <div className="text-4xl mb-4">⚙️</div>

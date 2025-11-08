@@ -1,10 +1,10 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
-import PublicLayout from '@/Layouts/PublicLayout';
-import axios from 'axios';
-import { bookingsService } from '@/services/bookings';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import axios from "axios";
+import { bookingsService } from "@/services/bookings";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function BookingCreate() {
     const navigate = useNavigate();
@@ -13,23 +13,23 @@ export default function BookingCreate() {
     const [loading, setLoading] = useState(true);
     
     const [data, setData] = useState({
-        service_type: '',
-        work_type: '',
-        city: 'Karachi',
-        area: '',
-        start_date: '',
-        start_time: '',
-        name: user?.name || '',
-        phone: user?.phone || '',
-        email: user?.email || '',
-        address: user?.address || '',
-        special_requirements: '',
+        service_type: "",
+        work_type: "",
+        city: "Karachi",
+        area: "",
+        start_date: "",
+        start_time: "",
+        name: user?.name || "",
+        phone: user?.phone || "",
+        email: user?.email || "",
+        address: user?.address || "",
+        special_requirements: "",
         assigned_user_id: null,
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
 
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const searchTimeoutRef = useRef(null);
@@ -47,37 +47,37 @@ export default function BookingCreate() {
                         work_type: response.prefill.work_type || prev.work_type,
                         city: response.prefill.city || prev.city,
                         area: response.prefill.area || prev.area,
-                        name: response.prefill.name || prev.name || user?.name || '',
-                        phone: response.prefill.phone || prev.phone || user?.phone || '',
-                        email: response.prefill.email || prev.email || user?.email || '',
-                        address: response.prefill.address || prev.address || user?.address || '',
+                        name: response.prefill.name || prev.name || user?.name || "",
+                        phone: response.prefill.phone || prev.phone || user?.phone || "",
+                        email: response.prefill.email || prev.email || user?.email || "",
+                        address: response.prefill.address || prev.address || user?.address || "",
                     }));
-                    setSearchQuery(response.prefill.area || '');
+                    setSearchQuery(response.prefill.area || "");
                 }
                 if (response.user) {
                     setData(prev => ({
                         ...prev,
-                        name: prev.name || response.user.name || '',
-                        phone: prev.phone || response.user.phone || '',
-                        email: prev.email || response.user.email || '',
-                        address: prev.address || response.user.address || '',
+                        name: prev.name || response.user.name || "",
+                        phone: prev.phone || response.user.phone || "",
+                        email: prev.email || response.user.email || "",
+                        address: prev.address || response.user.address || "",
                     }));
                 }
                 setLoading(false);
             })
             .catch((error) => {
-                console.error('Error fetching prefill data:', error);
+                console.error("Error fetching prefill data:", error);
                 setLoading(false);
             });
     }, [user]);
 
     const serviceTypes = [
-        { value: 'maid', label: 'Maid' },
-        { value: 'cook', label: 'Cook' },
-        { value: 'babysitter', label: 'Babysitter' },
-        { value: 'caregiver', label: 'Caregiver' },
-        { value: 'cleaner', label: 'Cleaner' },
-        { value: 'all_rounder', label: 'All Rounder' },
+        { value: "maid", label: "Maid" },
+        { value: "cook", label: "Cook" },
+        { value: "babysitter", label: "Babysitter" },
+        { value: "caregiver", label: "Caregiver" },
+        { value: "cleaner", label: "Cleaner" },
+        { value: "all_rounder", label: "All Rounder" },
     ];
 
     // Fetch location suggestions for area
@@ -88,7 +88,7 @@ export default function BookingCreate() {
             }
             searchTimeoutRef.current = setTimeout(() => {
                 axios
-                    .get('/api/karachi-locations/search', {
+                    .get("/api/karachi-locations/search", {
                         params: { q: searchQuery },
                     })
                     .then((response) => {
@@ -96,7 +96,7 @@ export default function BookingCreate() {
                         setShowSuggestions(true);
                     })
                     .catch((error) => {
-                        console.error('Error fetching locations:', error);
+                        console.error("Error fetching locations:", error);
                         setSuggestions([]);
                     });
             }, 300);
@@ -119,9 +119,9 @@ export default function BookingCreate() {
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
 
@@ -140,20 +140,20 @@ export default function BookingCreate() {
         // Always set city to Karachi
         const submitData = {
             ...data,
-            city: 'Karachi',
+            city: "Karachi",
         };
 
         try {
             const response = await bookingsService.createBooking(submitData);
             // Redirect to bookings index or show success message
-            router.visit(route('bookings.index'), {
-                method: 'get',
+            router.visit(route("bookings.index"), {
+                method: "get",
             });
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
-                setErrors({ submit: [error.response?.data?.message || 'Failed to create booking'] });
+                setErrors({ submit: [error.response?.data?.message || "Failed to create booking"] });
             }
         } finally {
             setProcessing(false);
@@ -290,7 +290,7 @@ export default function BookingCreate() {
                                     onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}
                                     disabled={!!user}
                                     className={`w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 ${
-                                        user ? 'bg-gray-100 cursor-not-allowed' : ''
+                                        user ? "bg-gray-100 cursor-not-allowed" : ""
                                     }`}
                                     required
                                 />
@@ -305,7 +305,7 @@ export default function BookingCreate() {
                                     onChange={(e) => setData(prev => ({ ...prev, phone: e.target.value }))}
                                     disabled={!!user}
                                     className={`w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 ${
-                                        user ? 'bg-gray-100 cursor-not-allowed' : ''
+                                        user ? "bg-gray-100 cursor-not-allowed" : ""
                                     }`}
                                     required
                                 />
@@ -320,7 +320,7 @@ export default function BookingCreate() {
                                     onChange={(e) => setData(prev => ({ ...prev, email: e.target.value }))}
                                     disabled={!!user}
                                     className={`w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 ${
-                                        user ? 'bg-gray-100 cursor-not-allowed' : ''
+                                        user ? "bg-gray-100 cursor-not-allowed" : ""
                                     }`}
                                     required
                                 />
@@ -357,10 +357,10 @@ export default function BookingCreate() {
                                 disabled={processing}
                                 className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold"
                             >
-                                {processing ? 'Submitting...' : 'Submit Booking'}
+                                {processing ? "Submitting..." : "Submit Booking"}
                             </button>
                             <Link
-                                to={route('helpers.index')}
+                                to={route("helpers.index")}
                                 className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold text-center"
                             >
                                 Browse Helpers First

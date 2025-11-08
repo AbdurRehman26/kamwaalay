@@ -1,8 +1,8 @@
 // Head removed
-import { useState, useEffect, useRef } from 'react';
-import PublicLayout from '@/Layouts/PublicLayout';
-import axios from 'axios';
-import { serviceListingsService } from '@/services/serviceListings';
+import { useState, useEffect, useRef } from "react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import axios from "axios";
+import { serviceListingsService } from "@/services/serviceListings";
 
 export default function ServiceListingEdit({ listingId }) {
     const [listing, setListing] = useState(null);
@@ -10,7 +10,7 @@ export default function ServiceListingEdit({ listingId }) {
     const [error, setError] = useState(null);
     const [selectedServiceTypes, setSelectedServiceTypes] = useState([]);
     const [selectedLocations, setSelectedLocations] = useState([]);
-    const [locationQuery, setLocationQuery] = useState('');
+    const [locationQuery, setLocationQuery] = useState("");
     const [locationSuggestions, setLocationSuggestions] = useState([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
     const locationRef = useRef(null);
@@ -18,10 +18,10 @@ export default function ServiceListingEdit({ listingId }) {
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
     const [data, setData] = useState({
-        work_type: '',
-        monthly_rate: '',
-        description: '',
-        status: 'active',
+        work_type: "",
+        monthly_rate: "",
+        description: "",
+        status: "active",
         is_active: true,
     });
 
@@ -47,29 +47,29 @@ export default function ServiceListingEdit({ listingId }) {
                             : []
                     );
                     setData({
-                        work_type: listingData.work_type || '',
-                        monthly_rate: listingData.monthly_rate || '',
-                        description: listingData.description || '',
-                        status: listingData.status || 'active',
+                        work_type: listingData.work_type || "",
+                        monthly_rate: listingData.monthly_rate || "",
+                        description: listingData.description || "",
+                        status: listingData.status || "active",
                         is_active: listingData.is_active ?? true,
                     });
                     setLoading(false);
                 })
                 .catch((err) => {
-                    console.error('Error fetching listing:', err);
-                    setError(err.response?.data?.message || 'Failed to load listing');
+                    console.error("Error fetching listing:", err);
+                    setError(err.response?.data?.message || "Failed to load listing");
                     setLoading(false);
                 });
         }
     }, [listingId]);
 
     const serviceTypes = [
-        { value: 'maid', label: 'Maid', icon: '🧹' },
-        { value: 'cook', label: 'Cook', icon: '👨‍🍳' },
-        { value: 'babysitter', label: 'Babysitter', icon: '👶' },
-        { value: 'caregiver', label: 'Caregiver', icon: '👵' },
-        { value: 'cleaner', label: 'Cleaner', icon: '✨' },
-        { value: 'all_rounder', label: 'All Rounder', icon: '🌟' },
+        { value: "maid", label: "Maid", icon: "🧹" },
+        { value: "cook", label: "Cook", icon: "👨‍🍳" },
+        { value: "babysitter", label: "Babysitter", icon: "👶" },
+        { value: "caregiver", label: "Caregiver", icon: "👵" },
+        { value: "cleaner", label: "Cleaner", icon: "✨" },
+        { value: "all_rounder", label: "All Rounder", icon: "🌟" },
     ];
 
     const addServiceType = (serviceType) => {
@@ -90,7 +90,7 @@ export default function ServiceListingEdit({ listingId }) {
         if (!exists) {
             setSelectedLocations([...selectedLocations, location]);
         }
-        setLocationQuery('');
+        setLocationQuery("");
         setShowLocationSuggestions(false);
     };
 
@@ -108,7 +108,7 @@ export default function ServiceListingEdit({ listingId }) {
             }
             searchTimeoutRef.current = setTimeout(() => {
                 axios
-                    .get('/api/locations/search', {
+                    .get("/api/locations/search", {
                         params: { q: locationQuery },
                     })
                     .then((response) => {
@@ -116,7 +116,7 @@ export default function ServiceListingEdit({ listingId }) {
                         setShowLocationSuggestions(true);
                     })
                     .catch((error) => {
-                        console.error('Error fetching locations:', error);
+                        console.error("Error fetching locations:", error);
                         setLocationSuggestions([]);
                     });
             }, 300);
@@ -141,9 +141,9 @@ export default function ServiceListingEdit({ listingId }) {
                 setShowLocationSuggestions(false);
             }
         };
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
 
@@ -154,13 +154,13 @@ export default function ServiceListingEdit({ listingId }) {
         
         // Validation
         if (selectedServiceTypes.length === 0) {
-            setErrors({ service_types: 'Please select at least one service type.' });
+            setErrors({ service_types: "Please select at least one service type." });
             setProcessing(false);
             return;
         }
 
         if (selectedLocations.length === 0) {
-            setErrors({ locations: 'Please select at least one location.' });
+            setErrors({ locations: "Please select at least one location." });
             setProcessing(false);
             return;
         }
@@ -182,14 +182,14 @@ export default function ServiceListingEdit({ listingId }) {
         try {
             await serviceListingsService.updateListing(listingId, apiData);
             // Redirect to my listings or show success
-            router.visit(route('service-listings.my-listings'), {
-                method: 'get',
+            router.visit(route("service-listings.my-listings"), {
+                method: "get",
             });
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
-                setErrors({ submit: [error.response?.data?.message || 'Failed to update listing'] });
+                setErrors({ submit: [error.response?.data?.message || "Failed to update listing"] });
             }
         } finally {
             setProcessing(false);
@@ -212,9 +212,9 @@ export default function ServiceListingEdit({ listingId }) {
             <PublicLayout>
                 
                 <div className="container mx-auto px-4 py-12 text-center">
-                    <p className="text-red-600">{error || 'Listing not found'}</p>
+                    <p className="text-red-600">{error || "Listing not found"}</p>
                     <Link
-                        to={route('service-listings.my-listings')}
+                        to={route("service-listings.my-listings")}
                         className="mt-4 inline-block bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                     >
                         Back to My Listings
@@ -270,8 +270,8 @@ export default function ServiceListingEdit({ listingId }) {
                                         disabled={selectedServiceTypes.includes(type.value)}
                                         className={`p-4 rounded-lg border-2 transition-all duration-300 ${
                                             selectedServiceTypes.includes(type.value)
-                                                ? 'border-blue-500 bg-blue-50 opacity-50 cursor-not-allowed'
-                                                : 'border-gray-200 hover:border-blue-300 bg-white'
+                                                ? "border-blue-500 bg-blue-50 opacity-50 cursor-not-allowed"
+                                                : "border-gray-200 hover:border-blue-300 bg-white"
                                         }`}
                                     >
                                         <div className="text-2xl mb-2">{type.icon}</div>
@@ -414,11 +414,11 @@ export default function ServiceListingEdit({ listingId }) {
                                 disabled={processing}
                                 className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold disabled:opacity-50"
                             >
-                                {processing ? 'Updating...' : 'Update Listing'}
+                                {processing ? "Updating..." : "Update Listing"}
                             </button>
                             <button
                                 type="button"
-                                onClick={() => router.visit(route('service-listings.my-listings'))}
+                                onClick={() => router.visit(route("service-listings.my-listings"))}
                                 className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                             >
                                 Cancel

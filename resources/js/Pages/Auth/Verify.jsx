@@ -1,32 +1,32 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Link } from 'react-router-dom'; import { useNavigate, useSearchParams } from 'react-router-dom';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState, useEffect } from 'react';
-import { authService } from '@/services/auth';
-import { useAuth } from '@/contexts/AuthContext';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import { Link } from "react-router-dom"; import { useNavigate, useSearchParams } from "react-router-dom";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState, useEffect } from "react";
+import { authService } from "@/services/auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Verify() {
     const navigate = useNavigate();
     const { updateUser } = useAuth();
     const [searchParams] = useSearchParams();
-    const [otp, setOtp] = useState('');
+    const [otp, setOtp] = useState("");
     const [user_id, setUserId] = useState(null);
-    const [method, setMethod] = useState('email');
-    const [identifier, setIdentifier] = useState('');
+    const [method, setMethod] = useState("email");
+    const [identifier, setIdentifier] = useState("");
     const [is_login, setIsLogin] = useState(false);
     const [verificationToken, setVerificationToken] = useState(null);
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
-    const [message, setMessage] = useState('');
+    const [message, setMessage] = useState("");
     const [timeLeft, setTimeLeft] = useState(180); // 3 minutes in seconds
 
     // Fetch verification info from API
     useEffect(() => {
         // Get verification token from URL params or localStorage
-        const tokenFromUrl = searchParams.get('verification_token');
+        const tokenFromUrl = searchParams.get("verification_token");
         const tokenFromStorage = authService.getVerificationToken();
         const token = tokenFromUrl || tokenFromStorage;
         
@@ -42,7 +42,7 @@ export default function Verify() {
             .then(data => {
                 if (data.method) {
                     setMethod(data.method);
-                    setIdentifier(data.identifier || '');
+                    setIdentifier(data.identifier || "");
                     setUserId(data.user_id);
                     setIsLogin(data.is_login || false);
                     // Update verification token if returned from API
@@ -53,11 +53,11 @@ export default function Verify() {
                 }
             })
             .catch(err => {
-                console.error('Error fetching verification info:', err);
+                console.error("Error fetching verification info:", err);
                 // If verification info is not available, redirect to login/register
                 if (err.response?.status === 422) {
                     authService.removeVerificationToken();
-                    navigate('/login');
+                    navigate("/login");
                 }
             });
     }, [searchParams, navigate]);
@@ -72,7 +72,7 @@ export default function Verify() {
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
+        return `${mins}:${secs.toString().padStart(2, "0")}`;
     };
 
     const handleResend = async (e) => {
@@ -81,10 +81,10 @@ export default function Verify() {
         try {
             await authService.resendOtp(verificationToken);
             setTimeLeft(180); // Reset timer
-            setOtp('');
-            setMessage('Verification code has been resent.');
+            setOtp("");
+            setMessage("Verification code has been resent.");
         } catch (error) {
-            setErrors({ otp: [error.response?.data?.message || 'Failed to resend code.'] });
+            setErrors({ otp: [error.response?.data?.message || "Failed to resend code."] });
         } finally {
             setProcessing(false);
         }
@@ -94,7 +94,7 @@ export default function Verify() {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
-        setMessage('');
+        setMessage("");
 
         try {
             const response = await authService.verifyOtp({
@@ -114,19 +114,19 @@ export default function Verify() {
                 // Redirect based on context
                 if (response.redirect) {
                     // If redirect is an object with route info, use it; otherwise use the string path
-                    const redirectPath = typeof response.redirect === 'string' 
+                    const redirectPath = typeof response.redirect === "string" 
                         ? response.redirect 
-                        : (response.redirect.route || '/dashboard');
+                        : (response.redirect.route || "/dashboard");
                     navigate(redirectPath);
                 } else {
-                    navigate('/dashboard');
+                    navigate("/dashboard");
                 }
             }
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
-                setErrors({ otp: [error.response?.data?.message || 'Verification failed. Please try again.'] });
+                setErrors({ otp: [error.response?.data?.message || "Verification failed. Please try again."] });
             }
         } finally {
             setProcessing(false);
@@ -139,12 +139,12 @@ export default function Verify() {
                 <div className="max-w-md w-full space-y-8">
                     <div>
                         <h2 className="mt-6 text-center text-4xl font-extrabold text-gray-900">
-                            {is_login ? 'Login Verification' : `Verify Your ${method === 'email' ? 'Email' : 'Phone'}`}
+                            {is_login ? "Login Verification" : `Verify Your ${method === "email" ? "Email" : "Phone"}`}
                         </h2>
                         <p className="mt-2 text-center text-sm text-gray-600">
                             {is_login 
-                                ? `We've sent a 6-digit verification code to ${method === 'email' ? 'your email' : 'your phone'}`
-                                : `We've sent a 6-digit verification code to`
+                                ? `We've sent a 6-digit verification code to ${method === "email" ? "your email" : "your phone"}`
+                                : "We've sent a 6-digit verification code to"
                             }
                             {!is_login && identifier && (
                                 <>
@@ -185,15 +185,15 @@ export default function Verify() {
                                 autoComplete="one-time-code"
                                 isFocused={true}
                                 onChange={(e) => {
-                                    const inputValue = e.target?.value || '';
-                                    const value = inputValue.replace(/\D/g, '').slice(0, 6);
+                                    const inputValue = e.target?.value || "";
+                                    const value = inputValue.replace(/\D/g, "").slice(0, 6);
                                     setOtp(value);
                                 }}
                                 required
                             />
                             <InputError message={errors.otp} className="mt-2" />
                             <p className="mt-2 text-xs text-gray-500">
-                                Enter the 6-digit code sent to {method === 'email' ? 'your email' : 'your phone'}
+                                Enter the 6-digit code sent to {method === "email" ? "your email" : "your phone"}
                             </p>
                         </div>
 
@@ -228,7 +228,7 @@ export default function Verify() {
                                         Verifying...
                                     </span>
                                 ) : (
-                                    'Verify Code'
+                                    "Verify Code"
                                 )}
                             </PrimaryButton>
                         </div>

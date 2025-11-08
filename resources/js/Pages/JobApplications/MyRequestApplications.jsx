@@ -1,7 +1,7 @@
 // Head removed
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState, useEffect } from 'react';
-import { jobApplicationsService } from '@/services/jobApplications';
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState, useEffect } from "react";
+import { jobApplicationsService } from "@/services/jobApplications";
 
 export default function MyRequestApplications() {
     const [applications, setApplications] = useState({ data: [], links: [], meta: {} });
@@ -14,49 +14,49 @@ export default function MyRequestApplications() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.error('Error fetching applications:', error);
+                console.error("Error fetching applications:", error);
                 setLoading(false);
             });
     }, []);
     const getStatusColor = (status) => {
         switch (status) {
-            case 'pending':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'accepted':
-                return 'bg-green-100 text-green-800';
-            case 'rejected':
-                return 'bg-red-100 text-red-800';
-            case 'withdrawn':
-                return 'bg-gray-100 text-gray-800';
+            case "pending":
+                return "bg-yellow-100 text-yellow-800";
+            case "accepted":
+                return "bg-green-100 text-green-800";
+            case "rejected":
+                return "bg-red-100 text-red-800";
+            case "withdrawn":
+                return "bg-gray-100 text-gray-800";
             default:
-                return 'bg-gray-100 text-gray-800';
+                return "bg-gray-100 text-gray-800";
         }
     };
 
     const handleAccept = async (applicationId) => {
-        if (confirm('Are you sure you want to accept this application? This will reject all other applications.')) {
+        if (confirm("Are you sure you want to accept this application? This will reject all other applications.")) {
             try {
                 await jobApplicationsService.acceptApplication(applicationId);
                 // Refresh applications
                 const data = await jobApplicationsService.getMyRequestApplications();
                 setApplications(data.applications || { data: [], links: [], meta: {} });
             } catch (error) {
-                console.error('Error accepting application:', error);
-                alert('Failed to accept application. Please try again.');
+                console.error("Error accepting application:", error);
+                alert("Failed to accept application. Please try again.");
             }
         }
     };
 
     const handleReject = async (applicationId) => {
-        if (confirm('Are you sure you want to reject this application?')) {
+        if (confirm("Are you sure you want to reject this application?")) {
             try {
                 await jobApplicationsService.rejectApplication(applicationId);
                 // Refresh applications
                 const data = await jobApplicationsService.getMyRequestApplications();
                 setApplications(data.applications || { data: [], links: [], meta: {} });
             } catch (error) {
-                console.error('Error rejecting application:', error);
-                alert('Failed to reject application. Please try again.');
+                console.error("Error rejecting application:", error);
+                alert("Failed to reject application. Please try again.");
             }
         }
     };
@@ -107,7 +107,7 @@ export default function MyRequestApplications() {
                                             <p className="text-green-600 font-bold text-lg">Proposed Rate: PKR {application.proposed_rate}/hr</p>
                                         )}
                                     </div>
-                                    {application.status === 'pending' && (
+                                    {application.status === "pending" && (
                                         <div className="flex gap-2 ml-4">
                                             <button
                                                 onClick={() => handleAccept(application.id)}
@@ -123,10 +123,10 @@ export default function MyRequestApplications() {
                                             </button>
                                         </div>
                                     )}
-                                    {application.status === 'accepted' && (
+                                    {application.status === "accepted" && (
                                         <div className="ml-4">
                                             <Link
-                                                to={route('bookings.show', application.booking.id)}
+                                                to={route("bookings.show", application.booking.id)}
                                                 className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition duration-300 font-medium text-sm font-semibold"
                                             >
                                                 View Booking
@@ -143,13 +143,13 @@ export default function MyRequestApplications() {
                                     {applications.links.map((link, index) => (
                                         <Link
                                             key={index}
-                                            to={link.url || '#'}
+                                            to={link.url || "#"}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                 link.active
-                                                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                                                    : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
-                                            } ${!link.url && 'cursor-not-allowed opacity-50'}`}
+                                                    ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                    : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                                            } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                         />
                                     ))}
                                 </div>

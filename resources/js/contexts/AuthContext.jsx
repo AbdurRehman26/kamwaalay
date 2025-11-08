@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { authService } from '../services/auth';
+import React, { createContext, useState, useEffect, useContext } from "react";
+import { authService } from "../services/auth";
 
 const AuthContext = createContext();
 
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
                     setLoading(false);
                 })
                 .catch((error) => {
-                    console.error('Error fetching user:', error);
+                    console.error("Error fetching user:", error);
                     // Token might be invalid, remove it
                     authService.removeToken();
                     setUser(null);
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
         try {
             await authService.logout();
         } catch (error) {
-            console.error('Logout error:', error);
+            console.error("Logout error:", error);
         } finally {
             setUser(null);
             authService.removeToken();
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
+        throw new Error("useAuth must be used within an AuthProvider");
     }
     return context;
 };

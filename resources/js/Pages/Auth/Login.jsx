@@ -1,37 +1,37 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Link } from 'react-router-dom'; import { useNavigate } from 'react-router-dom';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState } from 'react';
-import { authService } from '@/services/auth';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import Checkbox from "@/Components/Checkbox";
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import { Link } from "react-router-dom"; import { useNavigate } from "react-router-dom";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState } from "react";
+import { authService } from "@/services/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function Login() {
     const navigate = useNavigate();
     const { login, updateUser } = useAuth();
-    const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
-    const [password, setPassword] = useState('');
+    const [loginMethod, setLoginMethod] = useState("email"); // 'email' or 'phone'
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [password, setPassword] = useState("");
     const [remember, setRemember] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
-    const [message, setMessage] = useState('');
+    const [message, setMessage] = useState("");
 
     const submit = async (e) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
-        setMessage('');
+        setMessage("");
 
         try {
             const data = {
-                email: loginMethod === 'email' ? email : '',
-                phone: loginMethod === 'phone' ? phone : '',
+                email: loginMethod === "email" ? email : "",
+                phone: loginMethod === "phone" ? phone : "",
                 password: password,
                 remember: remember,
             };
@@ -40,25 +40,25 @@ export default function Login() {
             
             if (response.verification_method) {
                 // OTP verification required (account not verified)
-                setMessage(response.message || 'Please check your email/phone for the verification code.');
+                setMessage(response.message || "Please check your email/phone for the verification code.");
                 // Store verification token for OTP verification
                 if (response.verification_token) {
                     authService.setVerificationToken(response.verification_token);
                 }
-                navigate('/verify-otp');
+                navigate("/verify-otp");
             } else if (response.token) {
                 // Direct login success (account is verified)
                 // Update user state in AuthContext
                 if (response.user) {
                     updateUser(response.user);
                 }
-                navigate('/dashboard');
+                navigate("/dashboard");
             }
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
-                setErrors({ email: [error.response?.data?.message || 'Login failed. Please try again.'] });
+                setErrors({ email: [error.response?.data?.message || "Login failed. Please try again."] });
             }
         } finally {
             setProcessing(false);
@@ -75,9 +75,9 @@ export default function Login() {
                             Welcome Back
                         </h2>
                         <p className="mt-2 text-center text-sm text-gray-600">
-                            Or{' '}
+                            Or{" "}
                             <Link
-                                to={route('register')}
+                                to={route("register")}
                                 className="font-medium text-blue-600 hover:text-blue-500"
                             >
                                 create a new account
@@ -108,14 +108,14 @@ export default function Login() {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        setLoginMethod('email');
-                                        setEmail('');
-                                        setPhone('');
+                                        setLoginMethod("email");
+                                        setEmail("");
+                                        setPhone("");
                                     }}
                                     className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                                        loginMethod === 'email'
-                                            ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                            : 'border-gray-200 hover:border-blue-300 bg-white'
+                                        loginMethod === "email"
+                                            ? "border-blue-500 bg-blue-50 shadow-lg"
+                                            : "border-gray-200 hover:border-blue-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">📧</div>
@@ -124,14 +124,14 @@ export default function Login() {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        setLoginMethod('phone');
-                                        setEmail('');
-                                        setPhone('');
+                                        setLoginMethod("phone");
+                                        setEmail("");
+                                        setPhone("");
                                     }}
                                     className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                                        loginMethod === 'phone'
-                                            ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                            : 'border-gray-200 hover:border-blue-300 bg-white'
+                                        loginMethod === "phone"
+                                            ? "border-blue-500 bg-blue-50 shadow-lg"
+                                            : "border-gray-200 hover:border-blue-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">📱</div>
@@ -141,7 +141,7 @@ export default function Login() {
                         </div>
 
                         <div className="space-y-6">
-                            {loginMethod === 'email' ? (
+                            {loginMethod === "email" ? (
                                 <div>
                                     <InputLabel htmlFor="email" value="Email Address" className="text-gray-700 font-medium" />
                                     <TextInput
@@ -216,15 +216,15 @@ export default function Login() {
                                 className="w-full flex justify-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                                 disabled={processing}
                             >
-                                {processing ? 'Logging in...' : 'Log in'}
+                                {processing ? "Logging in..." : "Log in"}
                             </PrimaryButton>
                         </div>
 
                         <div className="text-center">
                             <p className="text-sm text-gray-600">
-                                Don't have an account?{' '}
+                                Don't have an account?{" "}
                                 <Link
-                                    to={route('register')}
+                                    to={route("register")}
                                     className="font-medium text-blue-600 hover:text-blue-500"
                                 >
                                     Sign up

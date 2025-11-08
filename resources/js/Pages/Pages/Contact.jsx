@@ -1,13 +1,13 @@
 // Head removed
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState } from 'react';
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState } from "react";
 
 export default function Contact() {
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        message: '',
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
@@ -50,7 +50,7 @@ export default function Contact() {
                                 <input
                                     type="text"
                                     value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
+                                    onChange={(e) => setData("name", e.target.value)}
                                     className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
@@ -61,7 +61,7 @@ export default function Contact() {
                                 <input
                                     type="email"
                                     value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
+                                    onChange={(e) => setData("email", e.target.value)}
                                     className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                     required
                                 />
@@ -72,7 +72,7 @@ export default function Contact() {
                                 <input
                                     type="tel"
                                     value={data.phone}
-                                    onChange={(e) => setData('phone', e.target.value)}
+                                    onChange={(e) => setData("phone", e.target.value)}
                                     className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                 />
                                 {errors.phone && <div className="text-red-500 text-sm mt-1">{errors.phone}</div>}
@@ -81,7 +81,7 @@ export default function Contact() {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
                                 <textarea
                                     value={data.message}
-                                    onChange={(e) => setData('message', e.target.value)}
+                                    onChange={(e) => setData("message", e.target.value)}
                                     rows={6}
                                     className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                     required

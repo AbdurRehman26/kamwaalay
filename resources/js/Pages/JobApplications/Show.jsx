@@ -1,9 +1,9 @@
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState, useEffect } from 'react';
-import { jobApplicationsService } from '@/services/jobApplications';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import { Link, useParams, useNavigate } from "react-router-dom";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState, useEffect } from "react";
+import { jobApplicationsService } from "@/services/jobApplications";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function JobApplicationShow() {
     const { applicationId } = useParams();
@@ -21,8 +21,8 @@ export default function JobApplicationShow() {
                     setLoading(false);
                 })
                 .catch((err) => {
-                    console.error('Error fetching application:', err);
-                    setError(err.response?.data?.message || 'Failed to load application');
+                    console.error("Error fetching application:", err);
+                    setError(err.response?.data?.message || "Failed to load application");
                     setLoading(false);
                 });
         }
@@ -44,9 +44,9 @@ export default function JobApplicationShow() {
             <PublicLayout>
                 
                 <div className="container mx-auto px-4 py-12 text-center">
-                    <p className="text-red-600">{error || 'Application not found'}</p>
+                    <p className="text-red-600">{error || "Application not found"}</p>
                     <Link
-                        to={route('job-applications.index')}
+                        to={route("job-applications.index")}
                         className="mt-4 inline-block bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                     >
                         Back to Applications
@@ -57,16 +57,16 @@ export default function JobApplicationShow() {
     }
     const getStatusColor = (status) => {
         switch (status) {
-            case 'pending':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'accepted':
-                return 'bg-green-100 text-green-800';
-            case 'rejected':
-                return 'bg-red-100 text-red-800';
-            case 'withdrawn':
-                return 'bg-gray-100 text-gray-800';
+            case "pending":
+                return "bg-yellow-100 text-yellow-800";
+            case "accepted":
+                return "bg-green-100 text-green-800";
+            case "rejected":
+                return "bg-red-100 text-red-800";
+            case "withdrawn":
+                return "bg-gray-100 text-gray-800";
             default:
-                return 'bg-gray-100 text-gray-800';
+                return "bg-gray-100 text-gray-800";
         }
     };
 
@@ -104,8 +104,8 @@ export default function JobApplicationShow() {
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Service Request</h3>
-                                <p className="text-gray-900 capitalize">{application.booking?.service_type?.replace('_', ' ') || 'N/A'}</p>
-                                <p className="text-gray-900 capitalize">{application.booking?.work_type?.replace('_', ' ') || 'N/A'}</p>
+                                <p className="text-gray-900 capitalize">{application.booking?.service_type?.replace("_", " ") || "N/A"}</p>
+                                <p className="text-gray-900 capitalize">{application.booking?.work_type?.replace("_", " ") || "N/A"}</p>
                                 <p className="text-gray-900">{application.booking.city}, {application.booking.area}</p>
                             </div>
                         </div>
@@ -128,19 +128,19 @@ export default function JobApplicationShow() {
                     </div>
 
                     {/* Actions */}
-                    {isBookingOwner && application.status === 'pending' && (
+                    {isBookingOwner && application.status === "pending" && (
                         <div className="bg-white rounded-lg shadow-md p-8 flex gap-4">
                             <button
                                 onClick={async () => {
-                                    if (confirm('Are you sure you want to accept this application? This will reject all other applications.')) {
+                                    if (confirm("Are you sure you want to accept this application? This will reject all other applications.")) {
                                         try {
                                             await jobApplicationsService.acceptApplication(application.id);
                                             // Refresh application data
                                             const data = await jobApplicationsService.getApplication(application.id);
                                             setApplication(data.application);
                                         } catch (error) {
-                                            console.error('Error accepting application:', error);
-                                            alert('Failed to accept application. Please try again.');
+                                            console.error("Error accepting application:", error);
+                                            alert("Failed to accept application. Please try again.");
                                         }
                                     }
                                 }}
@@ -150,15 +150,15 @@ export default function JobApplicationShow() {
                             </button>
                             <button
                                 onClick={async () => {
-                                    if (confirm('Are you sure you want to reject this application?')) {
+                                    if (confirm("Are you sure you want to reject this application?")) {
                                         try {
                                             await jobApplicationsService.rejectApplication(application.id);
                                             // Refresh application data
                                             const data = await jobApplicationsService.getApplication(application.id);
                                             setApplication(data.application);
                                         } catch (error) {
-                                            console.error('Error rejecting application:', error);
-                                            alert('Failed to reject application. Please try again.');
+                                            console.error("Error rejecting application:", error);
+                                            alert("Failed to reject application. Please try again.");
                                         }
                                     }
                                 }}
@@ -169,12 +169,12 @@ export default function JobApplicationShow() {
                         </div>
                     )}
 
-                    {isApplicant && application.status === 'pending' && (
+                    {isApplicant && application.status === "pending" && (
                         <div className="bg-white rounded-lg shadow-md p-8">
                             <button
                                 onClick={() => {
-                                    if (confirm('Are you sure you want to withdraw this application?')) {
-                                        router.post(route('job-applications.withdraw', application.id));
+                                    if (confirm("Are you sure you want to withdraw this application?")) {
+                                        router.post(route("job-applications.withdraw", application.id));
                                     }
                                 }}
                                 className="w-full bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-300 font-semibold"
@@ -184,11 +184,11 @@ export default function JobApplicationShow() {
                         </div>
                     )}
 
-                    {application.status === 'accepted' && (
+                    {application.status === "accepted" && (
                         <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                             <p className="text-green-800 font-semibold text-lg mb-4">✓ Application Accepted!</p>
                             <Link
-                                to={route('bookings.show', application.booking.id)}
+                                to={route("bookings.show", application.booking.id)}
                                 className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300 font-semibold"
                             >
                                 View Booking Details

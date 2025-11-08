@@ -1,5 +1,5 @@
 // Head removed
-import PublicLayout from '@/Layouts/PublicLayout';
+import PublicLayout from "@/Layouts/PublicLayout";
 
 export default function About() {
     return (

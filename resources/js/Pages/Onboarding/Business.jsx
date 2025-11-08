@@ -1,11 +1,11 @@
-import { useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
-import PublicLayout from '@/Layouts/PublicLayout';
-import axios from 'axios';
-import { useDropzone } from 'react-dropzone';
-import { onboardingService } from '@/services/onboarding';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import axios from "axios";
+import { useDropzone } from "react-dropzone";
+import { onboardingService } from "@/services/onboarding";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function OnboardingBusiness() {
     const navigate = useNavigate();
@@ -13,12 +13,12 @@ export default function OnboardingBusiness() {
     const [offers, setOffers] = useState([{
         selectedServiceTypes: [],
         selectedLocations: [],
-        work_type: '',
-        monthly_rate: '',
-        description: '',
+        work_type: "",
+        monthly_rate: "",
+        description: "",
     }]);
 
-    const [locationQueries, setLocationQueries] = useState(['']);
+    const [locationQueries, setLocationQueries] = useState([""]);
     const [locationSuggestions, setLocationSuggestions] = useState([[]]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState([false]);
     const locationRefs = useRef([]);
@@ -27,21 +27,21 @@ export default function OnboardingBusiness() {
     // Business profile fields
     const [profileData, setProfileData] = useState({
         nic: null,
-        nic_number: '',
-        bio: user?.bio || '',
-        city: user?.city || '',
-        area: user?.area || '',
+        nic_number: "",
+        bio: user?.bio || "",
+        city: user?.city || "",
+        area: user?.area || "",
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
 
     const serviceTypes = [
-        { value: 'maid', label: 'Maid', icon: '🧹' },
-        { value: 'cook', label: 'Cook', icon: '👨‍🍳' },
-        { value: 'babysitter', label: 'Babysitter', icon: '👶' },
-        { value: 'caregiver', label: 'Caregiver', icon: '👵' },
-        { value: 'cleaner', label: 'Cleaner', icon: '✨' },
-        { value: 'all_rounder', label: 'All Rounder', icon: '🌟' },
+        { value: "maid", label: "Maid", icon: "🧹" },
+        { value: "cook", label: "Cook", icon: "👨‍🍳" },
+        { value: "babysitter", label: "Babysitter", icon: "👶" },
+        { value: "caregiver", label: "Caregiver", icon: "👵" },
+        { value: "cleaner", label: "Cleaner", icon: "✨" },
+        { value: "all_rounder", label: "All Rounder", icon: "🌟" },
     ];
 
     // Fetch location suggestions for each offer
@@ -53,7 +53,7 @@ export default function OnboardingBusiness() {
                 }
                 searchTimeoutRefs.current[index] = setTimeout(() => {
                     axios
-                        .get('/api/locations/search', {
+                        .get("/api/locations/search", {
                             params: { q: query },
                         })
                         .then((response) => {
@@ -65,7 +65,7 @@ export default function OnboardingBusiness() {
                             setShowLocationSuggestions(newShow);
                         })
                         .catch((error) => {
-                            console.error('Error fetching locations:', error);
+                            console.error("Error fetching locations:", error);
                             const newSuggestions = [...locationSuggestions];
                             newSuggestions[index] = [];
                             setLocationSuggestions(newSuggestions);
@@ -86,11 +86,11 @@ export default function OnboardingBusiness() {
         setOffers([...offers, {
             selectedServiceTypes: [],
             selectedLocations: [],
-            work_type: '',
-            monthly_rate: '',
-            description: '',
+            work_type: "",
+            monthly_rate: "",
+            description: "",
         }]);
-        setLocationQueries([...locationQueries, '']);
+        setLocationQueries([...locationQueries, ""]);
         setLocationSuggestions([...locationSuggestions, []]);
         setShowLocationSuggestions([...showLocationSuggestions, false]);
     };
@@ -127,7 +127,7 @@ export default function OnboardingBusiness() {
     const handleLocationSelect = (location, offerIndex) => {
         // Only allow selection if location has an id (actual location from database)
         if (!location.id) {
-            alert('Please select a specific location (area) from the list, not just a city.');
+            alert("Please select a specific location (area) from the list, not just a city.");
             return;
         }
         // Check if location already exists
@@ -138,12 +138,12 @@ export default function OnboardingBusiness() {
                 id: location.id,
                 display_text: location.display_text,
                 city_name: location.city_name,
-                area: location.area || '',
+                area: location.area || "",
             });
             setOffers(newOffers);
         }
         const newQueries = [...locationQueries];
-        newQueries[offerIndex] = '';
+        newQueries[offerIndex] = "";
         setLocationQueries(newQueries);
         const newShow = [...showLocationSuggestions];
         newShow[offerIndex] = false;
@@ -166,9 +166,9 @@ export default function OnboardingBusiness() {
                 }
             });
         };
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
 
@@ -185,7 +185,7 @@ export default function OnboardingBusiness() {
         );
 
         if (validOffers.length === 0) {
-            alert('Please add at least one complete offer with service types, locations, and work type.');
+            alert("Please add at least one complete offer with service types, locations, and work type.");
             setProcessing(false);
             return;
         }
@@ -209,25 +209,25 @@ export default function OnboardingBusiness() {
 
         // Prepare FormData for file uploads
         const formData = new FormData();
-        formData.append('services', JSON.stringify(servicesArray));
-        formData.append('bio', profileData.bio || '');
-        formData.append('city', profileData.city || '');
-        formData.append('area', profileData.area || '');
-        formData.append('nic_number', profileData.nic_number || '');
+        formData.append("services", JSON.stringify(servicesArray));
+        formData.append("bio", profileData.bio || "");
+        formData.append("city", profileData.city || "");
+        formData.append("area", profileData.area || "");
+        formData.append("nic_number", profileData.nic_number || "");
         
         if (profileData.nic) {
-            formData.append('nic', profileData.nic);
+            formData.append("nic", profileData.nic);
         }
 
         try {
             await onboardingService.completeBusiness(formData);
             // Redirect to dashboard on success
-            router.visit(route('dashboard'), { method: 'get' });
+            router.visit(route("dashboard"), { method: "get" });
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
-                setErrors({ submit: [error.response?.data?.message || 'Failed to complete onboarding'] });
+                setErrors({ submit: [error.response?.data?.message || "Failed to complete onboarding"] });
             }
         } finally {
             setProcessing(false);
@@ -238,8 +238,8 @@ export default function OnboardingBusiness() {
     const NICDropzone = ({ onFileAccepted, file, error }) => {
         const { getRootProps, getInputProps, isDragActive } = useDropzone({
             accept: {
-                'image/*': ['.jpeg', '.jpg', '.png'],
-                'application/pdf': ['.pdf']
+                "image/*": [".jpeg", ".jpg", ".png"],
+                "application/pdf": [".pdf"]
             },
             maxFiles: 1,
             maxSize: 5 * 1024 * 1024, // 5MB
@@ -256,10 +256,10 @@ export default function OnboardingBusiness() {
                     {...getRootProps()}
                     className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                         isDragActive
-                            ? 'border-blue-500 bg-blue-50'
+                            ? "border-blue-500 bg-blue-50"
                             : error
-                            ? 'border-red-300 bg-red-50'
-                            : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
+                            ? "border-red-300 bg-red-50"
+                            : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
                     }`}
                 >
                     <input {...getInputProps()} required />
@@ -275,7 +275,7 @@ export default function OnboardingBusiness() {
                         ) : (
                             <>
                                 <p className="text-sm font-medium text-gray-700">
-                                    {isDragActive ? 'Drop the file here' : 'Click or drag to upload NIC'}
+                                    {isDragActive ? "Drop the file here" : "Click or drag to upload NIC"}
                                 </p>
                                 <p className="text-xs text-gray-500">
                                     Supports: JPG, PNG, PDF (Max 5MB)
@@ -358,8 +358,8 @@ export default function OnboardingBusiness() {
                                                 disabled={offer.selectedServiceTypes.includes(service.value)}
                                                 className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
                                                     offer.selectedServiceTypes.includes(service.value)
-                                                        ? 'border-blue-500 bg-blue-50 opacity-50 cursor-not-allowed'
-                                                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer'
+                                                        ? "border-blue-500 bg-blue-50 opacity-50 cursor-not-allowed"
+                                                        : "border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
                                                 }`}
                                             >
                                                 <div className="text-3xl mb-2">{service.icon}</div>
@@ -442,7 +442,7 @@ export default function OnboardingBusiness() {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Work Type *</label>
                                         <select
                                             value={offer.work_type}
-                                            onChange={(e) => updateOffer(offerIndex, 'work_type', e.target.value)}
+                                            onChange={(e) => updateOffer(offerIndex, "work_type", e.target.value)}
                                             className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                             required
                                         >
@@ -458,7 +458,7 @@ export default function OnboardingBusiness() {
                                             type="number"
                                             step="0.01"
                                             value={offer.monthly_rate}
-                                            onChange={(e) => updateOffer(offerIndex, 'monthly_rate', e.target.value)}
+                                            onChange={(e) => updateOffer(offerIndex, "monthly_rate", e.target.value)}
                                             className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                             placeholder="e.g., 15000"
                                         />
@@ -468,7 +468,7 @@ export default function OnboardingBusiness() {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                                         <textarea
                                             value={offer.description}
-                                            onChange={(e) => updateOffer(offerIndex, 'description', e.target.value)}
+                                            onChange={(e) => updateOffer(offerIndex, "description", e.target.value)}
                                             rows={4}
                                             className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                                             placeholder="Describe this service offer..."
@@ -487,10 +487,10 @@ export default function OnboardingBusiness() {
                                                 <span className="font-semibold">{offer.selectedServiceTypes.length}</span> service type(s): {offer.selectedServiceTypes.map((st) => {
                                                     const service = serviceTypes.find(s => s.value === st);
                                                     return service?.label;
-                                                }).join(', ')}
+                                                }).join(", ")}
                                             </div>
                                             <div>
-                                                <span className="font-semibold">{offer.selectedLocations.length}</span> location(s): {offer.selectedLocations.map(loc => loc.display_text).join(', ')}
+                                                <span className="font-semibold">{offer.selectedLocations.length}</span> location(s): {offer.selectedLocations.map(loc => loc.display_text).join(", ")}
                                             </div>
                                         </div>
                                     </div>
@@ -595,7 +595,7 @@ export default function OnboardingBusiness() {
                                 disabled={processing}
                                 className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold disabled:opacity-50"
                             >
-                                {processing ? 'Completing Profile...' : 'Complete Profile'}
+                                {processing ? "Completing Profile..." : "Complete Profile"}
                             </button>
                         </div>
                     </form>

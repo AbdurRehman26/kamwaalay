@@ -1,8 +1,8 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState, useEffect } from 'react';
-import { jobApplicationsService } from '@/services/jobApplications';
-import { route } from '@/utils/routes';
+import { useParams, useNavigate } from "react-router-dom";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState, useEffect } from "react";
+import { jobApplicationsService } from "@/services/jobApplications";
+import { route } from "@/utils/routes";
 
 export default function JobApplicationCreate() {
     const { bookingId } = useParams();
@@ -10,8 +10,8 @@ export default function JobApplicationCreate() {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState({
-        message: '',
-        proposed_rate: '',
+        message: "",
+        proposed_rate: "",
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
@@ -24,7 +24,7 @@ export default function JobApplicationCreate() {
                     setLoading(false);
                 })
                 .catch((error) => {
-                    console.error('Error fetching booking:', error);
+                    console.error("Error fetching booking:", error);
                     setLoading(false);
                 });
         }
@@ -38,14 +38,14 @@ export default function JobApplicationCreate() {
         try {
             const response = await jobApplicationsService.createApplication(bookingId, data);
             // Redirect to applications index or show success message
-            router.visit(route('job-applications.index'), {
-                method: 'get',
+            router.visit(route("job-applications.index"), {
+                method: "get",
             });
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
-                setErrors({ submit: [error.response?.data?.message || 'Failed to create application'] });
+                setErrors({ submit: [error.response?.data?.message || "Failed to create application"] });
             }
         } finally {
             setProcessing(false);
@@ -70,7 +70,7 @@ export default function JobApplicationCreate() {
                     <div className="text-center py-12">
                         <p className="text-red-600">Booking not found</p>
                         <button
-                            onClick={() => router.visit(route('job-applications.index'))}
+                            onClick={() => router.visit(route("job-applications.index"))}
                             className="mt-4 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                         >
                             Back to Job Requests
@@ -84,11 +84,11 @@ export default function JobApplicationCreate() {
                         <div className="grid md:grid-cols-2 gap-6">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Service Type</h3>
-                                <p className="text-gray-900 capitalize">{booking.service_type?.replace('_', ' ') || 'N/A'}</p>
+                                <p className="text-gray-900 capitalize">{booking.service_type?.replace("_", " ") || "N/A"}</p>
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Work Type</h3>
-                                <p className="text-gray-900 capitalize">{booking.work_type?.replace('_', ' ') || 'N/A'}</p>
+                                <p className="text-gray-900 capitalize">{booking.work_type?.replace("_", " ") || "N/A"}</p>
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Location</h3>
@@ -148,11 +148,11 @@ export default function JobApplicationCreate() {
                                 disabled={processing}
                                 className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                             >
-                                {processing ? 'Submitting...' : 'Submit Application'}
+                                {processing ? "Submitting..." : "Submit Application"}
                             </button>
                             <button
                                 type="button"
-                                onClick={() => router.visit(route('job-applications.index'))}
+                                onClick={() => router.visit(route("job-applications.index"))}
                                 className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                             >
                                 Cancel

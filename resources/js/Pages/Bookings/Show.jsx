@@ -1,9 +1,9 @@
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState, useEffect } from 'react';
-import { bookingsService } from '@/services/bookings';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import { Link, useParams, useNavigate } from "react-router-dom";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState, useEffect } from "react";
+import { bookingsService } from "@/services/bookings";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function BookingShow() {
     const { bookingId } = useParams();
@@ -21,8 +21,8 @@ export default function BookingShow() {
                     setLoading(false);
                 })
                 .catch((err) => {
-                    console.error('Error fetching booking:', err);
-                    setError(err.response?.data?.message || 'Failed to load booking');
+                    console.error("Error fetching booking:", err);
+                    setError(err.response?.data?.message || "Failed to load booking");
                     setLoading(false);
                 });
         }
@@ -44,9 +44,9 @@ export default function BookingShow() {
             <PublicLayout>
                 
                 <div className="container mx-auto px-4 py-12 text-center">
-                    <p className="text-red-600">{error || 'Booking not found'}</p>
+                    <p className="text-red-600">{error || "Booking not found"}</p>
                     <Link
-                        to={route('bookings.index')}
+                        to={route("bookings.index")}
                         className="mt-4 inline-block bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                     >
                         Back to My Requests
@@ -57,22 +57,22 @@ export default function BookingShow() {
     }
 
     const isOwner = user?.id === booking.user_id;
-    const isHelper = user?.role === 'helper' || user?.role === 'business';
+    const isHelper = user?.role === "helper" || user?.role === "business";
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'pending':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'confirmed':
-                return 'bg-green-100 text-green-800';
-            case 'in_progress':
-                return 'bg-blue-100 text-blue-800';
-            case 'completed':
-                return 'bg-gray-100 text-gray-800';
-            case 'cancelled':
-                return 'bg-red-100 text-red-800';
+            case "pending":
+                return "bg-yellow-100 text-yellow-800";
+            case "confirmed":
+                return "bg-green-100 text-green-800";
+            case "in_progress":
+                return "bg-blue-100 text-blue-800";
+            case "completed":
+                return "bg-gray-100 text-gray-800";
+            case "cancelled":
+                return "bg-red-100 text-red-800";
             default:
-                return 'bg-gray-100 text-gray-800';
+                return "bg-gray-100 text-gray-800";
         }
     };
 
@@ -89,21 +89,21 @@ export default function BookingShow() {
                     <div className="bg-white rounded-lg shadow-md p-8 mb-8">
                         <div className="flex items-center gap-3 mb-6">
                             <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold capitalize">
-                                {booking.service_type?.replace('_', ' ') || 'N/A'}
+                                {booking.service_type?.replace("_", " ") || "N/A"}
                             </span>
                             <span className={`px-4 py-2 rounded-full font-semibold ${getStatusColor(booking.status)}`}>
-                                {booking.status?.replace('_', ' ') || 'N/A'}
+                                {booking.status?.replace("_", " ") || "N/A"}
                             </span>
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Service Type</h3>
-                                <p className="text-gray-900 capitalize">{booking.service_type?.replace('_', ' ') || 'N/A'}</p>
+                                <p className="text-gray-900 capitalize">{booking.service_type?.replace("_", " ") || "N/A"}</p>
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Work Type</h3>
-                                <p className="text-gray-900 capitalize">{booking.work_type?.replace('_', ' ') || 'N/A'}</p>
+                                <p className="text-gray-900 capitalize">{booking.work_type?.replace("_", " ") || "N/A"}</p>
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Location</h3>
@@ -137,7 +137,7 @@ export default function BookingShow() {
                             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
                                 <p className="text-yellow-800 mb-4">No helper assigned yet. Check applications to your request.</p>
                                 <Link
-                                    to={route('job-applications.my-request-applications')}
+                                    to={route("job-applications.my-request-applications")}
                                     className="inline-block bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 transition duration-300 font-semibold"
                                 >
                                     View Applications
@@ -145,11 +145,11 @@ export default function BookingShow() {
                             </div>
                         )}
 
-                        {!booking.assigned_user_id && isHelper && booking.status === 'pending' && (
+                        {!booking.assigned_user_id && isHelper && booking.status === "pending" && (
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                                 <p className="text-blue-800 mb-4">This service request is open for applications.</p>
                                 <Link
-                                    to={route('job-applications.create', booking.id)}
+                                    to={route("job-applications.create", booking.id)}
                                     className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold"
                                 >
                                     Apply Now
@@ -162,14 +162,14 @@ export default function BookingShow() {
                         {user ? (
                             <>
                                 <Link
-                                    to={route('bookings.index')}
+                                    to={route("bookings.index")}
                                     className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold text-center"
                                 >
                                     Back to My Requests
                                 </Link>
-                                {isHelper && !booking.assigned_user_id && booking.status === 'pending' && (
+                                {isHelper && !booking.assigned_user_id && booking.status === "pending" && (
                                     <Link
-                                        to={route('job-applications.create', booking.id)}
+                                        to={route("job-applications.create", booking.id)}
                                         className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold text-center"
                                     >
                                         Apply to This Request
@@ -179,13 +179,13 @@ export default function BookingShow() {
                         ) : (
                             <>
                                 <Link
-                                    to={route('service-requests.browse')}
+                                    to={route("service-requests.browse")}
                                     className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold text-center"
                                 >
                                     Back to Services Required
                                 </Link>
                                 <Link
-                                    to={route('login')}
+                                    to={route("login")}
                                     className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold text-center"
                                 >
                                     Login to Apply

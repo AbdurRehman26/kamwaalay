@@ -1,9 +1,9 @@
-import { Link, useParams } from 'react-router-dom';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState, useEffect } from 'react';
-import { serviceListingsService } from '@/services/serviceListings';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import { Link, useParams } from "react-router-dom";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState, useEffect } from "react";
+import { serviceListingsService } from "@/services/serviceListings";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function ServiceListingShow() {
     const { listingId } = useParams();
@@ -22,8 +22,8 @@ export default function ServiceListingShow() {
                     setLoading(false);
                 })
                 .catch((err) => {
-                    console.error('Error fetching listing:', err);
-                    setError(err.response?.data?.message || 'Failed to load listing');
+                    console.error("Error fetching listing:", err);
+                    setError(err.response?.data?.message || "Failed to load listing");
                     setLoading(false);
                 });
         }
@@ -45,9 +45,9 @@ export default function ServiceListingShow() {
             <PublicLayout>
                 
                 <div className="container mx-auto px-4 py-12 text-center">
-                    <p className="text-red-600">{error || 'Listing not found'}</p>
+                    <p className="text-red-600">{error || "Listing not found"}</p>
                     <Link
-                        to={route('service-listings.index')}
+                        to={route("service-listings.index")}
                         className="mt-4 inline-block bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                     >
                         Back to Listings
@@ -66,7 +66,7 @@ export default function ServiceListingShow() {
                     <p className="text-xl text-white/90">Service offered by {listing.user?.name}</p>
                     {otherListings && otherListings.length > 0 && (
                         <p className="text-lg text-white/80 mt-2">
-                            This provider offers {otherListings.length} other service{otherListings.length !== 1 ? 's' : ''}
+                            This provider offers {otherListings.length} other service{otherListings.length !== 1 ? "s" : ""}
                         </p>
                     )}
                 </div>
@@ -84,12 +84,12 @@ export default function ServiceListingShow() {
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Work Type</h3>
-                                <p className="text-gray-900 capitalize">{listing.work_type?.replace('_', ' ') || 'N/A'}</p>
+                                <p className="text-gray-900 capitalize">{listing.work_type?.replace("_", " ") || "N/A"}</p>
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2 mt-4">Location</h3>
                                 <p className="text-gray-900">
                                     {listing.locations && listing.locations.length > 0 
                                         ? `${listing.locations[0].city}, ${listing.locations[0].area}`
-                                        : 'Location not specified'}
+                                        : "Location not specified"}
                                 </p>
                             </div>
                         </div>
@@ -108,7 +108,7 @@ export default function ServiceListingShow() {
                     {auth?.user && (
                         <div className="text-center space-y-3">
                             <Link
-                                to={route('bookings.create', {
+                                to={route("bookings.create", {
                                     service_type: listing.service_types && listing.service_types.length > 0 ? listing.service_types[0].service_type : null,
                                     work_type: listing.work_type,
                                     city: listing.locations && listing.locations.length > 0 ? listing.locations[0].city : null,
@@ -145,7 +145,7 @@ export default function ServiceListingShow() {
                                 </a>
                             )}
                             <Link
-                                to={route('login')}
+                                to={route("login")}
                                 className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-lg inline-block"
                             >
                                 Login to Request This Service
@@ -161,7 +161,7 @@ export default function ServiceListingShow() {
                                 {otherListings.map((otherListing) => (
                                     <Link
                                         key={otherListing.id}
-                                        to={route('service-listings.show', otherListing.id)}
+                                        to={route("service-listings.show", otherListing.id)}
                                         className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-blue-500"
                                     >
                                         <div className="flex items-center justify-between mb-4">
@@ -169,7 +169,7 @@ export default function ServiceListingShow() {
                                                 {otherListing.service_types && otherListing.service_types.length > 0 ? (
                                                     otherListing.service_types.slice(0, 2).map((st, idx) => (
                                                         <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
-                                                            {st?.service_type?.replace('_', ' ') || 'Service'}
+                                                            {st?.service_type?.replace("_", " ") || "Service"}
                                                         </span>
                                                     ))
                                                 ) : (
@@ -185,7 +185,7 @@ export default function ServiceListingShow() {
                                             )}
                                         </div>
                                         <p className="text-sm text-gray-600 mb-2 capitalize">
-                                            {otherListing.work_type?.replace('_', ' ') || 'Service'} • {otherListing.locations && otherListing.locations.length > 0 ? `${otherListing.locations[0].city}, ${otherListing.locations[0].area}` : 'Location not specified'}
+                                            {otherListing.work_type?.replace("_", " ") || "Service"} • {otherListing.locations && otherListing.locations.length > 0 ? `${otherListing.locations[0].city}, ${otherListing.locations[0].area}` : "Location not specified"}
                                         </p>
                                         {otherListing.description && (
                                             <p className="text-gray-600 text-sm line-clamp-2 mb-3">
@@ -197,9 +197,9 @@ export default function ServiceListingShow() {
                                 ))}
                             </div>
                             <div className="mt-6 text-center">
-                                {listing.user?.role === 'helper' && listing.user?.id && (
+                                {listing.user?.role === "helper" && listing.user?.id && (
                                     <Link
-                                        to={route('helpers.show', listing.user.id)}
+                                        to={route("helpers.show", listing.user.id)}
                                         className="text-blue-600 hover:text-blue-800 font-semibold"
                                     >
                                         View All Services from {listing.user?.name} →

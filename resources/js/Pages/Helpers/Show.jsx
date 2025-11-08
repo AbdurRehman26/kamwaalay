@@ -1,9 +1,9 @@
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useEffect, useState } from 'react';
-import { helpersService } from '@/services/helpers';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import { Link, useParams, useNavigate } from "react-router-dom";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useEffect, useState } from "react";
+import { helpersService } from "@/services/helpers";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function HelperShow() {
     const { helperId } = useParams();
@@ -23,7 +23,7 @@ export default function HelperShow() {
                     setLoading(false);
                 })
                 .catch((error) => {
-                    console.error('Error fetching helper:', error);
+                    console.error("Error fetching helper:", error);
                     setLoading(false);
                 });
         }
@@ -74,14 +74,14 @@ export default function HelperShow() {
                         </div>
                         <div className="flex-1">
                             <h1 className="text-4xl font-bold mb-2">{helper.name}</h1>
-                            <p className="text-xl text-white/90 mb-4">{helper.bio || 'Professional helper'}</p>
+                            <p className="text-xl text-white/90 mb-4">{helper.bio || "Professional helper"}</p>
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center">
                                     <span className="text-yellow-300 text-2xl mr-2">⭐</span>
                                     <span className="text-2xl font-bold">{helper.rating || 0}</span>
                                     <span className="text-white/80 ml-2">({helper.total_reviews || 0} reviews)</span>
                                 </div>
-                                {helper.verification_status === 'verified' && (
+                                {helper.verification_status === "verified" && (
                                     <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                                         ✓ Verified
                                     </span>
@@ -94,7 +94,7 @@ export default function HelperShow() {
                             </div>
                             {helper.service_listings && helper.service_listings.length > 0 && helper.service_listings[0].service_types && helper.service_listings[0].service_types.length > 0 && (
                                 <p className="mt-4 text-lg capitalize">
-                                    Primary Service: <span className="font-semibold">{helper.service_listings?.[0]?.service_types?.[0]?.service_type?.replace('_', ' ') || 'Service'}</span>
+                                    Primary Service: <span className="font-semibold">{helper.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "Service"}</span>
                                 </p>
                             )}
                         </div>
@@ -114,7 +114,7 @@ export default function HelperShow() {
                                     {serviceListings.map((listing) => (
                                         <Link
                                             key={listing.id}
-                                            to={route('service-listings.show', listing.id)}
+                                            to={route("service-listings.show", listing.id)}
                                             className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-blue-300"
                                         >
                                             <div className="flex items-center justify-between mb-4">
@@ -122,7 +122,7 @@ export default function HelperShow() {
                                                     {listing.service_types && listing.service_types.length > 0 ? (
                                                         listing.service_types.map((serviceType, idx) => (
                                                             <span key={idx} className="bg-blue-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
-                                                                {serviceType?.service_type?.replace('_', ' ') || 'Service'}
+                                                                {serviceType?.service_type?.replace("_", " ") || "Service"}
                                                             </span>
                                                         ))
                                                     ) : (
@@ -138,7 +138,7 @@ export default function HelperShow() {
                                                 )}
                                             </div>
                                             <h3 className="text-lg font-bold text-gray-900 mb-2 capitalize">
-                                                {listing.work_type?.replace('_', ' ') || 'Service'} Service
+                                                {listing.work_type?.replace("_", " ") || "Service"} Service
                                             </h3>
                                             {listing.locations && listing.locations.length > 0 && (
                                                 <div className="text-sm text-gray-600 mb-3 space-y-1">
@@ -162,7 +162,7 @@ export default function HelperShow() {
                                 </div>
                                 {serviceListings.length > 1 && (
                                     <p className="mt-4 text-sm text-gray-600 text-center">
-                                        {helper.name} offers {serviceListings.length} different service{serviceListings.length !== 1 ? 's' : ''} across multiple locations
+                                        {helper.name} offers {serviceListings.length} different service{serviceListings.length !== 1 ? "s" : ""} across multiple locations
                                     </p>
                                 )}
                             </div>
@@ -178,16 +178,16 @@ export default function HelperShow() {
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="flex items-center">
                                                     <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center mr-3">
-                                                        {review.user?.name?.charAt(0) || 'U'}
+                                                        {review.user?.name?.charAt(0) || "U"}
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-gray-900">{review.user?.name || 'Anonymous'}</p>
+                                                        <p className="font-semibold text-gray-900">{review.user?.name || "Anonymous"}</p>
                                                         <p className="text-sm text-gray-500">{new Date(review.created_at).toLocaleDateString()}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex text-yellow-400">
                                                     {[...Array(5)].map((_, i) => (
-                                                        <svg key={i} className={`w-5 h-5 ${i < review.rating ? 'fill-current' : 'text-gray-300'}`} viewBox="0 0 20 20">
+                                                        <svg key={i} className={`w-5 h-5 ${i < review.rating ? "fill-current" : "text-gray-300"}`} viewBox="0 0 20 20">
                                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.683-1.539 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.565-1.839-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z" />
                                                         </svg>
                                                     ))}
@@ -224,7 +224,7 @@ export default function HelperShow() {
                                 {helper.city && (
                                     <div>
                                         <p className="text-sm text-gray-600">Location</p>
-                                        <p className="font-semibold text-gray-900">{helper.city}, {helper.area || 'N/A'}</p>
+                                        <p className="font-semibold text-gray-900">{helper.city}, {helper.area || "N/A"}</p>
                                     </div>
                                 )}
                                 {helper.phone && (
@@ -241,7 +241,7 @@ export default function HelperShow() {
                             {user ? (
                                 <>
                                     <Link
-                                        to={route('bookings.create', {
+                                        to={route("bookings.create", {
                                             service_type: helper.service_listings && helper.service_listings.length > 0 && helper.service_listings[0].service_types && helper.service_listings[0].service_types.length > 0 
                                                 ? helper.service_listings[0].service_types[0].service_type 
                                                 : null,
@@ -268,7 +268,7 @@ export default function HelperShow() {
                                         <button
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                navigate(route('login'));
+                                                navigate(route("login"));
                                             }}
                                             className="w-full bg-gray-400 text-white px-6 py-3 rounded-lg cursor-not-allowed opacity-60 font-semibold text-center block mb-3 flex items-center justify-center gap-2 hover:bg-gray-500 transition-all duration-300"
                                             title="Please login to contact helper"
@@ -280,7 +280,7 @@ export default function HelperShow() {
                                         </button>
                                     )}
                                     <Link
-                                        to={route('login')}
+                                        to={route("login")}
                                         className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
                                     >
                                         Login to Post Request

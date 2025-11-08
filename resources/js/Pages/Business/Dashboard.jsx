@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import PublicLayout from '@/Layouts/PublicLayout';
-import { businessesService } from '@/services/businesses';
-import { useAuth } from '@/contexts/AuthContext';
-import { route } from '@/utils/routes';
+import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { businessesService } from "@/services/businesses";
+import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function BusinessDashboard() {
     const { user } = useAuth();
@@ -22,8 +22,8 @@ export default function BusinessDashboard() {
                 setLoading(false);
             })
             .catch((err) => {
-                console.error('Error fetching dashboard:', err);
-                setError(err.response?.data?.message || 'Failed to load dashboard');
+                console.error("Error fetching dashboard:", err);
+                setError(err.response?.data?.message || "Failed to load dashboard");
                 setLoading(false);
             });
     }, []);
@@ -94,7 +94,7 @@ export default function BusinessDashboard() {
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-lg font-semibold">Recent Workers</h3>
                                 <Link
-                                    to={route('business.workers')}
+                                    to={route("business.workers")}
                                     className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                                 >
                                     View All
@@ -108,12 +108,12 @@ export default function BusinessDashboard() {
                                                 <div className="font-medium">{worker.user?.name}</div>
                                                 <div className="text-sm text-gray-600 capitalize">
                                                     {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].service_types && worker.service_listings[0].service_types.length > 0
-                                                        ? worker.service_listings?.[0]?.service_types?.[0]?.service_type?.replace('_', ' ') || 'No service type'
-                                                        : 'No service type'}
+                                                        ? worker.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "No service type"
+                                                        : "No service type"}
                                                 </div>
                                             </div>
                                             <div className="text-sm text-gray-500">
-                                                {worker.verification_status === 'verified' ? (
+                                                {worker.verification_status === "verified" ? (
                                                     <span className="text-green-600">✓ Verified</span>
                                                 ) : (
                                                     <span className="text-yellow-600">Pending</span>
@@ -126,7 +126,7 @@ export default function BusinessDashboard() {
                                 <div className="text-center py-8 text-gray-500">
                                     <p>No workers yet</p>
                                     <Link
-                                        to={route('business.workers.create')}
+                                        to={route("business.workers.create")}
                                         className="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium"
                                     >
                                         Add Your First Worker
@@ -140,7 +140,7 @@ export default function BusinessDashboard() {
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-lg font-semibold">Recent Bookings</h3>
                                 <Link
-                                    to={route('bookings.index')}
+                                    to={route("bookings.index")}
                                     className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                                 >
                                     View All
@@ -152,7 +152,7 @@ export default function BusinessDashboard() {
                                         <div key={booking.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                             <div>
                                                 <div className="font-medium">{booking.user?.name}</div>
-                                                <div className="text-sm text-gray-600 capitalize">{booking.service_type?.replace('_', ' ') || 'N/A'}</div>
+                                                <div className="text-sm text-gray-600 capitalize">{booking.service_type?.replace("_", " ") || "N/A"}</div>
                                             </div>
                                             <div className="text-sm text-gray-500 capitalize">{booking.status}</div>
                                         </div>
@@ -169,7 +169,7 @@ export default function BusinessDashboard() {
                     {/* Quick Actions */}
                     <div className="mt-8">
                         <Link
-                            to={route('business.workers.create')}
+                            to={route("business.workers.create")}
                             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-300 shadow-lg"
                         >
                             ➕ Add New Worker

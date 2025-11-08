@@ -1,34 +1,34 @@
 // Head removed
-import PublicLayout from '@/Layouts/PublicLayout';
-import { useState } from 'react';
+import PublicLayout from "@/Layouts/PublicLayout";
+import { useState } from "react";
 
 export default function FAQ() {
     const [openIndex, setOpenIndex] = useState(null);
 
     const faqs = [
         {
-            q: 'How do I book a helper?',
-            a: 'Simply browse our verified helpers, select the one that matches your needs, and click "Book Now". Fill in the booking form with your requirements and submit.',
+            q: "How do I book a helper?",
+            a: "Simply browse our verified helpers, select the one that matches your needs, and click \"Book Now\". Fill in the booking form with your requirements and submit.",
         },
         {
-            q: 'Are all helpers verified?',
-            a: 'Yes! All our helpers undergo thorough background checks including police verification and document verification before being listed.',
+            q: "Are all helpers verified?",
+            a: "Yes! All our helpers undergo thorough background checks including police verification and document verification before being listed.",
         },
         {
-            q: 'What if I\'m not satisfied with the helper?',
-            a: 'We offer a free replacement guarantee. If you\'re not satisfied with your helper, contact us and we\'ll arrange a replacement at no extra cost.',
+            q: "What if I'm not satisfied with the helper?",
+            a: "We offer a free replacement guarantee. If you're not satisfied with your helper, contact us and we'll arrange a replacement at no extra cost.",
         },
         {
-            q: 'How do I pay for services?',
-            a: 'Payment can be made directly to the helper. Some helpers may accept online payments. Payment terms will be discussed during booking confirmation.',
+            q: "How do I pay for services?",
+            a: "Payment can be made directly to the helper. Some helpers may accept online payments. Payment terms will be discussed during booking confirmation.",
         },
         {
-            q: 'Can I choose the helper\'s schedule?',
-            a: 'Yes! You can specify your preferred schedule (full-time or part-time) and timings when making a booking. The helper will confirm their availability.',
+            q: "Can I choose the helper's schedule?",
+            a: "Yes! You can specify your preferred schedule (full-time or part-time) and timings when making a booking. The helper will confirm their availability.",
         },
         {
-            q: 'What services do you offer?',
-            a: 'We offer maids, cooks, babysitters, caregivers, cleaners, and all-rounders. Each helper has specific skills listed on their profile.',
+            q: "What services do you offer?",
+            a: "We offer maids, cooks, babysitters, caregivers, cleaners, and all-rounders. Each helper has specific skills listed on their profile.",
         },
     ];
 
@@ -50,7 +50,7 @@ export default function FAQ() {
                             >
                                 <span className="font-semibold text-lg">{faq.q}</span>
                                 <span className="text-blue-600 text-2xl">
-                                    {openIndex === index ? '−' : '+'}
+                                    {openIndex === index ? "−" : "+"}
                                 </span>
                             </button>
                             {openIndex === index && (

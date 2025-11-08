@@ -1,57 +1,57 @@
-import { Link } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
-import PublicLayout from '@/Layouts/PublicLayout';
-import axios from 'axios';
-import { helpersService } from '@/services/helpers';
-import { bookingsService } from '@/services/bookings';
-import { route } from '@/utils/routes';
+import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import axios from "axios";
+import { helpersService } from "@/services/helpers";
+import { bookingsService } from "@/services/bookings";
+import { route } from "@/utils/routes";
 
 export default function HelpersIndex({ helperId: initialHelperId, filters: initialFilters }) {
     const [helpers, setHelpers] = useState({ data: [], links: {}, meta: {} });
     const [filters, setFilters] = useState(initialFilters || {});
     const [loading, setLoading] = useState(true);
-    const [serviceType, setServiceType] = useState(filters?.service_type || '');
-    const [locationId, setLocationId] = useState(filters?.location_id || '');
-    const [locationDisplay, setLocationDisplay] = useState(filters?.location_display || '');
-    const [sortBy, setSortBy] = useState(filters?.sort_by || 'rating');
-    const [userType, setUserType] = useState(filters?.user_type || 'all');
+    const [serviceType, setServiceType] = useState(filters?.service_type || "");
+    const [locationId, setLocationId] = useState(filters?.location_id || "");
+    const [locationDisplay, setLocationDisplay] = useState(filters?.location_display || "");
+    const [sortBy, setSortBy] = useState(filters?.sort_by || "rating");
+    const [userType, setUserType] = useState(filters?.user_type || "all");
     const [showBookingForm, setShowBookingForm] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [selectedArea, setSelectedArea] = useState('');
+    const [selectedArea, setSelectedArea] = useState("");
     const searchTimeoutRef = useRef(null);
     const suggestionsRef = useRef(null);
     const locationFilterRef = useRef(null);
-    const [locationFilterQuery, setLocationFilterQuery] = useState('');
+    const [locationFilterQuery, setLocationFilterQuery] = useState("");
     const [locationFilterSuggestions, setLocationFilterSuggestions] = useState([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
 
     const [formData, setFormData] = useState({
-        service_type: '',
-        work_type: '',
-        city: 'Karachi',
-        area: '',
-        start_date: '',
-        start_time: '',
-        name: '',
-        phone: '',
-        email: '',
-        address: '',
-        special_requirements: '',
+        service_type: "",
+        work_type: "",
+        city: "Karachi",
+        area: "",
+        start_date: "",
+        start_time: "",
+        name: "",
+        phone: "",
+        email: "",
+        address: "",
+        special_requirements: "",
         assigned_user_id: null,
     });
     const [processing, setProcessing] = useState(false);
     const [formErrors, setFormErrors] = useState({});
 
     const serviceTypes = [
-        { value: '', label: 'All Services' },
-        { value: 'maid', label: 'Maid' },
-        { value: 'cook', label: 'Cook' },
-        { value: 'babysitter', label: 'Babysitter' },
-        { value: 'caregiver', label: 'Caregiver' },
-        { value: 'cleaner', label: 'Cleaner' },
-        { value: 'all_rounder', label: 'All Rounder' },
+        { value: "", label: "All Services" },
+        { value: "maid", label: "Maid" },
+        { value: "cook", label: "Cook" },
+        { value: "babysitter", label: "Babysitter" },
+        { value: "caregiver", label: "Caregiver" },
+        { value: "cleaner", label: "Cleaner" },
+        { value: "all_rounder", label: "All Rounder" },
     ];
 
     // Fetch location suggestions for booking form
@@ -62,7 +62,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
             }
             searchTimeoutRef.current = setTimeout(() => {
                 axios
-                    .get('/api/karachi-locations/search', {
+                    .get("/api/karachi-locations/search", {
                         params: { q: searchQuery },
                     })
                     .then((response) => {
@@ -70,7 +70,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         setShowSuggestions(true);
                     })
                     .catch((error) => {
-                        console.error('Error fetching locations:', error);
+                        console.error("Error fetching locations:", error);
                         setSuggestions([]);
                     });
             }, 300);
@@ -93,7 +93,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
             }
             searchTimeoutRef.current = setTimeout(() => {
                 axios
-                    .get('/api/locations/search', {
+                    .get("/api/locations/search", {
                         params: { q: locationFilterQuery },
                     })
                     .then((response) => {
@@ -101,7 +101,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         setShowLocationSuggestions(true);
                     })
                     .catch((error) => {
-                        console.error('Error fetching locations:', error);
+                        console.error("Error fetching locations:", error);
                         setLocationFilterSuggestions([]);
                     });
             }, 300);
@@ -135,14 +135,14 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
 
     const handleLocationSelect = (location) => {
-        setLocationId(location.id || '');
+        setLocationId(location.id || "");
         setLocationDisplay(location.display_text);
         setLocationFilterQuery(location.display_text);
         setShowLocationSuggestions(false);
@@ -168,7 +168,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 setLoading(false);
             })
             .catch((error) => {
-                console.error('Error fetching helpers:', error);
+                console.error("Error fetching helpers:", error);
                 setLoading(false);
             });
     }, [serviceType, locationId, sortBy, userType]);
@@ -177,11 +177,11 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         // Filters are applied via useEffect dependency
         // Just update URL without navigation
         const params = new URLSearchParams();
-        if (serviceType) params.append('service_type', serviceType);
-        if (locationId) params.append('location_id', locationId);
-        if (sortBy) params.append('sort_by', sortBy);
-        if (userType) params.append('user_type', userType);
-        window.history.pushState({}, '', `${route('helpers.index')}?${params.toString()}`);
+        if (serviceType) params.append("service_type", serviceType);
+        if (locationId) params.append("location_id", locationId);
+        if (sortBy) params.append("sort_by", sortBy);
+        if (userType) params.append("user_type", userType);
+        window.history.pushState({}, "", `${route("helpers.index")}?${params.toString()}`);
     };
 
     const handleBookingSubmit = async (e) => {
@@ -193,27 +193,27 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
             await bookingsService.createBooking(formData);
             // Reset form
             setFormData({
-                service_type: '',
-                work_type: '',
-                city: 'Karachi',
-                area: '',
-                start_date: '',
-                start_time: '',
-                name: '',
-                phone: '',
-                email: '',
-                address: '',
-                special_requirements: '',
+                service_type: "",
+                work_type: "",
+                city: "Karachi",
+                area: "",
+                start_date: "",
+                start_time: "",
+                name: "",
+                phone: "",
+                email: "",
+                address: "",
+                special_requirements: "",
                 assigned_user_id: null,
             });
             setShowBookingForm(false);
-            setSearchQuery('');
-            setSelectedArea('');
+            setSearchQuery("");
+            setSelectedArea("");
         } catch (error) {
             if (error.response?.data?.errors) {
                 setFormErrors(error.response.data.errors);
             } else {
-                setFormErrors({ error: [error.response?.data?.message || 'Failed to create booking'] });
+                setFormErrors({ error: [error.response?.data?.message || "Failed to create booking"] });
             }
         } finally {
             setProcessing(false);
@@ -257,7 +257,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             onClick={() => setShowBookingForm(!showBookingForm)}
                             className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                         >
-                            {showBookingForm ? 'Cancel Booking' : 'Post Service Request'}
+                            {showBookingForm ? "Cancel Booking" : "Post Service Request"}
                         </button>
                     </div>
 
@@ -296,8 +296,8 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 onChange={(e) => {
                                     setLocationFilterQuery(e.target.value);
                                     if (!e.target.value) {
-                                        setLocationId('');
-                                        setLocationDisplay('');
+                                        setLocationId("");
+                                        setLocationDisplay("");
                                     }
                                 }}
                                 onFocus={() => {
@@ -359,7 +359,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         required
                                     >
                                         <option value="">Select Service</option>
-                                        {serviceTypes.filter(t => t.value !== '').map((type) => (
+                                        {serviceTypes.filter(t => t.value !== "").map((type) => (
                                             <option key={type.value} value={type.value}>
                                                 {type.label}
                                             </option>
@@ -518,28 +518,28 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                     disabled={processing}
                                     className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                                 >
-                                    {processing ? 'Submitting...' : 'Submit Booking'}
+                                    {processing ? "Submitting..." : "Submit Booking"}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => {
                                         setShowBookingForm(false);
                                         setFormData({
-                                            service_type: '',
-                                            work_type: '',
-                                            city: 'Karachi',
-                                            area: '',
-                                            start_date: '',
-                                            start_time: '',
-                                            name: '',
-                                            phone: '',
-                                            email: '',
-                                            address: '',
-                                            special_requirements: '',
+                                            service_type: "",
+                                            work_type: "",
+                                            city: "Karachi",
+                                            area: "",
+                                            start_date: "",
+                                            start_time: "",
+                                            name: "",
+                                            phone: "",
+                                            email: "",
+                                            address: "",
+                                            special_requirements: "",
                                             assigned_user_id: null,
                                         });
-                                        setSearchQuery('');
-                                        setSelectedArea('');
+                                        setSearchQuery("");
+                                        setSelectedArea("");
                                     }}
                                     className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                                 >
@@ -559,21 +559,21 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                     <>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                             {helpers.data.map((helper) => {
-                                const isBusiness = helper.role === 'business';
+                                const isBusiness = helper.role === "business";
                                 // Ensure helper.id exists before creating route
                                 if (!helper.id) {
-                                    console.warn('Helper missing id:', helper);
+                                    console.warn("Helper missing id:", helper);
                                     return null;
                                 }
-                                const profileRoute = isBusiness ? route('businesses.show', helper.id) : route('helpers.show', helper.id);
+                                const profileRoute = isBusiness ? route("businesses.show", helper.id) : route("helpers.show", helper.id);
 
                                 return (
                                     <Link
                                         key={helper.id}
                                         to={profileRoute}
-                                        className={`group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${isBusiness ? 'border-2 border-blue-200' : ''}`}
+                                        className={`group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${isBusiness ? "border-2 border-blue-200" : ""}`}
                                     >
-                                        <div className={`h-56 flex items-center justify-center overflow-hidden ${isBusiness ? 'bg-gradient-to-br from-blue-400 to-blue-500' : 'bg-gradient-to-br from-blue-400 to-blue-500'}`}>
+                                        <div className={`h-56 flex items-center justify-center overflow-hidden ${isBusiness ? "bg-gradient-to-br from-blue-400 to-blue-500" : "bg-gradient-to-br from-blue-400 to-blue-500"}`}>
                                             {isBusiness ? (
                                                 <div className="text-7xl text-white">🏢</div>
                                             ) : helper.photo ? (
@@ -590,7 +590,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 )}
                                             </div>
                                             {!isBusiness && helper.service_listings && helper.service_listings.length > 0 && helper.service_listings[0].service_types && helper.service_listings[0].service_types.length > 0 && (
-                                                <p className="text-gray-600 mb-3 capitalize">{helper.service_listings?.[0]?.service_types?.[0]?.service_type?.replace('_', ' ') || 'Service'}</p>
+                                                <p className="text-gray-600 mb-3 capitalize">{helper.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "Service"}</p>
                                             )}
                                             {isBusiness && helper.bio && (
                                                 <p className="text-gray-600 mb-3 text-sm line-clamp-2">{helper.bio}</p>
@@ -602,21 +602,21 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                     <span className="text-gray-500 ml-2 text-sm">({helper.total_reviews || 0})</span>
                                                 </div>
                                             )}
-                                            <p className="text-sm text-gray-500 mb-2">{helper.city || 'N/A'}, {helper.area || 'N/A'}</p>
+                                            <p className="text-sm text-gray-500 mb-2">{helper.city || "N/A"}, {helper.area || "N/A"}</p>
                                             {!isBusiness && helper.experience_years > 0 && (
                                                 <p className="text-sm text-gray-600 mb-3">{helper.experience_years} years experience</p>
                                             )}
                                             {isBusiness && helper.service_listings && helper.service_listings.length > 0 && (
                                                 <div className="mb-3">
                                                     <p className="text-sm text-gray-600 mb-2">
-                                                        📋 {helper.service_listings.length} Service{helper.service_listings.length !== 1 ? 's' : ''}
+                                                        📋 {helper.service_listings.length} Service{helper.service_listings.length !== 1 ? "s" : ""}
                                                     </p>
                                                     <div className="flex flex-wrap gap-1">
                                                         {helper.service_listings.slice(0, 3).map((listing, idx) => (
                                                             listing.service_types && listing.service_types.length > 0 ? (
                                                                 listing.service_types.slice(0, 1).map((st, stIdx) => (
                                                                     <span key={`${idx}-${stIdx}`} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold capitalize">
-                                                                        {st?.service_type?.replace('_', ' ') || 'Service'}
+                                                                        {st?.service_type?.replace("_", " ") || "Service"}
                                                                     </span>
                                                                 ))
                                                             ) : null
@@ -629,7 +629,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                     </div>
                                                 </div>
                                             )}
-                                            {!isBusiness && helper.verification_status === 'verified' && (
+                                            {!isBusiness && helper.verification_status === "verified" && (
                                                 <span className="inline-block mt-2 bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-semibold">✓ Verified</span>
                                             )}
                                             {isBusiness && (
@@ -657,13 +657,13 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         {helpers.links.map((link, index) => (
                                             <Link
                                                 key={index}
-                                                to={link.url || '#'}
+                                                to={link.url || "#"}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
-                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                                                        : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
-                                                } ${!link.url && 'cursor-not-allowed opacity-50'}`}
+                                                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                        : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                                                } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                             />
                                         ))}
                                     </div>
@@ -678,12 +678,12 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         <p className="text-gray-500 mb-8">Try adjusting your filters to find helpers</p>
                         <button
                             onClick={() => {
-                                setServiceType('');
-                                setLocationId('');
-                                setLocationDisplay('');
-                                setLocationFilterQuery('');
-                                setUserType('all');
-                                setSortBy('rating');
+                                setServiceType("");
+                                setLocationId("");
+                                setLocationDisplay("");
+                                setLocationFilterQuery("");
+                                setUserType("all");
+                                setSortBy("rating");
                                 handleFilter();
                             }}
                             className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
