@@ -1,9 +1,9 @@
-import api from './api';
+import api from "./api";
 
 export const helpersService = {
     // Get helpers list
     async getHelpers(params = {}) {
-        const response = await api.get('/helpers', { params });
+        const response = await api.get("/helpers", { params });
         return response.data;
     },
 
@@ -15,9 +15,9 @@ export const helpersService = {
 
     // Create helper profile
     async createHelper(data) {
-        const response = await api.post('/helpers', data, {
+        const response = await api.post("/helpers", data, {
             headers: {
-                'Content-Type': 'multipart/form-data',
+                "Content-Type": "multipart/form-data",
             },
         });
         return response.data;
@@ -27,7 +27,7 @@ export const helpersService = {
     async updateHelper(id, data) {
         const response = await api.put(`/helpers/${id}`, data, {
             headers: {
-                'Content-Type': 'multipart/form-data',
+                "Content-Type": "multipart/form-data",
             },
         });
         return response.data;

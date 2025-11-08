@@ -1,8 +1,8 @@
-import api from './api';
+import api from "./api";
 
 export const serviceListingsService = {
     async getListings(params = {}) {
-        const response = await api.get('/service-listings', { params });
+        const response = await api.get("/service-listings", { params });
         return response.data;
     },
 
@@ -12,7 +12,7 @@ export const serviceListingsService = {
     },
 
     async createListing(data) {
-        const response = await api.post('/service-listings', data);
+        const response = await api.post("/service-listings", data);
         return response.data;
     },
 
@@ -27,7 +27,7 @@ export const serviceListingsService = {
     },
 
     async getMyListings() {
-        const response = await api.get('/service-listings/my-listings');
+        const response = await api.get("/service-listings/my-listings");
         return response.data;
     },
 };

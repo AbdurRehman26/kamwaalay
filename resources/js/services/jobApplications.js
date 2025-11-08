@@ -1,8 +1,8 @@
-import api from './api';
+import api from "./api";
 
 export const jobApplicationsService = {
     async getApplications(params = {}) {
-        const response = await api.get('/job-applications', { params });
+        const response = await api.get("/job-applications", { params });
         return response.data;
     },
 
@@ -37,12 +37,12 @@ export const jobApplicationsService = {
     },
 
     async getMyApplications() {
-        const response = await api.get('/job-applications/my-applications');
+        const response = await api.get("/job-applications/my-applications");
         return response.data;
     },
 
     async getMyRequestApplications() {
-        const response = await api.get('/job-applications/my-request-applications');
+        const response = await api.get("/job-applications/my-request-applications");
         return response.data;
     },
 

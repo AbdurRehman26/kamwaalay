@@ -1,8 +1,8 @@
-import api from './api';
+import api from "./api";
 
 export const businessesService = {
     async getBusinesses(params = {}) {
-        const response = await api.get('/businesses', { params });
+        const response = await api.get("/businesses", { params });
         return response.data;
     },
 
@@ -12,17 +12,17 @@ export const businessesService = {
     },
 
     async getDashboard() {
-        const response = await api.get('/business/dashboard');
+        const response = await api.get("/business/dashboard");
         return response.data;
     },
 
     async getWorkers() {
-        const response = await api.get('/business/workers');
+        const response = await api.get("/business/workers");
         return response.data;
     },
 
     async createWorker(data) {
-        const response = await api.post('/business/workers', data);
+        const response = await api.post("/business/workers", data);
         return response.data;
     },
 
@@ -37,7 +37,7 @@ export const businessesService = {
     },
 
     async getWorkerCreate() {
-        const response = await api.get('/business/workers/create');
+        const response = await api.get("/business/workers/create");
         return response.data;
     },
 

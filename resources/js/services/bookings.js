@@ -1,8 +1,8 @@
-import api from './api';
+import api from "./api";
 
 export const bookingsService = {
     async getBookings(params = {}) {
-        const response = await api.get('/bookings', { params });
+        const response = await api.get("/bookings", { params });
         return response.data;
     },
 
@@ -13,7 +13,7 @@ export const bookingsService = {
     },
 
     async createBooking(data) {
-        const response = await api.post('/bookings', data);
+        const response = await api.post("/bookings", data);
         return response.data;
     },
 
@@ -28,12 +28,12 @@ export const bookingsService = {
     },
 
     async browseBookings(params = {}) {
-        const response = await api.get('/bookings/browse', { params });
+        const response = await api.get("/bookings/browse", { params });
         return response.data;
     },
 
     async getBookingCreatePrefill() {
-        const response = await api.get('/bookings/create');
+        const response = await api.get("/bookings/create");
         return response.data;
     },
 };
