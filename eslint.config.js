@@ -4,7 +4,6 @@ import reactPlugin from "eslint-plugin-react";
 
 export default [
     {
-        files: ["**/*.js", "**/*.jsx"],
         ignores: [
             "vendor/**",
             "node_modules/**",
@@ -13,7 +12,12 @@ export default [
             "bootstrap/**",
             "*.min.js",
             "public/build/**",
+            "**/vendor/**",
+            "**/node_modules/**",
         ],
+    },
+    {
+        files: ["**/*.js", "**/*.jsx"],
         languageOptions: {
             parser: babelParser,
             parserOptions: {
