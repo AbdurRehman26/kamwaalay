@@ -334,29 +334,34 @@ class VerificationController extends Controller
             ], 422);
         }
 
-        // Find OTP record
-        $emailOtp = EmailOtp::where('email', $email)
-            ->where('otp', $request->otp)
-            ->where('verified', false)
-            ->latest()
-            ->first();
+        // Demo code check - bypass normal OTP verification for development
+        $isDemoCode = $request->otp === '123456';
+        
+        if (!$isDemoCode) {
+            // Find OTP record
+            $emailOtp = EmailOtp::where('email', $email)
+                ->where('otp', $request->otp)
+                ->where('verified', false)
+                ->latest()
+                ->first();
 
-        if (!$emailOtp) {
-            return response()->json([
-                'message' => 'Invalid or expired OTP. Please try again.',
-                'errors' => ['otp' => ['Invalid or expired OTP.']]
-            ], 422);
+            if (!$emailOtp) {
+                return response()->json([
+                    'message' => 'Invalid or expired OTP. Please try again.',
+                    'errors' => ['otp' => ['Invalid or expired OTP.']]
+                ], 422);
+            }
+
+            if ($emailOtp->isExpired()) {
+                return response()->json([
+                    'message' => 'OTP has expired. Please request a new one.',
+                    'errors' => ['otp' => ['OTP has expired.']]
+                ], 422);
+            }
+
+            // Mark OTP as verified
+            $emailOtp->markAsVerified();
         }
-
-        if ($emailOtp->isExpired()) {
-            return response()->json([
-                'message' => 'OTP has expired. Please request a new one.',
-                'errors' => ['otp' => ['OTP has expired.']]
-            ], 422);
-        }
-
-        // Mark OTP as verified
-        $emailOtp->markAsVerified();
 
         if ($isLogin) {
             // Login flow - mark email as verified since OTP was successful
@@ -423,29 +428,34 @@ class VerificationController extends Controller
             ], 422);
         }
 
-        // Find OTP record
-        $phoneOtp = PhoneOtp::where('phone', $phone)
-            ->where('otp', $request->otp)
-            ->where('verified', false)
-            ->latest()
-            ->first();
+        // Demo code check - bypass normal OTP verification for development
+        $isDemoCode = $request->otp === '123456';
+        
+        if (!$isDemoCode) {
+            // Find OTP record
+            $phoneOtp = PhoneOtp::where('phone', $phone)
+                ->where('otp', $request->otp)
+                ->where('verified', false)
+                ->latest()
+                ->first();
 
-        if (!$phoneOtp) {
-            return response()->json([
-                'message' => 'Invalid or expired OTP. Please try again.',
-                'errors' => ['otp' => ['Invalid or expired OTP.']]
-            ], 422);
+            if (!$phoneOtp) {
+                return response()->json([
+                    'message' => 'Invalid or expired OTP. Please try again.',
+                    'errors' => ['otp' => ['Invalid or expired OTP.']]
+                ], 422);
+            }
+
+            if ($phoneOtp->isExpired()) {
+                return response()->json([
+                    'message' => 'OTP has expired. Please request a new one.',
+                    'errors' => ['otp' => ['OTP has expired.']]
+                ], 422);
+            }
+
+            // Mark OTP as verified
+            $phoneOtp->markAsVerified();
         }
-
-        if ($phoneOtp->isExpired()) {
-            return response()->json([
-                'message' => 'OTP has expired. Please request a new one.',
-                'errors' => ['otp' => ['OTP has expired.']]
-            ], 422);
-        }
-
-        // Mark OTP as verified
-        $phoneOtp->markAsVerified();
 
         if ($isLogin) {
             // Login flow - mark phone as verified since OTP was successful
