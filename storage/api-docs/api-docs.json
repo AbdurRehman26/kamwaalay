@@ -968,6 +968,307 @@
                 }
             }
         },
+        "/api/verify-otp": {
+            "get": {
+                "tags": [
+                    "Verification"
+                ],
+                "summary": "Get verification page data",
+                "description": "Retrieve verification information for OTP verification. Supports both login (via verification_token) and registration (via session) flows.",
+                "operationId": "b8af94f5d860b2409e56b0547da8128d",
+                "parameters": [
+                    {
+                        "name": "verification_token",
+                        "in": "query",
+                        "description": "Encrypted verification token for login flow (optional)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Verification data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "method": {
+                                            "type": "string",
+                                            "enum": [
+                                                "email",
+                                                "phone"
+                                            ],
+                                            "example": "email"
+                                        },
+                                        "identifier": {
+                                            "description": "Email address or masked phone number",
+                                            "type": "string",
+                                            "example": "user@example.com"
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "is_login": {
+                                            "description": "Whether this is a login or registration verification",
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "verification_token": {
+                                            "description": "Verification token for login flow",
+                                            "type": "string",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid token or session",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Verification token has expired. Please login again."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "enum": [
+                                                "token_expired",
+                                                "invalid_token",
+                                                "invalid_session",
+                                                "user_not_found"
+                                            ],
+                                            "example": "token_expired"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Verification"
+                ],
+                "summary": "Verify OTP and complete registration or login",
+                "description": "Verify the OTP code sent via email or phone. Completes user registration or login process. Returns authentication token on success.",
+                "operationId": "4a4eab819dfc26ff5715cf24751f2396",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "otp",
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "otp": {
+                                        "description": "6-digit OTP code",
+                                        "type": "string",
+                                        "maxLength": 6,
+                                        "minLength": 6,
+                                        "example": "123456"
+                                    },
+                                    "user_id": {
+                                        "description": "User ID to verify",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "verification_token": {
+                                        "description": "Verification token for login flow (optional)",
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP verified successfully - Registration or login completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Registration successful!"
+                                        },
+                                        "user": {
+                                            "description": "User object with roles",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "user@example.com",
+                                                    "nullable": true
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+923001234567",
+                                                    "nullable": true
+                                                },
+                                                "email_verified_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                },
+                                                "phone_verified_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "description": "Sanctum authentication token",
+                                            "type": "string",
+                                            "example": "1|abcdefghijklmnopqrstuvwxyz"
+                                        },
+                                        "redirect": {
+                                            "description": "Redirect information (only for registration)",
+                                            "properties": {
+                                                "route": {
+                                                    "type": "string",
+                                                    "example": "onboarding.helper"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Email verified successfully! Please complete your profile to start offering services."
+                                                }
+                                            },
+                                            "type": "object",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid or expired OTP",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid or expired OTP. Please try again."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "otp": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Invalid or expired OTP."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/verify-otp/resend": {
+            "post": {
+                "tags": [
+                    "Verification"
+                ],
+                "summary": "Resend OTP code",
+                "description": "Resend the OTP verification code to the user's email or phone. Supports both login and registration flows.",
+                "operationId": "dfa3f7bcffcdd9a53f231d17f0f63a9a",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "verification_token": {
+                                        "description": "Verification token for login flow (optional)",
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP resent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Verification code has been resent to your email."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid token, session, or verification data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Verification token has expired. Please login again."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "enum": [
+                                                "token_expired",
+                                                "invalid_token",
+                                                "invalid_session",
+                                                "user_not_found",
+                                                "invalid_data"
+                                            ],
+                                            "example": "token_expired"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/bookings/create": {
             "get": {
                 "tags": [
@@ -4728,6 +5029,10 @@
         {
             "name": "Authentication",
             "description": "User authentication endpoints"
+        },
+        {
+            "name": "Verification",
+            "description": "OTP verification endpoints for registration and login"
         },
         {
             "name": "Bookings",

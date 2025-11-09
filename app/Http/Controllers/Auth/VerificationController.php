@@ -14,9 +14,51 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Verification", description: "OTP verification endpoints for registration and login")]
 class VerificationController extends Controller
 {
+    #[OA\Get(
+        path: "/api/verify-otp",
+        summary: "Get verification page data",
+        description: "Retrieve verification information for OTP verification. Supports both login (via verification_token) and registration (via session) flows.",
+        tags: ["Verification"],
+        parameters: [
+            new OA\Parameter(
+                name: "verification_token",
+                in: "query",
+                description: "Encrypted verification token for login flow (optional)",
+                required: false,
+                schema: new OA\Schema(type: "string")
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Verification data retrieved successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "method", type: "string", enum: ["email", "phone"], example: "email"),
+                        new OA\Property(property: "identifier", type: "string", example: "user@example.com", description: "Email address or masked phone number"),
+                        new OA\Property(property: "user_id", type: "integer", example: 1),
+                        new OA\Property(property: "is_login", type: "boolean", example: false, description: "Whether this is a login or registration verification"),
+                        new OA\Property(property: "verification_token", type: "string", nullable: true, description: "Verification token for login flow"),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Invalid token or session",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Verification token has expired. Please login again."),
+                        new OA\Property(property: "error", type: "string", example: "token_expired", enum: ["token_expired", "invalid_token", "invalid_session", "user_not_found"]),
+                    ]
+                )
+            ),
+        ]
+    )]
     /**
      * Display the verification page
      */
@@ -110,6 +152,78 @@ class VerificationController extends Controller
         }
     }
 
+    #[OA\Post(
+        path: "/api/verify-otp",
+        summary: "Verify OTP and complete registration or login",
+        description: "Verify the OTP code sent via email or phone. Completes user registration or login process. Returns authentication token on success.",
+        tags: ["Verification"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["otp", "user_id"],
+                properties: [
+                    new OA\Property(property: "otp", type: "string", minLength: 6, maxLength: 6, example: "123456", description: "6-digit OTP code"),
+                    new OA\Property(property: "user_id", type: "integer", example: 1, description: "User ID to verify"),
+                    new OA\Property(property: "verification_token", type: "string", nullable: true, description: "Verification token for login flow (optional)"),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "OTP verified successfully - Registration or login completed",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Registration successful!"),
+                        new OA\Property(
+                            property: "user",
+                            type: "object",
+                            description: "User object with roles",
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "name", type: "string", example: "John Doe"),
+                                new OA\Property(property: "email", type: "string", nullable: true, example: "user@example.com"),
+                                new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
+                                new OA\Property(property: "email_verified_at", type: "string", format: "date-time", nullable: true),
+                                new OA\Property(property: "phone_verified_at", type: "string", format: "date-time", nullable: true),
+                            ]
+                        ),
+                        new OA\Property(property: "token", type: "string", example: "1|abcdefghijklmnopqrstuvwxyz", description: "Sanctum authentication token"),
+                        new OA\Property(
+                            property: "redirect",
+                            type: "object",
+                            nullable: true,
+                            description: "Redirect information (only for registration)",
+                            properties: [
+                                new OA\Property(property: "route", type: "string", example: "onboarding.helper"),
+                                new OA\Property(property: "message", type: "string", example: "Email verified successfully! Please complete your profile to start offering services."),
+                            ]
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Invalid or expired OTP",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Invalid or expired OTP. Please try again."),
+                        new OA\Property(
+                            property: "errors",
+                            type: "object",
+                            properties: [
+                                new OA\Property(
+                                    property: "otp",
+                                    type: "array",
+                                    items: new OA\Items(type: "string", example: "Invalid or expired OTP.")
+                                ),
+                            ]
+                        ),
+                    ]
+                )
+            ),
+        ]
+    )]
     /**
      * Verify OTP and complete registration or login
      */
@@ -381,6 +495,41 @@ class VerificationController extends Controller
         }
     }
 
+    #[OA\Post(
+        path: "/api/verify-otp/resend",
+        summary: "Resend OTP code",
+        description: "Resend the OTP verification code to the user's email or phone. Supports both login and registration flows.",
+        tags: ["Verification"],
+        requestBody: new OA\RequestBody(
+            required: false,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: "verification_token", type: "string", nullable: true, description: "Verification token for login flow (optional)"),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "OTP resent successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Verification code has been resent to your email."),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Invalid token, session, or verification data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Verification token has expired. Please login again."),
+                        new OA\Property(property: "error", type: "string", example: "token_expired", enum: ["token_expired", "invalid_token", "invalid_session", "user_not_found", "invalid_data"]),
+                    ]
+                )
+            ),
+        ]
+    )]
     /**
      * Resend OTP
      */
