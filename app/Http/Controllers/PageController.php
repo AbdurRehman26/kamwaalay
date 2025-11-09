@@ -6,34 +6,140 @@ use App\Models\City;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Pages", description: "Public page endpoints")]
 class PageController extends Controller
 {
+    #[OA\Get(
+        path: "/api/about",
+        summary: "Get about page",
+        description: "Get about page content",
+        tags: ["Pages"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "About page content",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "About page content"),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function about(): JsonResponse
     {
         return response()->json(['message' => 'About page content']);
     }
 
+    #[OA\Get(
+        path: "/api/contact",
+        summary: "Get contact page",
+        description: "Get contact page content",
+        tags: ["Pages"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Contact page content",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Contact page content"),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function contact(): JsonResponse
     {
         return response()->json(['message' => 'Contact page content']);
     }
 
+    #[OA\Get(
+        path: "/api/faq",
+        summary: "Get FAQ page",
+        description: "Get FAQ page content",
+        tags: ["Pages"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "FAQ page content",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "FAQ page content"),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function faq(): JsonResponse
     {
         return response()->json(['message' => 'FAQ page content']);
     }
 
+    #[OA\Get(
+        path: "/api/terms",
+        summary: "Get terms page",
+        description: "Get terms and conditions page content",
+        tags: ["Pages"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Terms page content",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Terms page content"),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function terms(): JsonResponse
     {
         return response()->json(['message' => 'Terms page content']);
     }
 
+    #[OA\Get(
+        path: "/api/privacy",
+        summary: "Get privacy page",
+        description: "Get privacy policy page content",
+        tags: ["Pages"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Privacy page content",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Privacy page content"),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function privacy(): JsonResponse
     {
         return response()->json(['message' => 'Privacy page content']);
     }
 
+    #[OA\Get(
+        path: "/api/karachi-locations/search",
+        summary: "Search Karachi locations",
+        description: "Search Karachi locations for autocomplete (deprecated - use /api/locations/search)",
+        tags: ["Pages"],
+        parameters: [
+            new OA\Parameter(name: "q", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Search query"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of matching location areas",
+                content: new OA\JsonContent(
+                    type: "array",
+                    items: new OA\Items(type: "string")
+                )
+            ),
+        ]
+    )]
     /**
      * Search Karachi locations for autocomplete (deprecated - use searchLocations)
      */
@@ -59,6 +165,36 @@ class PageController extends Controller
         return response()->json($locations);
     }
 
+    #[OA\Get(
+        path: "/api/locations/search",
+        summary: "Search locations",
+        description: "Search locations (cities and areas) for autocomplete",
+        tags: ["Pages"],
+        parameters: [
+            new OA\Parameter(name: "q", in: "query", required: false, schema: new OA\Schema(type: "string", minLength: 2), description: "Search query (minimum 2 characters)"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of matching locations",
+                content: new OA\JsonContent(
+                    type: "array",
+                    items: new OA\Items(
+                        type: "object",
+                        properties: [
+                            new OA\Property(property: "id", type: "integer"),
+                            new OA\Property(property: "city_id", type: "integer"),
+                            new OA\Property(property: "city_name", type: "string"),
+                            new OA\Property(property: "area", type: "string", nullable: true),
+                            new OA\Property(property: "display_text", type: "string"),
+                            new OA\Property(property: "latitude", type: "number", nullable: true),
+                            new OA\Property(property: "longitude", type: "number", nullable: true),
+                        ]
+                    )
+                )
+            ),
+        ]
+    )]
     /**
      * Search locations for autocomplete (city and area)
      */

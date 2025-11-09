@@ -8,7 +8,9 @@ use App\Models\Review;
 use App\Models\Document;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Admin", description: "Admin management endpoints")]
 class AdminController extends Controller
 {
     public function __construct()
@@ -22,6 +24,27 @@ class AdminController extends Controller
         });
     }
 
+    #[OA\Get(
+        path: "/api/admin/dashboard",
+        summary: "Get admin dashboard",
+        description: "Get admin dashboard statistics and recent activity. Requires admin role.",
+        tags: ["Admin"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Admin dashboard data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "stats", type: "object", description: "Platform statistics"),
+                        new OA\Property(property: "recent_bookings", type: "array", items: new OA\Items(type: "object")),
+                        new OA\Property(property: "pending_helpers", type: "array", items: new OA\Items(type: "object")),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Admin access required"),
+        ]
+    )]
     public function dashboard()
     {
         $stats = [
@@ -54,6 +77,29 @@ class AdminController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/admin/helpers",
+        summary: "List helpers (admin)",
+        description: "Get paginated list of helpers with optional status filter. Requires admin role.",
+        tags: ["Admin"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "status", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["pending", "verified", "rejected"])),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of helpers",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "helpers", type: "object", description: "Paginated list of helpers"),
+                        new OA\Property(property: "filters", type: "object", description: "Applied filters"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Admin access required"),
+        ]
+    )]
     public function helpers(Request $request)
     {
         $query = User::role('helper');
@@ -70,6 +116,41 @@ class AdminController extends Controller
         ]);
     }
 
+    #[OA\Patch(
+        path: "/api/admin/helpers/{helper}/status",
+        summary: "Update helper status",
+        description: "Update helper verification status and active status. Requires admin role.",
+        tags: ["Admin"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "helper", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Helper user ID"),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["verification_status"],
+                properties: [
+                    new OA\Property(property: "verification_status", type: "string", enum: ["pending", "verified", "rejected"]),
+                    new OA\Property(property: "is_active", type: "boolean", nullable: true),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Helper status updated successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Helper status updated successfully!"),
+                        new OA\Property(property: "helper", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Admin access required"),
+            new OA\Response(response: 404, description: "Helper not found"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     public function updateHelperStatus(Request $request, User $helper)
     {
         if (!$helper->hasRole('helper')) {
@@ -89,6 +170,29 @@ class AdminController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/admin/bookings",
+        summary: "List bookings (admin)",
+        description: "Get paginated list of all bookings with optional status filter. Requires admin role.",
+        tags: ["Admin"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "status", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["pending", "confirmed", "in_progress", "completed", "cancelled"])),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of bookings",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "bookings", type: "object", description: "Paginated list of bookings"),
+                        new OA\Property(property: "filters", type: "object", description: "Applied filters"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Admin access required"),
+        ]
+    )]
     public function bookings(Request $request)
     {
         $query = Booking::with(['user', 'assignedUser']);
@@ -105,6 +209,29 @@ class AdminController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/admin/documents",
+        summary: "List documents (admin)",
+        description: "Get paginated list of all documents with optional status filter. Requires admin role.",
+        tags: ["Admin"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "status", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["pending", "verified", "rejected"])),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of documents",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "documents", type: "object", description: "Paginated list of documents"),
+                        new OA\Property(property: "filters", type: "object", description: "Applied filters"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Admin access required"),
+        ]
+    )]
     public function documents(Request $request)
     {
         $query = Document::with(['helper']);
@@ -121,6 +248,40 @@ class AdminController extends Controller
         ]);
     }
 
+    #[OA\Patch(
+        path: "/api/admin/documents/{document}/status",
+        summary: "Update document status",
+        description: "Update document verification status. Requires admin role. If all documents are verified, helper is automatically verified.",
+        tags: ["Admin"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "document", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Document ID"),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["status"],
+                properties: [
+                    new OA\Property(property: "status", type: "string", enum: ["pending", "verified", "rejected"]),
+                    new OA\Property(property: "admin_notes", type: "string", nullable: true),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Document status updated successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Document status updated successfully!"),
+                        new OA\Property(property: "document", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Admin access required"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     public function updateDocumentStatus(Request $request, Document $document)
     {
         $validated = $request->validate([

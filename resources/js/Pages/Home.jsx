@@ -27,7 +27,7 @@ export default function Home() {
     const services = [
         { name: "Maid", icon: "🧹", color: "from-blue-500 to-blue-600" },
         { name: "Cook", icon: "👨‍🍳", color: "from-orange-500 to-orange-600" },
-        { name: "Babysitter", icon: "👶", color: "from-pink-500 to-pink-600" },
+        { name: "Babysitter", icon: "👶", color: "from-blue-500 to-blue-600" },
         { name: "Caregiver", icon: "👵", color: "from-green-500 to-green-600" },
         { name: "Cleaner", icon: "✨", color: "from-blue-500 to-blue-600" },
         { name: "All Rounder", icon: "🌟", color: "from-yellow-500 to-yellow-600" },
@@ -136,7 +136,7 @@ export default function Home() {
                             <div className="text-5xl font-bold text-blue-600 mb-3">{stats?.total_helpers || 0}+</div>
                             <div className="text-gray-700 font-medium">Verified Helpers</div>
                         </div>
-                        <div className="text-center p-8 bg-gradient-to-br from-pink-50 to-orange-50 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+                        <div className="text-center p-8 bg-gradient-to-br from-blue-50 to-orange-50 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
                             <div className="text-5xl font-bold text-blue-600 mb-3">{stats?.total_bookings || 0}+</div>
                             <div className="text-gray-700 font-medium">Bookings</div>
                         </div>

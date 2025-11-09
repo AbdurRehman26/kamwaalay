@@ -6,9 +6,38 @@ use App\Models\ServiceListing;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Service Listings", description: "Service listing management endpoints")]
 class ServiceListingController extends Controller
 {
+    #[OA\Get(
+        path: "/api/service-listings",
+        summary: "List service listings",
+        description: "Get a paginated list of active service listings. Only visible to helpers and guests.",
+        tags: ["Service Listings"],
+        parameters: [
+            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
+            new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer")),
+            new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "work_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["full_time", "part_time"])),
+            new OA\Parameter(name: "sort_by", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["created_at", "rate_low", "rate_high"])),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of service listings",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "listings", type: "object", description: "Paginated list of service listings"),
+                        new OA\Property(property: "filters", type: "object", description: "Applied filters"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Service listings only available to helpers"),
+        ]
+    )]
     /**
      * Display a listing of the resource (only visible to helpers and guests)
      */
@@ -86,6 +115,26 @@ class ServiceListingController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/service-listings/create",
+        summary: "Get service listing creation form",
+        description: "Get form data for creating a service listing. Requires helper/business role and completed onboarding.",
+        tags: ["Service Listings"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Form data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Service listing creation form"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Only helpers and businesses can create listings"),
+            new OA\Response(response: 422, description: "Onboarding not completed"),
+        ]
+    )]
     /**
      * Show the form for creating a new resource
      */
@@ -109,6 +158,58 @@ class ServiceListingController extends Controller
         return response()->json(['message' => 'Service listing creation form']);
     }
 
+    #[OA\Post(
+        path: "/api/service-listings",
+        summary: "Create service listing",
+        description: "Create a new service listing. Supports both single listing and multiple listings format.",
+        tags: ["Service Listings"],
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(
+                        property: "listings",
+                        type: "array",
+                        nullable: true,
+                        description: "Array of listings (new format) - creates ONE listing with multiple service types and locations",
+                        items: new OA\Items(
+                            type: "object",
+                            required: ["service_type", "work_type", "city", "area"],
+                            properties: [
+                                new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                                new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
+                                new OA\Property(property: "city", type: "string", maxLength: 255),
+                                new OA\Property(property: "area", type: "string", maxLength: 255),
+                                new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
+                                new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
+                            ]
+                        )
+                    ),
+                    new OA\Property(property: "service_type", type: "string", nullable: true, enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"], description: "Single listing format (backward compatibility)"),
+                    new OA\Property(property: "work_type", type: "string", nullable: true, enum: ["full_time", "part_time"]),
+                    new OA\Property(property: "city", type: "string", nullable: true, maxLength: 255),
+                    new OA\Property(property: "area", type: "string", nullable: true, maxLength: 255),
+                    new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
+                    new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Service listing created successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Service listing created successfully!"),
+                        new OA\Property(property: "listing", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Only helpers and businesses can create listings"),
+            new OA\Response(response: 422, description: "Validation error or onboarding not completed"),
+        ]
+    )]
     /**
      * Store a newly created resource in storage
      */
@@ -232,6 +333,30 @@ class ServiceListingController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: "/api/service-listings/{serviceListing}",
+        summary: "Get service listing details",
+        description: "Get detailed information about a specific service listing. Only visible to helpers and guests.",
+        tags: ["Service Listings"],
+        parameters: [
+            new OA\Parameter(name: "serviceListing", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Service listing ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Service listing details",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "listing", type: "object"),
+                        new OA\Property(property: "other_listings", type: "array", items: new OA\Items(type: "object")),
+                        new OA\Property(property: "user", type: "object", nullable: true),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Service listings only available to helpers"),
+            new OA\Response(response: 404, description: "Service listing not found"),
+        ]
+    )]
     /**
      * Display the specified resource (only visible to helpers and guests)
      */
@@ -264,6 +389,28 @@ class ServiceListingController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/service-listings/{serviceListing}/edit",
+        summary: "Get service listing edit form",
+        description: "Get service listing data for editing. Only owner or admin can edit.",
+        tags: ["Service Listings"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "serviceListing", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Service listing ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Service listing data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "listing", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only edit own listings"),
+        ]
+    )]
     /**
      * Show the form for editing the specified resource
      */
@@ -282,6 +429,52 @@ class ServiceListingController extends Controller
         ]);
     }
 
+    #[OA\Put(
+        path: "/api/service-listings/{serviceListing}",
+        summary: "Update service listing",
+        description: "Update a service listing. Only owner or admin can update.",
+        tags: ["Service Listings"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "serviceListing", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Service listing ID"),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["service_types", "locations", "work_type", "status"],
+                properties: [
+                    new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
+                    new OA\Property(property: "locations", type: "array", items: new OA\Items(
+                        type: "object",
+                        required: ["city", "area"],
+                        properties: [
+                            new OA\Property(property: "city", type: "string", maxLength: 255),
+                            new OA\Property(property: "area", type: "string", maxLength: 255),
+                        ]
+                    )),
+                    new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
+                    new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
+                    new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
+                    new OA\Property(property: "status", type: "string", enum: ["active", "paused", "closed"]),
+                    new OA\Property(property: "is_active", type: "boolean", nullable: true),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Service listing updated successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Service listing updated successfully!"),
+                        new OA\Property(property: "listing", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only update own listings"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     /**
      * Update the specified resource in storage
      */
@@ -340,6 +533,28 @@ class ServiceListingController extends Controller
         ]);
     }
 
+    #[OA\Delete(
+        path: "/api/service-listings/{serviceListing}",
+        summary: "Delete service listing",
+        description: "Delete a service listing. Only owner or admin can delete.",
+        tags: ["Service Listings"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "serviceListing", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Service listing ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Service listing deleted successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Service listing deleted successfully!"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only delete own listings"),
+        ]
+    )]
     /**
      * Remove the specified resource from storage
      */
@@ -358,6 +573,25 @@ class ServiceListingController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/my-service-listings",
+        summary: "Get my service listings",
+        description: "Get paginated list of service listings created by the authenticated user (helper/business)",
+        tags: ["Service Listings"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of user's service listings",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "listings", type: "object", description: "Paginated list of service listings"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Only helpers and businesses can view their listings"),
+        ]
+    )]
     /**
      * Show my service listings (for helpers/businesses)
      */

@@ -6,9 +6,54 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\App;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Language", description: "Language and translation endpoints")]
 class LanguageController extends Controller
 {
+    #[OA\Post(
+        path: "/api/locale/{locale}",
+        summary: "Switch application language",
+        description: "Changes the application language to the specified locale",
+        tags: ["Language"],
+        parameters: [
+            new OA\Parameter(
+                name: "locale",
+                in: "path",
+                required: true,
+                description: "Language locale code (en or ur)",
+                schema: new OA\Schema(type: "string", enum: ["en", "ur"])
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Language changed successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Language changed successfully."),
+                        new OA\Property(property: "locale", type: "string", example: "en"),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Validation error",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Invalid locale."),
+                        new OA\Property(
+                            property: "errors",
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "locale", type: "array", items: new OA\Items(type: "string"))
+                            ]
+                        ),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function switch(Request $request, $locale): JsonResponse
     {
         // Validate locale
@@ -28,6 +73,38 @@ class LanguageController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/translations/{locale?}",
+        summary: "Get translations",
+        description: "Retrieves all translations for the specified locale",
+        tags: ["Language"],
+        parameters: [
+            new OA\Parameter(
+                name: "locale",
+                in: "path",
+                required: false,
+                description: "Language locale code (en or ur). If not provided, uses session locale.",
+                schema: new OA\Schema(type: "string", enum: ["en", "ur"])
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Translations retrieved successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "locale", type: "string", example: "en"),
+                        new OA\Property(
+                            property: "translations",
+                            type: "object",
+                            description: "Nested object containing translations from different files",
+                            additionalProperties: new OA\AdditionalProperties(type: "object")
+                        ),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function translations(Request $request, $locale = null): JsonResponse
     {
         // Use provided locale or get from session

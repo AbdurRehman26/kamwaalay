@@ -7,9 +7,36 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Bookings", description: "Service request (booking) management endpoints")]
 class BookingController extends Controller
 {
+    #[OA\Get(
+        path: "/api/bookings/create",
+        summary: "Get booking creation form",
+        description: "Get form data for creating a service request with optional prefill data",
+        tags: ["Bookings"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "work_type", in: "query", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "city", in: "query", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string")),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Form data with prefill",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "prefill", type: "object"),
+                        new OA\Property(property: "user", type: "object", nullable: true),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function create(Request $request)
     {
         // Pre-fill data from query parameters (e.g., from service listing)
@@ -21,6 +48,46 @@ class BookingController extends Controller
         ]);
     }
 
+    #[OA\Post(
+        path: "/api/bookings",
+        summary: "Create service request",
+        description: "Create a new service request (booking). Only users and businesses can create requests, not helpers.",
+        tags: ["Bookings"],
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["service_type", "work_type", "area", "name", "phone", "email"],
+                properties: [
+                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                    new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
+                    new OA\Property(property: "area", type: "string", maxLength: 255),
+                    new OA\Property(property: "start_date", type: "string", format: "date", nullable: true),
+                    new OA\Property(property: "start_time", type: "string", format: "time", nullable: true, example: "09:00"),
+                    new OA\Property(property: "name", type: "string", maxLength: 255),
+                    new OA\Property(property: "phone", type: "string", maxLength: 20),
+                    new OA\Property(property: "email", type: "string", format: "email", maxLength: 255),
+                    new OA\Property(property: "address", type: "string", nullable: true),
+                    new OA\Property(property: "special_requirements", type: "string", nullable: true),
+                    new OA\Property(property: "assigned_user_id", type: "integer", nullable: true),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Service request created successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Booking request submitted successfully!"),
+                        new OA\Property(property: "booking", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Helpers cannot create service requests"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     public function store(Request $request)
     {
         // Only users and businesses can create service requests, not helpers
@@ -57,6 +124,27 @@ class BookingController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/bookings/{booking}",
+        summary: "Get booking details",
+        description: "Get detailed information about a specific service request (public access)",
+        tags: ["Bookings"],
+        parameters: [
+            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Booking details",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "booking", type: "object", description: "Booking object with user, assignedUser, review, and jobApplications"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: "Booking not found"),
+        ]
+    )]
     public function show(Booking $booking)
     {
         // Allow public viewing of service requests
@@ -67,6 +155,24 @@ class BookingController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/bookings",
+        summary: "List user's bookings",
+        description: "Get paginated list of service requests created by the authenticated user",
+        tags: ["Bookings"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of user's bookings",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "bookings", type: "object", description: "Paginated list of bookings"),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function index()
     {
         $bookings = Booking::with(['user', 'assignedUser'])
@@ -79,6 +185,31 @@ class BookingController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/service-requests",
+        summary: "Browse available service requests",
+        description: "Browse all available pending service requests (for helpers/businesses to apply)",
+        tags: ["Bookings"],
+        parameters: [
+            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
+            new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer")),
+            new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "work_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["full_time", "part_time"])),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of available service requests",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "bookings", type: "object", description: "Paginated list of pending bookings"),
+                        new OA\Property(property: "filters", type: "object", description: "Applied filters"),
+                    ]
+                )
+            ),
+        ]
+    )]
     /**
      * Display all available service requests publicly (for helpers/businesses to browse)
      */
@@ -141,6 +272,40 @@ class BookingController extends Controller
         ]);
     }
 
+    #[OA\Patch(
+        path: "/api/bookings/{booking}",
+        summary: "Update booking",
+        description: "Update booking status and notes. Only booking owner can update.",
+        tags: ["Bookings"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["status"],
+                properties: [
+                    new OA\Property(property: "status", type: "string", enum: ["pending", "confirmed", "in_progress", "completed", "cancelled"]),
+                    new OA\Property(property: "admin_notes", type: "string", nullable: true),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Booking updated successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Booking updated successfully!"),
+                        new OA\Property(property: "booking", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only update own bookings"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     public function update(Request $request, Booking $booking)
     {
         // Only booking owner can update
@@ -161,6 +326,29 @@ class BookingController extends Controller
         ]);
     }
 
+    #[OA\Delete(
+        path: "/api/bookings/{booking}",
+        summary: "Delete booking",
+        description: "Delete (cancel) a service request. Only booking owner can delete.",
+        tags: ["Bookings"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Booking cancelled successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Booking cancelled successfully!"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only delete own bookings"),
+            new OA\Response(response: 404, description: "Booking not found"),
+        ]
+    )]
     public function destroy(Booking $booking)
     {
         // Only booking owner can delete

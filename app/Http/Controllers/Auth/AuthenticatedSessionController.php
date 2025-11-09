@@ -14,9 +14,29 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Authentication", description: "User authentication endpoints")]
 class AuthenticatedSessionController extends Controller
 {
+    #[OA\Get(
+        path: "/api/login",
+        summary: "Get login form data",
+        description: "Returns login form configuration",
+        tags: ["Authentication"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Login form data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "can_reset_password", type: "boolean", example: true),
+                        new OA\Property(property: "status", type: "string", nullable: true),
+                    ]
+                )
+            ),
+        ]
+    )]
     /**
      * Display the login view.
      */
@@ -28,6 +48,58 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
+    #[OA\Post(
+        path: "/api/login",
+        summary: "Authenticate user",
+        description: "Authenticates a user with email/phone and password. Returns token if verified, otherwise requires OTP verification.",
+        tags: ["Authentication"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["password"],
+                properties: [
+                    new OA\Property(property: "email", type: "string", format: "email", nullable: true, example: "user@example.com"),
+                    new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
+                    new OA\Property(property: "password", type: "string", format: "password", example: "password123"),
+                    new OA\Property(property: "remember", type: "boolean", example: false),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Login successful (verified account)",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Login successful!"),
+                        new OA\Property(property: "user", type: "object"),
+                        new OA\Property(property: "token", type: "string", example: "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 202,
+                description: "OTP verification required",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "OTP verification required"),
+                        new OA\Property(property: "verification_method", type: "string", example: "email"),
+                        new OA\Property(property: "verification_identifier", type: "string", example: "user@example.com"),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Validation error",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string"),
+                        new OA\Property(property: "errors", type: "object"),
+                    ]
+                )
+            ),
+        ]
+    )]
     /**
      * Handle an incoming authentication request.
      */
@@ -223,6 +295,33 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
+    #[OA\Post(
+        path: "/api/logout",
+        summary: "Logout user",
+        description: "Logs out the authenticated user and revokes their token",
+        tags: ["Authentication"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Logout successful",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Logged out successfully"),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Unauthenticated",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Unauthenticated."),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function destroy(Request $request): JsonResponse
     {
         // For API, revoke Sanctum token if present

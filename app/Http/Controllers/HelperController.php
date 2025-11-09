@@ -8,9 +8,38 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Helpers", description: "Helper profile management endpoints")]
 class HelperController extends Controller
 {
+    #[OA\Get(
+        path: "/api/helpers",
+        summary: "List helpers",
+        description: "Get a paginated list of verified helpers and businesses with filtering options",
+        tags: ["Helpers"],
+        parameters: [
+            new OA\Parameter(name: "user_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["all", "helper", "business"]), description: "Filter by user type"),
+            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]), description: "Filter by service type"),
+            new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer"), description: "Filter by location ID"),
+            new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Filter by city name"),
+            new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Filter by area"),
+            new OA\Parameter(name: "min_experience", in: "query", required: false, schema: new OA\Schema(type: "integer"), description: "Minimum years of experience"),
+            new OA\Parameter(name: "sort_by", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["rating", "experience"]), description: "Sort by rating or experience"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of helpers",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "helpers", type: "object", description: "Paginated list of helpers"),
+                        new OA\Property(property: "filters", type: "object", description: "Applied filters"),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function index(Request $request)
     {
         // Filter by user type: 'all', 'helper', or 'business'
@@ -92,6 +121,27 @@ class HelperController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/helpers/{helper}",
+        summary: "Get helper details",
+        description: "Get detailed information about a specific helper including reviews, documents, and service listings",
+        tags: ["Helpers"],
+        parameters: [
+            new OA\Parameter(name: "helper", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Helper user ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Helper details",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "helper", type: "object", description: "Helper user object with reviews, documents, and service listings"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: "Helper not found"),
+        ]
+    )]
     public function show(User $helper)
     {
         if (!$helper->hasRole('helper')) {
@@ -109,11 +159,70 @@ class HelperController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/helpers/create",
+        summary: "Get helper creation form",
+        description: "Get form data for creating a helper profile",
+        tags: ["Helpers"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Form data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Helper creation form"),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function create(): JsonResponse
     {
         return response()->json(['message' => 'Helper creation form']);
     }
 
+    #[OA\Post(
+        path: "/api/helpers",
+        summary: "Create helper profile",
+        description: "Create or update helper profile information",
+        tags: ["Helpers"],
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: "multipart/form-data",
+                schema: new OA\Schema(
+                    required: ["service_type", "experience_years", "city", "area", "availability"],
+                    properties: [
+                        new OA\Property(property: "photo", type: "string", format: "binary", description: "Helper profile photo"),
+                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                        new OA\Property(property: "skills", type: "string", nullable: true),
+                        new OA\Property(property: "experience_years", type: "integer", minimum: 0),
+                        new OA\Property(property: "city", type: "string", maxLength: 255),
+                        new OA\Property(property: "area", type: "string", maxLength: 255),
+                        new OA\Property(property: "availability", type: "string", enum: ["full_time", "part_time", "available"]),
+                        new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
+                        new OA\Property(property: "bio", type: "string", nullable: true),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Helper profile created successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Helper profile created successfully!"),
+                        new OA\Property(property: "helper", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - User is not a helper"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -146,6 +255,29 @@ class HelperController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/helpers/{helper}/edit",
+        summary: "Get helper edit form",
+        description: "Get helper profile data for editing",
+        tags: ["Helpers"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "helper", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Helper user ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Helper profile data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "helper", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only edit own profile"),
+            new OA\Response(response: 404, description: "Helper not found"),
+        ]
+    )]
     public function edit(User $helper)
     {
         if (!$helper->hasRole('helper')) {
@@ -162,6 +294,51 @@ class HelperController extends Controller
         ]);
     }
 
+    #[OA\Put(
+        path: "/api/helpers/{helper}",
+        summary: "Update helper profile",
+        description: "Update helper profile information",
+        tags: ["Helpers"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "helper", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Helper user ID"),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: "multipart/form-data",
+                schema: new OA\Schema(
+                    required: ["service_type", "experience_years", "city", "area", "availability"],
+                    properties: [
+                        new OA\Property(property: "photo", type: "string", format: "binary", description: "Helper profile photo"),
+                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                        new OA\Property(property: "skills", type: "string", nullable: true),
+                        new OA\Property(property: "experience_years", type: "integer", minimum: 0),
+                        new OA\Property(property: "city", type: "string", maxLength: 255),
+                        new OA\Property(property: "area", type: "string", maxLength: 255),
+                        new OA\Property(property: "availability", type: "string", enum: ["full_time", "part_time", "available"]),
+                        new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
+                        new OA\Property(property: "bio", type: "string", nullable: true),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Helper profile updated successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Helper profile updated successfully!"),
+                        new OA\Property(property: "helper", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only edit own profile"),
+            new OA\Response(response: 404, description: "Helper not found"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     public function update(Request $request, User $helper)
     {
         if (!$helper->hasRole('helper')) {

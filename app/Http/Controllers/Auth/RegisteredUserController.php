@@ -16,9 +16,28 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Authentication", description: "User authentication endpoints")]
 class RegisteredUserController extends Controller
 {
+    #[OA\Get(
+        path: "/api/register",
+        summary: "Get registration form",
+        description: "Get form data for user registration",
+        tags: ["Authentication"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Registration form data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Registration form"),
+                    ]
+                )
+            ),
+        ]
+    )]
     /**
      * Display the registration view.
      */
@@ -27,6 +46,42 @@ class RegisteredUserController extends Controller
         return response()->json(['message' => 'Registration form']);
     }
 
+    #[OA\Post(
+        path: "/api/register",
+        summary: "Register new user",
+        description: "Register a new user account. Requires OTP verification after registration. Either email or phone must be provided.",
+        tags: ["Authentication"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["name", "password", "role"],
+                properties: [
+                    new OA\Property(property: "name", type: "string", maxLength: 255),
+                    new OA\Property(property: "email", type: "string", format: "email", nullable: true, maxLength: 255, description: "Either email or phone is required"),
+                    new OA\Property(property: "phone", type: "string", nullable: true, maxLength: 20, description: "Either email or phone is required"),
+                    new OA\Property(property: "password", type: "string", format: "password", minLength: 8),
+                    new OA\Property(property: "password_confirmation", type: "string", format: "password"),
+                    new OA\Property(property: "role", type: "string", enum: ["user", "helper", "business"]),
+                    new OA\Property(property: "address", type: "string", nullable: true, maxLength: 255),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Registration successful - OTP verification required",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Registration successful! Please check your email for the verification code."),
+                        new OA\Property(property: "user_id", type: "integer"),
+                        new OA\Property(property: "verification_method", type: "string", enum: ["email", "phone"]),
+                        new OA\Property(property: "identifier", type: "string", description: "Email or masked phone number"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     /**
      * Handle an incoming registration request.
      *

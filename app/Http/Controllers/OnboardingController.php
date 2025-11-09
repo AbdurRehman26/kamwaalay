@@ -6,9 +6,30 @@ use App\Models\ServiceListing;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Onboarding", description: "User onboarding endpoints")]
 class OnboardingController extends Controller
 {
+    #[OA\Get(
+        path: "/api/onboarding/helper",
+        summary: "Get helper onboarding form",
+        description: "Get form data for helper onboarding. Requires helper role.",
+        tags: ["Onboarding"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Onboarding form data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "user", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Only helpers can access"),
+        ]
+    )]
     /**
      * Show helper onboarding
      */
@@ -25,6 +46,59 @@ class OnboardingController extends Controller
         ]);
     }
 
+    #[OA\Post(
+        path: "/api/onboarding/helper",
+        summary: "Complete helper onboarding",
+        description: "Complete helper onboarding by submitting services, NIC document, and profile information. Requires helper role.",
+        tags: ["Onboarding"],
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: "multipart/form-data",
+                schema: new OA\Schema(
+                    required: ["services", "nic", "nic_number"],
+                    properties: [
+                        new OA\Property(
+                            property: "services",
+                            type: "array",
+                            items: new OA\Items(
+                                type: "object",
+                                required: ["service_type", "work_type", "location_id"],
+                                properties: [
+                                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                                    new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
+                                    new OA\Property(property: "location_id", type: "integer"),
+                                    new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
+                                    new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
+                                ]
+                            )
+                        ),
+                        new OA\Property(property: "nic", type: "string", format: "binary", description: "NIC document file (jpeg, jpg, png, pdf, max 5MB)"),
+                        new OA\Property(property: "nic_number", type: "string", maxLength: 255),
+                        new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
+                        new OA\Property(property: "skills", type: "string", nullable: true),
+                        new OA\Property(property: "experience_years", type: "integer", nullable: true, minimum: 0),
+                        new OA\Property(property: "bio", type: "string", nullable: true),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Onboarding completed successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Onboarding completed successfully!"),
+                        new OA\Property(property: "user", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Only helpers can complete onboarding"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     /**
      * Complete helper onboarding
      */
@@ -157,6 +231,25 @@ class OnboardingController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/onboarding/business",
+        summary: "Get business onboarding form",
+        description: "Get form data for business onboarding. Requires business role.",
+        tags: ["Onboarding"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Onboarding form data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "user", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Only businesses can access"),
+        ]
+    )]
     /**
      * Show business onboarding
      */
@@ -173,6 +266,37 @@ class OnboardingController extends Controller
         ]);
     }
 
+    #[OA\Post(
+        path: "/api/onboarding/business",
+        summary: "Complete business onboarding",
+        description: "Complete business onboarding by submitting business information. Requires business role.",
+        tags: ["Onboarding"],
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: "business_name", type: "string", nullable: true, maxLength: 255),
+                    new OA\Property(property: "business_address", type: "string", nullable: true, maxLength: 500),
+                    new OA\Property(property: "business_description", type: "string", nullable: true, maxLength: 2000),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Onboarding completed successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Onboarding completed successfully!"),
+                        new OA\Property(property: "user", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Only businesses can complete onboarding"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     /**
      * Complete business onboarding
      */

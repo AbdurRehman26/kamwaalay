@@ -11,9 +11,32 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Authentication", description: "User authentication endpoints")]
 class NewPasswordController extends Controller
 {
+    #[OA\Get(
+        path: "/api/reset-password/{token}",
+        summary: "Get password reset form",
+        description: "Get form data for resetting password with the provided token",
+        tags: ["Authentication"],
+        parameters: [
+            new OA\Parameter(name: "token", in: "path", required: true, schema: new OA\Schema(type: "string"), description: "Password reset token"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Password reset form data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "email", type: "string", nullable: true),
+                        new OA\Property(property: "token", type: "string"),
+                    ]
+                )
+            ),
+        ]
+    )]
     /**
      * Display the password reset view.
      */
@@ -25,6 +48,36 @@ class NewPasswordController extends Controller
         ]);
     }
 
+    #[OA\Post(
+        path: "/api/reset-password",
+        summary: "Reset password",
+        description: "Reset user password using the reset token received via email",
+        tags: ["Authentication"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["token", "email", "password"],
+                properties: [
+                    new OA\Property(property: "token", type: "string", description: "Password reset token from email"),
+                    new OA\Property(property: "email", type: "string", format: "email", description: "User's email address"),
+                    new OA\Property(property: "password", type: "string", format: "password", minLength: 8),
+                    new OA\Property(property: "password_confirmation", type: "string", format: "password"),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Password reset successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Your password has been reset."),
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: "Validation error or invalid token"),
+        ]
+    )]
     /**
      * Handle an incoming new password request.
      *

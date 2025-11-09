@@ -7,9 +7,33 @@ use App\Models\Review;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Reviews", description: "Review management endpoints")]
 class ReviewController extends Controller
 {
+    #[OA\Get(
+        path: "/api/bookings/{booking}/review/create",
+        summary: "Get review creation form",
+        description: "Get booking data for creating a review. Only booking owner can create reviews.",
+        tags: ["Reviews"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Booking data for review",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "booking", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only review own bookings"),
+        ]
+    )]
     public function create(Booking $booking)
     {
         if ($booking->user_id !== Auth::id()) {
@@ -28,6 +52,40 @@ class ReviewController extends Controller
         ]);
     }
 
+    #[OA\Post(
+        path: "/api/bookings/{booking}/review",
+        summary: "Create review",
+        description: "Create a review for a completed booking. Only booking owner can create reviews.",
+        tags: ["Reviews"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["rating"],
+                properties: [
+                    new OA\Property(property: "rating", type: "integer", minimum: 1, maximum: 5, description: "Rating from 1 to 5"),
+                    new OA\Property(property: "comment", type: "string", nullable: true, maxLength: 1000),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Review created successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Review submitted successfully!"),
+                        new OA\Property(property: "review", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only review own bookings"),
+            new OA\Response(response: 422, description: "Validation error or review already exists"),
+        ]
+    )]
     public function store(Request $request, Booking $booking)
     {
         if ($booking->user_id !== Auth::id()) {
@@ -60,6 +118,28 @@ class ReviewController extends Controller
         ]);
     }
 
+    #[OA\Get(
+        path: "/api/reviews/{review}/edit",
+        summary: "Get review edit form",
+        description: "Get review data for editing. Only review owner can edit.",
+        tags: ["Reviews"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "review", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Review ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Review data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "review", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only edit own reviews"),
+        ]
+    )]
     public function edit(Review $review)
     {
         if ($review->user_id !== Auth::id()) {
@@ -71,6 +151,40 @@ class ReviewController extends Controller
         ]);
     }
 
+    #[OA\Put(
+        path: "/api/reviews/{review}",
+        summary: "Update review",
+        description: "Update a review. Only review owner can update.",
+        tags: ["Reviews"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "review", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Review ID"),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["rating"],
+                properties: [
+                    new OA\Property(property: "rating", type: "integer", minimum: 1, maximum: 5),
+                    new OA\Property(property: "comment", type: "string", nullable: true, maxLength: 1000),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Review updated successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Review updated successfully!"),
+                        new OA\Property(property: "review", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only update own reviews"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
     public function update(Request $request, Review $review)
     {
         if ($review->user_id !== Auth::id()) {
@@ -90,6 +204,28 @@ class ReviewController extends Controller
         ]);
     }
 
+    #[OA\Delete(
+        path: "/api/reviews/{review}",
+        summary: "Delete review",
+        description: "Delete a review. Only review owner can delete.",
+        tags: ["Reviews"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "review", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Review ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Review deleted successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Review deleted successfully!"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Forbidden - Can only delete own reviews"),
+        ]
+    )]
     public function destroy(Review $review)
     {
         if ($review->user_id !== Auth::id()) {
