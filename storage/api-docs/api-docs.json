@@ -974,14 +974,14 @@
                     "Verification"
                 ],
                 "summary": "Get verification page data",
-                "description": "Retrieve verification information for OTP verification. Supports both login (via verification_token) and registration (via session) flows.",
+                "description": "Retrieve verification information for OTP verification. Requires verification_token.",
                 "operationId": "b8af94f5d860b2409e56b0547da8128d",
                 "parameters": [
                     {
                         "name": "verification_token",
                         "in": "query",
-                        "description": "Encrypted verification token for login flow (optional)",
-                        "required": false,
+                        "description": "Encrypted verification token for verification flow",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
@@ -1028,7 +1028,7 @@
                         }
                     },
                     "422": {
-                        "description": "Invalid token or session",
+                        "description": "Invalid token",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1042,7 +1042,6 @@
                                             "enum": [
                                                 "token_expired",
                                                 "invalid_token",
-                                                "invalid_session",
                                                 "user_not_found"
                                             ],
                                             "example": "token_expired"
@@ -1060,7 +1059,7 @@
                     "Verification"
                 ],
                 "summary": "Verify OTP and complete registration or login",
-                "description": "Verify the OTP code sent via email or phone. Completes user registration or login process. Returns authentication token on success.",
+                "description": "Verify the OTP code sent via email or phone. Completes user registration or login process. Returns authentication token on success. If email or phone is provided, it will be used directly for verification. Otherwise, the method uses verification_token.",
                 "operationId": "4a4eab819dfc26ff5715cf24751f2396",
                 "requestBody": {
                     "required": true,
@@ -1068,8 +1067,7 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "otp",
-                                    "user_id"
+                                    "otp"
                                 ],
                                 "properties": {
                                     "otp": {
@@ -1079,13 +1077,21 @@
                                         "minLength": 6,
                                         "example": "123456"
                                     },
-                                    "user_id": {
-                                        "description": "User ID to verify",
-                                        "type": "integer",
-                                        "example": 1
+                                    "email": {
+                                        "description": "Email address for verification (required if phone and verification_token not provided)",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com",
+                                        "nullable": true
+                                    },
+                                    "phone": {
+                                        "description": "Phone number for verification (required if email and verification_token not provided)",
+                                        "type": "string",
+                                        "example": "+923001234567",
+                                        "nullable": true
                                     },
                                     "verification_token": {
-                                        "description": "Verification token for login flow (optional)",
+                                        "description": "Verification token for login flow (optional, required if email and phone not provided)",
                                         "type": "string",
                                         "nullable": true
                                     }
@@ -1203,7 +1209,7 @@
                     "Verification"
                 ],
                 "summary": "Resend OTP code",
-                "description": "Resend the OTP verification code to the user's email or phone. Supports both login and registration flows.",
+                "description": "Resend the OTP verification code to the user's email or phone. Supports both login and registration flows. Requires either email, phone, or verification_token.",
                 "operationId": "dfa3f7bcffcdd9a53f231d17f0f63a9a",
                 "requestBody": {
                     "required": false,
@@ -1211,6 +1217,19 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
+                                    "email": {
+                                        "description": "Email address for resending OTP",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com",
+                                        "nullable": true
+                                    },
+                                    "phone": {
+                                        "description": "Phone number for resending OTP",
+                                        "type": "string",
+                                        "example": "+923001234567",
+                                        "nullable": true
+                                    },
                                     "verification_token": {
                                         "description": "Verification token for login flow (optional)",
                                         "type": "string",
@@ -1240,7 +1259,7 @@
                         }
                     },
                     "422": {
-                        "description": "Invalid token, session, or verification data",
+                        "description": "Invalid token or verification data",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1254,7 +1273,6 @@
                                             "enum": [
                                                 "token_expired",
                                                 "invalid_token",
-                                                "invalid_session",
                                                 "user_not_found",
                                                 "invalid_data"
                                             ],

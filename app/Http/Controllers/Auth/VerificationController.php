@@ -22,14 +22,14 @@ class VerificationController extends Controller
     #[OA\Get(
         path: "/api/verify-otp",
         summary: "Get verification page data",
-        description: "Retrieve verification information for OTP verification. Supports both login (via verification_token) and registration (via session) flows.",
+        description: "Retrieve verification information for OTP verification. Requires verification_token.",
         tags: ["Verification"],
         parameters: [
             new OA\Parameter(
                 name: "verification_token",
                 in: "query",
-                description: "Encrypted verification token for login flow (optional)",
-                required: false,
+                description: "Encrypted verification token for verification flow",
+                required: true,
                 schema: new OA\Schema(type: "string")
             ),
         ],
@@ -49,11 +49,11 @@ class VerificationController extends Controller
             ),
             new OA\Response(
                 response: 422,
-                description: "Invalid token or session",
+                description: "Invalid token",
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "message", type: "string", example: "Verification token has expired. Please login again."),
-                        new OA\Property(property: "error", type: "string", example: "token_expired", enum: ["token_expired", "invalid_token", "invalid_session", "user_not_found"]),
+                        new OA\Property(property: "error", type: "string", example: "token_expired", enum: ["token_expired", "invalid_token", "user_not_found"]),
                     ]
                 )
             ),
@@ -64,107 +64,77 @@ class VerificationController extends Controller
      */
     public function show(Request $request): JsonResponse
     {
-        // Check for verification token (for login) or session (for registration)
+        $request->validate([
+            'verification_token' => 'required|string',
+        ]);
+
         $verificationToken = $request->input('verification_token');
 
-        if ($verificationToken) {
-            // Login verification - use token
-            try {
-                $verificationData = decrypt($verificationToken);
+        try {
+            $verificationData = decrypt($verificationToken);
 
-                // Check if token is expired
-                if (isset($verificationData['expires_at']) && now()->gt($verificationData['expires_at'])) {
-                    return response()->json([
-                        'message' => 'Verification token has expired. Please login again.',
-                        'error' => 'token_expired'
-                    ], 422);
-                }
-
-                $userId = $verificationData['user_id'] ?? null;
-                $method = $verificationData['method'] ?? null;
-                $identifier = $verificationData['identifier'] ?? null;
-                $isLogin = true;
-
-                if (!$userId || !$method) {
-                    return response()->json([
-                        'message' => 'Invalid verification token. Please login again.',
-                        'error' => 'invalid_token'
-                    ], 422);
-                }
-
-                $user = User::find($userId);
-                if (!$user) {
-                    return response()->json([
-                        'message' => 'Invalid verification token. Please login again.',
-                        'error' => 'user_not_found'
-                    ], 422);
-                }
-
-                // Mask phone if method is phone
-                if ($method === 'phone') {
-                    $identifier = $this->maskPhone($identifier);
-                }
-
+            // Check if token is expired
+            if (isset($verificationData['expires_at']) && now()->gt($verificationData['expires_at'])) {
                 return response()->json([
-                    'method' => $method,
-                    'identifier' => $identifier,
-                    'user_id' => $userId,
-                    'is_login' => $isLogin,
-                    'verification_token' => $verificationToken,
-                ]);
-            } catch (\Exception $e) {
+                    'message' => 'Verification token has expired. Please login again.',
+                    'error' => 'token_expired'
+                ], 422);
+            }
+
+            $userId = $verificationData['user_id'] ?? null;
+            $method = $verificationData['method'] ?? null;
+            $identifier = $verificationData['identifier'] ?? null;
+            $isLogin = isset($verificationData['is_login']) ? $verificationData['is_login'] : true;
+
+            if (!$userId || !$method || !$identifier) {
                 return response()->json([
                     'message' => 'Invalid verification token. Please login again.',
                     'error' => 'invalid_token'
-                ], 422);
-            }
-        } else {
-            // Registration verification - fall back to session (for backward compatibility)
-            $userId = $request->session()->get('verification_user_id');
-            $method = $request->session()->get('verification_method');
-            $isLogin = false;
-
-            if (!$userId || !$method) {
-                return response()->json([
-                    'message' => 'Please complete registration first.',
-                    'error' => 'invalid_session'
                 ], 422);
             }
 
             $user = User::find($userId);
             if (!$user) {
                 return response()->json([
-                    'message' => 'Invalid verification session. Please register again.',
+                    'message' => 'Invalid verification token. Please login again.',
                     'error' => 'user_not_found'
                 ], 422);
             }
 
-            $identifier = $method === 'email'
-                ? $request->session()->get('verification_email')
-                : $this->maskPhone($request->session()->get('verification_phone'));
+            // Mask phone if method is phone
+            if ($method === 'phone') {
+                $identifier = $this->maskPhone($identifier);
+            }
 
             return response()->json([
                 'method' => $method,
                 'identifier' => $identifier,
                 'user_id' => $userId,
                 'is_login' => $isLogin,
+                'verification_token' => $verificationToken,
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Invalid verification token. Please login again.',
+                'error' => 'invalid_token'
+            ], 422);
         }
     }
 
     #[OA\Post(
         path: "/api/verify-otp",
         summary: "Verify OTP and complete registration or login",
-        description: "Verify the OTP code sent via email or phone. Completes user registration or login process. Returns authentication token on success.",
+        description: "Verify the OTP code sent via email or phone. Completes user registration or login process. Returns authentication token on success. If email or phone is provided, it will be used directly for verification. Otherwise, the method uses verification_token.",
         tags: ["Verification"],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["otp", "user_id"],
+                required: ["otp"],
                 properties: [
                     new OA\Property(property: "otp", type: "string", minLength: 6, maxLength: 6, example: "123456", description: "6-digit OTP code"),
-                    new OA\Property(property: "user_id", type: "integer", example: 1, description: "User ID to verify"),
-                    new OA\Property(property: "verification_token", type: "string", nullable: true, description: "Verification token for login flow (optional)"),
+                    new OA\Property(property: "email", type: "string", format: "email", nullable: true, example: "user@example.com", description: "Email address for verification (required if phone and verification_token not provided)"),
+                    new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567", description: "Phone number for verification (required if email and verification_token not provided)"),
+                    new OA\Property(property: "verification_token", type: "string", nullable: true, description: "Verification token for login flow (optional, required if email and phone not provided)"),
                 ]
             )
         ),
@@ -231,19 +201,71 @@ class VerificationController extends Controller
     {
         $request->validate([
             'otp' => 'required|string|size:6',
-            'user_id' => 'required|exists:users,id',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
             'verification_token' => 'nullable|string', // Optional for login, required for login flow
         ]);
 
-        // Check for verification token (for login) or session (for registration)
-        $verificationToken = $request->input('verification_token');
-        $verificationData = null;
-        $isLogin = false;
+        // Validate that at least one identifier is provided
+        if (!$request->has('email') && !$request->has('phone') && !$request->has('verification_token')) {
+            return response()->json([
+                'message' => 'Either email, phone, or verification_token must be provided.',
+                'errors' => ['email' => ['Either email, phone, or verification_token must be provided.']]
+            ], 422);
+        }
 
-        if ($verificationToken) {
-            // Login verification - use token
+        // If email is provided, use it directly for email verification
+        if ($request->has('email') && $request->email) {
+            // Find user by email
+            $user = User::where('email', $request->email)->first();
+            
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not found with this email address.',
+                    'errors' => ['email' => ['User not found with this email address.']]
+                ], 422);
+            }
+
+            // Determine if this is a login or registration flow
+            $isLogin = $request->has('verification_token') && $request->verification_token;
+
+            $verificationData = [
+                'user_id' => $user->id,
+                'method' => 'email',
+                'identifier' => $request->email,
+            ];
+
+            return $this->verifyEmailOtp($request, $user, $isLogin, $verificationData);
+        }
+
+        // If phone is provided, use it directly for phone verification
+        if ($request->has('phone') && $request->phone) {
+            // Find user by phone
+            $user = User::where('phone', $request->phone)->first();
+            
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not found with this phone number.',
+                    'errors' => ['phone' => ['User not found with this phone number.']]
+                ], 422);
+            }
+
+            // Determine if this is a login or registration flow
+            $isLogin = $request->has('verification_token') && $request->verification_token;
+
+            $verificationData = [
+                'user_id' => $user->id,
+                'method' => 'phone',
+                'identifier' => $request->phone,
+            ];
+
+            return $this->verifyPhoneOtp($request, $user, $isLogin, $verificationData);
+        }
+
+        // If verification_token is provided, use it for verification
+        if ($request->has('verification_token') && $request->verification_token) {
             try {
-                $verificationData = decrypt($verificationToken);
+                $verificationData = decrypt($request->verification_token);
 
                 // Check if token is expired
                 if (isset($verificationData['expires_at']) && now()->gt($verificationData['expires_at'])) {
@@ -257,11 +279,28 @@ class VerificationController extends Controller
                 $method = $verificationData['method'] ?? null;
                 $isLogin = true;
 
-                if (!$userId || !$method || $userId != $request->user_id) {
+                if (!$userId || !$method) {
                     return response()->json([
                         'message' => 'Invalid verification token. Please login again.',
                         'errors' => ['otp' => ['Invalid verification token.']]
                     ], 422);
+                }
+
+                // Get user from token
+                $user = User::find($userId);
+                if (!$user) {
+                    return response()->json([
+                        'message' => 'User not found. Please login again.',
+                        'errors' => ['otp' => ['User not found.']]
+                    ], 422);
+                }
+
+                $verificationData['identifier'] = $verificationData['identifier'] ?? null;
+
+                if ($method === 'email') {
+                    return $this->verifyEmailOtp($request, $user, $isLogin, $verificationData);
+                } else {
+                    return $this->verifyPhoneOtp($request, $user, $isLogin, $verificationData);
                 }
             } catch (\Exception $e) {
                 return response()->json([
@@ -269,38 +308,13 @@ class VerificationController extends Controller
                     'errors' => ['otp' => ['Invalid verification token.']]
                 ], 422);
             }
-        } else {
-            // Registration verification - fall back to session
-            $userId = $request->session()->get('verification_user_id');
-            $method = $request->session()->get('verification_method');
-            $isLogin = false;
-
-            if (!$userId || !$method || $userId != $request->user_id) {
-                return response()->json([
-                    'message' => 'Invalid verification session. Please register again.',
-                    'errors' => ['otp' => ['Invalid verification session.']]
-                ], 422);
-            }
-
-            $verificationData = [
-                'user_id' => $userId,
-                'method' => $method,
-            ];
         }
 
-        $user = User::find($request->user_id);
-        if (!$user) {
-            return response()->json([
-                'message' => $isLogin ? 'User not found. Please login again.' : 'User not found. Please register again.',
-                'errors' => ['otp' => ['User not found.']]
-            ], 422);
-        }
-
-        if ($verificationData['method'] === 'email') {
-            return $this->verifyEmailOtp($request, $user, $isLogin, $verificationData);
-        } else {
-            return $this->verifyPhoneOtp($request, $user, $isLogin, $verificationData);
-        }
+        // This should never be reached due to validation above, but just in case
+        return response()->json([
+            'message' => 'Either email, phone, or verification_token must be provided.',
+            'errors' => ['email' => ['Either email, phone, or verification_token must be provided.']]
+        ], 422);
     }
 
     /**
@@ -308,10 +322,10 @@ class VerificationController extends Controller
      */
     private function verifyEmailOtp(Request $request, User $user, bool $isLogin = false, array $verificationData = null): JsonResponse
     {
-        // Get email from verification data or session
-        $email = $isLogin
-            ? ($verificationData['identifier'] ?? null)
-            : ($request->session()->get('verification_email') ?? null);
+        // Get email from request parameter, verification data, or user (in priority order)
+        $email = $request->input('email')
+            ?? ($verificationData['identifier'] ?? null)
+            ?? $user->email;
 
         if (!$email) {
             return response()->json([
@@ -377,13 +391,6 @@ class VerificationController extends Controller
             $user->load('roles');
             $user->refresh();
 
-            // Clear registration session data
-            $request->session()->forget([
-                'verification_user_id',
-                'verification_method',
-                'verification_email'
-            ]);
-
             // Create Sanctum token for API
             $token = $user->createToken('api-token')->plainTextToken;
 
@@ -404,10 +411,10 @@ class VerificationController extends Controller
      */
     private function verifyPhoneOtp(Request $request, User $user, bool $isLogin = false, array $verificationData = null): JsonResponse
     {
-        // Get phone from verification data or session
-        $phone = $isLogin
-            ? ($verificationData['identifier'] ?? null)
-            : ($request->session()->get('verification_phone') ?? null);
+        // Get phone from request parameter, verification data, or user (in priority order)
+        $phone = $request->input('phone')
+            ?? ($verificationData['identifier'] ?? null)
+            ?? $user->phone;
 
         if (!$phone) {
             return response()->json([
@@ -473,13 +480,6 @@ class VerificationController extends Controller
             $user->load('roles');
             $user->refresh();
 
-            // Clear registration session data
-            $request->session()->forget([
-                'verification_user_id',
-                'verification_method',
-                'verification_phone'
-            ]);
-
             // Create Sanctum token for API
             $token = $user->createToken('api-token')->plainTextToken;
 
@@ -498,12 +498,14 @@ class VerificationController extends Controller
     #[OA\Post(
         path: "/api/verify-otp/resend",
         summary: "Resend OTP code",
-        description: "Resend the OTP verification code to the user's email or phone. Supports both login and registration flows.",
+        description: "Resend the OTP verification code to the user's email or phone. Supports both login and registration flows. Requires either email, phone, or verification_token.",
         tags: ["Verification"],
         requestBody: new OA\RequestBody(
             required: false,
             content: new OA\JsonContent(
                 properties: [
+                    new OA\Property(property: "email", type: "string", format: "email", nullable: true, example: "user@example.com", description: "Email address for resending OTP"),
+                    new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567", description: "Phone number for resending OTP"),
                     new OA\Property(property: "verification_token", type: "string", nullable: true, description: "Verification token for login flow (optional)"),
                 ]
             )
@@ -520,11 +522,11 @@ class VerificationController extends Controller
             ),
             new OA\Response(
                 response: 422,
-                description: "Invalid token, session, or verification data",
+                description: "Invalid token or verification data",
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "message", type: "string", example: "Verification token has expired. Please login again."),
-                        new OA\Property(property: "error", type: "string", example: "token_expired", enum: ["token_expired", "invalid_token", "invalid_session", "user_not_found", "invalid_data"]),
+                        new OA\Property(property: "error", type: "string", example: "token_expired", enum: ["token_expired", "invalid_token", "user_not_found", "invalid_data"]),
                     ]
                 )
             ),
@@ -536,18 +538,73 @@ class VerificationController extends Controller
     public function resend(Request $request): JsonResponse
     {
         $request->validate([
-            'verification_token' => 'nullable|string', // Optional for login
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'verification_token' => 'nullable|string',
         ]);
 
-        // Check for verification token (for login) or session (for registration)
-        $verificationToken = $request->input('verification_token');
-        $verificationData = null;
-        $isLogin = false;
+        // Validate that at least one identifier is provided
+        if (!$request->has('email') && !$request->has('phone') && !$request->has('verification_token')) {
+            return response()->json([
+                'message' => 'Either email, phone, or verification_token must be provided.',
+                'error' => 'invalid_data'
+            ], 422);
+        }
 
-        if ($verificationToken) {
-            // Login verification - use token
+        // If email is provided, use it directly
+        if ($request->has('email') && $request->email) {
+            $user = User::where('email', $request->email)->first();
+            
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not found with this email address.',
+                    'error' => 'user_not_found'
+                ], 422);
+            }
+
+            $role = $user->roles->first()->name ?? 'user';
+            $isLogin = $request->has('verification_token') && $request->verification_token;
+
+            if ($isLogin) {
+                $this->sendLoginEmailOtp($user);
+            } else {
+                $this->sendEmailOtp($user, $role);
+            }
+
+            return response()->json([
+                'message' => 'Verification code has been resent to your email.',
+            ]);
+        }
+
+        // If phone is provided, use it directly
+        if ($request->has('phone') && $request->phone) {
+            $user = User::where('phone', $request->phone)->first();
+            
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not found with this phone number.',
+                    'error' => 'user_not_found'
+                ], 422);
+            }
+
+            $role = $user->roles->first()->name ?? 'user';
+            $isLogin = $request->has('verification_token') && $request->verification_token;
+
+            if ($isLogin) {
+                $this->sendLoginPhoneOtp($request->phone, $role);
+            } else {
+                $this->sendPhoneOtp($request->phone, $role);
+            }
+
+            return response()->json([
+                'message' => 'Verification code has been resent to your phone.',
+            ]);
+        }
+
+        // If verification_token is provided, use it
+        if ($request->has('verification_token') && $request->verification_token) {
             try {
-                $verificationData = decrypt($verificationToken);
+                $verificationData = decrypt($request->verification_token);
 
                 // Check if token is expired
                 if (isset($verificationData['expires_at']) && now()->gt($verificationData['expires_at'])) {
@@ -559,13 +616,35 @@ class VerificationController extends Controller
 
                 $userId = $verificationData['user_id'] ?? null;
                 $method = $verificationData['method'] ?? null;
-                $isLogin = true;
+                $identifier = $verificationData['identifier'] ?? null;
 
-                if (!$userId || !$method) {
+                if (!$userId || !$method || !$identifier) {
                     return response()->json([
                         'message' => 'Invalid verification token. Please login again.',
                         'error' => 'invalid_token'
                     ], 422);
+                }
+
+                $user = User::find($userId);
+                if (!$user) {
+                    return response()->json([
+                        'message' => 'User not found. Please login again.',
+                        'error' => 'user_not_found'
+                    ], 422);
+                }
+
+                $role = $user->roles->first()->name ?? 'user';
+
+                if ($method === 'email') {
+                    $this->sendLoginEmailOtp($user);
+                    return response()->json([
+                        'message' => 'Verification code has been resent to your email.',
+                    ]);
+                } else {
+                    $this->sendLoginPhoneOtp($identifier, $role);
+                    return response()->json([
+                        'message' => 'Verification code has been resent to your phone.',
+                    ]);
                 }
             } catch (\Exception $e) {
                 return response()->json([
@@ -573,80 +652,13 @@ class VerificationController extends Controller
                     'error' => 'invalid_token'
                 ], 422);
             }
-        } else {
-            // Registration verification - fall back to session
-            $userId = $request->session()->get('verification_user_id');
-            $method = $request->session()->get('verification_method');
-            $isLogin = false;
-
-            if (!$userId || !$method) {
-                return response()->json([
-                    'message' => 'Please complete registration first.',
-                    'error' => 'invalid_session'
-                ], 422);
-            }
-
-            $verificationData = [
-                'user_id' => $userId,
-                'method' => $method,
-            ];
         }
 
-        $user = User::find($verificationData['user_id']);
-        if (!$user) {
-            return response()->json([
-                'message' => $isLogin ? 'User not found. Please login again.' : 'User not found. Please register again.',
-                'error' => 'user_not_found'
-            ], 422);
-        }
-
-        if ($verificationData['method'] === 'email') {
-            $email = $isLogin
-                ? ($verificationData['identifier'] ?? null)
-                : ($request->session()->get('verification_email') ?? null);
-
-            if (!$email) {
-                return response()->json([
-                    'message' => 'Invalid verification data. Please try again.',
-                    'error' => 'invalid_data'
-                ], 422);
-            }
-
-            $role = $user->roles->first()->name ?? 'user';
-
-            if ($isLogin) {
-                $this->sendLoginEmailOtp($user);
-            } else {
-                $this->sendEmailOtp($user, $role);
-            }
-
-            return response()->json([
-                'message' => 'Verification code has been resent to your email.',
-            ]);
-        } else {
-            $phone = $isLogin
-                ? ($verificationData['identifier'] ?? null)
-                : ($request->session()->get('verification_phone') ?? null);
-
-            if (!$phone) {
-                return response()->json([
-                    'message' => 'Invalid verification data. Please try again.',
-                    'error' => 'invalid_data'
-                ], 422);
-            }
-
-            $role = $user->roles->first()->name ?? 'user';
-
-            if ($isLogin) {
-                $this->sendLoginPhoneOtp($phone, $role);
-            } else {
-                $this->sendPhoneOtp($phone, $role);
-            }
-
-            return response()->json([
-                'message' => 'Verification code has been resent to your phone.',
-            ]);
-        }
+        // This should never be reached due to validation above
+        return response()->json([
+            'message' => 'Either email, phone, or verification_token must be provided.',
+            'error' => 'invalid_data'
+        ], 422);
     }
 
     /**
