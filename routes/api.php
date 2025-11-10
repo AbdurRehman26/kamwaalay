@@ -95,12 +95,7 @@ Route::middleware('guest')->group(function () {
 // Authenticated routes (require Sanctum token)
 Route::middleware('auth:sanctum')->group(function () {
     // User info
-    Route::get('/user', function (Request $request) {
-        $user = $request->user()->load('roles');
-        $userArray = $user->toArray();
-        $userArray['onboarding_complete'] = $user->hasCompletedOnboarding();
-        return $userArray;
-    });
+    Route::get('/user', [App\Http\Controllers\ProfileController::class, 'user']);
     
     // Dashboard
     Route::get('/dashboard', function () {

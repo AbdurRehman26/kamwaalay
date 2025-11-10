@@ -25,7 +25,17 @@ class ProfileController extends Controller
                 description: "User profile data",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "user", type: "object"),
+                        new OA\Property(
+                            property: "user",
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "name", type: "string", example: "John Doe"),
+                                new OA\Property(property: "email", type: "string", nullable: true, example: "user@example.com"),
+                                new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
+                                new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
+                            ]
+                        ),
                         new OA\Property(property: "must_verify_email", type: "boolean"),
                         new OA\Property(property: "status", type: "string", nullable: true),
                     ]
@@ -33,6 +43,39 @@ class ProfileController extends Controller
             ),
         ]
     )]
+    #[OA\Get(
+        path: "/api/user",
+        summary: "Get authenticated user",
+        description: "Get the currently authenticated user's information with onboarding status",
+        tags: ["Profile"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "User data",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "id", type: "integer", example: 1),
+                        new OA\Property(property: "name", type: "string", example: "John Doe"),
+                        new OA\Property(property: "email", type: "string", nullable: true, example: "user@example.com"),
+                        new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
+                        new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
+                    ]
+                )
+            ),
+        ]
+    )]
+    /**
+     * Get authenticated user (for /api/user endpoint)
+     */
+    public function user(Request $request): JsonResponse
+    {
+        $user = $request->user()->load('roles');
+        $userArray = $user->toArray();
+        $userArray['onboarding_complete'] = $user->hasCompletedOnboarding();
+        return response()->json($userArray);
+    }
+
     /**
      * Display the user's profile form.
      */
@@ -68,7 +111,17 @@ class ProfileController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "message", type: "string", example: "Profile updated successfully."),
-                        new OA\Property(property: "user", type: "object"),
+                        new OA\Property(
+                            property: "user",
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "name", type: "string", example: "John Doe"),
+                                new OA\Property(property: "email", type: "string", nullable: true, example: "user@example.com"),
+                                new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
+                                new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
+                            ]
+                        ),
                     ]
                 )
             ),

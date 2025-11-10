@@ -156,6 +156,7 @@ class VerificationController extends Controller
                                 new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
                                 new OA\Property(property: "email_verified_at", type: "string", format: "date-time", nullable: true),
                                 new OA\Property(property: "phone_verified_at", type: "string", format: "date-time", nullable: true),
+                                new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
                             ]
                         ),
                         new OA\Property(property: "token", type: "string", example: "1|abcdefghijklmnopqrstuvwxyz", description: "Sanctum authentication token"),

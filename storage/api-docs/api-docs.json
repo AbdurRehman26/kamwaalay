@@ -485,6 +485,31 @@
                                             "example": "Login successful!"
                                         },
                                         "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "user@example.com",
+                                                    "nullable": true
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+923001234567",
+                                                    "nullable": true
+                                                },
+                                                "onboarding_complete": {
+                                                    "description": "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)",
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
                                             "type": "object"
                                         },
                                         "token": {
@@ -1157,6 +1182,11 @@
                                                     "type": "string",
                                                     "format": "date-time",
                                                     "nullable": true
+                                                },
+                                                "onboarding_complete": {
+                                                    "description": "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)",
+                                                    "type": "boolean",
+                                                    "example": true
                                                 }
                                             },
                                             "type": "object"
@@ -4000,7 +4030,7 @@
                 ],
                 "summary": "Get user profile",
                 "description": "Get the authenticated user's profile information",
-                "operationId": "21d26f16795aefad77fc3cf09e8a7c65",
+                "operationId": "7f317bb117c920d8debb635ecde975d0",
                 "responses": {
                     "200": {
                         "description": "User profile data",
@@ -4009,6 +4039,31 @@
                                 "schema": {
                                     "properties": {
                                         "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "user@example.com",
+                                                    "nullable": true
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+923001234567",
+                                                    "nullable": true
+                                                },
+                                                "onboarding_complete": {
+                                                    "description": "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)",
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
                                             "type": "object"
                                         },
                                         "must_verify_email": {
@@ -4130,6 +4185,31 @@
                                             "example": "Profile updated successfully."
                                         },
                                         "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "user@example.com",
+                                                    "nullable": true
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+923001234567",
+                                                    "nullable": true
+                                                },
+                                                "onboarding_complete": {
+                                                    "description": "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)",
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -4140,6 +4220,58 @@
                     },
                     "422": {
                         "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get authenticated user",
+                "description": "Get the currently authenticated user's information with onboarding status",
+                "operationId": "597ba5a83c277e9eb08e63fca4af690c",
+                "responses": {
+                    "200": {
+                        "description": "User data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "user@example.com",
+                                            "nullable": true
+                                        },
+                                        "phone": {
+                                            "type": "string",
+                                            "example": "+923001234567",
+                                            "nullable": true
+                                        },
+                                        "onboarding_complete": {
+                                            "description": "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)",
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
