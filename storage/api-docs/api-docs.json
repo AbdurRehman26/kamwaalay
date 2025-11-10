@@ -435,32 +435,33 @@
                     "Authentication"
                 ],
                 "summary": "Authenticate user",
-                "description": "Authenticates a user with email/phone and password. Returns token if verified, otherwise requires OTP verification.",
+                "description": "Authenticates a user. If email/phone and password are provided, logs in directly. If only email/phone is provided, sends OTP for verification.",
                 "operationId": "bc76a9d52929cab7a147ca7b5c527430",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "password"
-                                ],
                                 "properties": {
                                     "email": {
+                                        "description": "Email address (required if phone not provided)",
                                         "type": "string",
                                         "format": "email",
                                         "example": "user@example.com",
                                         "nullable": true
                                     },
                                     "phone": {
+                                        "description": "Phone number (required if email not provided)",
                                         "type": "string",
                                         "example": "+923001234567",
                                         "nullable": true
                                     },
                                     "password": {
+                                        "description": "Password (optional - if not provided, OTP will be sent",
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "password123",
+                                        "nullable": true
                                     },
                                     "remember": {
                                         "type": "boolean",
@@ -497,22 +498,36 @@
                         }
                     },
                     "202": {
-                        "description": "OTP verification required",
+                        "description": "OTP sent for verification (when password not provided or account not verified)",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "OTP verification required"
+                                            "example": "Please check your email for the verification code."
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 1
                                         },
                                         "verification_method": {
                                             "type": "string",
+                                            "enum": [
+                                                "email",
+                                                "phone"
+                                            ],
                                             "example": "email"
                                         },
-                                        "verification_identifier": {
+                                        "identifier": {
+                                            "description": "Email or masked phone number",
                                             "type": "string",
                                             "example": "user@example.com"
+                                        },
+                                        "verification_token": {
+                                            "description": "Token to use for OTP verification",
+                                            "type": "string",
+                                            "example": "encrypted_token"
                                         }
                                     },
                                     "type": "object"

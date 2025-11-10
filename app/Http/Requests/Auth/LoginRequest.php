@@ -31,7 +31,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required_without:phone', 'nullable', 'string', 'email'],
             'phone' => ['required_without:email', 'nullable', 'string', 'max:20'],
-            'password' => ['required', 'string'],
+            'password' => ['nullable', 'string'], // Password is optional - if not provided, OTP flow will be used
         ];
     }
 
@@ -71,7 +71,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Verify credentials without logging in (for OTP flow).
+     * Verify credentials without logging in (for password-based login).
      *
      * @return User|null
      * @throws \Illuminate\Validation\ValidationException
@@ -91,7 +91,54 @@ class LoginRequest extends FormRequest
             $user = User::where('phone', $phone)->first();
         }
 
-        if (!$user || !Hash::check($this->input('password'), $user->password)) {
+        if (!$user) {
+            RateLimiter::hit($this->throttleKey());
+
+            $field = $this->filled('email') ? 'email' : 'phone';
+            throw ValidationException::withMessages([
+                $field => trans('auth.failed'),
+            ]);
+        }
+
+        // If password is provided, verify it
+        if ($this->filled('password')) {
+            if (!Hash::check($this->input('password'), $user->password)) {
+                RateLimiter::hit($this->throttleKey());
+
+                $field = $this->filled('email') ? 'email' : 'phone';
+                throw ValidationException::withMessages([
+                    $field => trans('auth.failed'),
+                ]);
+            }
+        }
+
+        RateLimiter::clear($this->throttleKey());
+
+        return $user;
+    }
+
+    /**
+     * Find user by email or phone (for OTP flow).
+     *
+     * @return User|null
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function findUser(): ?User
+    {
+        $this->ensureIsNotRateLimited();
+
+        $user = null;
+
+        // Check if login is by email or phone
+        if ($this->filled('email')) {
+            $user = User::where('email', $this->input('email'))->first();
+        } elseif ($this->filled('phone')) {
+            // Normalize phone number (remove spaces, dashes, etc.)
+            $phone = preg_replace('/[^0-9+]/', '', $this->input('phone'));
+            $user = User::where('phone', $phone)->first();
+        }
+
+        if (!$user) {
             RateLimiter::hit($this->throttleKey());
 
             $field = $this->filled('email') ? 'email' : 'phone';

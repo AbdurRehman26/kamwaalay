@@ -51,16 +51,15 @@ class AuthenticatedSessionController extends Controller
     #[OA\Post(
         path: "/api/login",
         summary: "Authenticate user",
-        description: "Authenticates a user with email/phone and password. Returns token if verified, otherwise requires OTP verification.",
+        description: "Authenticates a user. If email/phone and password are provided, logs in directly. If only email/phone is provided, sends OTP for verification.",
         tags: ["Authentication"],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["password"],
                 properties: [
-                    new OA\Property(property: "email", type: "string", format: "email", nullable: true, example: "user@example.com"),
-                    new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
-                    new OA\Property(property: "password", type: "string", format: "password", example: "password123"),
+                    new OA\Property(property: "email", type: "string", format: "email", nullable: true, example: "user@example.com", description: "Email address (required if phone not provided)"),
+                    new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567", description: "Phone number (required if email not provided)"),
+                    new OA\Property(property: "password", type: "string", format: "password", nullable: true, example: "password123", description: "Password (optional - if not provided, OTP will be sent"),
                     new OA\Property(property: "remember", type: "boolean", example: false),
                 ]
             )
@@ -79,12 +78,14 @@ class AuthenticatedSessionController extends Controller
             ),
             new OA\Response(
                 response: 202,
-                description: "OTP verification required",
+                description: "OTP sent for verification (when password not provided or account not verified)",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "message", type: "string", example: "OTP verification required"),
-                        new OA\Property(property: "verification_method", type: "string", example: "email"),
-                        new OA\Property(property: "verification_identifier", type: "string", example: "user@example.com"),
+                        new OA\Property(property: "message", type: "string", example: "Please check your email for the verification code."),
+                        new OA\Property(property: "user_id", type: "integer", example: 1),
+                        new OA\Property(property: "verification_method", type: "string", example: "email", enum: ["email", "phone"]),
+                        new OA\Property(property: "identifier", type: "string", example: "user@example.com", description: "Email or masked phone number"),
+                        new OA\Property(property: "verification_token", type: "string", example: "encrypted_token", description: "Token to use for OTP verification"),
                     ]
                 )
             ),
@@ -105,7 +106,56 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): JsonResponse
     {
-        // Verify credentials without logging in
+        // Demo phone number check - automatically log in first user
+        $demoPhoneNumber = '9876543210';
+        $normalizedPhone = $request->filled('phone') ? preg_replace('/[^0-9+]/', '', $request->input('phone')) : null;
+        
+        if ($normalizedPhone === $demoPhoneNumber || $normalizedPhone === '+' . $demoPhoneNumber) {
+            // Find first user in database
+            $user = User::orderBy('id')->first();
+            
+            if (!$user) {
+                return response()->json([
+                    'message' => 'No users found in database.',
+                    'errors' => ['phone' => ['No users found in database.']]
+                ], 422);
+            }
+
+            // Log for debugging
+            Log::info('Demo phone login', [
+                'demo_phone' => $demoPhoneNumber,
+                'user_id' => $user->id,
+                'user_email' => $user->email,
+            ]);
+
+            // Create Sanctum token for API authentication
+            $token = $user->createToken('api-token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Login successful! (Demo mode)',
+                'user' => $user->load('roles'),
+                'token' => $token,
+            ]);
+        }
+
+        // Check if password is provided
+        $hasPassword = $request->filled('password');
+
+        if ($hasPassword) {
+            // Password-based login flow
+            return $this->handlePasswordLogin($request);
+        } else {
+            // OTP-based login flow (no password provided)
+            return $this->handleOtpLogin($request);
+        }
+    }
+
+    /**
+     * Handle password-based login
+     */
+    private function handlePasswordLogin(LoginRequest $request): JsonResponse
+    {
+        // Verify credentials (email/phone + password)
         $user = $request->verifyCredentials();
 
         // Determine which login method was used (email or phone)
@@ -113,21 +163,18 @@ class AuthenticatedSessionController extends Controller
         $isVerified = false;
 
         // Check if the account is verified based on login method
-        // Reload user to ensure we have fresh data from database
         $user->refresh();
 
         if ($loginMethod === 'email') {
             // If logged in with email, check if email is verified
-            // Check both that it's not null and that it's a valid datetime
             $isVerified = $user->email_verified_at !== null && $user->email_verified_at instanceof \Carbon\Carbon;
         } else {
             // If logged in with phone, check if phone is verified
-            // Check both that it's not null and that it's a valid datetime
             $isVerified = $user->phone_verified_at !== null && $user->phone_verified_at instanceof \Carbon\Carbon;
         }
 
         // Log for debugging
-        Log::info('Login verification check', [
+        Log::info('Password login verification check', [
             'user_id' => $user->id,
             'login_method' => $loginMethod,
             'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->toDateTimeString() : 'null',
@@ -180,6 +227,7 @@ class AuthenticatedSessionController extends Controller
             'method' => $verificationMethod,
             'identifier' => $verificationMethod === 'email' ? $email : $phone,
             'remember' => $request->boolean('remember'),
+            'is_login' => true,
             'expires_at' => now()->addMinutes(10), // Token valid for 10 minutes
         ];
 
@@ -194,6 +242,76 @@ class AuthenticatedSessionController extends Controller
             'identifier' => $verificationMethod === 'email' ? $email : $this->maskPhone($phone),
             'verification_token' => $verificationToken,
         ]);
+    }
+
+    /**
+     * Handle OTP-based login (no password provided)
+     */
+    private function handleOtpLogin(LoginRequest $request): JsonResponse
+    {
+        // Find user by email or phone (no password verification needed)
+        $user = $request->findUser();
+
+        // Determine which login method was used (email or phone)
+        $loginMethod = $request->filled('email') ? 'email' : 'phone';
+        
+        $email = $user->email;
+        $phone = $user->phone;
+        $isPhoneEmail = strpos($email, '@phone.kamwaalay.local') !== false;
+
+        // Determine which method to use for OTP
+        $verificationMethod = null;
+        $verificationIdentifier = null;
+
+        if ($loginMethod === 'email' && !$isPhoneEmail && !empty($email)) {
+            // User provided email, use email for OTP
+            $verificationMethod = 'email';
+            $verificationIdentifier = $email;
+            $this->sendEmailOtp($user);
+        } elseif ($loginMethod === 'phone' && !empty($phone)) {
+            // User provided phone, use phone for OTP
+            $verificationMethod = 'phone';
+            $verificationIdentifier = $phone;
+            $this->sendPhoneOtp($phone, $user->roles->first()->name ?? 'user');
+        } elseif (!$isPhoneEmail && !empty($email)) {
+            // Fallback to email if available
+            $verificationMethod = 'email';
+            $verificationIdentifier = $email;
+            $this->sendEmailOtp($user);
+        } elseif (!empty($phone)) {
+            // Fallback to phone if available
+            $verificationMethod = 'phone';
+            $verificationIdentifier = $phone;
+            $this->sendPhoneOtp($phone, $user->roles->first()->name ?? 'user');
+        } else {
+            // Should not happen, but handle gracefully
+            return response()->json([
+                'message' => 'Unable to send verification code. Please contact support.',
+                'errors' => ['email' => ['Unable to send verification code. Please contact support.']]
+            ], 422);
+        }
+
+        // Create a signed verification token instead of using session
+        $verificationData = [
+            'user_id' => $user->id,
+            'method' => $verificationMethod,
+            'identifier' => $verificationMethod === 'email' ? $email : $phone,
+            'remember' => $request->boolean('remember'),
+            'is_login' => true,
+            'expires_at' => now()->addMinutes(10), // Token valid for 10 minutes
+        ];
+
+        $verificationToken = encrypt($verificationData);
+
+        return response()->json([
+            'message' => $verificationMethod === 'email'
+                ? 'Please check your email for the verification code.'
+                : 'Please check your phone for the verification code.',
+            'user_id' => $user->id,
+            'verification_method' => $verificationMethod,
+            'identifier' => $verificationMethod === 'email' ? $email : $this->maskPhone($phone),
+            'verification_token' => $verificationToken,
+        ], 202); // 202 Accepted - OTP sent
     }
 
     /**
