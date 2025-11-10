@@ -129,21 +129,24 @@ class OnboardingController extends Controller
         ]);
 
         // Update user profile if provided
-        $userData = [];
+        $profileData = [];
         if ($request->has('photo')) {
-            $userData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
+            $profileData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
         }
         if ($request->has('skills')) {
-            $userData['skills'] = $validated['skills'];
+            $profileData['skills'] = $validated['skills'];
         }
         if ($request->has('experience_years')) {
-            $userData['experience_years'] = $validated['experience_years'];
+            $profileData['experience_years'] = $validated['experience_years'];
         }
         if ($request->has('bio')) {
-            $userData['bio'] = $validated['bio'];
+            $profileData['bio'] = $validated['bio'];
         }
-        if (!empty($userData)) {
-            $user->update($userData);
+        if (!empty($profileData)) {
+            $user->profile()->updateOrCreate(
+                ['profileable_id' => $user->id, 'profileable_type' => 'App\Models\User'],
+                $profileData
+            );
         }
 
         // Store NIC document

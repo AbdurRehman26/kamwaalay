@@ -52,26 +52,32 @@ class BusinessController extends Controller
         $query = User::role('business')
             ->where('is_active', true);
 
-        // Filter by location
+        // Filter by location (from profile)
         $locationDisplay = '';
         if ($request->has('location_id') && $request->location_id) {
             $location = \App\Models\Location::find($request->location_id);
             if ($location) {
                 $location->load('city');
-                $query->where('city', $location->city->name)
+                $query->whereHas('profile', function ($q) use ($location) {
+                    $q->where('city', $location->city->name)
                       ->where('area', $location->area);
+                });
                 $locationDisplay = $location->area 
                     ? $location->city->name . ', ' . $location->area 
                     : $location->city->name;
             }
         } elseif ($request->has('city_name') && $request->city_name) {
-            $query->where('city', $request->city_name);
+            $query->whereHas('profile', function ($q) use ($request) {
+                $q->where('city', $request->city_name);
+            });
             $locationDisplay = $request->city_name;
         } elseif ($request->has('area') && $request->area) {
-            $query->where('area', 'like', '%' . $request->area . '%');
+            $query->whereHas('profile', function ($q) use ($request) {
+                $q->where('area', 'like', '%' . $request->area . '%');
+            });
         }
 
-        $businesses = $query->with(['roles', 'serviceListings'])
+        $businesses = $query->with(['roles', 'profile', 'serviceListings'])
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
@@ -118,13 +124,16 @@ class BusinessController extends Controller
 
         $business->load([
             'roles',
+            'profile',
             'serviceListings' => function ($query) {
                 $query->where('is_active', true)->where('status', 'active');
             },
             'helpers' => function ($query) {
                 $query->where('is_active', true)
-                      ->where('verification_status', 'verified')
-                      ->with(['roles', 'serviceListings'])
+                      ->with(['roles', 'profile', 'serviceListings'])
+                      ->whereHas('profile', function ($q) {
+                          $q->where('verification_status', 'verified');
+                      })
                       ->limit(10);
             }
         ]);
@@ -420,7 +429,6 @@ class BusinessController extends Controller
                         new OA\Property(property: "city", type: "string", maxLength: 255),
                         new OA\Property(property: "area", type: "string", maxLength: 255),
                         new OA\Property(property: "availability", type: "string", enum: ["full_time", "part_time", "available"]),
-                        new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
                         new OA\Property(property: "bio", type: "string", nullable: true),
                     ]
                 )
@@ -468,11 +476,16 @@ class BusinessController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        // Update user data
-        $helperData = [
+        // Update user basic data
+        $userData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
+        ];
+        $helper->update($userData);
+
+        // Update or create profile
+        $profileData = [
             'service_type' => $validated['service_type'],
             'skills' => $validated['skills'] ?? null,
             'experience_years' => $validated['experience_years'],
@@ -485,17 +498,20 @@ class BusinessController extends Controller
 
         if ($request->hasFile('photo')) {
             // Delete old photo
-            if ($helper->photo) {
-                Storage::disk('public')->delete($helper->photo);
+            if ($helper->profile && $helper->profile->photo) {
+                Storage::disk('public')->delete($helper->profile->photo);
             }
-            $helperData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
+            $profileData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
         }
 
-        $helper->update($helperData);
+        $helper->profile()->updateOrCreate(
+            ['profileable_id' => $helper->id, 'profileable_type' => 'App\Models\User'],
+            $profileData
+        );
 
         return response()->json([
             'message' => 'Worker updated successfully!',
-            'worker' => $helper->load('roles'),
+            'worker' => new UserResource($helper->load(['roles', 'profile'])),
         ]);
     }
 

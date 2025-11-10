@@ -54,12 +54,12 @@ class Review extends Model
                 $review->load('booking');
             }
             $helper = $review->helper;
-            if ($helper) {
+            if ($helper && $helper->profile) {
                 $reviews = $helper->helperReviews()->get();
                 $avgRating = $reviews->avg('rating');
                 $totalReviews = $reviews->count();
                 
-                $helper->update([
+                $helper->profile->update([
                     'rating' => round($avgRating, 2),
                     'total_reviews' => $totalReviews,
                 ]);
@@ -72,11 +72,11 @@ class Review extends Model
                 $review->load('booking');
             }
             $helper = $review->helper;
-            if ($helper) {
+            if ($helper && $helper->profile) {
                 $reviews = $helper->helperReviews()->get();
                 $avgRating = $reviews->avg('rating');
                 
-                $helper->update([
+                $helper->profile->update([
                     'rating' => round($avgRating, 2),
                 ]);
             }
@@ -88,12 +88,12 @@ class Review extends Model
                 $review->load('booking');
             }
             $helper = $review->helper;
-            if ($helper) {
+            if ($helper && $helper->profile) {
                 $reviews = $helper->helperReviews()->get();
                 $avgRating = $reviews->count() > 0 ? $reviews->avg('rating') : 0;
                 $totalReviews = $reviews->count();
                 
-                $helper->update([
+                $helper->profile->update([
                     'rating' => round($avgRating, 2),
                     'total_reviews' => $totalReviews,
                 ]);

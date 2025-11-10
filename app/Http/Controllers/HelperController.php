@@ -70,46 +70,66 @@ class HelperController extends Controller
             }
         });
 
-                // Filter by service type
-                if ($request->has('service_type') && $request->service_type) {
-                    $query->byServiceType($request->service_type);
-                }
+        // Filter by service type (from profile)
+        if ($request->has('service_type') && $request->service_type) {
+            $query->whereHas('profile', function ($q) use ($request) {
+                $q->where('service_type', $request->service_type);
+            });
+        }
 
-        // Filter by location
+        // Filter by location (from profile)
         $locationDisplay = '';
         if ($request->has('location_id') && $request->location_id) {
             $location = \App\Models\Location::find($request->location_id);
             if ($location) {
                 $location->load('city');
-                $query->where('city', $location->city->name)
+                $query->whereHas('profile', function ($q) use ($location) {
+                    $q->where('city', $location->city->name)
                       ->where('area', $location->area);
+                });
                 $locationDisplay = $location->area 
                     ? $location->city->name . ', ' . $location->area 
                     : $location->city->name;
             }
         } elseif ($request->has('city_name') && $request->city_name) {
             // If city name provided, filter by city
-            $query->where('city', $request->city_name);
+            $query->whereHas('profile', function ($q) use ($request) {
+                $q->where('city', $request->city_name);
+            });
             $locationDisplay = $request->city_name;
         } elseif ($request->has('area') && $request->area) {
             // If area provided, filter by area in any city
-            $query->where('area', 'like', '%' . $request->area . '%');
+            $query->whereHas('profile', function ($q) use ($request) {
+                $q->where('area', 'like', '%' . $request->area . '%');
+            });
         }
 
         // Filter by experience
         if ($request->has('min_experience')) {
-            $query->where('experience_years', '>=', $request->min_experience);
+            $query->whereHas('profile', function ($q) use ($request) {
+                $q->where('experience_years', '>=', $request->min_experience);
+            });
         }
 
-        // Sort by rating or experience
+        // Sort by rating or experience (from profile)
         $sortBy = $request->get('sort_by', 'rating');
         if ($sortBy === 'experience') {
-            $query->orderBy('experience_years', 'desc');
+            $query->join('profiles', function ($join) {
+                $join->on('users.id', '=', 'profiles.profileable_id')
+                     ->where('profiles.profileable_type', '=', 'App\Models\User');
+            })
+            ->orderBy('profiles.experience_years', 'desc')
+            ->select('users.*');
         } else {
-            $query->orderBy('rating', 'desc');
+            $query->join('profiles', function ($join) {
+                $join->on('users.id', '=', 'profiles.profileable_id')
+                     ->where('profiles.profileable_type', '=', 'App\Models\User');
+            })
+            ->orderBy('profiles.rating', 'desc')
+            ->select('users.*');
         }
 
-        $helpers = $query->with('roles')->paginate(12);
+        $helpers = $query->with(['roles', 'profile'])->paginate(12);
 
         $filters = $request->only(['service_type', 'location_id', 'city_name', 'area', 'min_experience', 'sort_by', 'user_type']);
         if ($locationDisplay) {
@@ -149,7 +169,7 @@ class HelperController extends Controller
             abort(404);
         }
 
-        $helper->load(['roles', 'helperReviews.user', 'documents', 'serviceListings' => function ($query) {
+        $helper->load(['roles', 'profile', 'helperReviews.user', 'documents', 'serviceListings' => function ($query) {
             $query->where('is_active', true)
                   ->where('status', 'active')
                   ->with(['serviceTypes', 'locations']);
@@ -203,7 +223,6 @@ class HelperController extends Controller
                         new OA\Property(property: "city", type: "string", maxLength: 255),
                         new OA\Property(property: "area", type: "string", maxLength: 255),
                         new OA\Property(property: "availability", type: "string", enum: ["full_time", "part_time", "available"]),
-                        new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
                         new OA\Property(property: "bio", type: "string", nullable: true),
                     ]
                 )
@@ -234,7 +253,6 @@ class HelperController extends Controller
             'city' => 'required|string|max:255',
             'area' => 'required|string|max:255',
             'availability' => 'required|in:full_time,part_time,available',
-            'monthly_rate' => 'nullable|numeric|min:0',
             'bio' => 'nullable|string',
         ]);
 
@@ -248,11 +266,15 @@ class HelperController extends Controller
             $validated['photo'] = $request->file('photo')->store('helpers/photos', 'public');
         }
 
-        $user->update($validated);
+        // Create or update profile
+        $user->profile()->updateOrCreate(
+            ['profileable_id' => $user->id, 'profileable_type' => 'App\Models\User'],
+            $validated
+        );
 
         return response()->json([
             'message' => 'Helper profile created successfully!',
-            'helper' => new UserResource($user->load('roles')),
+            'helper' => new UserResource($user->load(['roles', 'profile'])),
         ]);
     }
 
@@ -318,7 +340,6 @@ class HelperController extends Controller
                         new OA\Property(property: "city", type: "string", maxLength: 255),
                         new OA\Property(property: "area", type: "string", maxLength: 255),
                         new OA\Property(property: "availability", type: "string", enum: ["full_time", "part_time", "available"]),
-                        new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
                         new OA\Property(property: "bio", type: "string", nullable: true),
                     ]
                 )
@@ -359,23 +380,26 @@ class HelperController extends Controller
             'city' => 'required|string|max:255',
             'area' => 'required|string|max:255',
             'availability' => 'required|in:full_time,part_time,available',
-            'monthly_rate' => 'nullable|numeric|min:0',
             'bio' => 'nullable|string',
         ]);
 
         if ($request->hasFile('photo')) {
             // Delete old photo
-            if ($helper->photo) {
-                Storage::disk('public')->delete($helper->photo);
+            if ($helper->profile && $helper->profile->photo) {
+                Storage::disk('public')->delete($helper->profile->photo);
             }
             $validated['photo'] = $request->file('photo')->store('helpers/photos', 'public');
         }
 
-        $helper->update($validated);
+        // Update or create profile
+        $helper->profile()->updateOrCreate(
+            ['profileable_id' => $helper->id, 'profileable_type' => 'App\Models\User'],
+            $validated
+        );
 
         return response()->json([
             'message' => 'Helper profile updated successfully!',
-            'helper' => $helper->load('roles'),
+            'helper' => new UserResource($helper->load(['roles', 'profile'])),
         ]);
     }
 }

@@ -25,21 +25,7 @@ class User extends Authenticatable
         'password',
         'phone',
         'address',
-        // Helper-specific fields
-        'photo',
-        'service_type',
-        'skills',
-        'experience_years',
-        'city',
-        'area',
-        'availability',
-        'monthly_rate',
-        'bio',
-        'verification_status',
-        'police_verified',
         'is_active',
-        'rating',
-        'total_reviews',
     ];
 
     /**
@@ -63,12 +49,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
-            'experience_years' => 'integer',
-            'monthly_rate' => 'decimal:2',
-            'police_verified' => 'boolean',
             'is_active' => 'boolean',
-            'rating' => 'decimal:2',
-            'total_reviews' => 'integer',
         ];
     }
 
@@ -124,6 +105,12 @@ class User extends Authenticatable
     public function documents()
     {
         return $this->hasMany(Document::class, 'user_id');
+    }
+
+    // Profile relationship (polymorphic one-to-one)
+    public function profile()
+    {
+        return $this->morphOne(Profile::class, 'profileable');
     }
 
     // Service listings (services offered by helpers/businesses)
@@ -187,21 +174,90 @@ class User extends Authenticatable
     public function scopeVerifiedHelpers($query)
     {
         return $query->role('helper')
-                    ->where('verification_status', 'verified')
+                    ->whereHas('profile', function ($q) {
+                        $q->where('verification_status', 'verified')
+                          ->where('is_active', true);
+                    })
                     ->where('is_active', true);
     }
 
     public function scopeByServiceType($query, ?string $serviceType)
     {
         if ($serviceType) {
-            return $query->where('service_type', $serviceType);
+            return $query->whereHas('profile', function ($q) use ($serviceType) {
+                $q->where('service_type', $serviceType);
+            });
         }
         return $query;
     }
 
     public function scopeByCity($query, string $city)
     {
-        return $query->where('city', $city);
+        return $query->whereHas('profile', function ($q) use ($city) {
+            $q->where('city', $city);
+        });
+    }
+
+    // Accessors to get profile fields
+    public function getPhotoAttribute()
+    {
+        return $this->profile?->photo;
+    }
+
+    public function getServiceTypeAttribute()
+    {
+        return $this->profile?->service_type;
+    }
+
+    public function getSkillsAttribute()
+    {
+        return $this->profile?->skills;
+    }
+
+    public function getExperienceYearsAttribute()
+    {
+        return $this->profile?->experience_years;
+    }
+
+    public function getCityAttribute()
+    {
+        return $this->profile?->city;
+    }
+
+    public function getAreaAttribute()
+    {
+        return $this->profile?->area;
+    }
+
+    public function getAvailabilityAttribute()
+    {
+        return $this->profile?->availability;
+    }
+
+
+    public function getBioAttribute()
+    {
+        return $this->profile?->bio;
+    }
+
+    public function getVerificationStatusAttribute()
+    {
+        return $this->profile?->verification_status;
+    }
+
+    public function getPoliceVerifiedAttribute()
+    {
+        return $this->profile?->police_verified;
+    }
+
+    public function getRatingAttribute()
+    {
+        return $this->profile?->rating ?? 0.00;
+    }
+
+    public function getTotalReviewsAttribute()
+    {
+        return $this->profile?->total_reviews ?? 0;
     }
 
     public function getServiceTypeLabelAttribute(): string
@@ -209,7 +265,7 @@ class User extends Authenticatable
         if (!$this->service_type) {
             return '';
         }
-        
+
         return match($this->service_type) {
             'maid' => 'Maid',
             'cook' => 'Cook',

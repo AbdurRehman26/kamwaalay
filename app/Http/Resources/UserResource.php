@@ -19,12 +19,24 @@ class UserResource extends JsonResource
     }
 
     /**
+     * Ensure profile is loaded if user is a helper/business
+     */
+    private function ensureProfileLoaded(): void
+    {
+        if ($this->hasRole(['helper', 'business']) && !$this->relationLoaded('profile')) {
+            $this->load('profile');
+        }
+    }
+
+    /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
+        $this->ensureProfileLoaded();
+        
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -39,21 +51,20 @@ class UserResource extends JsonResource
             'onboarding_complete' => $this->hasCompletedOnboarding(),
             'role' => $this->getRoleAttribute(),
             'roles' => $this->getRolesArray(),
-            // Helper-specific fields
-            'photo' => $this->when(isset($this->photo), $this->photo),
-            'service_type' => $this->when(isset($this->service_type), $this->service_type),
-            'skills' => $this->when(isset($this->skills), $this->skills),
-            'experience_years' => $this->when(isset($this->experience_years), $this->experience_years),
-            'city' => $this->when(isset($this->city), $this->city),
-            'area' => $this->when(isset($this->area), $this->area),
-            'availability' => $this->when(isset($this->availability), $this->availability),
-            'monthly_rate' => $this->when(isset($this->monthly_rate), $this->monthly_rate),
-            'bio' => $this->when(isset($this->bio), $this->bio),
-            'verification_status' => $this->when(isset($this->verification_status), $this->verification_status),
-            'police_verified' => $this->when(isset($this->police_verified), $this->police_verified),
+            // Profile fields (from profile - works for both helpers and businesses)
+            'photo' => $this->when($this->profile, $this->photo),
+            'service_type' => $this->when($this->profile, $this->service_type),
+            'skills' => $this->when($this->profile, $this->skills),
+            'experience_years' => $this->when($this->profile, $this->experience_years),
+            'city' => $this->when($this->profile, $this->city),
+            'area' => $this->when($this->profile, $this->area),
+            'availability' => $this->when($this->profile, $this->availability),
+            'bio' => $this->when($this->profile, $this->bio),
+            'verification_status' => $this->when($this->profile, $this->verification_status),
+            'police_verified' => $this->when($this->profile, $this->police_verified),
             'is_active' => $this->when(isset($this->is_active), $this->is_active),
-            'rating' => $this->when(isset($this->rating), $this->rating),
-            'total_reviews' => $this->when(isset($this->total_reviews), $this->total_reviews),
+            'rating' => $this->when($this->profile, $this->rating),
+            'total_reviews' => $this->when($this->profile, $this->total_reviews),
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -31,8 +32,13 @@ class HomeController extends Controller
     public function index(): JsonResponse
     {
         $featuredHelpers = User::verifiedHelpers()
-            ->with('roles')
-            ->orderBy('rating', 'desc')
+            ->join('profiles', function ($join) {
+                $join->on('users.id', '=', 'profiles.profileable_id')
+                     ->where('profiles.profileable_type', '=', 'App\Models\User');
+            })
+            ->with(['roles', 'profile'])
+            ->orderBy('profiles.rating', 'desc')
+            ->select('users.*')
             ->take(6)
             ->get();
 
@@ -40,7 +46,9 @@ class HomeController extends Controller
             'total_helpers' => User::verifiedHelpers()->count(),
             'total_bookings' => \App\Models\Booking::where('status', 'confirmed')->count(),
             'total_reviews' => \App\Models\Review::count(),
-            'verified_helpers' => User::role('helper')->where('verification_status', 'verified')->count(),
+            'verified_helpers' => User::role('helper')->whereHas('profile', function ($q) {
+                $q->where('verification_status', 'verified');
+            })->count(),
         ];
 
         return response()->json([
