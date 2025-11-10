@@ -50,8 +50,12 @@ class AdminController extends Controller
         $stats = [
             'total_users' => User::count(),
             'total_helpers' => User::role('helper')->count(),
-            'verified_helpers' => User::role('helper')->where('verification_status', 'verified')->count(),
-            'pending_helpers' => User::role('helper')->where('verification_status', 'pending')->count(),
+            'verified_helpers' => User::role('helper')->whereHas('profile', function ($q) {
+                $q->where('verification_status', 'verified');
+            })->count(),
+            'pending_helpers' => User::role('helper')->whereHas('profile', function ($q) {
+                $q->where('verification_status', 'pending');
+            })->count(),
             'total_bookings' => Booking::count(),
             'pending_bookings' => Booking::where('status', 'pending')->count(),
             'confirmed_bookings' => Booking::where('status', 'confirmed')->count(),
@@ -65,7 +69,9 @@ class AdminController extends Controller
             ->get();
 
         $pendingHelpers = User::role('helper')
-            ->where('verification_status', 'pending')
+            ->whereHas('profile', function ($q) {
+                $q->where('verification_status', 'pending');
+            })
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
@@ -105,7 +111,9 @@ class AdminController extends Controller
         $query = User::role('helper');
 
         if ($request->has('status')) {
-            $query->where('verification_status', $request->status);
+            $query->whereHas('profile', function ($q) use ($request) {
+                $q->where('verification_status', $request->status);
+            });
         }
 
         $helpers = $query->orderBy('created_at', 'desc')->paginate(15);
@@ -162,11 +170,15 @@ class AdminController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $helper->update($validated);
+        // Update or create profile
+        $helper->profile()->updateOrCreate(
+            ['profileable_id' => $helper->id, 'profileable_type' => 'App\Models\User'],
+            $validated
+        );
 
         return response()->json([
             'message' => 'Helper status updated successfully!',
-            'helper' => $helper->load('roles'),
+            'helper' => $helper->load(['roles', 'profile']),
         ]);
     }
 
@@ -300,7 +312,10 @@ class AdminController extends Controller
                     ->count() === 0;
 
                 if ($allVerified && $helper->documents()->where('status', 'verified')->count() > 0) {
-                    $helper->update(['verification_status' => 'verified']);
+                    $helper->profile()->updateOrCreate(
+                        ['profileable_id' => $helper->id, 'profileable_type' => 'App\Models\User'],
+                        ['verification_status' => 'verified']
+                    );
                 }
             }
         }

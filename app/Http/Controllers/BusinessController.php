@@ -174,9 +174,15 @@ class BusinessController extends Controller
 
         $stats = [
             'total_workers' => $business->helpers()->count(),
-            'active_workers' => $business->helpers()->where('is_active', true)->count(),
-            'pending_verification' => $business->helpers()->where('verification_status', 'pending')->count(),
-            'verified_workers' => $business->helpers()->where('verification_status', 'verified')->count(),
+            'active_workers' => $business->helpers()->whereHas('profile', function ($q) {
+                $q->where('is_active', true);
+            })->count(),
+            'pending_verification' => $business->helpers()->whereHas('profile', function ($q) {
+                $q->where('verification_status', 'pending');
+            })->count(),
+            'verified_workers' => $business->helpers()->whereHas('profile', function ($q) {
+                $q->where('verification_status', 'verified');
+            })->count(),
             'total_bookings' => Booking::whereIn('assigned_user_id', $business->helpers()->pluck('users.id')->toArray())->count(),
         ];
 

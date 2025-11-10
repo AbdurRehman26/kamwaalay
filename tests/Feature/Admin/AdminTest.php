@@ -76,10 +76,12 @@ test('admins can view helpers list', function () {
 test('admins can update helper verification status', function () {
     $admin = createAdmin();
 
-    $helper = User::factory()->create([
-        'verification_status' => 'pending',
-    ]);
+    $helper = User::factory()->create();
     $helper->assignRole('helper');
+    $helper->profile()->create([
+        'verification_status' => 'pending',
+        'is_active' => true,
+    ]);
     
     $token = $admin->createToken('test-token')->plainTextToken;
 
@@ -93,8 +95,9 @@ test('admins can update helper verification status', function () {
 
     $response->assertStatus(200);
     $helper->refresh();
-    expect($helper->verification_status)->toBe('verified');
-    expect($helper->is_active)->toBeTrue();
+    $helper->load('profile');
+    expect($helper->profile->verification_status)->toBe('verified');
+    expect($helper->profile->is_active)->toBeTrue();
 });
 
 test('admins can view bookings list', function () {
@@ -180,11 +183,19 @@ test('admins can update document status', function () {
 test('admin dashboard shows correct statistics', function () {
     $admin = createAdmin();
 
-    $helper = User::factory()->create(['verification_status' => 'verified']);
+    $helper = User::factory()->create();
     $helper->assignRole('helper');
+    $helper->profile()->create([
+        'verification_status' => 'verified',
+        'is_active' => true,
+    ]);
 
-    $pendingHelper = User::factory()->create(['verification_status' => 'pending']);
+    $pendingHelper = User::factory()->create();
     $pendingHelper->assignRole('helper');
+    $pendingHelper->profile()->create([
+        'verification_status' => 'pending',
+        'is_active' => true,
+    ]);
 
     Booking::factory()->create(['status' => 'pending']);
     Booking::factory()->create(['status' => 'confirmed']);

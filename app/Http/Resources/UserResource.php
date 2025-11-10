@@ -65,6 +65,26 @@ class UserResource extends JsonResource
             'is_active' => $this->when(isset($this->is_active), $this->is_active),
             'rating' => $this->when($this->profile, $this->rating),
             'total_reviews' => $this->when($this->profile, $this->total_reviews),
+            // Service listings (if loaded)
+            'service_listings' => $this->when($this->relationLoaded('serviceListings'), function () {
+                return $this->serviceListings->map(function ($listing) {
+                    return [
+                        'id' => $listing->id,
+                        'work_type' => $listing->work_type,
+                        'description' => $listing->description,
+                        'is_active' => $listing->is_active,
+                        'status' => $listing->status,
+                        'monthly_rate' => $listing->monthly_rate,
+                        'service_types' => $listing->serviceTypes->pluck('service_type')->toArray(),
+                        'locations' => $listing->locations->map(function ($location) {
+                            return [
+                                'city' => $location->city,
+                                'area' => $location->area,
+                            ];
+                        })->toArray(),
+                    ];
+                });
+            }),
         ];
     }
 }

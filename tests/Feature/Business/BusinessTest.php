@@ -90,9 +90,11 @@ test('businesses can update their worker', function () {
 
     $helper = User::factory()->create([
         'name' => 'Old Name',
-        'service_type' => 'maid',
     ]);
     $helper->assignRole('helper');
+    $helper->profile()->create([
+        'service_type' => 'maid',
+    ]);
     $business->helpers()->attach($helper->id);
     
     $token = $business->createToken('test-token')->plainTextToken;
@@ -116,8 +118,9 @@ test('businesses can update their worker', function () {
 
     $response->assertStatus(200);
     $helper->refresh();
+    $helper->load('profile');
     expect($helper->name)->toBe('New Name');
-    expect($helper->service_type)->toBe('cook');
+    expect($helper->profile->service_type)->toBe('cook');
 });
 
 test('businesses can remove a worker', function () {

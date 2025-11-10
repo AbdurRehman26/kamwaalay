@@ -134,8 +134,9 @@ test('businesses can complete onboarding', function () {
     $response->assertStatus(200);
     
     $business->refresh();
-    expect($business->bio)->toBe('Professional business');
-    expect($business->city)->toBe('Karachi');
+    $business->load('profile');
+    expect($business->profile->bio)->toBe('Professional business');
+    expect($business->profile->city)->toBe('Karachi');
     
     $listings = ServiceListing::where('user_id', $business->id)->get();
     expect($listings)->toHaveCount(1);

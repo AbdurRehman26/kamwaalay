@@ -58,19 +58,21 @@ test('helpers can create their profile', function () {
     ]);
 
     $response->assertStatus(200);
-    $this->assertDatabaseHas('users', [
-        'id' => $helper->id,
+    $this->assertDatabaseHas('profiles', [
+        'profileable_id' => $helper->id,
+        'profileable_type' => 'App\Models\User',
         'service_type' => 'maid',
         'skills' => 'Cleaning, Laundry',
     ]);
 });
 
 test('helpers can update their profile', function () {
-    $helper = User::factory()->create([
+    $helper = User::factory()->create();
+    $helper->assignRole('helper');
+    $helper->profile()->create([
         'service_type' => 'maid',
         'skills' => 'Cleaning',
     ]);
-    $helper->assignRole('helper');
     
     $token = $helper->createToken('test-token')->plainTextToken;
 
@@ -88,8 +90,9 @@ test('helpers can update their profile', function () {
     ]);
 
     $response->assertStatus(200);
-    $this->assertDatabaseHas('users', [
-        'id' => $helper->id,
+    $this->assertDatabaseHas('profiles', [
+        'profileable_id' => $helper->id,
+        'profileable_type' => 'App\Models\User',
         'service_type' => 'cook',
         'skills' => 'Cooking, Baking',
     ]);

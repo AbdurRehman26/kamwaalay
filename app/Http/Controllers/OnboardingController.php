@@ -329,18 +329,21 @@ class OnboardingController extends Controller
         ]);
 
         // Update user profile if provided
-        $userData = [];
+        $profileData = [];
         if ($request->has('bio')) {
-            $userData['bio'] = $validated['bio'];
+            $profileData['bio'] = $validated['bio'];
         }
         if ($request->has('city')) {
-            $userData['city'] = $validated['city'];
+            $profileData['city'] = $validated['city'];
         }
         if ($request->has('area')) {
-            $userData['area'] = $validated['area'];
+            $profileData['area'] = $validated['area'];
         }
-        if (!empty($userData)) {
-            $user->update($userData);
+        if (!empty($profileData)) {
+            $user->profile()->updateOrCreate(
+                ['profileable_id' => $user->id, 'profileable_type' => 'App\Models\User'],
+                $profileData
+            );
         }
 
         // Store NIC document
