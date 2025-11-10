@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class BookingResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'user_id' => $this->user_id,
+            'assigned_user_id' => $this->assigned_user_id,
+            'service_type' => $this->service_type,
+            'service_type_label' => $this->service_type_label,
+            'work_type' => $this->work_type,
+            'city' => $this->city,
+            'area' => $this->area,
+            'start_date' => $this->start_date?->format('Y-m-d'),
+            'start_time' => $this->start_time?->toIso8601String(),
+            'name' => $this->name,
+            'phone' => $this->phone,
+            'email' => $this->email,
+            'address' => $this->address,
+            'special_requirements' => $this->special_requirements,
+            'status' => $this->status,
+            'status_label' => $this->status_label,
+            'admin_notes' => $this->admin_notes,
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
+            'user' => $this->whenLoaded('user', function () {
+                return new UserResource($this->user);
+            }),
+            'assigned_user' => $this->whenLoaded('assignedUser', function () {
+                return new UserResource($this->assignedUser);
+            }),
+            'review' => $this->whenLoaded('review', function () {
+                return new ReviewResource($this->review);
+            }),
+            'job_applications' => $this->whenLoaded('jobApplications', function () {
+                return JobApplicationResource::collection($this->jobApplications);
+            }),
+        ];
+    }
+}
+

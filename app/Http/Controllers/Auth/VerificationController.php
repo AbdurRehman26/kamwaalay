@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\EmailOtp;
 use App\Models\PhoneOtp;
@@ -381,7 +382,7 @@ class VerificationController extends Controller
 
             return response()->json([
                 'message' => 'Login successful!',
-                'user' => $this->formatUserResponse($user->load('roles')),
+                'user' => new UserResource($user->load('roles')),
                 'token' => $token,
             ]);
         } else {
@@ -405,7 +406,7 @@ class VerificationController extends Controller
 
             return response()->json([
                 'message' => 'Registration successful!',
-                'user' => $this->formatUserResponse($user->load('roles')),
+                'user' => new UserResource($user->load('roles')),
                 'token' => $token,
                 'redirect' => $redirectInfo,
             ]);
@@ -475,7 +476,7 @@ class VerificationController extends Controller
 
             return response()->json([
                 'message' => 'Login successful!',
-                'user' => $this->formatUserResponse($user->load('roles')),
+                'user' => new UserResource($user->load('roles')),
                 'token' => $token,
             ]);
         } else {
@@ -499,7 +500,7 @@ class VerificationController extends Controller
 
             return response()->json([
                 'message' => 'Registration successful!',
-                'user' => $this->formatUserResponse($user->load('roles')),
+                'user' => new UserResource($user->load('roles')),
                 'token' => $token,
                 'redirect' => $redirectInfo,
             ]);
@@ -891,13 +892,4 @@ class VerificationController extends Controller
         ];
     }
 
-    /**
-     * Format user response with onboarding_complete
-     */
-    private function formatUserResponse(User $user): array
-    {
-        $userArray = $user->toArray();
-        $userArray['onboarding_complete'] = $user->hasCompletedOnboarding();
-        return $userArray;
-    }
 }

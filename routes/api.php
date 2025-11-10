@@ -19,6 +19,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -101,7 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user()->load('roles');
         return response()->json([
-            'user' => $user,
+            'user' => new UserResource($user),
             'roles' => $user->roles->pluck('name'),
         ]);
     });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Resources\UserResource;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -70,10 +71,7 @@ class ProfileController extends Controller
      */
     public function user(Request $request): JsonResponse
     {
-        $user = $request->user()->load('roles');
-        $userArray = $user->toArray();
-        $userArray['onboarding_complete'] = $user->hasCompletedOnboarding();
-        return response()->json($userArray);
+        return response()->json(new UserResource($request->user()->load('roles')));
     }
 
     /**
@@ -82,7 +80,7 @@ class ProfileController extends Controller
     public function edit(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => $request->user()->load('roles'),
+            'user' => new UserResource($request->user()->load('roles')),
             'must_verify_email' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
         ]);
@@ -149,7 +147,7 @@ class ProfileController extends Controller
 
         return response()->json([
             'message' => 'Profile updated successfully.',
-            'user' => $user->load('roles'),
+            'user' => new UserResource($user->load('roles')),
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\PhoneOtp;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -144,7 +145,7 @@ class PhoneOtpController extends Controller
 
         return response()->json([
             'message' => 'Registration successful!',
-            'user' => $user->load('roles'),
+            'user' => new UserResource($user->load('roles')),
             'token' => $token,
             'redirect' => $redirectInfo,
         ]);

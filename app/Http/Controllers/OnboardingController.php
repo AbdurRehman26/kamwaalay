@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\ServiceListing;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,7 +43,7 @@ class OnboardingController extends Controller
         }
 
         return response()->json([
-            'user' => $user->load('roles'),
+            'user' => new UserResource($user->load('roles')),
         ]);
     }
 
@@ -227,7 +228,7 @@ class OnboardingController extends Controller
 
         return response()->json([
             'message' => 'Welcome! Your profile has been set up successfully.',
-            'user' => $user->load('roles'),
+            'user' => new UserResource($user->load('roles')),
         ]);
     }
 
@@ -262,7 +263,7 @@ class OnboardingController extends Controller
         }
 
         return response()->json([
-            'user' => $user->load('roles'),
+            'user' => new UserResource($user->load('roles')),
         ]);
     }
 
@@ -421,7 +422,7 @@ class OnboardingController extends Controller
 
         return response()->json([
             'message' => 'Welcome! Your business profile has been set up successfully.',
-            'user' => $user->load('roles'),
+            'user' => new UserResource($user->load('roles')),
         ]);
     }
 }

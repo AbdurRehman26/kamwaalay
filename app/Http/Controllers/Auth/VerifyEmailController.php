@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
@@ -28,7 +29,7 @@ class VerifyEmailController extends Controller
         return response()->json([
             'message' => 'Email verified successfully.',
             'verified' => true,
-            'user' => $request->user()->load('roles'),
+            'user' => new UserResource($request->user()->load('roles')),
         ]);
     }
 }

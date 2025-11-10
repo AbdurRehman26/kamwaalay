@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ServiceListingResource;
+use App\Http\Resources\UserResource;
 use App\Models\ServiceListing;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -110,7 +112,7 @@ class ServiceListingController extends Controller
         }
 
         return response()->json([
-            'listings' => $listings,
+            'listings' => ServiceListingResource::collection($listings)->response()->getData(true),
             'filters' => $filters,
         ]);
     }
@@ -289,7 +291,7 @@ class ServiceListingController extends Controller
 
             return response()->json([
                 'message' => $message,
-                'listing' => $listing->load(['serviceTypes', 'locations']),
+                'listing' => new ServiceListingResource($listing->load(['serviceTypes', 'locations', 'user'])),
             ]);
         } else {
             // Single listing (backward compatibility - will need to be updated)
@@ -328,7 +330,7 @@ class ServiceListingController extends Controller
 
             return response()->json([
                 'message' => 'Service listing created successfully!',
-                'listing' => $listing->load(['serviceTypes', 'locations']),
+                'listing' => new ServiceListingResource($listing->load(['serviceTypes', 'locations', 'user'])),
             ]);
         }
     }
@@ -383,9 +385,9 @@ class ServiceListingController extends Controller
             ->get();
 
         return response()->json([
-            'listing' => $serviceListing,
-            'other_listings' => $otherListings,
-            'user' => Auth::user()?->load('roles'),
+            'listing' => new ServiceListingResource($serviceListing->load(['serviceTypes', 'locations', 'user'])),
+            'other_listings' => ServiceListingResource::collection($otherListings->load(['serviceTypes', 'locations'])),
+            'user' => Auth::user() ? new UserResource(Auth::user()->load('roles')) : null,
         ]);
     }
 
@@ -425,7 +427,7 @@ class ServiceListingController extends Controller
         $serviceListing->load(['user', 'serviceTypes', 'locations']);
 
         return response()->json([
-            'listing' => $serviceListing,
+            'listing' => new ServiceListingResource($serviceListing),
         ]);
     }
 
@@ -529,7 +531,7 @@ class ServiceListingController extends Controller
 
         return response()->json([
             'message' => 'Service listing updated successfully!',
-            'listing' => $serviceListing->load(['serviceTypes', 'locations']),
+            'listing' => new ServiceListingResource($serviceListing->load(['serviceTypes', 'locations', 'user'])),
         ]);
     }
 
@@ -608,7 +610,7 @@ class ServiceListingController extends Controller
             ->paginate(12);
 
         return response()->json([
-            'listings' => $listings,
+            'listings' => ServiceListingResource::collection($listings)->response()->getData(true),
         ]);
     }
 }

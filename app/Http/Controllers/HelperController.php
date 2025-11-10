@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\City;
 use Illuminate\Http\JsonResponse;
@@ -108,7 +109,7 @@ class HelperController extends Controller
             $query->orderBy('rating', 'desc');
         }
 
-        $helpers = $query->paginate(12);
+        $helpers = $query->with('roles')->paginate(12);
 
         $filters = $request->only(['service_type', 'location_id', 'city_name', 'area', 'min_experience', 'sort_by', 'user_type']);
         if ($locationDisplay) {
@@ -116,7 +117,7 @@ class HelperController extends Controller
         }
         
         return response()->json([
-            'helpers' => $helpers,
+            'helpers' => UserResource::collection($helpers)->response()->getData(true),
             'filters' => $filters,
         ]);
     }
@@ -148,14 +149,14 @@ class HelperController extends Controller
             abort(404);
         }
 
-        $helper->load(['helperReviews.user', 'documents', 'serviceListings' => function ($query) {
+        $helper->load(['roles', 'helperReviews.user', 'documents', 'serviceListings' => function ($query) {
             $query->where('is_active', true)
                   ->where('status', 'active')
                   ->with(['serviceTypes', 'locations']);
         }]);
 
         return response()->json([
-            'helper' => $helper,
+            'helper' => new UserResource($helper),
         ]);
     }
 
@@ -251,7 +252,7 @@ class HelperController extends Controller
 
         return response()->json([
             'message' => 'Helper profile created successfully!',
-            'helper' => $user->load('roles'),
+            'helper' => new UserResource($user->load('roles')),
         ]);
     }
 

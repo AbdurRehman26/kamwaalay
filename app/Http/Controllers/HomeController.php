@@ -44,7 +44,7 @@ class HomeController extends Controller
         ];
 
         return response()->json([
-            'featured_helpers' => $featuredHelpers,
+            'featured_helpers' => UserResource::collection($featuredHelpers),
             'stats' => $stats,
         ]);
     }

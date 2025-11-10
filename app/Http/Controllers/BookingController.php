@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BookingResource;
+use App\Http\Resources\UserResource;
 use App\Models\Booking;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -44,7 +46,7 @@ class BookingController extends Controller
         
         return response()->json([
             'prefill' => $prefill,
-            'user' => Auth::user()?->load('roles'),
+            'user' => Auth::user() ? new UserResource(Auth::user()->load('roles')) : null,
         ]);
     }
 
@@ -120,7 +122,7 @@ class BookingController extends Controller
 
         return response()->json([
             'message' => 'Booking request submitted successfully!',
-            'booking' => $booking->load(['user', 'assignedUser']),
+            'booking' => new BookingResource($booking->load(['user', 'assignedUser'])),
         ]);
     }
 
@@ -151,7 +153,7 @@ class BookingController extends Controller
         $booking->load(['user', 'assignedUser', 'review', 'jobApplications']);
 
         return response()->json([
-            'booking' => $booking,
+            'booking' => new BookingResource($booking),
         ]);
     }
 
@@ -181,7 +183,7 @@ class BookingController extends Controller
             ->paginate(10);
 
         return response()->json([
-            'bookings' => $bookings,
+            'bookings' => BookingResource::collection($bookings)->response()->getData(true),
         ]);
     }
 
@@ -267,7 +269,7 @@ class BookingController extends Controller
         }
 
         return response()->json([
-            'bookings' => $bookings,
+            'bookings' => BookingResource::collection($bookings)->response()->getData(true),
             'filters' => $filters,
         ]);
     }
@@ -322,7 +324,7 @@ class BookingController extends Controller
 
         return response()->json([
             'message' => 'Booking updated successfully!',
-            'booking' => $booking->load(['user', 'helper']),
+            'booking' => new BookingResource($booking->load(['user', 'assignedUser'])),
         ]);
     }
 

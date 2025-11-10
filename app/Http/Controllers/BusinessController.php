@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\Booking;
 use Illuminate\Http\JsonResponse;
@@ -70,7 +71,7 @@ class BusinessController extends Controller
             $query->where('area', 'like', '%' . $request->area . '%');
         }
 
-        $businesses = $query->with('serviceListings')
+        $businesses = $query->with(['roles', 'serviceListings'])
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
@@ -80,7 +81,7 @@ class BusinessController extends Controller
         }
 
         return response()->json([
-            'businesses' => $businesses,
+            'businesses' => UserResource::collection($businesses)->response()->getData(true),
             'filters' => $filters,
         ]);
     }
@@ -116,19 +117,20 @@ class BusinessController extends Controller
         }
 
         $business->load([
+            'roles',
             'serviceListings' => function ($query) {
                 $query->where('is_active', true)->where('status', 'active');
             },
             'helpers' => function ($query) {
                 $query->where('is_active', true)
                       ->where('verification_status', 'verified')
-                      ->with('serviceListings')
+                      ->with(['roles', 'serviceListings'])
                       ->limit(10);
             }
         ]);
 
         return response()->json([
-            'business' => $business,
+            'business' => new UserResource($business),
         ]);
     }
 
@@ -391,7 +393,7 @@ class BusinessController extends Controller
         }
 
         return response()->json([
-            'helper' => $helper->load('roles'),
+            'helper' => new UserResource($helper->load('roles')),
         ]);
     }
 

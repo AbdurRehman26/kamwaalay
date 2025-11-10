@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\UserResource;
 use App\Models\EmailOtp;
 use App\Models\PhoneOtp;
 use App\Models\User;
@@ -141,11 +142,11 @@ class AuthenticatedSessionController extends Controller
             // Create Sanctum token for API authentication
             $token = $user->createToken('api-token')->plainTextToken;
 
-            return response()->json([
-                'message' => 'Login successful! (Demo mode)',
-                'user' => $this->formatUserResponse($user->load('roles')),
-                'token' => $token,
-            ]);
+                    return response()->json([
+                        'message' => 'Login successful! (Demo mode)',
+                        'user' => new UserResource($user->load('roles')),
+                        'token' => $token,
+                    ]);
         }
 
         // Check if password is provided
@@ -199,7 +200,7 @@ class AuthenticatedSessionController extends Controller
 
             return response()->json([
                 'message' => 'Login successful!',
-                'user' => $this->formatUserResponse($user->load('roles')),
+                'user' => new UserResource($user->load('roles')),
                 'token' => $token,
             ]);
         }
@@ -476,13 +477,4 @@ class AuthenticatedSessionController extends Controller
         return substr($phone, 0, 2) . str_repeat('*', strlen($phone) - 4) . substr($phone, -2);
     }
 
-    /**
-     * Format user response with onboarding_complete
-     */
-    private function formatUserResponse(User $user): array
-    {
-        $userArray = $user->toArray();
-        $userArray['onboarding_complete'] = $user->hasCompletedOnboarding();
-        return $userArray;
-    }
 }
