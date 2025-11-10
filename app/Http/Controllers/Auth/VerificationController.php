@@ -380,7 +380,7 @@ class VerificationController extends Controller
 
             return response()->json([
                 'message' => 'Login successful!',
-                'user' => $user->load('roles'),
+                'user' => $this->formatUserResponse($user->load('roles')),
                 'token' => $token,
             ]);
         } else {
@@ -404,7 +404,7 @@ class VerificationController extends Controller
 
             return response()->json([
                 'message' => 'Registration successful!',
-                'user' => $user->load('roles'),
+                'user' => $this->formatUserResponse($user->load('roles')),
                 'token' => $token,
                 'redirect' => $redirectInfo,
             ]);
@@ -474,7 +474,7 @@ class VerificationController extends Controller
 
             return response()->json([
                 'message' => 'Login successful!',
-                'user' => $user->load('roles'),
+                'user' => $this->formatUserResponse($user->load('roles')),
                 'token' => $token,
             ]);
         } else {
@@ -498,7 +498,7 @@ class VerificationController extends Controller
 
             return response()->json([
                 'message' => 'Registration successful!',
-                'user' => $user->load('roles'),
+                'user' => $this->formatUserResponse($user->load('roles')),
                 'token' => $token,
                 'redirect' => $redirectInfo,
             ]);
@@ -888,5 +888,15 @@ class VerificationController extends Controller
             'route' => 'dashboard',
             'message' => 'Welcome! Your account has been verified and activated.',
         ];
+    }
+
+    /**
+     * Format user response with onboarding_complete
+     */
+    private function formatUserResponse(User $user): array
+    {
+        $userArray = $user->toArray();
+        $userArray['onboarding_complete'] = $user->hasCompletedOnboarding();
+        return $userArray;
     }
 }

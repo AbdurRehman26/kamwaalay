@@ -80,17 +80,23 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): JsonResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        // Mark profile as updated for normal users (not helper/business) on first update
+        if (!$user->hasRole(['helper', 'business']) && $user->profile_updated_at === null) {
+            $user->profile_updated_at = now();
+        }
+
+        $user->save();
 
         return response()->json([
             'message' => 'Profile updated successfully.',
-            'user' => $request->user()->load('roles'),
+            'user' => $user->load('roles'),
         ]);
     }
 

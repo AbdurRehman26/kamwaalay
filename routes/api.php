@@ -96,7 +96,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     // User info
     Route::get('/user', function (Request $request) {
-        return $request->user()->load('roles');
+        $user = $request->user()->load('roles');
+        $userArray = $user->toArray();
+        $userArray['onboarding_complete'] = $user->hasCompletedOnboarding();
+        return $userArray;
     });
     
     // Dashboard

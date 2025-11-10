@@ -133,7 +133,7 @@ class AuthenticatedSessionController extends Controller
 
             return response()->json([
                 'message' => 'Login successful! (Demo mode)',
-                'user' => $user->load('roles'),
+                'user' => $this->formatUserResponse($user->load('roles')),
                 'token' => $token,
             ]);
         }
@@ -189,7 +189,7 @@ class AuthenticatedSessionController extends Controller
 
             return response()->json([
                 'message' => 'Login successful!',
-                'user' => $user->load('roles'),
+                'user' => $this->formatUserResponse($user->load('roles')),
                 'token' => $token,
             ]);
         }
@@ -464,5 +464,15 @@ class AuthenticatedSessionController extends Controller
         }
 
         return substr($phone, 0, 2) . str_repeat('*', strlen($phone) - 4) . substr($phone, -2);
+    }
+
+    /**
+     * Format user response with onboarding_complete
+     */
+    private function formatUserResponse(User $user): array
+    {
+        $userArray = $user->toArray();
+        $userArray['onboarding_complete'] = $user->hasCompletedOnboarding();
+        return $userArray;
     }
 }

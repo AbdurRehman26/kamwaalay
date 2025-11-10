@@ -133,15 +133,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has completed onboarding (has at least one service listing)
+     * Check if user has completed onboarding
+     * - Helper/Business: completed when they have at least one service listing
+     * - Normal user: completed when they have updated their profile for the first time
      */
     public function hasCompletedOnboarding(): bool
     {
-        if (!$this->hasRole(['helper', 'business'])) {
-            return true; // Regular users don't need onboarding
+        if ($this->hasRole('helper') || $this->hasRole('business')) {
+            // Helper/Business onboarding is complete when they have service listings
+            return $this->serviceListings()->exists();
         }
 
-        return $this->serviceListings()->exists();
+        // Normal user onboarding is complete when they have updated their profile
+        return $this->profile_updated_at !== null;
     }
 
     // Job applications (helpers applying to service requests)
