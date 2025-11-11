@@ -120,13 +120,14 @@ class AuthenticatedSessionController extends Controller
         // Demo phone number check - automatically log in first user with helper or business role
         $demoPhoneNumber = '9876543210';
         $normalizedPhone = $request->filled('phone') ? preg_replace('/[^0-9+]/', '', $request->input('phone')) : null;
-        
+
         if ($normalizedPhone === $demoPhoneNumber || $normalizedPhone === '+' . $demoPhoneNumber) {
             // Find first user with helper or business role
             $user = User::whereHas('roles', function ($query) {
-                $query->whereIn('name', ['helper', 'business']);
+                $query->whereIn('name', ['helper', 'business'])
+                ->whereNotIn('name', ['admin']);
             })->orderBy('id')->first();
-            
+
             if (!$user) {
                 return response()->json([
                     'message' => 'No helper or business users found in database.',
@@ -267,7 +268,7 @@ class AuthenticatedSessionController extends Controller
 
         // Determine which login method was used (email or phone)
         $loginMethod = $request->filled('email') ? 'email' : 'phone';
-        
+
         $email = $user->email;
         $phone = $user->phone;
         $isPhoneEmail = strpos($email, '@phone.kamwaalay.local') !== false;
