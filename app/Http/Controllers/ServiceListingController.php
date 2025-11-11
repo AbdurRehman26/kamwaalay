@@ -55,40 +55,58 @@ class ServiceListingController extends Controller
                 abort(403, 'Service listings are only available to helpers.');
             }
         }
-        $query = ServiceListing::with(['user', 'serviceTypes', 'locations'])
-            ->where('is_active', true)
-            ->where('status', 'active');
+        $query = ServiceListing::with(['profile.profileable'])
+            ->where('service_listings.is_active', true)
+            ->where('service_listings.status', 'active');
 
-        // Filter by service type (via pivot table)
+        // Filter by service type (using JSON column)
         if ($request->has('service_type') && $request->service_type) {
-            $query->whereHas('serviceTypes', function ($q) use ($request) {
-                $q->where('service_type', $request->service_type);
-            });
+            $query->whereJsonContains('service_listings.service_types', $request->service_type);
         }
 
-        // Filter by location (via pivot table)
+        // Filter by location (using JSON column)
         $locationDisplay = '';
         if ($request->has('location_id') && $request->location_id) {
             $location = \App\Models\Location::find($request->location_id);
             if ($location) {
                 $location->load('city');
-                $query->whereHas('locations', function ($q) use ($location) {
-                    $q->where('city', $location->city->name)
-                      ->where('area', $location->area);
-                });
+                $query->whereJsonContains('service_listings.locations', $request->location_id);
                 $locationDisplay = $location->area
                     ? $location->city->name . ', ' . $location->area
                     : $location->city->name;
             }
         } elseif ($request->has('city_name') && $request->city_name) {
-            $query->whereHas('locations', function ($q) use ($request) {
-                $q->where('city', $request->city_name);
-            });
+            // For city filtering, we need to find location IDs first
+            $cityLocationIds = \App\Models\Location::whereHas('city', function ($q) use ($request) {
+                $q->where('name', $request->city_name);
+            })->pluck('id')->toArray();
+            
+            if (!empty($cityLocationIds)) {
+                $query->where(function ($q) use ($cityLocationIds) {
+                    foreach ($cityLocationIds as $locationId) {
+                        $q->orWhereJsonContains('service_listings.locations', $locationId);
+                    }
+                });
+            } else {
+                // No locations found for this city, return empty result
+                $query->whereRaw('1 = 0');
+            }
             $locationDisplay = $request->city_name;
         } elseif ($request->has('area') && $request->area) {
-            $query->whereHas('locations', function ($q) use ($request) {
-                $q->where('area', 'like', '%' . $request->area . '%');
-            });
+            // For area filtering, we need to find location IDs first
+            $areaLocationIds = \App\Models\Location::where('area', 'like', '%' . $request->area . '%')
+                ->pluck('id')->toArray();
+            
+            if (!empty($areaLocationIds)) {
+                $query->where(function ($q) use ($areaLocationIds) {
+                    foreach ($areaLocationIds as $locationId) {
+                        $q->orWhereJsonContains('service_listings.locations', $locationId);
+                    }
+                });
+            } else {
+                // No locations found for this area, return empty result
+                $query->whereRaw('1 = 0');
+            }
         }
 
         // Filter by work type
@@ -293,7 +311,7 @@ class ServiceListingController extends Controller
 
             return response()->json([
                 'message' => $message,
-                'listing' => new ServiceListingResource($listing->load(['serviceTypes', 'locations', 'user'])),
+                'listing' => new ServiceListingResource($listing->load(['profile.profileable'])),
             ]);
         } else {
             // Single listing (backward compatibility - will need to be updated)
@@ -332,7 +350,7 @@ class ServiceListingController extends Controller
 
             return response()->json([
                 'message' => 'Service listing created successfully!',
-                'listing' => new ServiceListingResource($listing->load(['serviceTypes', 'locations', 'user'])),
+                'listing' => new ServiceListingResource($listing->load(['profile.profileable'])),
             ]);
         }
     }

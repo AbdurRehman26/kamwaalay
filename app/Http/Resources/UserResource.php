@@ -70,6 +70,25 @@ class UserResource extends JsonResource
             // Service listings (if loaded)
             'service_listings' => $this->when($this->relationLoaded('serviceListings'), function () {
                 return $this->serviceListings->map(function ($listing) {
+                    // Get service types from JSON column
+                    $serviceTypes = $listing->service_types ?? [];
+                    
+                    // Get locations from JSON column (location IDs)
+                    $locationIds = $listing->locations ?? [];
+                    $locationDetails = [];
+                    
+                    // Fetch location details if location IDs exist
+                    if (!empty($locationIds)) {
+                        $locations = \App\Models\Location::whereIn('id', $locationIds)->with('city')->get();
+                        $locationDetails = $locations->map(function ($location) {
+                            return [
+                                'id' => $location->id,
+                                'city' => $location->city->name,
+                                'area' => $location->area ?? '',
+                            ];
+                        })->toArray();
+                    }
+                    
                     return [
                         'id' => $listing->id,
                         'work_type' => $listing->work_type,
@@ -77,13 +96,8 @@ class UserResource extends JsonResource
                         'is_active' => $listing->is_active,
                         'status' => $listing->status,
                         'monthly_rate' => $listing->monthly_rate,
-                        'service_types' => $listing->serviceTypes->pluck('service_type')->toArray(),
-                        'locations' => $listing->locations->map(function ($location) {
-                            return [
-                                'city' => $location->city,
-                                'area' => $location->area,
-                            ];
-                        })->toArray(),
+                        'service_types' => $serviceTypes,
+                        'locations' => $locationDetails,
                     ];
                 });
             }),
