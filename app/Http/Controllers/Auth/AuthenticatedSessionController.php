@@ -173,23 +173,17 @@ class AuthenticatedSessionController extends Controller
         $loginMethod = $request->filled('email') ? 'email' : 'phone';
         $isVerified = false;
 
-        // Check if the account is verified based on login method
+        // Check if the account is verified
         $user->refresh();
 
-        if ($loginMethod === 'email') {
-            // If logged in with email, check if email is verified
-            $isVerified = $user->email_verified_at !== null && $user->email_verified_at instanceof \Carbon\Carbon;
-        } else {
-            // If logged in with phone, check if phone is verified
-            $isVerified = $user->phone_verified_at !== null && $user->phone_verified_at instanceof \Carbon\Carbon;
-        }
+        // Check if verified_at is set (OTP was verified at least once)
+        $isVerified = $user->verified_at !== null && $user->verified_at instanceof \Carbon\Carbon;
 
         // Log for debugging
         Log::info('Password login verification check', [
             'user_id' => $user->id,
             'login_method' => $loginMethod,
-            'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->toDateTimeString() : 'null',
-            'phone_verified_at' => $user->phone_verified_at ? $user->phone_verified_at->toDateTimeString() : 'null',
+            'verified_at' => $user->verified_at ? $user->verified_at->toDateTimeString() : 'null',
             'is_verified' => $isVerified,
         ]);
 
@@ -198,11 +192,41 @@ class AuthenticatedSessionController extends Controller
             // Create Sanctum token for API authentication
             $token = $user->createToken('api-token')->plainTextToken;
 
-            return response()->json([
+            // Check if onboarding is complete and set redirect info
+            $onboardingComplete = $user->hasCompletedOnboarding();
+            $redirectInfo = null;
+
+            if (!$onboardingComplete) {
+                if ($user->hasRole('helper')) {
+                    $redirectInfo = [
+                        'route' => 'onboarding.helper',
+                        'message' => 'Please complete your profile to start offering services.',
+                    ];
+                } elseif ($user->hasRole('business')) {
+                    $redirectInfo = [
+                        'route' => 'onboarding.business',
+                        'message' => 'Please complete your business profile to get started.',
+                    ];
+                } else {
+                    // Normal user - redirect to profile update
+                    $redirectInfo = [
+                        'route' => 'profile.edit',
+                        'message' => 'Please update your profile to get started.',
+                    ];
+                }
+            }
+
+            $response = [
                 'message' => 'Login successful!',
                 'user' => new UserResource($user->load('roles')),
                 'token' => $token,
-            ]);
+            ];
+
+            if ($redirectInfo) {
+                $response['redirect'] = $redirectInfo;
+            }
+
+            return response()->json($response);
         }
 
         // Account is not verified - require OTP verification

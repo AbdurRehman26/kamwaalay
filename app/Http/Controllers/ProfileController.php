@@ -135,7 +135,7 @@ class ProfileController extends Controller
         $user->fill($request->validated());
 
         if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
+            $user->verified_at = null; // Email changed, needs re-verification
         }
 
         // Mark profile as updated for normal users (not helper/business) on first update

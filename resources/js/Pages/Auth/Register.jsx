@@ -49,17 +49,31 @@ export default function Register() {
         try {
             const response = await authService.register(formData);
             
-            // If registration requires OTP verification
-            if (response.verification_method) {
-                // Store verification token for OTP verification
-                if (response.verification_token) {
-                    authService.setVerificationToken(response.verification_token);
-                }
-                navigate("/verify-otp");
-            } else if (response.token) {
-                // Direct registration success (shouldn't happen, but handle it)
-                navigate("/dashboard");
+            // After registration, always redirect to OTP verification
+            // Store verification info for OTP verification
+            if (response.verification_token) {
+                authService.setVerificationToken(response.verification_token);
             }
+            if (response.user_id) {
+                // Store user_id in localStorage for OTP verification
+                localStorage.setItem("verification_user_id", response.user_id);
+            }
+            if (response.verification_method) {
+                localStorage.setItem("verification_method", response.verification_method);
+            }
+            if (response.identifier) {
+                localStorage.setItem("verification_identifier", response.identifier);
+            }
+            
+            // Store the actual email or phone used for signup (not masked)
+            if (response.verification_method === "email" && formData.email) {
+                localStorage.setItem("verification_email", formData.email);
+            } else if (response.verification_method === "phone" && formData.phone) {
+                localStorage.setItem("verification_phone", formData.phone);
+            }
+            
+            // Always navigate to verify OTP after registration
+            navigate("/verify-otp");
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);

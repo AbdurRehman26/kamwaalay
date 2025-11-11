@@ -78,7 +78,6 @@ class OnboardingController extends Controller
                         new OA\Property(property: "nic", type: "string", format: "binary", description: "NIC document file (jpeg, jpg, png, pdf, max 5MB)"),
                         new OA\Property(property: "nic_number", type: "string", maxLength: 255),
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
-                        new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", nullable: true, minimum: 0),
                         new OA\Property(property: "bio", type: "string", nullable: true),
                     ]
@@ -111,6 +110,19 @@ class OnboardingController extends Controller
             abort(403);
         }
 
+        // Handle services if sent as JSON string (from FormData)
+        $servicesData = $request->input('services');
+        if (is_string($servicesData)) {
+            $decoded = json_decode($servicesData, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'message' => 'Invalid services data format.',
+                    'errors' => ['services' => ['Invalid services data format.']]
+                ], 422);
+            }
+            $request->merge(['services' => $decoded]);
+        }
+
         $validated = $request->validate([
             'services' => 'required|array|min:1',
             'services.*.service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
@@ -123,18 +135,14 @@ class OnboardingController extends Controller
             'nic_number' => 'required|string|max:255',
             // Optional helper profile fields
             'photo' => 'nullable|image|max:2048',
-            'skills' => 'nullable|string',
             'experience_years' => 'nullable|integer|min:0',
             'bio' => 'nullable|string',
         ]);
 
         // Update user profile if provided
         $profileData = [];
-        if ($request->has('photo')) {
+        if ($request->hasFile('photo')) {
             $profileData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
-        }
-        if ($request->has('skills')) {
-            $profileData['skills'] = $validated['skills'];
         }
         if ($request->has('experience_years')) {
             $profileData['experience_years'] = $validated['experience_years'];
@@ -310,6 +318,19 @@ class OnboardingController extends Controller
         
         if (!$user->hasRole('business')) {
             abort(403);
+        }
+
+        // Handle services if sent as JSON string (from FormData)
+        $servicesData = $request->input('services');
+        if (is_string($servicesData)) {
+            $decoded = json_decode($servicesData, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'message' => 'Invalid services data format.',
+                    'errors' => ['services' => ['Invalid services data format.']]
+                ], 422);
+            }
+            $request->merge(['services' => $decoded]);
         }
 
         $validated = $request->validate([

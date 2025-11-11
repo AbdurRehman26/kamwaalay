@@ -18,9 +18,13 @@ export const AuthProvider = ({ children }) => {
                 })
                 .catch((error) => {
                     console.error("Error fetching user:", error);
-                    // Token might be invalid, remove it
-                    authService.removeToken();
-                    setUser(null);
+                    // Only remove token if it's a 401 (Unauthorized) - token is invalid
+                    if (error.response?.status === 401) {
+                        authService.removeToken();
+                        setUser(null);
+                    }
+                    // For other errors (network, 500, etc.), keep token but set loading to false
+                    // The ProtectedRoute will handle showing loading if token exists but user is null
                     setLoading(false);
                 });
         } else {

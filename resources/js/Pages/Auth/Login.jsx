@@ -52,7 +52,39 @@ export default function Login() {
                 if (response.user) {
                     updateUser(response.user);
                 }
-                navigate("/dashboard");
+                
+                // Redirect based on onboarding status
+                if (response.redirect) {
+                    // If redirect is an object with route info, convert route name to path
+                    let redirectPath;
+                    if (typeof response.redirect === "string") {
+                        redirectPath = response.redirect;
+                    } else {
+                        const routeName = response.redirect.route || "/dashboard";
+                        // Convert route names to paths
+                        if (routeName === "onboarding.helper") {
+                            redirectPath = "/onboarding/helper";
+                        } else if (routeName === "onboarding.business") {
+                            redirectPath = "/onboarding/business";
+                        } else if (routeName === "profile.edit") {
+                            redirectPath = "/profile";
+                        } else {
+                            redirectPath = routeName;
+                        }
+                    }
+                    navigate(redirectPath);
+                } else if (response.user && !response.user.onboarding_complete) {
+                    // Check onboarding status from user object
+                    if (response.user.role === "helper") {
+                        navigate("/onboarding/helper");
+                    } else if (response.user.role === "business") {
+                        navigate("/onboarding/business");
+                    } else {
+                        navigate("/profile");
+                    }
+                } else {
+                    navigate("/dashboard");
+                }
             }
         } catch (error) {
             if (error.response?.data?.errors) {

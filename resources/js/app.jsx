@@ -4,8 +4,9 @@ import "./bootstrap";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { authService } from "./services/auth";
 import { LanguageProvider } from "./contexts/LanguageContext";
 // Pages
 import Home from "./Pages/Home";
@@ -46,13 +47,45 @@ function AppRoutes() {
     // Protected Route Component (has access to AuthProvider context)
     const ProtectedRoute = ({ children }) => {
         const { user, loading } = useAuth();
+        const location = useLocation();
+        const isAuthenticated = authService.isAuthenticated();
         
         if (loading) {
             return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
         }
         
-        if (!user) {
+        // If we have a token but user is null (API call failed), still allow access
+        // The API will validate the token on each request, and we don't want to log out
+        // users on temporary network errors
+        if (isAuthenticated && !user) {
+            // Token exists but user data not loaded - allow access
+            // This prevents logout on page reload if API call fails temporarily
+            return children;
+        }
+        
+        // Only redirect to login if we don't have a token AND no user
+        if (!isAuthenticated && !user) {
             return <Navigate to="/login" replace />;
+        }
+        
+        // If we have user, proceed with checks
+        if (user) {
+            // Check if user is helper or business and hasn't completed onboarding
+            const isHelper = user.role === "helper";
+            const isBusiness = user.role === "business";
+            const onboardingIncomplete = !user.onboarding_complete;
+            
+            // If user is on onboarding page, allow access
+            const isOnOnboardingPage = location.pathname === "/onboarding/helper" || location.pathname === "/onboarding/business";
+            
+            // If helper/business hasn't completed onboarding and not on onboarding page, redirect
+            if ((isHelper || isBusiness) && onboardingIncomplete && !isOnOnboardingPage) {
+                if (isHelper) {
+                    return <Navigate to="/onboarding/helper" replace />;
+                } else if (isBusiness) {
+                    return <Navigate to="/onboarding/business" replace />;
+                }
+            }
         }
         
         return children;

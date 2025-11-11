@@ -38,28 +38,46 @@ export default function Verify() {
             }
         }
         
-        authService.getVerificationInfo(token)
-            .then(data => {
-                if (data.method) {
-                    setMethod(data.method);
-                    setIdentifier(data.identifier || "");
-                    setUserId(data.user_id);
-                    setIsLogin(data.is_login || false);
-                    // Update verification token if returned from API
-                    if (data.verification_token) {
-                        setVerificationToken(data.verification_token);
-                        authService.setVerificationToken(data.verification_token);
+        // Check localStorage for verification info (from registration)
+        const storedUserId = localStorage.getItem("verification_user_id");
+        const storedMethod = localStorage.getItem("verification_method");
+        const storedIdentifier = localStorage.getItem("verification_identifier");
+        
+        if (storedUserId && storedMethod) {
+            setUserId(storedUserId);
+            setMethod(storedMethod);
+            setIdentifier(storedIdentifier || "");
+            setIsLogin(false); // This is registration flow
+        }
+        
+        // Try to get verification info from API
+        if (token) {
+            authService.getVerificationInfo(token)
+                .then(data => {
+                    if (data.method) {
+                        setMethod(data.method);
+                        setIdentifier(data.identifier || "");
+                        setUserId(data.user_id);
+                        setIsLogin(data.is_login || false);
+                        // Update verification token if returned from API
+                        if (data.verification_token) {
+                            setVerificationToken(data.verification_token);
+                            authService.setVerificationToken(data.verification_token);
+                        }
                     }
-                }
-            })
-            .catch(err => {
-                console.error("Error fetching verification info:", err);
-                // If verification info is not available, redirect to login/register
-                if (err.response?.status === 422) {
-                    authService.removeVerificationToken();
-                    navigate("/login");
-                }
-            });
+                })
+                .catch(err => {
+                    console.error("Error fetching verification info:", err);
+                    // If verification info is not available from API but we have it from localStorage, continue
+                    if (!storedUserId && err.response?.status === 422) {
+                        authService.removeVerificationToken();
+                        navigate("/login");
+                    }
+                });
+        } else if (!storedUserId) {
+            // No token and no stored info, redirect to login
+            navigate("/login");
+        }
     }, [searchParams, navigate]);
 
     useEffect(() => {
@@ -97,14 +115,42 @@ export default function Verify() {
         setMessage("");
 
         try {
-            const response = await authService.verifyOtp({
+            // Prepare OTP verification payload
+            const otpPayload = {
                 otp: otp,
-                user_id: user_id,
-            }, verificationToken);
+            };
+            
+            // Add email or phone based on verification method
+            if (method === "email") {
+                // Get email from localStorage or identifier
+                const storedEmail = localStorage.getItem("verification_email");
+                const emailToUse = storedEmail || identifier;
+                if (emailToUse) {
+                    otpPayload.email = emailToUse.toLowerCase().trim();
+                }
+            } else if (method === "phone") {
+                // Get phone from localStorage or identifier
+                const storedPhone = localStorage.getItem("verification_phone");
+                const phoneToUse = storedPhone || identifier;
+                if (phoneToUse) {
+                    // Normalize phone number (remove non-numeric characters except +)
+                    otpPayload.phone = phoneToUse.replace(/[^0-9+]/g, "");
+                }
+            }
+            
+            // Add verification_token if available (for login flow)
+            const response = await authService.verifyOtp(otpPayload, verificationToken);
 
             if (response.token) {
                 // Store token
                 authService.setToken(response.token);
+                
+                // Clean up verification info from localStorage
+                localStorage.removeItem("verification_user_id");
+                localStorage.removeItem("verification_method");
+                localStorage.removeItem("verification_identifier");
+                localStorage.removeItem("verification_email");
+                localStorage.removeItem("verification_phone");
                 
                 // Update user state in AuthContext
                 if (response.user) {
@@ -113,11 +159,33 @@ export default function Verify() {
                 
                 // Redirect based on context
                 if (response.redirect) {
-                    // If redirect is an object with route info, use it; otherwise use the string path
-                    const redirectPath = typeof response.redirect === "string" 
-                        ? response.redirect 
-                        : (response.redirect.route || "/dashboard");
+                    // If redirect is an object with route info, convert route name to path
+                    let redirectPath;
+                    if (typeof response.redirect === "string") {
+                        redirectPath = response.redirect;
+                    } else {
+                        const routeName = response.redirect.route || "/dashboard";
+                        // Convert route names to paths
+                        if (routeName === "onboarding.helper") {
+                            redirectPath = "/onboarding/helper";
+                        } else if (routeName === "onboarding.business") {
+                            redirectPath = "/onboarding/business";
+                        } else if (routeName === "profile.edit") {
+                            redirectPath = "/profile";
+                        } else {
+                            redirectPath = routeName;
+                        }
+                    }
                     navigate(redirectPath);
+                } else if (response.user && !response.user.onboarding_complete) {
+                    // Check onboarding status from user object
+                    if (response.user.role === "helper") {
+                        navigate("/onboarding/helper");
+                    } else if (response.user.role === "business") {
+                        navigate("/onboarding/business");
+                    } else {
+                        navigate("/profile");
+                    }
                 } else {
                     navigate("/dashboard");
                 }

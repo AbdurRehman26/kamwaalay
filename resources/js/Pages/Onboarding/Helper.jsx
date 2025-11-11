@@ -29,12 +29,22 @@ export default function OnboardingHelper() {
         photo: null,
         nic: null,
         nic_number: "",
-        skills: user?.skills || "",
         experience_years: user?.experience_years || "",
         bio: user?.bio || "",
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
+
+    // Update profile data when user loads
+    useEffect(() => {
+        if (user) {
+            setProfileData(prev => ({
+                ...prev,
+                experience_years: user?.experience_years || prev.experience_years,
+                bio: user?.bio || prev.bio,
+            }));
+        }
+    }, [user]);
 
     const serviceTypes = [
         { value: "maid", label: "Maid", icon: "🧹" },
@@ -199,8 +209,7 @@ export default function OnboardingHelper() {
                     servicesArray.push({
                         service_type: serviceType,
                         work_type: offer.work_type,
-                        city: location.city_name,
-                        area: location.area,
+                        location_id: location.id,
                         monthly_rate: offer.monthly_rate || null,
                         description: offer.description || null,
                     });
@@ -211,7 +220,6 @@ export default function OnboardingHelper() {
         // Prepare FormData for file uploads
         const formData = new FormData();
         formData.append("services", JSON.stringify(servicesArray));
-        formData.append("skills", profileData.skills || "");
         formData.append("experience_years", profileData.experience_years || "");
         formData.append("bio", profileData.bio || "");
         formData.append("nic_number", profileData.nic_number || "");
@@ -240,25 +248,78 @@ export default function OnboardingHelper() {
 
     // NIC Dropzone Component
     const NICDropzone = ({ onFileAccepted, file, error }) => {
-        const { getRootProps, getInputProps, isDragActive } = useDropzone({
-            accept: {
-                "image/*": [".jpeg", ".jpg", ".png"],
-                "application/pdf": [".pdf"]
-            },
-            maxFiles: 1,
-            maxSize: 5 * 1024 * 1024, // 5MB
-            onDrop: (acceptedFiles) => {
-                if (acceptedFiles.length > 0) {
-                    onFileAccepted(acceptedFiles[0]);
+        const fileInputId = `nic-file-input-${Math.random().toString(36).substr(2, 9)}`;
+        const [isDragActive, setIsDragActive] = useState(false);
+
+        const handleFileChange = (e) => {
+            const selectedFile = e.target.files?.[0];
+            if (selectedFile) {
+                // Validate file type
+                const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+                if (!validTypes.includes(selectedFile.type)) {
+                    alert("Invalid file type. Please upload JPG, PNG, or PDF.");
+                    e.target.value = ""; // Reset input
+                    return;
                 }
-            },
-        });
+                // Validate file size (5MB)
+                if (selectedFile.size > 5 * 1024 * 1024) {
+                    alert("File size exceeds 5MB limit.");
+                    e.target.value = ""; // Reset input
+                    return;
+                }
+                onFileAccepted(selectedFile);
+            }
+        };
+
+        const handleDragOver = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragActive(true);
+        };
+
+        const handleDragLeave = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragActive(false);
+        };
+
+        const handleDrop = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragActive(false);
+            
+            const droppedFile = e.dataTransfer.files?.[0];
+            if (droppedFile) {
+                // Validate file type
+                const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+                if (!validTypes.includes(droppedFile.type)) {
+                    alert("Invalid file type. Please upload JPG, PNG, or PDF.");
+                    return;
+                }
+                // Validate file size (5MB)
+                if (droppedFile.size > 5 * 1024 * 1024) {
+                    alert("File size exceeds 5MB limit.");
+                    return;
+                }
+                onFileAccepted(droppedFile);
+            }
+        };
 
         return (
             <div>
-                <div
-                    {...getRootProps()}
-                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                <input
+                    id={fileInputId}
+                    type="file"
+                    accept=".jpeg,.jpg,.png,.pdf"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                />
+                <label
+                    htmlFor={fileInputId}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors block ${
                         isDragActive
                             ? "border-blue-500 bg-blue-50"
                             : error
@@ -266,7 +327,6 @@ export default function OnboardingHelper() {
                             : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
                     }`}
                 >
-                    <input {...getInputProps()} required />
                     <div className="space-y-2">
                         <div className="text-4xl mb-2">📄</div>
                         {file ? (
@@ -287,7 +347,7 @@ export default function OnboardingHelper() {
                             </>
                         )}
                     </div>
-                </div>
+                </label>
                 {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
             </div>
         );
@@ -295,24 +355,78 @@ export default function OnboardingHelper() {
 
     // Photo Dropzone Component
     const PhotoDropzone = ({ onFileAccepted, file, error }) => {
-        const { getRootProps, getInputProps, isDragActive } = useDropzone({
-            accept: {
-                "image/*": [".jpeg", ".jpg", ".png"]
-            },
-            maxFiles: 1,
-            maxSize: 2 * 1024 * 1024, // 2MB
-            onDrop: (acceptedFiles) => {
-                if (acceptedFiles.length > 0) {
-                    onFileAccepted(acceptedFiles[0]);
+        const fileInputId = `photo-file-input-${Math.random().toString(36).substr(2, 9)}`;
+        const [isDragActive, setIsDragActive] = useState(false);
+
+        const handleFileChange = (e) => {
+            const selectedFile = e.target.files?.[0];
+            if (selectedFile) {
+                // Validate file type
+                const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+                if (!validTypes.includes(selectedFile.type)) {
+                    alert("Invalid file type. Please upload JPG or PNG.");
+                    e.target.value = ""; // Reset input
+                    return;
                 }
-            },
-        });
+                // Validate file size (2MB)
+                if (selectedFile.size > 2 * 1024 * 1024) {
+                    alert("File size exceeds 2MB limit.");
+                    e.target.value = ""; // Reset input
+                    return;
+                }
+                onFileAccepted(selectedFile);
+            }
+        };
+
+        const handleDragOver = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragActive(true);
+        };
+
+        const handleDragLeave = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragActive(false);
+        };
+
+        const handleDrop = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragActive(false);
+            
+            const droppedFile = e.dataTransfer.files?.[0];
+            if (droppedFile) {
+                // Validate file type
+                const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+                if (!validTypes.includes(droppedFile.type)) {
+                    alert("Invalid file type. Please upload JPG or PNG.");
+                    return;
+                }
+                // Validate file size (2MB)
+                if (droppedFile.size > 2 * 1024 * 1024) {
+                    alert("File size exceeds 2MB limit.");
+                    return;
+                }
+                onFileAccepted(droppedFile);
+            }
+        };
 
         return (
             <div>
-                <div
-                    {...getRootProps()}
-                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                <input
+                    id={fileInputId}
+                    type="file"
+                    accept=".jpeg,.jpg,.png"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                />
+                <label
+                    htmlFor={fileInputId}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors block ${
                         isDragActive
                             ? "border-blue-500 bg-blue-50"
                             : error
@@ -320,7 +434,6 @@ export default function OnboardingHelper() {
                             : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
                     }`}
                 >
-                    <input {...getInputProps()} />
                     <div className="space-y-2">
                         <div className="text-4xl mb-2">📷</div>
                         {file ? (
@@ -341,7 +454,7 @@ export default function OnboardingHelper() {
                             </>
                         )}
                     </div>
-                </div>
+                </label>
                 {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
             </div>
         );
@@ -620,18 +733,6 @@ export default function OnboardingHelper() {
                             <p className="text-sm text-gray-600 mb-6">Optional: Add more details about yourself</p>
 
                             <div className="space-y-6">
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Skills</label>
-                                    <input
-                                        type="text"
-                                        value={profileData.skills}
-                                        onChange={(e) => setProfileData({ ...profileData, skills: e.target.value })}
-                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
-                                        placeholder="e.g., Cooking, Cleaning, Childcare"
-                                    />
-                                    {errors.skills && <div className="text-red-500 text-sm mt-1">{errors.skills}</div>}
-                                </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>

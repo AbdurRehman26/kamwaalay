@@ -35,6 +35,18 @@ export default function OnboardingBusiness() {
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
 
+    // Update profile data when user loads
+    useEffect(() => {
+        if (user) {
+            setProfileData(prev => ({
+                ...prev,
+                bio: user?.bio || prev.bio,
+                city: user?.city || prev.city,
+                area: user?.area || prev.area,
+            }));
+        }
+    }, [user]);
+
     const serviceTypes = [
         { value: "maid", label: "Maid", icon: "🧹" },
         { value: "cook", label: "Cook", icon: "👨‍🍳" },
@@ -198,8 +210,7 @@ export default function OnboardingBusiness() {
                     servicesArray.push({
                         service_type: serviceType,
                         work_type: offer.work_type,
-                        city: location.city_name,
-                        area: location.area,
+                        location_id: location.id,
                         monthly_rate: offer.monthly_rate || null,
                         description: offer.description || null,
                     });
@@ -243,6 +254,8 @@ export default function OnboardingBusiness() {
             },
             maxFiles: 1,
             maxSize: 5 * 1024 * 1024, // 5MB
+            noClick: false,
+            noKeyboard: false,
             onDrop: (acceptedFiles) => {
                 if (acceptedFiles.length > 0) {
                     onFileAccepted(acceptedFiles[0]);
@@ -262,7 +275,7 @@ export default function OnboardingBusiness() {
                             : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
                     }`}
                 >
-                    <input {...getInputProps()} required />
+                    <input {...getInputProps()} />
                     <div className="space-y-2">
                         <div className="text-4xl mb-2">📄</div>
                         {file ? (

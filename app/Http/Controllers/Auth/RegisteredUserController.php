@@ -129,8 +129,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'phone' => $phone,
             'address' => $request->address,
-            'email_verified_at' => null, // Will be set after email OTP verification
-            'phone_verified_at' => null, // Will be set after phone OTP verification
+            'verified_at' => null, // Will be set after OTP verification (first time)
         ]);
 
         // Assign role using Spatie Permission

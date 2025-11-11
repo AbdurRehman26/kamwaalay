@@ -17,6 +17,13 @@ api.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        
+        // If data is FormData, let browser set Content-Type with boundary
+        // Don't set Content-Type header for FormData - browser will set it automatically
+        if (config.data instanceof FormData) {
+            delete config.headers["Content-Type"];
+        }
+        
         return config;
     },
     (error) => {
@@ -29,9 +36,10 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Unauthorized - clear token and redirect to login
+            // Unauthorized - clear token
+            // Don't redirect here - let the component handle it
+            // This prevents redirect loops and allows components to handle auth state
             localStorage.removeItem("auth_token");
-            window.location.href = "/login";
         }
         return Promise.reject(error);
     }

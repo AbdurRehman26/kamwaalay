@@ -155,8 +155,7 @@ class VerificationController extends Controller
                                 new OA\Property(property: "name", type: "string", example: "John Doe"),
                                 new OA\Property(property: "email", type: "string", nullable: true, example: "user@example.com"),
                                 new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
-                                new OA\Property(property: "email_verified_at", type: "string", format: "date-time", nullable: true),
-                                new OA\Property(property: "phone_verified_at", type: "string", format: "date-time", nullable: true),
+                                new OA\Property(property: "verified_at", type: "string", format: "date-time", nullable: true),
                                 new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
                             ]
                         ),
@@ -366,11 +365,10 @@ class VerificationController extends Controller
         }
 
         if ($isLogin) {
-            // Login flow - mark email as verified since OTP was successful
-            if (empty($user->email_verified_at)) {
-                $user->update([
-                    'email_verified_at' => Carbon::now(),
-                ]);
+            // Login flow - mark as verified since OTP was successful (first time verification)
+            if (!$user->verified_at) {
+                $user->verified_at = Carbon::now();
+                $user->save();
             }
 
             // Reload user with roles relationship
@@ -380,16 +378,45 @@ class VerificationController extends Controller
             // Create Sanctum token only (no session)
             $token = $user->createToken('api-token')->plainTextToken;
 
-            return response()->json([
+            // Check if onboarding is complete and set redirect info
+            $onboardingComplete = $user->hasCompletedOnboarding();
+            $redirectInfo = null;
+
+            if (!$onboardingComplete) {
+                if ($user->hasRole('helper')) {
+                    $redirectInfo = [
+                        'route' => 'onboarding.helper',
+                        'message' => 'Please complete your profile to start offering services.',
+                    ];
+                } elseif ($user->hasRole('business')) {
+                    $redirectInfo = [
+                        'route' => 'onboarding.business',
+                        'message' => 'Please complete your business profile to get started.',
+                    ];
+                } else {
+                    // Normal user - redirect to profile update
+                    $redirectInfo = [
+                        'route' => 'profile.edit',
+                        'message' => 'Please update your profile to get started.',
+                    ];
+                }
+            }
+
+            $response = [
                 'message' => 'Login successful!',
                 'user' => new UserResource($user->load('roles')),
                 'token' => $token,
-            ]);
+            ];
+
+            if ($redirectInfo) {
+                $response['redirect'] = $redirectInfo;
+            }
+
+            return response()->json($response);
         } else {
-            // Registration flow - mark email as verified and fire Registered event
-            $user->update([
-                'email_verified_at' => Carbon::now(),
-            ]);
+            // Registration flow - mark as verified and fire Registered event (first time verification)
+            $user->verified_at = Carbon::now();
+            $user->save();
 
             // Fire Registered event now that user is verified
             event(new Registered($user));
@@ -460,11 +487,10 @@ class VerificationController extends Controller
         }
 
         if ($isLogin) {
-            // Login flow - mark phone as verified since OTP was successful
-            if (empty($user->phone_verified_at)) {
-                $user->update([
-                    'phone_verified_at' => Carbon::now(),
-                ]);
+            // Login flow - mark as verified since OTP was successful (first time verification)
+            if (!$user->verified_at) {
+                $user->verified_at = Carbon::now();
+                $user->save();
             }
 
             // Reload user with roles relationship
@@ -474,16 +500,45 @@ class VerificationController extends Controller
             // Create Sanctum token only (no session)
             $token = $user->createToken('api-token')->plainTextToken;
 
-            return response()->json([
+            // Check if onboarding is complete and set redirect info
+            $onboardingComplete = $user->hasCompletedOnboarding();
+            $redirectInfo = null;
+
+            if (!$onboardingComplete) {
+                if ($user->hasRole('helper')) {
+                    $redirectInfo = [
+                        'route' => 'onboarding.helper',
+                        'message' => 'Please complete your profile to start offering services.',
+                    ];
+                } elseif ($user->hasRole('business')) {
+                    $redirectInfo = [
+                        'route' => 'onboarding.business',
+                        'message' => 'Please complete your business profile to get started.',
+                    ];
+                } else {
+                    // Normal user - redirect to profile update
+                    $redirectInfo = [
+                        'route' => 'profile.edit',
+                        'message' => 'Please update your profile to get started.',
+                    ];
+                }
+            }
+
+            $response = [
                 'message' => 'Login successful!',
                 'user' => new UserResource($user->load('roles')),
                 'token' => $token,
-            ]);
+            ];
+
+            if ($redirectInfo) {
+                $response['redirect'] = $redirectInfo;
+            }
+
+            return response()->json($response);
         } else {
-            // Registration flow - mark phone as verified and fire Registered event
-            $user->update([
-                'phone_verified_at' => Carbon::now(),
-            ]);
+            // Registration flow - mark as verified and fire Registered event (first time verification)
+            $user->verified_at = Carbon::now();
+            $user->save();
 
             // Fire Registered event now that user is verified
             event(new Registered($user));
@@ -864,28 +919,42 @@ class VerificationController extends Controller
         // Refresh user to ensure roles are loaded
         $user->refresh();
 
+        // Check if onboarding is complete
+        $onboardingComplete = $user->hasCompletedOnboarding();
+
         // Log role for debugging
         Log::info('Redirecting user after verification', [
             'user_id' => $user->id,
             'roles' => $user->roles->pluck('name')->toArray(),
             'has_helper' => $user->hasRole('helper'),
             'has_business' => $user->hasRole('business'),
+            'onboarding_complete' => $onboardingComplete,
         ]);
 
-        if ($user->hasRole('helper')) {
+        // If onboarding is not complete, redirect to onboarding/profile
+        if (!$onboardingComplete) {
+            if ($user->hasRole('helper')) {
+                return [
+                    'route' => 'onboarding.helper',
+                    'message' => 'Email verified successfully! Please complete your profile to start offering services.',
+                ];
+            }
+
+            if ($user->hasRole('business')) {
+                return [
+                    'route' => 'onboarding.business',
+                    'message' => 'Phone verified successfully! Please complete your business profile to get started.',
+                ];
+            }
+
+            // Normal user - redirect to profile update
             return [
-                'route' => 'onboarding.helper',
-                'message' => 'Email verified successfully! Please complete your profile to start offering services.',
+                'route' => 'profile.edit',
+                'message' => 'Welcome! Please update your profile to get started.',
             ];
         }
 
-        if ($user->hasRole('business')) {
-            return [
-                'route' => 'onboarding.business',
-                'message' => 'Phone verified successfully! Please complete your business profile to get started.',
-            ];
-        }
-
+        // Onboarding is complete - redirect to dashboard
         return [
             'route' => 'dashboard',
             'message' => 'Welcome! Your account has been verified and activated.',
