@@ -24,7 +24,7 @@ class ServiceListingFactory extends Factory
         return [
             'profile_id' => Profile::factory(),
             'service_types' => [fake()->randomElement($serviceTypes)],
-            'locations' => [Location::factory()],
+            'locations' => [Location::first()?->id ?? Location::factory()->create()->id],
             'work_type' => fake()->randomElement(['full_time', 'part_time']),
             'monthly_rate' => fake()->numberBetween(10000, 30000),
             'description' => fake()->sentence(),

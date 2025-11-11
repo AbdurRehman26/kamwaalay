@@ -22,8 +22,9 @@ test('helpers can view their service listings', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
+    $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;
@@ -41,8 +42,9 @@ test('helpers can edit their service listing', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
+    $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
     ]);
 
     ServiceListingServiceType::create([
@@ -71,8 +73,9 @@ test('helpers can delete their service listing', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
+    $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;
@@ -94,8 +97,11 @@ test('helpers cannot edit other helpers service listings', function () {
     $helper2 = User::factory()->create();
     $helper2->assignRole('helper');
 
+    $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        'user_id' => $helper1->id,
+        $profile = $helper->profile()->create([]);
+        
+        'profile_id' => $helper1->profile()->create([])->id,
     ]);
     
     $token = $helper2->createToken('test-token')->plainTextToken;
@@ -114,8 +120,11 @@ test('helpers cannot delete other helpers service listings', function () {
     $helper2 = User::factory()->create();
     $helper2->assignRole('helper');
 
+    $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        'user_id' => $helper1->id,
+        $profile = $helper->profile()->create([]);
+        
+        'profile_id' => $helper1->profile()->create([])->id,
     ]);
     
     $token = $helper2->createToken('test-token')->plainTextToken;
@@ -132,8 +141,11 @@ test('businesses can view their service listings', function () {
     $business = User::factory()->create();
     $business->assignRole('business');
 
+    $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        'user_id' => $business->id,
+        $profile = $helper->profile()->create([]);
+        
+        'profile_id' => $business->profile()->create([])->id,
     ]);
     
     $token = $business->createToken('test-token')->plainTextToken;
@@ -151,8 +163,11 @@ test('guests can view individual service listing', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
+    $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        $profile = $helper->profile()->create([]);
+        
+        'profile_id' => $profile->id,
         'is_active' => true,
         'status' => 'active',
     ]);

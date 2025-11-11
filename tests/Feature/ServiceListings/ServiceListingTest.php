@@ -24,10 +24,13 @@ beforeEach(function () {
 test('helpers can create service listings', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
+    
+    // Create profile for helper
+    $profile = $helper->profile()->create([]);
 
     // Helper needs to complete onboarding (have service listings)
     ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;
@@ -72,8 +75,9 @@ test('guests can view service listings', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
+    $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
         'is_active' => true,
         'status' => 'active',
     ]);
@@ -119,8 +123,11 @@ test('helpers can view their own listings', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
+    $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        $profile = $helper->profile()->create([]);
+        
+        'profile_id' => $profile->id,
     ]);
 
     $response = $this->getJson("/api/service-listings/{$listing->id}");
@@ -133,8 +140,11 @@ test('helpers can update their service listings', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
+    $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        $profile = $helper->profile()->create([]);
+        
+        'profile_id' => $profile->id,
     ]);
 
     ServiceListingServiceType::create([
@@ -180,8 +190,9 @@ test('service listings require service types', function () {
     $helper->assignRole('helper');
 
     // Helper needs to complete onboarding (have service listings)
-    ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        $profile = $helper->profile()->create([]);
+        
+        'profile_id' => $profile->id,
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;
@@ -210,8 +221,9 @@ test('service listings require locations', function () {
     $helper->assignRole('helper');
 
     // Helper needs to complete onboarding (have service listings)
-    ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        $profile = $helper->profile()->create([]);
+        
+        'profile_id' => $profile->id,
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;

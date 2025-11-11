@@ -303,8 +303,9 @@ class OnboardingController extends Controller
             abort(403);
         }
 
-        // Handle services if sent as JSON string (from FormData)
+        // Handle services and locations if sent as JSON string (from FormData)
         $servicesData = $request->input('services');
+        $decodedServices = $servicesData;
         if (is_string($servicesData)) {
             $decoded = json_decode($servicesData, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -313,24 +314,48 @@ class OnboardingController extends Controller
                     'errors' => ['services' => ['Invalid services data format.']]
                 ], 422);
             }
-            $request->merge(['services' => $decoded]);
+            $decodedServices = $decoded;
         }
 
-        $validated = $request->validate([
+        $locationsData = $request->input('locations');
+        $decodedLocations = $locationsData;
+        if (is_string($locationsData)) {
+            $decoded = json_decode($locationsData, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'message' => 'Invalid locations data format.',
+                    'errors' => ['locations' => ['Invalid locations data format.']]
+                ], 422);
+            }
+            $decodedLocations = $decoded;
+        }
+
+        $dataToValidate = $request->all();
+        $dataToValidate['services'] = $decodedServices;
+        $dataToValidate['locations'] = $decodedLocations;
+
+        $validator = Validator::make($dataToValidate, [
             'services' => 'required|array|min:1',
-            'services.*.service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
-            'services.*.work_type' => 'required|in:full_time,part_time',
-            'services.*.location_id' => 'required',
-            'services.*.monthly_rate' => 'nullable|numeric|min:0',
-            'services.*.description' => 'nullable|string|max:2000',
-            // Profile verification fields (optional for now)
+            'services.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'locations' => 'required|array|min:1',
+            'locations.*' => 'required|integer|exists:locations,id',
+            'work_type' => 'required|in:full_time,part_time',
+            'monthly_rate' => 'nullable|numeric|min:0',
+            'description' => 'nullable|string|max:2000',
             'nic' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:5120',
             'nic_number' => 'nullable|string|max:255',
-            // Optional business profile fields
             'bio' => 'nullable|string',
             'city' => 'nullable|string|max:255',
             'area' => 'nullable|string|max:255',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        $validated = $validator->validated();
 
         // Update user profile if provided
         $profileData = [];
@@ -368,59 +393,17 @@ class OnboardingController extends Controller
             $profile = $user->profile()->create([]);
         }
 
-        // Group services by common fields (work_type, monthly_rate, description)
-        $groupedServices = [];
-        foreach ($validated['services'] as $serviceData) {
-            $location = \App\Models\Location::find($serviceData['location_id']);
-            if (!$location) {
-                continue;
-            }
-
-            $key = md5(serialize([
-                $serviceData['work_type'] ?? 'full_time',
-                $serviceData['monthly_rate'] ?? null,
-                $serviceData['description'] ?? null,
-            ]));
-            
-            if (!isset($groupedServices[$key])) {
-                $groupedServices[$key] = [
-                    'common' => [
-                        'profile_id' => $profile->id,
-                        'work_type' => $serviceData['work_type'] ?? 'full_time',
-                        'monthly_rate' => $serviceData['monthly_rate'] ?? null,
-                        'description' => $serviceData['description'] ?? null,
-                        'is_active' => true,
-                        'status' => 'active',
-                    ],
-                    'service_types' => [],
-                    'location_ids' => [],
-                ];
-            }
-            
-            // Add service type
-            if (!in_array($serviceData['service_type'], $groupedServices[$key]['service_types'])) {
-                $groupedServices[$key]['service_types'][] = $serviceData['service_type'];
-            }
-            
-            // Add location ID
-            if (!in_array($serviceData['location_id'], $groupedServices[$key]['location_ids'])) {
-                $groupedServices[$key]['location_ids'][] = $serviceData['location_id'];
-            }
-        }
-        
-        // Create service listings for each group (multiple listings per profile allowed)
-        foreach ($groupedServices as $group) {
-            ServiceListing::create([
-                'profile_id' => $group['common']['profile_id'],
-                'service_types' => $group['service_types'],
-                'locations' => $group['location_ids'],
-                'work_type' => $group['common']['work_type'],
-                'monthly_rate' => $group['common']['monthly_rate'],
-                'description' => $group['common']['description'],
-                'is_active' => $group['common']['is_active'],
-                'status' => $group['common']['status'],
-            ]);
-        }
+        // Create service listing with profile link and JSON arrays
+        $listing = ServiceListing::create([
+            'profile_id' => $profile->id,
+            'service_types' => $validated['services'], // Array of service type strings
+            'locations' => $validated['locations'], // Array of location IDs
+            'work_type' => $validated['work_type'],
+            'monthly_rate' => $validated['monthly_rate'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'is_active' => true,
+            'status' => 'active',
+        ]);
 
         return response()->json([
             'message' => 'Welcome! Your business profile has been set up successfully.',

@@ -29,8 +29,9 @@ test('helpers can view available job applications', function () {
     $helper->assignRole('helper');
 
     // Helper needs to complete onboarding (have service listings)
+    $profile = $helper->profile()->create([]);
     ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
     ]);
 
     $booking = Booking::factory()->create([
@@ -54,8 +55,9 @@ test('helpers can apply to a service request', function () {
     $helper->assignRole('helper');
 
     // Helper needs to complete onboarding (have service listings)
+    $profile = $helper->profile()->create([]);
     ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
     ]);
 
     $user = User::factory()->create();
@@ -79,7 +81,7 @@ test('helpers can apply to a service request', function () {
     $response->assertStatus(200);
     $this->assertDatabaseHas('job_applications', [
         'booking_id' => $booking->id,
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
         'status' => 'pending',
     ]);
 });
@@ -89,8 +91,9 @@ test('helpers cannot apply twice to the same service request', function () {
     $helper->assignRole('helper');
 
     // Helper needs to complete onboarding (have service listings)
+    $profile = $helper->profile()->create([]);
     ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
     ]);
 
     $user = User::factory()->create();
@@ -103,7 +106,7 @@ test('helpers cannot apply twice to the same service request', function () {
 
     JobApplication::create([
         'booking_id' => $booking->id,
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
         'status' => 'pending',
     ]);
     
@@ -134,7 +137,7 @@ test('users can accept a job application', function () {
 
     $application = JobApplication::create([
         'booking_id' => $booking->id,
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
         'status' => 'pending',
     ]);
     
@@ -169,7 +172,7 @@ test('accepting an application rejects other applications', function () {
 
     $application1 = JobApplication::create([
         'booking_id' => $booking->id,
-        'user_id' => $helper1->id,
+        'profile_id' => $helper1->profile()->create([])->id,
         'status' => 'pending',
     ]);
 
@@ -204,7 +207,7 @@ test('users can reject a job application', function () {
 
     $application = JobApplication::create([
         'booking_id' => $booking->id,
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
         'status' => 'pending',
     ]);
     
@@ -234,7 +237,7 @@ test('helpers can withdraw their application', function () {
 
     $application = JobApplication::create([
         'booking_id' => $booking->id,
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
         'status' => 'pending',
     ]);
     
@@ -263,7 +266,7 @@ test('helpers can view their applications', function () {
 
     JobApplication::create([
         'booking_id' => $booking->id,
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
         'status' => 'pending',
     ]);
     
@@ -291,7 +294,7 @@ test('users can view applications for their service requests', function () {
 
     JobApplication::create([
         'booking_id' => $booking->id,
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
         'status' => 'pending',
     ]);
     
@@ -321,7 +324,7 @@ test('only booking owner can accept applications', function () {
 
     $application = JobApplication::create([
         'booking_id' => $booking->id,
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
         'status' => 'pending',
     ]);
     
@@ -350,7 +353,7 @@ test('only applicant can withdraw application', function () {
 
     $application = JobApplication::create([
         'booking_id' => $booking->id,
-        'user_id' => $helper1->id,
+        'profile_id' => $helper1->profile()->create([])->id,
         'status' => 'pending',
     ]);
     
