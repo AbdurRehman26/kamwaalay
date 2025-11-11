@@ -176,9 +176,9 @@ class User extends Authenticatable
         return $query->role('helper')
                     ->whereHas('profile', function ($q) {
                         $q->where('verification_status', 'verified')
-                          ->where('is_active', true);
+                          ->where('profiles.is_active', true);
                     })
-                    ->where('is_active', true);
+                    ->where('users.is_active', true);
     }
 
     public function scopeByServiceType($query, ?string $serviceType)

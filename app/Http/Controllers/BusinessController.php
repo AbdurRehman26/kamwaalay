@@ -50,7 +50,7 @@ class BusinessController extends Controller
     public function index(Request $request)
     {
         $query = User::role('business')
-            ->where('is_active', true);
+            ->where('users.is_active', true);
 
         // Filter by location (from profile)
         $locationDisplay = '';
@@ -129,7 +129,7 @@ class BusinessController extends Controller
                 $query->where('is_active', true)->where('status', 'active');
             },
             'helpers' => function ($query) {
-                $query->where('is_active', true)
+                $query->where('users.is_active', true)
                       ->with(['roles', 'profile', 'serviceListings'])
                       ->whereHas('profile', function ($q) {
                           $q->where('verification_status', 'verified');

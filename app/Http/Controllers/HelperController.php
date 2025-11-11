@@ -45,27 +45,33 @@ class HelperController extends Controller
     {
         // Filter by user type: 'all', 'helper', or 'business'
         $userType = $request->get('user_type', 'all');
-        
+
         // Base query for helpers and businesses
         $query = User::where(function ($q) use ($userType) {
             if ($userType === 'helper') {
                 // Show only helpers
                 $q->role('helper')
-                  ->where('verification_status', 'verified')
-                  ->where('is_active', true);
+                  ->whereHas('profile', function ($profileQ) {
+                      $profileQ->where('verification_status', 'verified')
+                               ->where('profiles.is_active', true);
+                  })
+                  ->where('users.is_active', true);
             } elseif ($userType === 'business') {
                 // Show only businesses
                 $q->role('business')
-                  ->where('is_active', true);
+                  ->where('users.is_active', true);
             } else {
                 // Show both helpers and businesses (default)
                 $q->where(function ($subQ) {
                     $subQ->role('helper')
-                         ->where('verification_status', 'verified')
-                         ->where('is_active', true);
+                         ->whereHas('profile', function ($profileQ) {
+                             $profileQ->where('verification_status', 'verified')
+                                      ->where('profiles.is_active', true);
+                         })
+                         ->where('users.is_active', true);
                 })->orWhere(function ($subQ) {
                     $subQ->role('business')
-                         ->where('is_active', true);
+                         ->where('users.is_active', true);
                 });
             }
         });
@@ -87,8 +93,8 @@ class HelperController extends Controller
                     $q->where('city', $location->city->name)
                       ->where('area', $location->area);
                 });
-                $locationDisplay = $location->area 
-                    ? $location->city->name . ', ' . $location->area 
+                $locationDisplay = $location->area
+                    ? $location->city->name . ', ' . $location->area
                     : $location->city->name;
             }
         } elseif ($request->has('city_name') && $request->city_name) {
@@ -135,7 +141,7 @@ class HelperController extends Controller
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
         }
-        
+
         return response()->json([
             'helpers' => UserResource::collection($helpers)->response()->getData(true),
             'filters' => $filters,

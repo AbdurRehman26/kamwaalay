@@ -117,18 +117,20 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): JsonResponse
     {
-        // Demo phone number check - automatically log in first user
+        // Demo phone number check - automatically log in first user with helper or business role
         $demoPhoneNumber = '9876543210';
         $normalizedPhone = $request->filled('phone') ? preg_replace('/[^0-9+]/', '', $request->input('phone')) : null;
         
         if ($normalizedPhone === $demoPhoneNumber || $normalizedPhone === '+' . $demoPhoneNumber) {
-            // Find first user in database
-            $user = User::orderBy('id')->first();
+            // Find first user with helper or business role
+            $user = User::whereHas('roles', function ($query) {
+                $query->whereIn('name', ['helper', 'business']);
+            })->orderBy('id')->first();
             
             if (!$user) {
                 return response()->json([
-                    'message' => 'No users found in database.',
-                    'errors' => ['phone' => ['No users found in database.']]
+                    'message' => 'No helper or business users found in database.',
+                    'errors' => ['phone' => ['No helper or business users found in database.']]
                 ], 422);
             }
 
