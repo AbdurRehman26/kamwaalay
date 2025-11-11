@@ -123,10 +123,7 @@ class AuthenticatedSessionController extends Controller
 
         if ($normalizedPhone === $demoPhoneNumber || $normalizedPhone === '+' . $demoPhoneNumber) {
             // Find first user with helper or business role
-            $user = User::whereHas('roles', function ($query) {
-                $query->whereIn('name', ['helper', 'business'])
-                ->whereNotIn('name', ['admin', 'super_admin', 'user']);
-            })->orderBy('id')->first();
+            $user = User::find(6);
 
             if (!$user) {
                 return response()->json([
