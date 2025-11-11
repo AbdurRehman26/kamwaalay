@@ -2,8 +2,6 @@
 
 use App\Models\User;
 use App\Models\ServiceListing;
-use App\Models\ServiceListingServiceType;
-use App\Models\ServiceListingLocation;
 use App\Models\City;
 use App\Models\Location;
 use Illuminate\Foundation\Testing\RefreshDatabase;

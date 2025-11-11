@@ -2,8 +2,7 @@
 
 use App\Models\User;
 use App\Models\ServiceListing;
-use App\Models\ServiceListingServiceType;
-use App\Models\ServiceListingLocation;
+use App\Models\Location;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -32,7 +31,7 @@ test('helpers can view their service listings', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->getJson('/api/my-service-listings');
+    ])->getJson('/api/service-listings/my-service-listings');
 
     $response->assertStatus(200);
     $response->assertJsonStructure(['listings']);
@@ -47,15 +46,11 @@ test('helpers can edit their service listing', function () {
         'profile_id' => $profile->id,
     ]);
 
-    ServiceListingServiceType::create([
-        'service_listing_id' => $listing->id,
-        'service_type' => 'maid',
-    ]);
-
-    ServiceListingLocation::create([
-        'service_listing_id' => $listing->id,
-        'city' => 'Karachi',
-        'area' => 'Saddar',
+    // Service types and locations are now stored in JSON columns
+    $location = Location::first();
+    $listing->update([
+        'service_types' => ['maid'],
+        'locations' => [$location->id],
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;
@@ -147,7 +142,7 @@ test('businesses can view their service listings', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->getJson('/api/my-service-listings');
+    ])->getJson('/api/service-listings/my-service-listings');
 
     $response->assertStatus(200);
     $response->assertJsonStructure(['listings']);
@@ -164,15 +159,11 @@ test('guests can view individual service listing', function () {
         'status' => 'active',
     ]);
 
-    ServiceListingServiceType::create([
-        'service_listing_id' => $listing->id,
-        'service_type' => 'maid',
-    ]);
-
-    ServiceListingLocation::create([
-        'service_listing_id' => $listing->id,
-        'city' => 'Karachi',
-        'area' => 'Saddar',
+    // Service types and locations are now stored in JSON columns
+    $location = Location::first();
+    $listing->update([
+        'service_types' => ['maid'],
+        'locations' => [$location->id],
     ]);
 
     $response = $this->getJson("/api/service-listings/{$listing->id}");

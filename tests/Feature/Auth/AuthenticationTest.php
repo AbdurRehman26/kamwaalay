@@ -34,8 +34,7 @@ test('users can authenticate using phone number', function () {
         'phone' => '03001234567',
         'email' => '03001234567@phone.kamwaalay.local', // Phone-only users get placeholder email
         'password' => bcrypt('password'),
-        'verified_at' => null,
-        'phone_verified_at' => null, // Ensure phone is unverified
+        'verified_at' => null, // Ensure phone is unverified
     ]);
 
     $response = $this->postJson('/api/login', [

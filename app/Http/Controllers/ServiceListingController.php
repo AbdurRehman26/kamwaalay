@@ -10,6 +10,7 @@ use App\Models\Booking;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Service Listings", description: "Service listing management endpoints")]
@@ -251,108 +252,79 @@ class ServiceListingController extends Controller
             ], 422);
         }
 
-        // Check if we're receiving listings array (new format) or single listing (old format)
-        if ($request->has('listings') && is_array($request->listings)) {
-            // New format: Create ONE listing with multiple service types and locations
-            $validated = $request->validate([
-                'listings' => 'required|array|min:1',
-                'listings.*.service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
-                'listings.*.work_type' => 'required|in:full_time,part_time',
-                'listings.*.city' => 'required|string|max:255',
-                'listings.*.area' => 'required|string|max:255',
-                'listings.*.monthly_rate' => 'nullable|numeric|min:0',
-                'listings.*.description' => 'nullable|string|max:2000',
-            ]);
-
-            // Get unique service types and locations from all listings
-            $serviceTypes = array_unique(array_column($validated['listings'], 'service_type'));
-            $locations = [];
-            foreach ($validated['listings'] as $listing) {
-                $locationKey = $listing['city'] . '|' . $listing['area'];
-                if (!isset($locations[$locationKey])) {
-                    $locations[$locationKey] = [
-                        'city' => $listing['city'],
-                        'area' => $listing['area'],
-                    ];
-                }
+        // Handle services and locations if sent as JSON string (from FormData)
+        $servicesData = $request->input('service_types');
+        $decodedServices = $servicesData;
+        if (is_string($servicesData)) {
+            $decoded = json_decode($servicesData, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'message' => 'Invalid service_types data format.',
+                    'errors' => ['service_types' => ['Invalid service_types data format.']]
+                ], 422);
             }
-
-            // Get common fields from first listing (they should all be the same)
-            $firstListing = $validated['listings'][0];
-
-            // Create ONE service listing
-            $listing = ServiceListing::create([
-                'user_id' => Auth::id(),
-                'work_type' => $firstListing['work_type'],
-                'monthly_rate' => $firstListing['monthly_rate'] ?? null,
-                'description' => $firstListing['description'] ?? null,
-                'status' => 'active',
-                'is_active' => true,
-            ]);
-
-            // Attach service types
-            foreach ($serviceTypes as $serviceType) {
-                \App\Models\ServiceListingServiceType::create([
-                    'service_listing_id' => $listing->id,
-                    'service_type' => $serviceType,
-                ]);
-            }
-
-            // Attach locations
-            foreach ($locations as $location) {
-                \App\Models\ServiceListingLocation::create([
-                    'service_listing_id' => $listing->id,
-                    'city' => $location['city'],
-                    'area' => $location['area'],
-                ]);
-            }
-
-            $message = 'Service listing created successfully with ' . count($serviceTypes) . ' service type(s) and ' . count($locations) . ' location(s)!';
-
-            return response()->json([
-                'message' => $message,
-                'listing' => new ServiceListingResource($listing->load(['profile.profileable'])),
-            ]);
-        } else {
-            // Single listing (backward compatibility - will need to be updated)
-            $validated = $request->validate([
-                'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
-                'work_type' => 'required|in:full_time,part_time',
-                'city' => 'required|string|max:255',
-                'area' => 'required|string|max:255',
-                'monthly_rate' => 'nullable|numeric|min:0',
-                'description' => 'nullable|string|max:2000',
-                'status' => 'nullable|in:active,paused,closed',
-            ]);
-
-            // Create ONE listing with single service type and location
-            $listing = ServiceListing::create([
-                'user_id' => Auth::id(),
-                'work_type' => $validated['work_type'],
-                'monthly_rate' => $validated['monthly_rate'] ?? null,
-                'description' => $validated['description'] ?? null,
-                'status' => $validated['status'] ?? 'active',
-                'is_active' => true,
-            ]);
-
-            // Attach service type
-            \App\Models\ServiceListingServiceType::create([
-                'service_listing_id' => $listing->id,
-                'service_type' => $validated['service_type'],
-            ]);
-
-            // Attach location
-            \App\Models\ServiceListingLocation::create([
-                'service_listing_id' => $listing->id,
-                'city' => $validated['city'],
-                'area' => $validated['area'],
-            ]);
-
-            return response()->json([
-                'message' => 'Service listing created successfully!',
-                'listing' => new ServiceListingResource($listing->load(['profile.profileable'])),
-            ]);
+            $decodedServices = $decoded;
         }
+
+        $locationsData = $request->input('locations');
+        $decodedLocations = $locationsData;
+        if (is_string($locationsData)) {
+            $decoded = json_decode($locationsData, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'message' => 'Invalid locations data format.',
+                    'errors' => ['locations' => ['Invalid locations data format.']]
+                ], 422);
+            }
+            $decodedLocations = $decoded;
+        }
+
+        $dataToValidate = $request->all();
+        $dataToValidate['service_types'] = $decodedServices;
+        $dataToValidate['locations'] = $decodedLocations;
+
+        $validator = Validator::make($dataToValidate, [
+            'service_types' => 'required|array|min:1',
+            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'locations' => 'required|array|min:1',
+            'locations.*' => 'required|integer|exists:locations,id',
+            'work_type' => 'required|in:full_time,part_time',
+            'monthly_rate' => 'nullable|numeric|min:0',
+            'description' => 'nullable|string|max:2000',
+            'status' => 'nullable|in:active,paused,closed',
+            'is_active' => 'boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        $validated = $validator->validated();
+
+        // Get or create profile
+        $profile = $user->profile;
+        if (!$profile) {
+            $profile = $user->profile()->create([]);
+        }
+
+        // Create service listing with profile link and JSON arrays
+        $listing = ServiceListing::create([
+            'profile_id' => $profile->id,
+            'service_types' => $validated['service_types'], // Array of service type strings
+            'locations' => $validated['locations'], // Array of location IDs
+            'work_type' => $validated['work_type'],
+            'monthly_rate' => $validated['monthly_rate'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'is_active' => $validated['is_active'] ?? true,
+            'status' => $validated['status'] ?? 'active',
+        ]);
+
+        return response()->json([
+            'message' => 'Service listing created successfully!',
+            'listing' => new ServiceListingResource($listing->load(['profile.profileable'])),
+        ]);
     }
 
     #[OA\Get(
@@ -631,11 +603,12 @@ class ServiceListingController extends Controller
      */
     public function destroy(ServiceListing $serviceListing)
     {
-                // Only owner or admin can delete
-                $user = Auth::user();
-                if (Auth::id() !== $serviceListing->user_id && !$user->hasRole(['admin', 'super_admin'])) {
-                    abort(403);
-                }
+        // Only owner or admin can delete
+        $user = Auth::user();
+        $profile = $user->profile;
+        if (!$profile || $serviceListing->profile_id !== $profile->id && !$user->hasRole(['admin', 'super_admin'])) {
+            abort(403);
+        }
 
         $serviceListing->delete();
 

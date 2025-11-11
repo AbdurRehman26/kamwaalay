@@ -2,8 +2,7 @@
 
 use App\Models\User;
 use App\Models\ServiceListing;
-use App\Models\ServiceListingServiceType;
-use App\Models\ServiceListingLocation;
+use App\Models\Location;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -39,24 +38,11 @@ test('helpers can create service listings', function () {
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->postJson('/api/service-listings', [
-        'listings' => [
-            [
-                'service_type' => 'maid',
-                'work_type' => 'full_time',
-                'city' => 'Karachi',
-                'area' => 'Saddar',
-                'monthly_rate' => 15000,
-                'description' => 'Professional maid service',
-            ],
-            [
-                'service_type' => 'cleaner',
-                'work_type' => 'full_time',
-                'city' => 'Karachi',
-                'area' => 'DHA',
-                'monthly_rate' => 15000,
-                'description' => 'Professional maid service',
-            ],
-        ],
+        'service_types' => ['maid', 'cleaner'],
+        'locations' => [Location::first()->id],
+        'work_type' => 'full_time',
+        'monthly_rate' => 15000,
+        'description' => 'Professional maid service',
     ]);
 
     $response->assertStatus(200);
@@ -64,11 +50,13 @@ test('helpers can create service listings', function () {
     
     // Get the newly created listing from the response
     $newListingId = $response->json('listing.id');
-    $newListing = ServiceListing::with(['serviceTypes', 'locations'])->find($newListingId);
+    $newListing = ServiceListing::find($newListingId);
     
     expect($newListing)->not->toBeNull();
-    expect($newListing->serviceTypes->count())->toBeGreaterThanOrEqual(1);
-    expect($newListing->locations->count())->toBeGreaterThanOrEqual(1);
+    expect($newListing->service_types)->toBeArray();
+    expect(count($newListing->service_types))->toBeGreaterThanOrEqual(1);
+    expect($newListing->locations)->toBeArray();
+    expect(count($newListing->locations))->toBeGreaterThanOrEqual(1);
 });
 
 test('guests can view service listings', function () {
@@ -82,15 +70,11 @@ test('guests can view service listings', function () {
         'status' => 'active',
     ]);
 
-    ServiceListingServiceType::create([
-        'service_listing_id' => $listing->id,
-        'service_type' => 'maid',
-    ]);
-
-    ServiceListingLocation::create([
-        'service_listing_id' => $listing->id,
-        'city' => 'Karachi',
-        'area' => 'Saddar',
+    // Service types and locations are now stored in JSON columns
+    $location = Location::first();
+    $listing->update([
+        'service_types' => ['maid'],
+        'locations' => [$location->id],
     ]);
 
     $response = $this->getJson('/api/service-listings');
@@ -143,28 +127,25 @@ test('helpers can update their service listings', function () {
         'profile_id' => $profile->id,
     ]);
 
-    ServiceListingServiceType::create([
-        'service_listing_id' => $listing->id,
-        'service_type' => 'maid',
-    ]);
-
-    ServiceListingLocation::create([
-        'service_listing_id' => $listing->id,
-        'city' => 'Karachi',
-        'area' => 'Saddar',
+    // Service types and locations are now stored in JSON columns
+    $location = Location::first();
+    $listing->update([
+        'service_types' => ['maid'],
+        'locations' => [$location->id],
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;
 
+    // Get a specific location for the update (PECHS if available, or use first)
+    $pechsLocation = Location::where('area', 'PECHS')->first() ?? Location::first();
+    
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->putJson("/api/service-listings/{$listing->id}", [
         'service_types' => ['cook'],
         'work_type' => 'part_time',
-        'locations' => [
-            ['city' => 'Karachi', 'area' => 'PECHS'],
-        ],
+        'locations' => [$pechsLocation->id],
         'monthly_rate' => 20000,
         'description' => 'Updated description',
         'status' => 'active',
@@ -173,12 +154,13 @@ test('helpers can update their service listings', function () {
 
     $response->assertStatus(200);
     $listing->refresh();
-    // Reload relationships
-    $listing->load(['serviceTypes', 'locations']);
-    expect($listing->serviceTypes)->toHaveCount(1);
-    expect($listing->serviceTypes->first()->service_type)->toBe('cook');
+    expect($listing->service_types)->toBeArray();
+    expect($listing->service_types)->toHaveCount(1);
+    expect($listing->service_types[0])->toBe('cook');
+    expect($listing->locations)->toBeArray();
     expect($listing->locations)->toHaveCount(1);
-    expect($listing->locations->first()->area)->toBe('PECHS');
+    $updatedLocation = Location::find($listing->locations[0]);
+    expect($updatedLocation->id)->toBe($pechsLocation->id);
 });
 
 test('service listings require service types', function () {
@@ -197,19 +179,13 @@ test('service listings require service types', function () {
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->postJson('/api/service-listings', [
-        'listings' => [
-            [
-                'work_type' => 'full_time',
-                'city' => 'Karachi',
-                'area' => 'Saddar',
-                'monthly_rate' => 15000,
-                'description' => 'Professional service',
-            ],
-        ],
+        'work_type' => 'full_time',
+        'monthly_rate' => 15000,
+        'description' => 'Professional service',
     ]);
 
     $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['listings.0.service_type']);
+    $response->assertJsonValidationErrors(['service_types']);
 });
 
 test('service listings require locations', function () {
@@ -228,17 +204,13 @@ test('service listings require locations', function () {
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->postJson('/api/service-listings', [
-        'listings' => [
-            [
-                'service_type' => 'maid',
-                'work_type' => 'full_time',
-                'monthly_rate' => 15000,
-                'description' => 'Professional service',
-            ],
-        ],
+        'service_types' => ['maid'],
+        'work_type' => 'full_time',
+        'monthly_rate' => 15000,
+        'description' => 'Professional service',
     ]);
 
     $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['listings.0.city', 'listings.0.area']);
+    $response->assertJsonValidationErrors(['locations']);
 });
 

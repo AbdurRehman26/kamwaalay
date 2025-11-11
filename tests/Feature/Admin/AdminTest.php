@@ -138,9 +138,11 @@ test('admins can view documents list', function () {
 
     $helper = User::factory()->create();
     $helper->assignRole('helper');
+    
+    $profile = $helper->profile()->create([]);
 
     Document::factory()->count(3)->create([
-        'profile_id' => $profile->id,
+        'user_id' => $helper->id,
     ]);
     
     $token = $admin->createToken('test-token')->plainTextToken;
@@ -159,9 +161,11 @@ test('admins can update document status', function () {
 
     $helper = User::factory()->create();
     $helper->assignRole('helper');
+    
+    $profile = $helper->profile()->create([]);
 
     $document = Document::factory()->create([
-        'profile_id' => $profile->id,
+        'user_id' => $helper->id,
         'status' => 'pending',
     ]);
     

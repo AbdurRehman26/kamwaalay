@@ -2,8 +2,7 @@
 
 use App\Models\User;
 use App\Models\ServiceListing;
-use App\Models\ServiceListingServiceType;
-use App\Models\ServiceListingLocation;
+use App\Models\Location;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -112,10 +111,11 @@ test('helpers can see their service listings on profile', function () {
         'status' => 'active',
     ]);
 
-    ServiceListingLocation::create([
-        'service_listing_id' => $listing->id,
-        'city' => 'Karachi',
-        'area' => 'Saddar',
+    // Service types and locations are now stored in JSON columns
+    $location = Location::first();
+    $listing->update([
+        'service_types' => ['maid'],
+        'locations' => [$location->id],
     ]);
 
     $response = $this->getJson("/api/helpers/{$helper->id}");
