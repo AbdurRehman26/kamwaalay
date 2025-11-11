@@ -119,7 +119,7 @@ export default function ServiceListingShow() {
                                 {listing.service_types && listing.service_types.length > 0 ? (
                                     listing.service_types.map((serviceType, idx) => (
                                         <span key={idx} className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold capitalize">
-                                            {typeof serviceType === 'string' ? serviceType.replace("_", " ") : serviceType}
+                                            {typeof serviceType === "string" ? serviceType.replace("_", " ") : serviceType}
                                         </span>
                                     ))
                                 ) : (
@@ -181,7 +181,7 @@ export default function ServiceListingShow() {
                                                     {booking.service_type_label} - {booking.work_type?.replace("_", " ")}
                                                 </h3>
                                                 <p className="text-gray-600">
-                                                    <span className="font-semibold">Location:</span> {booking.city}{booking.area ? `, ${booking.area}` : ''}
+                                                    <span className="font-semibold">Location:</span> {booking.city}{booking.area ? `, ${booking.area}` : ""}
                                                 </p>
                                                 {booking.user && (
                                                     <p className="text-gray-600 mt-1">
@@ -190,9 +190,9 @@ export default function ServiceListingShow() {
                                                 )}
                                             </div>
                                             <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                                booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                                                'bg-gray-100 text-gray-800'
+                                                booking.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                                                booking.status === "confirmed" ? "bg-green-100 text-green-800" :
+                                                "bg-gray-100 text-gray-800"
                                             }`}>
                                                 {booking.status_label || booking.status}
                                             </span>
@@ -257,16 +257,16 @@ export default function ServiceListingShow() {
                                     to={(() => {
                                         const params = new URLSearchParams();
                                         if (listing.service_types && listing.service_types.length > 0) {
-                                            params.append('service_type', listing.service_types[0]);
+                                            params.append("service_type", listing.service_types[0]);
                                         }
                                         if (listing.work_type) {
-                                            params.append('work_type', listing.work_type);
+                                            params.append("work_type", listing.work_type);
                                         }
                                         if (listing.locations && listing.locations.length > 0) {
-                                            params.append('location_id', listing.locations[0]);
+                                            params.append("location_id", listing.locations[0]);
                                         }
                                         const queryString = params.toString();
-                                        return `${route("job-applications.index")}${queryString ? `?${queryString}` : ''}`;
+                                        return `${route("job-applications.index")}${queryString ? `?${queryString}` : ""}`;
                                     })()}
                                     className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-lg inline-block"
                                 >
@@ -338,7 +338,7 @@ export default function ServiceListingShow() {
                                                 {otherListing.service_types && otherListing.service_types.length > 0 ? (
                                                     otherListing.service_types.slice(0, 2).map((st, idx) => (
                                                         <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
-                                                            {typeof st === 'string' ? st.replace("_", " ") : (st?.service_type?.replace("_", " ") || "Service")}
+                                                            {typeof st === "string" ? st.replace("_", " ") : (st?.service_type?.replace("_", " ") || "Service")}
                                                         </span>
                                                     ))
                                                 ) : (

@@ -39,8 +39,8 @@ api.interceptors.response.use(
             // Unauthorized - clear token
             // Don't remove token for /api/user endpoint - let AuthContext handle it
             // This prevents premature token removal on page refresh
-            const url = error.config?.url || '';
-            if (!url.includes('/user')) {
+            const url = error.config?.url || "";
+            if (!url.includes("/user")) {
                 localStorage.removeItem("auth_token");
             }
         }

@@ -193,7 +193,7 @@ export default function Dashboard() {
                                                         {application.booking && (
                                                             <div className="text-sm text-gray-600 space-y-1">
                                                                 <p>
-                                                                    <span className="font-semibold">Location:</span> {application.booking.city}{application.booking.area ? `, ${application.booking.area}` : ''}
+                                                                    <span className="font-semibold">Location:</span> {application.booking.city}{application.booking.area ? `, ${application.booking.area}` : ""}
                                                                 </p>
                                                                 {user.role === "user" ? (
                                                                     <p>

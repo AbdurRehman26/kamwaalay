@@ -51,8 +51,8 @@ export default function ServiceListingEdit() {
                         // Fallback: create location objects using the listing's city/area
                         const locations = listingData.locations.map((locationId) => ({
                             id: locationId,
-                            city_name: listingData.city || '',
-                            area: listingData.area || '',
+                            city_name: listingData.city || "",
+                            area: listingData.area || "",
                             display_text: listingData.city && listingData.area 
                                 ? `${listingData.city}, ${listingData.area}`
                                 : listingData.city || `Location ID: ${locationId}`
@@ -105,7 +105,7 @@ export default function ServiceListingEdit() {
             setSelectedLocations([...selectedLocations, {
                 id: location.id || location.display_text,
                 city_name: location.city_name,
-                area: location.area || '',
+                area: location.area || "",
                 display_text: location.display_text
             }]);
         }
