@@ -125,7 +125,7 @@ class AuthenticatedSessionController extends Controller
             // Find first user with helper or business role
             $user = User::whereHas('roles', function ($query) {
                 $query->whereIn('name', ['helper', 'business'])
-                ->whereNotIn('name', ['admin']);
+                ->whereNotIn('name', ['admin', 'super_admin']);
             })->orderBy('id')->first();
 
             if (!$user) {
