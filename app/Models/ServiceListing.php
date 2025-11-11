@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ServiceListing extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id',
+        'profile_id',
+        'service_types',
+        'locations',
         'work_type',
         'monthly_rate',
         'description',
@@ -22,33 +23,27 @@ class ServiceListing extends Model
     protected function casts(): array
     {
         return [
+            'service_types' => 'array',
+            'locations' => 'array',
             'monthly_rate' => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }
 
     /**
-     * Get the user (helper or business) that owns this service listing
+     * Get the profile that owns this service listing
      */
-    public function user(): BelongsTo
+    public function profile(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Profile::class);
     }
 
     /**
-     * Get the service types for this listing (many-to-many)
+     * Get the user through the profile
      */
-    public function serviceTypes(): HasMany
+    public function user()
     {
-        return $this->hasMany(ServiceListingServiceType::class);
-    }
-
-    /**
-     * Get the locations for this listing (many-to-many)
-     */
-    public function locations(): HasMany
-    {
-        return $this->hasMany(ServiceListingLocation::class);
+        return $this->profile?->profileable;
     }
 
     /**
@@ -60,36 +55,19 @@ class ServiceListing extends Model
     }
 
     /**
-     * Scope for service type (via pivot table)
+     * Scope for service type (using JSON column)
      */
     public function scopeByServiceType($query, $serviceType)
     {
-        return $query->whereHas('serviceTypes', function ($q) use ($serviceType) {
-            $q->where('service_type', $serviceType);
-        });
+        return $query->whereJsonContains('service_types', $serviceType);
     }
 
     /**
-     * Scope for city (via pivot table)
+     * Scope for location ID (using JSON column)
      */
-    public function scopeByCity($query, $city)
+    public function scopeByLocationId($query, $locationId)
     {
-        return $query->whereHas('locations', function ($q) use ($city) {
-            $q->where('city', $city);
-        });
-    }
-
-    /**
-     * Scope for location (city and area via pivot table)
-     */
-    public function scopeByLocation($query, $city, $area = null)
-    {
-        return $query->whereHas('locations', function ($q) use ($city, $area) {
-            $q->where('city', $city);
-            if ($area) {
-                $q->where('area', $area);
-            }
-        });
+        return $query->whereJsonContains('locations', $locationId);
     }
 
     /**
@@ -97,47 +75,12 @@ class ServiceListing extends Model
      */
     public function getServiceTypeLabelAttribute(): string
     {
-        if (!$this->relationLoaded('serviceTypes')) {
-            $this->load('serviceTypes');
-        }
-        
-        if ($this->serviceTypes && $this->serviceTypes->count() > 0) {
-            return str_replace('_', ' ', $this->serviceTypes->first()->service_type);
+        $serviceTypes = $this->service_types ?? [];
+        if (count($serviceTypes) > 0) {
+            return str_replace('_', ' ', $serviceTypes[0]);
         }
         
         return 'Service';
-    }
-
-    /**
-     * Get the first location (for display purposes)
-     */
-    public function getCityAttribute(): ?string
-    {
-        if (!$this->relationLoaded('locations')) {
-            $this->load('locations');
-        }
-        
-        if ($this->locations && $this->locations->count() > 0) {
-            return $this->locations->first()->city;
-        }
-        
-        return null;
-    }
-
-    /**
-     * Get the first area (for display purposes)
-     */
-    public function getAreaAttribute(): ?string
-    {
-        if (!$this->relationLoaded('locations')) {
-            $this->load('locations');
-        }
-        
-        if ($this->locations && $this->locations->count() > 0) {
-            return $this->locations->first()->area;
-        }
-        
-        return null;
     }
 
     /**
@@ -145,14 +88,7 @@ class ServiceListing extends Model
      */
     public function getServiceTypeAttribute(): ?string
     {
-        if (!$this->relationLoaded('serviceTypes')) {
-            $this->load('serviceTypes');
-        }
-        
-        if ($this->serviceTypes && $this->serviceTypes->count() > 0) {
-            return $this->serviceTypes->first()->service_type;
-        }
-        
-        return null;
+        $serviceTypes = $this->service_types ?? [];
+        return $serviceTypes[0] ?? null;
     }
 }

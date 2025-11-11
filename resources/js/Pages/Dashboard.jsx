@@ -2,9 +2,60 @@ import PublicLayout from "@/Layouts/PublicLayout";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
+import { useState, useEffect } from "react";
+import { jobApplicationsService } from "@/services/jobApplications";
 
 export default function Dashboard() {
     const { user } = useAuth();
+    const [applications, setApplications] = useState({ data: [], links: [], meta: {} });
+    const [loadingApplications, setLoadingApplications] = useState(false);
+
+    // Fetch applications based on user role
+    useEffect(() => {
+        if (user) {
+            setLoadingApplications(true);
+            if (user.role === "helper" || user.role === "business") {
+                // Helpers/businesses see applications they submitted
+                jobApplicationsService.getMyApplications()
+                    .then((data) => {
+                        setApplications(data.applications || { data: [], links: [], meta: {} });
+                        setLoadingApplications(false);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching applications:", error);
+                        setLoadingApplications(false);
+                    });
+            } else if (user.role === "user") {
+                // Regular users see applications received for their service requests
+                jobApplicationsService.getMyRequestApplications()
+                    .then((data) => {
+                        setApplications(data.applications || { data: [], links: [], meta: {} });
+                        setLoadingApplications(false);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching request applications:", error);
+                        setLoadingApplications(false);
+                    });
+            } else {
+                setLoadingApplications(false);
+            }
+        }
+    }, [user]);
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "pending":
+                return "bg-yellow-100 text-yellow-800";
+            case "accepted":
+                return "bg-green-100 text-green-800";
+            case "rejected":
+                return "bg-red-100 text-red-800";
+            case "withdrawn":
+                return "bg-gray-100 text-gray-800";
+            default:
+                return "bg-gray-100 text-gray-800";
+        }
+    };
 
     return (
         <PublicLayout>
@@ -97,6 +148,125 @@ export default function Dashboard() {
                         )}
 
                     </div>
+
+                    {/* Applications Section */}
+                    {user && (user.role === "helper" || user.role === "business" || user.role === "user") && (
+                        <div className="mt-12">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-2xl font-bold text-gray-900">
+                                    {user.role === "user" ? "Applications for My Requests" : "My Applications"}
+                                </h2>
+                                <Link
+                                    to={user.role === "user" 
+                                        ? route("job-applications.my-request-applications")
+                                        : route("job-applications.my-applications")
+                                    }
+                                    className="text-blue-600 hover:text-blue-800 font-semibold"
+                                >
+                                    View All →
+                                </Link>
+                            </div>
+                            
+                            {loadingApplications ? (
+                                <div className="bg-white rounded-lg shadow-md p-8 text-center">
+                                    <p className="text-gray-600">Loading applications...</p>
+                                </div>
+                            ) : applications.data && applications.data.length > 0 ? (
+                                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                                    <div className="divide-y divide-gray-200">
+                                        {applications.data.slice(0, 5).map((application) => (
+                                            <Link
+                                                key={application.id}
+                                                to={route("job-applications.show", application.id)}
+                                                className="block p-6 hover:bg-gray-50 transition-colors"
+                                            >
+                                                <div className="flex justify-between items-start">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-3 mb-2">
+                                                            <h3 className="text-lg font-semibold text-gray-900">
+                                                                {application.booking?.service_type_label || application.booking?.service_type || "Service Request"}
+                                                            </h3>
+                                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(application.status)}`}>
+                                                                {application.status}
+                                                            </span>
+                                                        </div>
+                                                        {application.booking && (
+                                                            <div className="text-sm text-gray-600 space-y-1">
+                                                                <p>
+                                                                    <span className="font-semibold">Location:</span> {application.booking.city}{application.booking.area ? `, ${application.booking.area}` : ''}
+                                                                </p>
+                                                                {user.role === "user" ? (
+                                                                    <p>
+                                                                        <span className="font-semibold">Applied by:</span> {application.user?.name || "N/A"}
+                                                                    </p>
+                                                                ) : (
+                                                                    <p>
+                                                                        <span className="font-semibold">Requested by:</span> {application.booking.user?.name || "N/A"}
+                                                                    </p>
+                                                                )}
+                                                                {application.proposed_rate && (
+                                                                    <p>
+                                                                        <span className="font-semibold">Proposed Rate:</span> PKR {application.proposed_rate}/month
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        {application.message && (
+                                                            <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                                                                {application.message}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="ml-4 text-sm text-gray-500">
+                                                        {application.applied_at && (
+                                                            <p>{new Date(application.applied_at).toLocaleDateString()}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                    {applications.meta?.total > 5 && (
+                                        <div className="bg-gray-50 px-6 py-4 text-center">
+                                            <Link
+                                                to={user.role === "user" 
+                                                    ? route("job-applications.my-request-applications")
+                                                    : route("job-applications.my-applications")
+                                                }
+                                                className="text-blue-600 hover:text-blue-800 font-semibold"
+                                            >
+                                                View all {applications.meta.total} applications →
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="bg-white rounded-lg shadow-md p-8 text-center">
+                                    {user.role === "user" ? (
+                                        <>
+                                            <p className="text-gray-600 mb-4">You haven't received any applications for your service requests yet.</p>
+                                            <Link
+                                                to={route("bookings.create")}
+                                                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold"
+                                            >
+                                                Post a Service Request
+                                            </Link>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="text-gray-600 mb-4">You haven't applied to any service requests yet.</p>
+                                            <Link
+                                                to={route("job-applications.index")}
+                                                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold"
+                                            >
+                                                Browse Service Requests
+                                            </Link>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </PublicLayout>

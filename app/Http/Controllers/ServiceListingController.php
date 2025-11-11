@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ServiceListingResource;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\BookingResource;
 use App\Models\ServiceListing;
+use App\Models\Booking;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -364,30 +366,72 @@ class ServiceListingController extends Controller
      */
     public function show(ServiceListing $serviceListing)
     {
-        // Only helpers and guests can view service listings
-        // Users and businesses should not see this page
-        if (Auth::check()) {
-            $user = Auth::user();
-            if ($user->hasRole(['user', 'business'])) {
-                abort(403, 'Service listings are only available to helpers.');
-            }
-        }
+        // Everyone can view service listings (helpers, businesses, users, and guests)
+        // No restrictions on viewing
 
-        $serviceListing->load(['user', 'serviceTypes', 'locations']);
+        $serviceListing->load(['profile.profileable']);
 
-        // Get other active service listings from the same user
-        $otherListings = ServiceListing::with(['user', 'serviceTypes', 'locations'])
-            ->where('user_id', $serviceListing->user_id)
+        // Get other active service listings from the same profile
+        $otherListings = ServiceListing::where('profile_id', $serviceListing->profile_id)
             ->where('id', '!=', $serviceListing->id)
             ->where('is_active', true)
             ->where('status', 'active')
             ->limit(4)
             ->get();
 
+        $currentUser = Auth::user();
+        if ($currentUser) {
+            $currentUser->load(['roles', 'profile']);
+        }
+
+        // Get matching service requests (bookings) for the owner
+        $matchingBookings = collect([]);
+        if ($currentUser && $currentUser->profile && $serviceListing->profile_id === $currentUser->profile->id) {
+            // User owns this listing - find matching service requests
+            $bookingQuery = Booking::with(['user', 'jobApplications'])
+                ->where('status', 'pending')
+                ->whereNull('assigned_user_id');
+
+            // Match by service type (if listing has service types)
+            if (!empty($serviceListing->service_types)) {
+                $bookingQuery->whereIn('service_type', $serviceListing->service_types);
+            }
+
+            // Match by work type
+            if ($serviceListing->work_type) {
+                $bookingQuery->where('work_type', $serviceListing->work_type);
+            }
+
+            // Match by location (if listing has locations)
+            if (!empty($serviceListing->locations)) {
+                $locationIds = $serviceListing->locations;
+                $locations = \App\Models\Location::whereIn('id', $locationIds)->get();
+                if ($locations->isNotEmpty()) {
+                    $bookingQuery->where(function ($q) use ($locations) {
+                        foreach ($locations as $location) {
+                            $location->load('city');
+                            $q->orWhere(function ($subQ) use ($location) {
+                                $subQ->where('city', $location->city->name)
+                                     ->where('area', $location->area);
+                            });
+                        }
+                    });
+                }
+            }
+
+            // Exclude bookings the user already applied to
+            $bookingQuery->whereDoesntHave('jobApplications', function ($q) use ($currentUser) {
+                $q->where('user_id', $currentUser->id);
+            });
+
+            $matchingBookings = $bookingQuery->orderBy('created_at', 'desc')->limit(5)->get();
+        }
+
         return response()->json([
-            'listing' => new ServiceListingResource($serviceListing->load(['serviceTypes', 'locations', 'user'])),
-            'other_listings' => ServiceListingResource::collection($otherListings->load(['serviceTypes', 'locations'])),
-            'user' => Auth::user() ? new UserResource(Auth::user()->load('roles')) : null,
+            'listing' => new ServiceListingResource($serviceListing),
+            'other_listings' => ServiceListingResource::collection($otherListings),
+            'user' => $currentUser ? new UserResource($currentUser) : null,
+            'matching_bookings' => BookingResource::collection($matchingBookings),
         ]);
     }
 
@@ -420,14 +464,38 @@ class ServiceListingController extends Controller
     {
                 // Only owner or admin can edit
                 $user = Auth::user();
-                if (Auth::id() !== $serviceListing->user_id && !$user->hasRole(['admin', 'super_admin'])) {
+                $profile = $user->profile;
+                if (!$profile || $serviceListing->profile_id !== $profile->id && !$user->hasRole(['admin', 'super_admin'])) {
                     abort(403);
                 }
 
-        $serviceListing->load(['user', 'serviceTypes', 'locations']);
+        $serviceListing->load(['profile.profileable']);
+
+        // Get location details for all locations in the listing
+        $locationDetails = [];
+        if (!empty($serviceListing->locations)) {
+            $locations = \App\Models\Location::whereIn('id', $serviceListing->locations)
+                ->with('city')
+                ->get();
+            
+            $locationDetails = $locations->map(function ($location) {
+                return [
+                    'id' => $location->id,
+                    'city_name' => $location->city->name,
+                    'area' => $location->area ?? '',
+                    'display_text' => $location->area 
+                        ? $location->city->name . ', ' . $location->area 
+                        : $location->city->name,
+                ];
+            })->toArray();
+        }
+
+        $listingResource = new ServiceListingResource($serviceListing);
+        $listingArray = $listingResource->toArray(request());
+        $listingArray['location_details'] = $locationDetails;
 
         return response()->json([
-            'listing' => new ServiceListingResource($serviceListing),
+            'listing' => $listingArray,
         ]);
     }
 
@@ -484,7 +552,8 @@ class ServiceListingController extends Controller
     {
                 // Only owner or admin can update
                 $user = Auth::user();
-                if (Auth::id() !== $serviceListing->user_id && !$user->hasRole(['admin', 'super_admin'])) {
+                $profile = $user->profile;
+                if (!$profile || $serviceListing->profile_id !== $profile->id && !$user->hasRole(['admin', 'super_admin'])) {
                     abort(403);
                 }
 
@@ -492,8 +561,7 @@ class ServiceListingController extends Controller
             'service_types' => 'required|array|min:1',
             'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
             'locations' => 'required|array|min:1',
-            'locations.*.city' => 'required|string|max:255',
-            'locations.*.area' => 'required|string|max:255',
+            'locations.*' => 'required|integer|exists:locations,id',
             'work_type' => 'required|in:full_time,part_time',
             'monthly_rate' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:2000',
@@ -501,8 +569,10 @@ class ServiceListingController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        // Update main listing fields
+        // Update main listing fields with JSON columns
         $serviceListing->update([
+            'service_types' => $validated['service_types'],
+            'locations' => $validated['locations'],
             'work_type' => $validated['work_type'],
             'monthly_rate' => $validated['monthly_rate'] ?? null,
             'description' => $validated['description'] ?? null,
@@ -510,28 +580,9 @@ class ServiceListingController extends Controller
             'is_active' => $validated['is_active'] ?? true,
         ]);
 
-        // Update service types (delete old, create new)
-        $serviceListing->serviceTypes()->delete();
-        foreach ($validated['service_types'] as $serviceType) {
-            \App\Models\ServiceListingServiceType::create([
-                'service_listing_id' => $serviceListing->id,
-                'service_type' => $serviceType,
-            ]);
-        }
-
-        // Update locations (delete old, create new)
-        $serviceListing->locations()->delete();
-        foreach ($validated['locations'] as $location) {
-            \App\Models\ServiceListingLocation::create([
-                'service_listing_id' => $serviceListing->id,
-                'city' => $location['city'],
-                'area' => $location['area'],
-            ]);
-        }
-
         return response()->json([
             'message' => 'Service listing updated successfully!',
-            'listing' => new ServiceListingResource($serviceListing->load(['serviceTypes', 'locations', 'user'])),
+            'listing' => new ServiceListingResource($serviceListing->load(['profile.profileable'])),
         ]);
     }
 
@@ -576,7 +627,7 @@ class ServiceListingController extends Controller
     }
 
     #[OA\Get(
-        path: "/api/my-service-listings",
+        path: "/api/service-listings/my-service-listings",
         summary: "Get my service listings",
         description: "Get paginated list of service listings created by the authenticated user (helper/business)",
         tags: ["Service Listings"],
@@ -604,8 +655,20 @@ class ServiceListingController extends Controller
             abort(403);
         }
 
-        $listings = ServiceListing::with(['serviceTypes', 'locations'])
-            ->where('user_id', Auth::id())
+        // Get user's profile
+        $profile = $user->profile;
+        if (!$profile) {
+            return response()->json([
+                'listings' => [
+                    'data' => [],
+                    'links' => [],
+                    'meta' => []
+                ],
+            ]);
+        }
+
+        // Get service listings for this profile
+        $listings = ServiceListing::where('profile_id', $profile->id)
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 

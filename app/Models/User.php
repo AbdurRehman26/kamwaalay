@@ -113,10 +113,17 @@ class User extends Authenticatable
         return $this->morphOne(Profile::class, 'profileable');
     }
 
-    // Service listings (services offered by helpers/businesses)
+    // Service listings (services offered by helpers/businesses) - through profile
     public function serviceListings()
     {
-        return $this->hasMany(ServiceListing::class);
+        return $this->hasManyThrough(
+            ServiceListing::class,
+            Profile::class,
+            'profileable_id', // Foreign key on profiles table
+            'profile_id', // Foreign key on service_listings table
+            'id', // Local key on users table
+            'id' // Local key on profiles table
+        )->where('profiles.profileable_type', 'App\Models\User');
     }
 
     /**
@@ -127,8 +134,12 @@ class User extends Authenticatable
     public function hasCompletedOnboarding(): bool
     {
         if ($this->hasRole('helper') || $this->hasRole('business')) {
-            // Helper/Business onboarding is complete when they have service listings
-            return $this->serviceListings()->exists();
+            // Check if user has a profile with service listings
+            $profile = $this->profile;
+            if (!$profile) {
+                return false;
+            }
+            return $profile->serviceListings()->exists();
         }
 
         // Normal user onboarding is complete when they have updated their profile

@@ -20,12 +20,31 @@ export const AuthProvider = ({ children }) => {
                     console.error("Error fetching user:", error);
                     // Only remove token if it's a 401 (Unauthorized) - token is invalid
                     if (error.response?.status === 401) {
+                        // Token is invalid - remove it
                         authService.removeToken();
                         setUser(null);
+                        setLoading(false);
+                    } else {
+                        // For other errors (network, 500, etc.), keep token but set loading to false
+                        // The ProtectedRoute will handle showing loading if token exists but user is null
+                        // Retry once after a short delay for network errors
+                        if (!error.response || error.response.status >= 500) {
+                            console.log("Network error, retrying user fetch...");
+                            setTimeout(() => {
+                                authService.getCurrentUser()
+                                    .then((response) => {
+                                        setUser(response.user);
+                                        setLoading(false);
+                                    })
+                                    .catch((retryError) => {
+                                        console.error("Retry failed:", retryError);
+                                        setLoading(false);
+                                    });
+                            }, 1000);
+                        } else {
+                            setLoading(false);
+                        }
                     }
-                    // For other errors (network, 500, etc.), keep token but set loading to false
-                    // The ProtectedRoute will handle showing loading if token exists but user is null
-                    setLoading(false);
                 });
         } else {
             setLoading(false);

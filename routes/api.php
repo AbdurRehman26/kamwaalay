@@ -53,7 +53,7 @@ Route::get('/businesses/{business}', [BusinessController::class, 'show']);
 
 // Public service listings
 Route::get('/service-listings', [ServiceListingController::class, 'index']);
-Route::get('/service-listings/{serviceListing}', [ServiceListingController::class, 'show']);
+Route::get('/service-listings/{serviceListing}', [ServiceListingController::class, 'show'])->where('serviceListing', '[0-9]+');
 
 // Public booking/service requests
 Route::get('/service-requests', [BookingController::class, 'browse']);
@@ -70,22 +70,22 @@ Route::middleware('guest')->group(function () {
     // Registration
     Route::get('/register', [RegisteredUserController::class, 'create']);
     Route::post('/register', [RegisteredUserController::class, 'store']);
-    
+
     // Phone OTP Registration
     Route::get('/register/phone', [PhoneOtpController::class, 'create']);
     Route::post('/register/phone/send-otp', [PhoneOtpController::class, 'sendOtp']);
     Route::post('/register/phone/verify-otp', [PhoneOtpController::class, 'verifyOtp']);
     Route::post('/register/phone/resend-otp', [PhoneOtpController::class, 'resendOtp']);
-    
+
     // OTP Verification
     Route::get('/verify-otp', [VerificationController::class, 'show']);
     Route::post('/verify-otp', [VerificationController::class, 'verify']);
     Route::post('/verify-otp/resend', [VerificationController::class, 'resend']);
-    
+
     // Login
     Route::get('/login', [AuthenticatedSessionController::class, 'create']);
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-    
+
     // Password Reset
     Route::get('/forgot-password', [PasswordResetLinkController::class, 'create']);
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
@@ -97,7 +97,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     // User info
     Route::get('/user', [App\Http\Controllers\ProfileController::class, 'user']);
-    
+
     // Dashboard
     Route::get('/dashboard', function () {
         $user = auth()->user()->load('roles');
@@ -106,39 +106,40 @@ Route::middleware('auth:sanctum')->group(function () {
             'roles' => $user->roles->pluck('name'),
         ]);
     });
-    
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit']);
     Route::patch('/profile', [ProfileController::class, 'update']);
     Route::delete('/profile', [ProfileController::class, 'destroy']);
-    
+
     // Password
     Route::put('/password', [PasswordController::class, 'update']);
-    
+
     // Logout
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
-    
+
     // Helper profile management
     Route::get('/helpers/create', [HelperController::class, 'create']);
     Route::post('/helpers', [HelperController::class, 'store']);
     Route::get('/helpers/{helper}/edit', [HelperController::class, 'edit']);
     Route::put('/helpers/{helper}', [HelperController::class, 'update']);
-    
+
     // Bookings
     Route::get('/bookings', [BookingController::class, 'index']);
     Route::get('/bookings/create', [BookingController::class, 'create']);
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::patch('/bookings/{booking}', [BookingController::class, 'update']);
     Route::delete('/bookings/{booking}', [BookingController::class, 'destroy']);
-    
+
     // Service Listings
+    // IMPORTANT: More specific routes must come before parameterized routes
+    Route::get('/service-listings/my-service-listings', [ServiceListingController::class, 'myListings']);
     Route::get('/service-listings/create', [ServiceListingController::class, 'create']);
     Route::post('/service-listings', [ServiceListingController::class, 'store']);
-    Route::get('/service-listings/{serviceListing}/edit', [ServiceListingController::class, 'edit']);
-    Route::put('/service-listings/{serviceListing}', [ServiceListingController::class, 'update']);
-    Route::delete('/service-listings/{serviceListing}', [ServiceListingController::class, 'destroy']);
-    Route::get('/my-service-listings', [ServiceListingController::class, 'myListings']);
-    
+    Route::get('/service-listings/{serviceListing}/edit', [ServiceListingController::class, 'edit'])->where('serviceListing', '[0-9]+');
+    Route::put('/service-listings/{serviceListing}', [ServiceListingController::class, 'update'])->where('serviceListing', '[0-9]+');
+    Route::delete('/service-listings/{serviceListing}', [ServiceListingController::class, 'destroy'])->where('serviceListing', '[0-9]+');
+
     // Job Applications
     Route::get('/job-applications', [JobApplicationController::class, 'index']);
     Route::get('/bookings/{booking}/apply', [JobApplicationController::class, 'create']);
@@ -150,14 +151,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/job-applications/{jobApplication}/reject', [JobApplicationController::class, 'reject']);
     Route::post('/job-applications/{jobApplication}/withdraw', [JobApplicationController::class, 'withdraw']);
     Route::delete('/job-applications/{jobApplication}', [JobApplicationController::class, 'destroy']);
-    
+
     // Reviews
     Route::get('/bookings/{booking}/review/create', [ReviewController::class, 'create']);
     Route::post('/bookings/{booking}/review', [ReviewController::class, 'store']);
     Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit']);
     Route::put('/reviews/{review}', [ReviewController::class, 'update']);
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy']);
-    
+
     // Business routes
     Route::prefix('business')->group(function () {
         Route::get('/dashboard', [BusinessController::class, 'dashboard']);
@@ -168,13 +169,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/workers/{helper}', [BusinessController::class, 'updateWorker']);
         Route::delete('/workers/{helper}', [BusinessController::class, 'destroyWorker']);
     });
-    
+
     // Onboarding routes
     Route::get('/onboarding/helper', [OnboardingController::class, 'helper']);
     Route::post('/onboarding/helper', [OnboardingController::class, 'completeHelper']);
     Route::get('/onboarding/business', [OnboardingController::class, 'business']);
     Route::post('/onboarding/business', [OnboardingController::class, 'completeBusiness']);
-    
+
     // Admin routes
     Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard']);

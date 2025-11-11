@@ -27,7 +27,7 @@ export const serviceListingsService = {
     },
 
     async getMyListings() {
-        const response = await api.get("/service-listings/my-listings");
+        const response = await api.get("/service-listings/my-service-listings");
         return response.data;
     },
 };

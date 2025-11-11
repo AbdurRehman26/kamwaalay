@@ -1,10 +1,12 @@
-// Head removed
 import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
-import axios from "axios";
+import api from "@/services/api";
 import { serviceListingsService } from "@/services/serviceListings";
+import { route } from "@/utils/routes";
 
 export default function ServiceListingCreate() {
+    const navigate = useNavigate();
     const [selectedServiceTypes, setSelectedServiceTypes] = useState([]);
     const [selectedLocations, setSelectedLocations] = useState([]);
     const [locationQuery, setLocationQuery] = useState("");
@@ -38,8 +40,8 @@ export default function ServiceListingCreate() {
                 clearTimeout(searchTimeoutRef.current);
             }
             searchTimeoutRef.current = setTimeout(() => {
-                axios
-                    .get("/api/locations/search", {
+                api
+                    .get("/locations/search", {
                         params: { q: locationQuery },
                     })
                     .then((response) => {
@@ -158,10 +160,8 @@ export default function ServiceListingCreate() {
         serviceListingsService.createListing(apiData)
             .then((response) => {
                 setProcessing(false);
-                // Redirect to my listings or show success
-                router.visit(route("service-listings.my-listings"), {
-                    method: "get",
-                });
+                // Redirect to my listings
+                navigate(route("service-listings.my-listings"));
             })
             .catch((error) => {
                 if (error.response?.data?.errors) {

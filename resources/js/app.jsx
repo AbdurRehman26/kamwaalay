@@ -1,7 +1,7 @@
 import "../css/app.css";
 import "./bootstrap";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
@@ -50,22 +50,27 @@ function AppRoutes() {
         const location = useLocation();
         const isAuthenticated = authService.isAuthenticated();
         
+        // Wait for AuthContext to finish loading before making decisions
+        // This is crucial - we must wait for the user data to load on page refresh
         if (loading) {
             return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
         }
         
-        // If we have a token but user is null (API call failed), still allow access
-        // The API will validate the token on each request, and we don't want to log out
-        // users on temporary network errors
-        if (isAuthenticated && !user) {
-            // Token exists but user data not loaded - allow access
-            // This prevents logout on page reload if API call fails temporarily
-            return children;
+        // If no token, redirect to login immediately
+        if (!isAuthenticated) {
+            return <Navigate to="/login" replace />;
         }
         
-        // Only redirect to login if we don't have a token AND no user
-        if (!isAuthenticated && !user) {
-            return <Navigate to="/login" replace />;
+        // If we have a token but no user after loading completes
+        // AuthContext removes token on 401, so if we still have token but no user,
+        // it might be a network error. For now, allow access and let API calls handle auth
+        // The API will return 401 if token is invalid, and we'll handle it there
+        // This prevents logout on page refresh due to temporary network issues
+        if (isAuthenticated && !user && !loading) {
+            // Token exists but user not loaded - could be network error
+            // Allow access temporarily - API calls will validate the token
+            // If token is invalid, API will return 401 and AuthContext will handle it
+            return children;
         }
         
         // If we have user, proceed with checks
@@ -86,6 +91,11 @@ function AppRoutes() {
                     return <Navigate to="/onboarding/business" replace />;
                 }
             }
+        }
+        
+        // Final check: if no user after all checks, redirect to login
+        if (!user) {
+            return <Navigate to="/login" replace />;
         }
         
         return children;

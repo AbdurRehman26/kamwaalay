@@ -71,7 +71,9 @@ class ProfileController extends Controller
      */
     public function user(Request $request): JsonResponse
     {
-        return response()->json(new UserResource($request->user()->load('roles')));
+        return response()->json([
+            'user' => new UserResource($request->user()->load('roles'))
+        ]);
     }
 
     /**

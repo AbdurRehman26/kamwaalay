@@ -188,38 +188,44 @@ export default function OnboardingHelper() {
         setProcessing(true);
         setErrors({});
         
-        // Validate all offers
-        const validOffers = offers.filter(offer => 
-            offer.selectedServiceTypes.length > 0 && 
-            offer.selectedLocations.length > 0 && 
-            offer.work_type
-        );
-
-        if (validOffers.length === 0) {
-            alert("Please add at least one complete offer with service types, locations, and work type.");
+        // Get the first offer (we'll simplify to single offer structure)
+        const offer = offers[0];
+        
+        // Validate
+        if (!offer.selectedServiceTypes.length) {
+            alert("Please select at least one service type.");
+            setProcessing(false);
+            return;
+        }
+        if (!offer.selectedLocations.length) {
+            alert("Please select at least one location.");
+            setProcessing(false);
+            return;
+        }
+        if (!offer.work_type) {
+            alert("Please select a work type.");
             setProcessing(false);
             return;
         }
 
-        // Create services array: all combinations from all offers
-        const servicesArray = [];
-        validOffers.forEach(offer => {
-            offer.selectedServiceTypes.forEach(serviceType => {
-                offer.selectedLocations.forEach(location => {
-                    servicesArray.push({
-                        service_type: serviceType,
-                        work_type: offer.work_type,
-                        location_id: location.id,
-                        monthly_rate: offer.monthly_rate || null,
-                        description: offer.description || null,
-                    });
-                });
-            });
-        });
+        // Prepare data in the expected format
+        const services = offer.selectedServiceTypes; // Array of strings
+        const locations = offer.selectedLocations.map(loc => loc.id); // Array of location IDs
+        const work_type = offer.work_type;
+        const monthly_rate = offer.monthly_rate ? parseFloat(offer.monthly_rate) : null;
+        const description = offer.description || null;
 
         // Prepare FormData for file uploads
         const formData = new FormData();
-        formData.append("services", JSON.stringify(servicesArray));
+        formData.append("services", JSON.stringify(services));
+        formData.append("locations", JSON.stringify(locations));
+        formData.append("work_type", work_type);
+        if (monthly_rate !== null) {
+            formData.append("monthly_rate", monthly_rate);
+        }
+        if (description) {
+            formData.append("description", description);
+        }
         formData.append("experience_years", profileData.experience_years || "");
         formData.append("bio", profileData.bio || "");
         formData.append("nic_number", profileData.nic_number || "");
@@ -234,7 +240,7 @@ export default function OnboardingHelper() {
         try {
             await onboardingService.completeHelper(formData);
             // Redirect to dashboard on success
-            router.visit(route("dashboard"), { method: "get" });
+            navigate(route("dashboard"));
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);

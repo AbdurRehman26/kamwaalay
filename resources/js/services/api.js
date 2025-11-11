@@ -37,9 +37,12 @@ api.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             // Unauthorized - clear token
-            // Don't redirect here - let the component handle it
-            // This prevents redirect loops and allows components to handle auth state
-            localStorage.removeItem("auth_token");
+            // Don't remove token for /api/user endpoint - let AuthContext handle it
+            // This prevents premature token removal on page refresh
+            const url = error.config?.url || '';
+            if (!url.includes('/user')) {
+                localStorage.removeItem("auth_token");
+            }
         }
         return Promise.reject(error);
     }

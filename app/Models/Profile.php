@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Profile extends Model
@@ -45,6 +46,14 @@ class Profile extends Model
     public function profileable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Get the service listings for this profile
+     */
+    public function serviceListings(): HasMany
+    {
+        return $this->hasMany(ServiceListing::class);
     }
 
     /**

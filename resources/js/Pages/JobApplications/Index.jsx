@@ -1,8 +1,9 @@
-// Head removed
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
-import axios from "axios";
+import api from "@/services/api";
 import { jobApplicationsService } from "@/services/jobApplications";
+import { route } from "@/utils/routes";
 
 export default function JobApplicationsIndex() {
     const [bookings, setBookings] = useState({ data: [], links: [], meta: {} });
@@ -34,8 +35,8 @@ export default function JobApplicationsIndex() {
                 clearTimeout(searchTimeoutRef.current);
             }
             searchTimeoutRef.current = setTimeout(() => {
-                axios
-                    .get("/api/locations/search", {
+                api
+                    .get("/locations/search", {
                         params: { q: locationFilterQuery },
                     })
                     .then((response) => {

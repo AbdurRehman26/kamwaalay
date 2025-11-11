@@ -7,6 +7,7 @@ use App\Models\ServiceListing;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Onboarding", description: "User onboarding endpoints")]
@@ -58,7 +59,7 @@ class OnboardingController extends Controller
             content: new OA\MediaType(
                 mediaType: "multipart/form-data",
                 schema: new OA\Schema(
-                    required: ["services", "nic", "nic_number"],
+                    required: ["services"],
                     properties: [
                         new OA\Property(
                             property: "services",
@@ -75,8 +76,8 @@ class OnboardingController extends Controller
                                 ]
                             )
                         ),
-                        new OA\Property(property: "nic", type: "string", format: "binary", description: "NIC document file (jpeg, jpg, png, pdf, max 5MB)"),
-                        new OA\Property(property: "nic_number", type: "string", maxLength: 255),
+                        new OA\Property(property: "nic", type: "string", format: "binary", nullable: true, description: "NIC document file (jpeg, jpg, png, pdf, max 5MB) - optional"),
+                        new OA\Property(property: "nic_number", type: "string", nullable: true, maxLength: 255),
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", nullable: true, minimum: 0),
                         new OA\Property(property: "bio", type: "string", nullable: true),
@@ -110,8 +111,10 @@ class OnboardingController extends Controller
             abort(403);
         }
 
-        // Handle services if sent as JSON string (from FormData)
+        // Handle services and locations if sent as JSON strings (from FormData)
+        // Decode BEFORE validation so validation works correctly
         $servicesData = $request->input('services');
+        $decodedServices = $servicesData;
         if (is_string($servicesData)) {
             $decoded = json_decode($servicesData, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -120,24 +123,54 @@ class OnboardingController extends Controller
                     'errors' => ['services' => ['Invalid services data format.']]
                 ], 422);
             }
-            $request->merge(['services' => $decoded]);
+            $decodedServices = $decoded;
         }
 
-        $validated = $request->validate([
+        $locationsData = $request->input('locations');
+        $decodedLocations = $locationsData;
+        if (is_string($locationsData)) {
+            $decoded = json_decode($locationsData, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'message' => 'Invalid locations data format.',
+                    'errors' => ['locations' => ['Invalid locations data format.']]
+                ], 422);
+            }
+            $decodedLocations = $decoded;
+        }
+
+        // Prepare data for validation (merge decoded arrays with other request data)
+        // Note: $request->all() includes files for multipart/form-data
+        $dataToValidate = $request->all();
+        $dataToValidate['services'] = $decodedServices;
+        $dataToValidate['locations'] = $decodedLocations;
+
+        // Validate the decoded data
+        $validator = Validator::make($dataToValidate, [
             'services' => 'required|array|min:1',
-            'services.*.service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
-            'services.*.work_type' => 'required|in:full_time,part_time',
-            'services.*.location_id' => 'required',
-            'services.*.monthly_rate' => 'nullable|numeric|min:0',
-            'services.*.description' => 'nullable|string|max:2000',
-            // Profile verification fields
-            'nic' => 'required|file|mimes:jpeg,jpg,png,pdf|max:5120',
-            'nic_number' => 'required|string|max:255',
+            'services.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'locations' => 'required|array|min:1',
+            'locations.*' => 'required|integer|exists:locations,id',
+            'work_type' => 'required|in:full_time,part_time',
+            'monthly_rate' => 'nullable|numeric|min:0',
+            'description' => 'nullable|string|max:2000',
+            // Profile verification fields (optional for now)
+            'nic' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:5120',
+            'nic_number' => 'nullable|string|max:255',
             // Optional helper profile fields
             'photo' => 'nullable|image|max:2048',
             'experience_years' => 'nullable|integer|min:0',
             'bio' => 'nullable|string',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $validated = $validator->validated();
 
         // Update user profile if provided
         $profileData = [];
@@ -157,85 +190,35 @@ class OnboardingController extends Controller
             );
         }
 
-        // Store NIC document
+        // Store NIC document (if provided)
         if ($request->hasFile('nic')) {
             $nicPath = $request->file('nic')->store('documents/nic', 'public');
             \App\Models\Document::create([
                 'user_id' => $user->id,
                 'document_type' => 'nic',
-                'document_number' => $validated['nic_number'],
+                'document_number' => $validated['nic_number'] ?? null,
                 'file_path' => $nicPath,
                 'status' => 'pending',
             ]);
         }
 
-        // Group services by common fields (work_type, monthly_rate, description)
-        $groupedServices = [];
-        foreach ($validated['services'] as $serviceData) {
-            $location = \App\Models\Location::find($serviceData['location_id']);
-            if (!$location) {
-                continue;
-            }
+        // Get or create profile
+        $profile = $user->profile;
+        if (!$profile) {
+            $profile = $user->profile()->create([]);
+        }
 
-            $location->load('city');
-            
-            $key = md5(serialize([
-                $serviceData['work_type'] ?? 'full_time',
-                $serviceData['monthly_rate'] ?? null,
-                $serviceData['description'] ?? null,
-            ]));
-            
-            if (!isset($groupedServices[$key])) {
-                $groupedServices[$key] = [
-                    'common' => [
-                        'user_id' => $user->id,
-                        'work_type' => $serviceData['work_type'] ?? 'full_time',
-                        'monthly_rate' => $serviceData['monthly_rate'] ?? null,
-                        'description' => $serviceData['description'] ?? null,
-                        'is_active' => true,
-                        'status' => 'active',
-                    ],
-                    'service_types' => [],
-                    'locations' => [],
-                ];
-            }
-            
-            // Add service type
-            if (!in_array($serviceData['service_type'], $groupedServices[$key]['service_types'])) {
-                $groupedServices[$key]['service_types'][] = $serviceData['service_type'];
-            }
-            
-            // Add location
-            $locationKey = $location->city->name . '|' . ($location->area ?? '');
-            if (!isset($groupedServices[$key]['locations'][$locationKey])) {
-                $groupedServices[$key]['locations'][$locationKey] = [
-                    'city' => $location->city->name,
-                    'area' => $location->area ?? '',
-                ];
-            }
-        }
-        
-        // Create service listings for each group
-        foreach ($groupedServices as $group) {
-            $listing = ServiceListing::create($group['common']);
-            
-            // Attach service types
-            foreach ($group['service_types'] as $serviceType) {
-                \App\Models\ServiceListingServiceType::create([
-                    'service_listing_id' => $listing->id,
-                    'service_type' => $serviceType,
-                ]);
-            }
-            
-            // Attach locations
-            foreach ($group['locations'] as $location) {
-                \App\Models\ServiceListingLocation::create([
-                    'service_listing_id' => $listing->id,
-                    'city' => $location['city'],
-                    'area' => $location['area'],
-                ]);
-            }
-        }
+        // Create service listing with profile link and JSON arrays
+        $listing = ServiceListing::create([
+            'profile_id' => $profile->id,
+            'service_types' => $validated['services'], // Array of service type strings
+            'locations' => $validated['locations'], // Array of location IDs
+            'work_type' => $validated['work_type'],
+            'monthly_rate' => $validated['monthly_rate'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'is_active' => true,
+            'status' => 'active',
+        ]);
 
         return response()->json([
             'message' => 'Welcome! Your profile has been set up successfully.',
@@ -340,9 +323,9 @@ class OnboardingController extends Controller
             'services.*.location_id' => 'required',
             'services.*.monthly_rate' => 'nullable|numeric|min:0',
             'services.*.description' => 'nullable|string|max:2000',
-            // Profile verification fields
-            'nic' => 'required|file|mimes:jpeg,jpg,png,pdf|max:5120',
-            'nic_number' => 'required|string|max:255',
+            // Profile verification fields (optional for now)
+            'nic' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:5120',
+            'nic_number' => 'nullable|string|max:255',
             // Optional business profile fields
             'bio' => 'nullable|string',
             'city' => 'nullable|string|max:255',
@@ -367,16 +350,22 @@ class OnboardingController extends Controller
             );
         }
 
-        // Store NIC document
+        // Store NIC document (if provided)
         if ($request->hasFile('nic')) {
             $nicPath = $request->file('nic')->store('documents/nic', 'public');
             \App\Models\Document::create([
                 'user_id' => $user->id,
                 'document_type' => 'nic',
-                'document_number' => $validated['nic_number'],
+                'document_number' => $validated['nic_number'] ?? null,
                 'file_path' => $nicPath,
                 'status' => 'pending',
             ]);
+        }
+
+        // Get or create profile
+        $profile = $user->profile;
+        if (!$profile) {
+            $profile = $user->profile()->create([]);
         }
 
         // Group services by common fields (work_type, monthly_rate, description)
@@ -387,8 +376,6 @@ class OnboardingController extends Controller
                 continue;
             }
 
-            $location->load('city');
-            
             $key = md5(serialize([
                 $serviceData['work_type'] ?? 'full_time',
                 $serviceData['monthly_rate'] ?? null,
@@ -398,7 +385,7 @@ class OnboardingController extends Controller
             if (!isset($groupedServices[$key])) {
                 $groupedServices[$key] = [
                     'common' => [
-                        'user_id' => $user->id,
+                        'profile_id' => $profile->id,
                         'work_type' => $serviceData['work_type'] ?? 'full_time',
                         'monthly_rate' => $serviceData['monthly_rate'] ?? null,
                         'description' => $serviceData['description'] ?? null,
@@ -406,7 +393,7 @@ class OnboardingController extends Controller
                         'status' => 'active',
                     ],
                     'service_types' => [],
-                    'locations' => [],
+                    'location_ids' => [],
                 ];
             }
             
@@ -415,36 +402,24 @@ class OnboardingController extends Controller
                 $groupedServices[$key]['service_types'][] = $serviceData['service_type'];
             }
             
-            // Add location
-            $locationKey = $location->city->name . '|' . ($location->area ?? '');
-            if (!isset($groupedServices[$key]['locations'][$locationKey])) {
-                $groupedServices[$key]['locations'][$locationKey] = [
-                    'city' => $location->city->name,
-                    'area' => $location->area ?? '',
-                ];
+            // Add location ID
+            if (!in_array($serviceData['location_id'], $groupedServices[$key]['location_ids'])) {
+                $groupedServices[$key]['location_ids'][] = $serviceData['location_id'];
             }
         }
         
-        // Create service listings for each group
+        // Create service listings for each group (multiple listings per profile allowed)
         foreach ($groupedServices as $group) {
-            $listing = ServiceListing::create($group['common']);
-            
-            // Attach service types
-            foreach ($group['service_types'] as $serviceType) {
-                \App\Models\ServiceListingServiceType::create([
-                    'service_listing_id' => $listing->id,
-                    'service_type' => $serviceType,
-                ]);
-            }
-            
-            // Attach locations
-            foreach ($group['locations'] as $location) {
-                \App\Models\ServiceListingLocation::create([
-                    'service_listing_id' => $listing->id,
-                    'city' => $location['city'],
-                    'area' => $location['area'],
-                ]);
-            }
+            ServiceListing::create([
+                'profile_id' => $group['common']['profile_id'],
+                'service_types' => $group['service_types'],
+                'locations' => $group['location_ids'],
+                'work_type' => $group['common']['work_type'],
+                'monthly_rate' => $group['common']['monthly_rate'],
+                'description' => $group['common']['description'],
+                'is_active' => $group['common']['is_active'],
+                'status' => $group['common']['status'],
+            ]);
         }
 
         return response()->json([
