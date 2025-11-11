@@ -176,8 +176,8 @@ class HelperController extends Controller
         }
 
         $helper->load(['roles', 'profile', 'helperReviews.user', 'documents', 'serviceListings' => function ($query) {
-            $query->where('is_active', true)
-                  ->where('status', 'active')
+            $query->where('service_listings.is_active', true)
+                  ->where('service_listings.status', 'active')
                   ->with(['serviceTypes', 'locations']);
         }]);
 

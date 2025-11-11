@@ -126,7 +126,7 @@ class BusinessController extends Controller
             'roles',
             'profile',
             'serviceListings' => function ($query) {
-                $query->where('is_active', true)->where('status', 'active');
+                $query->where('service_listings.is_active', true)->where('service_listings.status', 'active');
             },
             'helpers' => function ($query) {
                 $query->where('users.is_active', true)

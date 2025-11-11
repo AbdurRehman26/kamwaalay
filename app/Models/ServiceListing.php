@@ -51,7 +51,7 @@ class ServiceListing extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)->where('status', 'active');
+        return $query->where('service_listings.is_active', true)->where('service_listings.status', 'active');
     }
 
     /**
