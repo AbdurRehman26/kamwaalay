@@ -3,7 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\ServiceListing;
-use App\Models\User;
+use App\Models\Profile;
+use App\Models\Location;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,8 +19,12 @@ class ServiceListingFactory extends Factory
      */
     public function definition(): array
     {
+        $serviceTypes = ['maid', 'cook', 'babysitter', 'caregiver', 'cleaner', 'all_rounder'];
+        
         return [
-            'user_id' => User::factory(),
+            'profile_id' => Profile::factory(),
+            'service_types' => [fake()->randomElement($serviceTypes)],
+            'locations' => [Location::factory()],
             'work_type' => fake()->randomElement(['full_time', 'part_time']),
             'monthly_rate' => fake()->numberBetween(10000, 30000),
             'description' => fake()->sentence(),

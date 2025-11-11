@@ -98,7 +98,7 @@ test('users must provide correct password to delete account', function () {
 test('email verification is reset when email is changed', function () {
     $user = User::factory()->create([
         'email' => 'old@example.com',
-        'email_verified_at' => now(),
+        'verified_at' => now(),
     ]);
     $user->assignRole('user');
     
@@ -114,6 +114,6 @@ test('email verification is reset when email is changed', function () {
 
     $response->assertStatus(200);
     $user->refresh();
-    expect($user->email_verified_at)->toBeNull();
+    expect($user->verified_at)->toBeNull();
 });
 

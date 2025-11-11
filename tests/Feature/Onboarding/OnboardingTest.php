@@ -56,23 +56,11 @@ test('helpers can complete onboarding', function () {
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->post('/api/onboarding/helper', [
-        'services' => [
-            [
-                'service_type' => 'maid',
-                'work_type' => 'full_time',
-                'location_id' => $location->id,
-                'monthly_rate' => 15000,
-                'description' => 'Professional maid service',
-            ],
-            [
-                'service_type' => 'cleaner',
-                'work_type' => 'part_time',
-                'location_id' => $location->id,
-                'monthly_rate' => 13500,
-                'description' => 'Deep cleaning service',
-            ],
-        ],
-        'skills' => 'Cleaning, Laundry',
+        'services' => ['maid', 'cleaner'],
+        'locations' => [$location->id],
+        'work_type' => 'full_time',
+        'monthly_rate' => 15000,
+        'description' => 'Professional maid service',
         'experience_years' => 5,
         'bio' => 'Experienced helper',
         'nic' => $nicFile,
@@ -81,13 +69,20 @@ test('helpers can complete onboarding', function () {
 
     $response->assertStatus(200);
     
-    // Should create service listings grouped by common fields
-    $listings = ServiceListing::where('user_id', $helper->id)->get();
-    expect($listings)->toHaveCount(2); // Different work_type groups them separately
+    // Should create service listing
+    $helper->refresh();
+    $helper->load('profile');
+    $profile = $helper->profile;
+    expect($profile)->not->toBeNull();
     
-    // Check service types are attached
+    $listings = ServiceListing::where('profile_id', $profile->id)->get();
+    expect($listings)->toHaveCount(1);
+    
+    // Check service types are in JSON column
     $listing = $listings->first();
-    expect($listing->serviceTypes)->toHaveCount(1);
+    expect($listing->service_types)->toBeArray();
+    expect($listing->service_types)->toContain('maid');
+    expect($listing->service_types)->toContain('cleaner');
 });
 
 test('businesses can view onboarding page', function () {
@@ -115,15 +110,11 @@ test('businesses can complete onboarding', function () {
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->post('/api/onboarding/business', [
-        'services' => [
-            [
-                'service_type' => 'maid',
-                'work_type' => 'full_time',
-                'location_id' => $location->id,
-                'monthly_rate' => 15000,
-                'description' => 'Professional service',
-            ],
-        ],
+        'services' => ['maid'],
+        'locations' => [$location->id],
+        'work_type' => 'full_time',
+        'monthly_rate' => 15000,
+        'description' => 'Professional service',
         'bio' => 'Professional business',
         'city' => 'Karachi',
         'area' => 'Saddar',
@@ -138,7 +129,8 @@ test('businesses can complete onboarding', function () {
     expect($business->profile->bio)->toBe('Professional business');
     expect($business->profile->city)->toBe('Karachi');
     
-    $listings = ServiceListing::where('user_id', $business->id)->get();
+    $profile = $business->profile;
+    $listings = ServiceListing::where('profile_id', $profile->id)->get();
     expect($listings)->toHaveCount(1);
 });
 

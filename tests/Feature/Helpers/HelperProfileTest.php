@@ -101,16 +101,15 @@ test('helpers can update their profile', function () {
 test('helpers can see their service listings on profile', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
+    
+    // Create profile for helper
+    $profile = $helper->profile()->create([]);
 
     $listing = ServiceListing::factory()->create([
-        'user_id' => $helper->id,
+        'profile_id' => $profile->id,
+        'service_types' => ['maid'],
         'is_active' => true,
         'status' => 'active',
-    ]);
-
-    ServiceListingServiceType::create([
-        'service_listing_id' => $listing->id,
-        'service_type' => 'maid',
     ]);
 
     ServiceListingLocation::create([

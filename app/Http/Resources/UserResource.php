@@ -64,9 +64,11 @@ class UserResource extends JsonResource
             'is_active' => $this->when(isset($this->is_active), $this->is_active),
             'rating' => $this->when($this->profile, $this->rating),
             'total_reviews' => $this->when($this->profile, $this->total_reviews),
-            'profile' => $this->when($this->profile, [
-                'id' => $this->profile->id,
-            ]),
+            'profile' => $this->when($this->profile, function () {
+                return [
+                    'id' => $this->profile->id,
+                ];
+            }),
             // Service listings (if loaded)
             'service_listings' => $this->when($this->relationLoaded('serviceListings'), function () {
                 return $this->serviceListings->map(function ($listing) {
