@@ -7,4 +7,4 @@ use Illuminate\Support\Facades\Route;
 // React Router will handle client-side routing
 Route::get('/{any}', function () {
     return view('app');
-})->where('any', '^(?!api|sanctum|storage).*');
+})->where('any', '^(?!api|sanctum|storage|build).*');
