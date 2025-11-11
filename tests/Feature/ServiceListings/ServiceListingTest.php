@@ -125,8 +125,6 @@ test('helpers can view their own listings', function () {
 
     $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        $profile = $helper->profile()->create([]);
-        
         'profile_id' => $profile->id,
     ]);
 
@@ -142,8 +140,6 @@ test('helpers can update their service listings', function () {
 
     $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        $profile = $helper->profile()->create([]);
-        
         'profile_id' => $profile->id,
     ]);
 
@@ -190,8 +186,8 @@ test('service listings require service types', function () {
     $helper->assignRole('helper');
 
     // Helper needs to complete onboarding (have service listings)
-        $profile = $helper->profile()->create([]);
-        
+    $profile = $helper->profile()->create([]);
+    ServiceListing::factory()->create([
         'profile_id' => $profile->id,
     ]);
     
@@ -221,8 +217,8 @@ test('service listings require locations', function () {
     $helper->assignRole('helper');
 
     // Helper needs to complete onboarding (have service listings)
-        $profile = $helper->profile()->create([]);
-        
+    $profile = $helper->profile()->create([]);
+    ServiceListing::factory()->create([
         'profile_id' => $profile->id,
     ]);
     

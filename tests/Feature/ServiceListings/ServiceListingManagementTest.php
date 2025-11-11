@@ -97,11 +97,9 @@ test('helpers cannot edit other helpers service listings', function () {
     $helper2 = User::factory()->create();
     $helper2->assignRole('helper');
 
-    $profile = $helper->profile()->create([]);
+    $profile = $helper1->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        $profile = $helper->profile()->create([]);
-        
-        'profile_id' => $helper1->profile()->create([])->id,
+        'profile_id' => $profile->id,
     ]);
     
     $token = $helper2->createToken('test-token')->plainTextToken;
@@ -120,11 +118,9 @@ test('helpers cannot delete other helpers service listings', function () {
     $helper2 = User::factory()->create();
     $helper2->assignRole('helper');
 
-    $profile = $helper->profile()->create([]);
+    $profile = $helper1->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        $profile = $helper->profile()->create([]);
-        
-        'profile_id' => $helper1->profile()->create([])->id,
+        'profile_id' => $profile->id,
     ]);
     
     $token = $helper2->createToken('test-token')->plainTextToken;
@@ -141,11 +137,9 @@ test('businesses can view their service listings', function () {
     $business = User::factory()->create();
     $business->assignRole('business');
 
-    $profile = $helper->profile()->create([]);
+    $profile = $business->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        $profile = $helper->profile()->create([]);
-        
-        'profile_id' => $business->profile()->create([])->id,
+        'profile_id' => $profile->id,
     ]);
     
     $token = $business->createToken('test-token')->plainTextToken;
@@ -165,8 +159,6 @@ test('guests can view individual service listing', function () {
 
     $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
-        $profile = $helper->profile()->create([]);
-        
         'profile_id' => $profile->id,
         'is_active' => true,
         'status' => 'active',
