@@ -285,7 +285,7 @@ export default function BusinessShow() {
                         </div>
 
                         {/* Action Buttons */}
-                        {auth?.user && (
+                        {user && (
                             <div className="bg-white rounded-lg shadow-md p-6">
                                 <Link
                                     to={route("service-listings.index", {
