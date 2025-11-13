@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { route } from "@/utils/routes";
@@ -85,10 +84,6 @@ export default function PublicLayout({ children }) {
                             )}
                         </div>
 
-                        <div className="hidden lg:flex items-center">
-                            <LanguageSwitcher />
-                        </div>
-
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             className="lg:hidden text-gray-700 p-2"
@@ -139,9 +134,6 @@ export default function PublicLayout({ children }) {
                                     <Link to={route("register")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Register</Link>
                                 </>
                             )}
-                            <div className="px-4 py-2 border-t border-gray-200 mt-4">
-                                <LanguageSwitcher />
-                            </div>
                         </div>
                     )}
                 </div>
