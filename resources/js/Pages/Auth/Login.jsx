@@ -13,7 +13,8 @@ import { route } from "@/utils/routes";
 export default function Login() {
     const navigate = useNavigate();
     const { login, updateUser } = useAuth();
-    const [loginMethod, setLoginMethod] = useState("email"); // 'email' or 'phone'
+    const [loginMethod, setLoginMethod] = useState("phone"); // 'email' or 'phone'
+    const [authMethod, setAuthMethod] = useState("otp"); // 'otp' or 'password'
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
@@ -32,7 +33,7 @@ export default function Login() {
             const data = {
                 email: loginMethod === "email" ? email : "",
                 phone: loginMethod === "phone" ? phone : "",
-                password: password,
+                password: authMethod === "password" ? password : "",
                 remember: remember,
             };
 
@@ -151,7 +152,7 @@ export default function Login() {
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">📧</div>
-                                    <h3 className="font-bold text-base text-gray-900">Email</h3>
+                                    <h3 className={`font-bold text-base ${loginMethod === "email" ? "text-blue-600" : "text-gray-900"}`}>Email</h3>
                                 </button>
                                 <button
                                     type="button"
@@ -167,7 +168,43 @@ export default function Login() {
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">📱</div>
-                                    <h3 className="font-bold text-base text-gray-900">Phone</h3>
+                                    <h3 className={`font-bold text-base ${loginMethod === "phone" ? "text-blue-600" : "text-gray-900"}`}>Phone</h3>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Authenticate Method Selection */}
+                        <div>
+                            <InputLabel value="Authenticate with" className="text-gray-700 font-medium mb-4" />
+                            <div className="grid grid-cols-2 gap-4">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setAuthMethod("otp");
+                                        setPassword("");
+                                    }}
+                                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                                        authMethod === "otp"
+                                            ? "border-blue-500 bg-blue-50 shadow-lg"
+                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                    }`}
+                                >
+                                    <div className="text-2xl mb-2">💬</div>
+                                    <h3 className={`font-bold text-base ${authMethod === "otp" ? "text-blue-600" : "text-gray-900"}`}>OTP</h3>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setAuthMethod("password");
+                                    }}
+                                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                                        authMethod === "password"
+                                            ? "border-blue-500 bg-blue-50 shadow-lg"
+                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                    }`}
+                                >
+                                    <div className="text-2xl mb-2">🔒</div>
+                                    <h3 className={`font-bold text-base ${authMethod === "password" ? "text-blue-600" : "text-gray-900"}`}>Password</h3>
                                 </button>
                             </div>
                         </div>
@@ -192,63 +229,95 @@ export default function Login() {
                             ) : (
                                 <div>
                                     <InputLabel htmlFor="phone" value="Phone Number" className="text-gray-700 font-medium" />
-                                    <TextInput
-                                        id="phone"
-                                        type="tel"
-                                        name="phone"
-                                        value={phone}
-                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        autoComplete="tel"
-                                        isFocused={true}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        placeholder="+92 300 1234567"
-                                        required
-                                    />
+                                    <div className="mt-2 flex items-center gap-2">
+                                        <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-l-lg">
+                                            <span className="text-2xl">🇵🇰</span>
+                                            <span className="text-sm font-medium text-gray-700">+92</span>
+                                            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                        <TextInput
+                                            id="phone"
+                                            type="tel"
+                                            name="phone"
+                                            value={phone}
+                                            className="flex-1 rounded-r-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            autoComplete="tel"
+                                            isFocused={true}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            placeholder="Enter your phone number"
+                                            required
+                                        />
+                                    </div>
                                     <InputError message={errors.phone} className="mt-2" />
+                                    {authMethod === "otp" && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setPhone("9876543210")}
+                                            className="mt-2 w-full bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-lg hover:bg-green-100 transition-colors flex items-center justify-center gap-2"
+                                        >
+                                            <span>🔒</span>
+                                            <span className="text-sm font-medium">Use Demo Number: 9876543210</span>
+                                        </button>
+                                    )}
                                 </div>
                             )}
 
-                            <div>
-                                <InputLabel htmlFor="password" value="Password" className="text-gray-700 font-medium" />
-                                <TextInput
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    value={password}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    autoComplete="current-password"
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                                <InputError message={errors.password} className="mt-2" />
+                            {authMethod === "password" && (
+                                <div>
+                                    <InputLabel htmlFor="password" value="Password" className="text-gray-700 font-medium" />
+                                    <TextInput
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        value={password}
+                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        autoComplete="current-password"
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                    <InputError message={errors.password} className="mt-2" />
+                                </div>
+                            )}
+                        </div>
+
+                        {authMethod === "password" && (
+                            <div className="flex items-center justify-between">
+                                <label className="flex items-center">
+                                    <Checkbox
+                                        name="remember"
+                                        checked={remember}
+                                        onChange={(e) => setRemember(e.target.checked)}
+                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className="ml-2 text-sm text-gray-600">Remember me</span>
+                                </label>
+
+                                <Link
+                                    to="/forgot-password"
+                                    className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                                >
+                                    Forgot password?
+                                </Link>
                             </div>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <label className="flex items-center">
-                                <Checkbox
-                                    name="remember"
-                                    checked={remember}
-                                    onChange={(e) => setRemember(e.target.checked)}
-                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                            </label>
-
-                            <Link
-                                to="/forgot-password"
-                                className="text-sm font-medium text-blue-600 hover:text-blue-500"
-                            >
-                                Forgot password?
-                            </Link>
-                        </div>
+                        )}
 
                         <div>
                             <PrimaryButton
-                                className="w-full flex justify-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                                disabled={processing}
+                                className={`w-full flex justify-center text-white py-3 px-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 ${
+                                    authMethod === "otp"
+                                        ? "bg-gray-400 hover:bg-gray-500"
+                                        : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                                }`}
+                                disabled={processing || (authMethod === "otp" && !phone && !email)}
                             >
-                                {processing ? "Logging in..." : "Log in"}
+                                {processing 
+                                    ? "Processing..." 
+                                    : authMethod === "otp" 
+                                        ? "Send OTP" 
+                                        : "Log in"
+                                }
                             </PrimaryButton>
                         </div>
 
