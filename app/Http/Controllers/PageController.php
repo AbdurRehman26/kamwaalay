@@ -55,6 +55,65 @@ class PageController extends Controller
         return response()->json(['message' => 'Contact page content']);
     }
 
+    #[OA\Post(
+        path: "/api/contact",
+        summary: "Send contact form message",
+        description: "Submit a contact form message",
+        tags: ["Pages"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["name", "message"],
+                properties: [
+                    new OA\Property(property: "name", type: "string", description: "Contact name"),
+                    new OA\Property(property: "phone", type: "string", nullable: true, description: "Contact phone number"),
+                    new OA\Property(property: "message", type: "string", description: "Message content"),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Message sent successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Thank you for contacting us. We'll get back to you soon."),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Validation error",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string"),
+                        new OA\Property(property: "errors", type: "object"),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function sendContactMessage(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'message' => 'required|string|max:5000',
+        ]);
+
+        // In a real application, you would:
+        // 1. Store the message in a database
+        // 2. Send an email notification
+        // 3. Send a confirmation email to the user
+        
+        // For now, we'll just log it and return success
+        \Log::info('Contact form submission', $validated);
+
+        return response()->json([
+            'message' => 'Thank you for contacting us. We\'ll get back to you soon.',
+        ], 200);
+    }
+
     #[OA\Get(
         path: "/api/faq",
         summary: "Get FAQ page",

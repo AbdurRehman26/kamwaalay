@@ -5,6 +5,7 @@ export const routes = {
     register: () => "/register",
     verifyOtp: () => "/verify-otp",
     dashboard: () => "/dashboard",
+    messages: () => "/messages",
     profile: {
         edit: () => "/profile",
     },

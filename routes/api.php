@@ -19,7 +19,9 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\MessageController;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -34,6 +36,9 @@ use Illuminate\Http\Request;
 |
 */
 
+// Broadcasting authentication
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
 // Language routes
 Route::post('/locale/{locale}', [LanguageController::class, 'switch']);
 Route::get('/translations/{locale?}', [LanguageController::class, 'translations']);
@@ -42,6 +47,7 @@ Route::get('/translations/{locale?}', [LanguageController::class, 'translations'
 Route::get('/home', [HomeController::class, 'index']);
 Route::get('/about', [PageController::class, 'about']);
 Route::get('/contact', [PageController::class, 'contact']);
+Route::post('/contact', [PageController::class, 'sendContactMessage']);
 Route::get('/faq', [PageController::class, 'faq']);
 Route::get('/terms', [PageController::class, 'terms']);
 Route::get('/privacy', [PageController::class, 'privacy']);
@@ -185,4 +191,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/documents', [AdminController::class, 'documents']);
         Route::patch('/documents/{document}/status', [AdminController::class, 'updateDocumentStatus']);
     });
+
+    // Messages/Chat routes
+    Route::get('/conversations', [MessageController::class, 'getConversations']);
+    Route::get('/conversations/{conversation}/messages', [MessageController::class, 'getMessages']);
+    Route::post('/messages', [MessageController::class, 'sendMessage']);
 });

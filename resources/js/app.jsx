@@ -41,6 +41,7 @@ import PageContact from "./Pages/Pages/Contact";
 import PageFAQ from "./Pages/Pages/FAQ";
 import PageTerms from "./Pages/Pages/Terms";
 import PagePrivacy from "./Pages/Pages/Privacy";
+import MessagesIndex from "./Pages/Messages/Index";
 
 // Routes Component (inside providers)
 function AppRoutes() {
@@ -200,6 +201,11 @@ function AppRoutes() {
                     <Route path="/onboarding/business" element={
                         <ProtectedRoute>
                             <OnboardingBusiness />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/messages" element={
+                        <ProtectedRoute>
+                            <MessagesIndex />
                         </ProtectedRoute>
                     } />
                     

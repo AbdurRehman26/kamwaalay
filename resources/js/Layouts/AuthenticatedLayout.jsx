@@ -34,6 +34,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
+                                <NavLink
+                                    href={route("messages")}
+                                    active={location.pathname === route("messages")}
+                                >
+                                    Messages
+                                </NavLink>
                                 {user && (user.role === "helper" || user.role === "business") && (
                                     <>
                                         <NavLink
@@ -182,6 +188,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={location.pathname === route("dashboard")}
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("messages")}
+                            active={location.pathname === route("messages")}
+                        >
+                            Messages
                         </ResponsiveNavLink>
                         {user && (user.role === "helper" || user.role === "business") && (
                             <>
