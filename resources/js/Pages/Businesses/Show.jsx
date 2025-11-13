@@ -96,8 +96,77 @@ export default function BusinessShow() {
 
             <div className="container mx-auto px-4 py-12">
                 <div className="grid lg:grid-cols-3 gap-8">
-                    {/* Main Content */}
-                    <div className="lg:col-span-2 space-y-8">
+                    {/* Sidebar - Moved to Left */}
+                    <div className="space-y-6 order-2 lg:order-1">
+                        {/* Business Info */}
+                        <div className="bg-white rounded-lg shadow-md p-6">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">Business Information</h3>
+                            <div className="space-y-4">
+                                {business.email && (
+                                    <div>
+                                        <p className="text-sm text-gray-600">Email</p>
+                                        <p className="font-semibold text-gray-900">{business.email}</p>
+                                    </div>
+                                )}
+                                {business.phone && (
+                                    <div>
+                                        <p className="text-sm text-gray-600">Phone</p>
+                                        <p className="font-semibold text-gray-900">{business.phone}</p>
+                                    </div>
+                                )}
+                                {business.address && (
+                                    <div>
+                                        <p className="text-sm text-gray-600">Address</p>
+                                        <p className="font-semibold text-gray-900">{business.address}</p>
+                                    </div>
+                                )}
+                                {business.city && (
+                                    <div>
+                                        <p className="text-sm text-gray-600">Location</p>
+                                        <p className="font-semibold text-gray-900">{business.city}, {business.area || "N/A"}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Stats Card */}
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-md p-6">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">Business Stats</h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-600">Total Services</span>
+                                    <span className="font-bold text-blue-600 text-lg">{serviceListings.length}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-600">Active Workers</span>
+                                    <span className="font-bold text-blue-600 text-lg">{workers.length}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        {user && (
+                            <div className="bg-white rounded-lg shadow-md p-6">
+                                <Link
+                                    to={route("service-listings.index", {
+                                        user_id: business.id,
+                                    })}
+                                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
+                                >
+                                    View All Services
+                                </Link>
+                                <Link
+                                    to={route("bookings.create")}
+                                    className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-300 font-semibold text-center block"
+                                >
+                                    Request Service
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Main Content - Moved to Right */}
+                    <div className="lg:col-span-2 space-y-8 order-1 lg:order-2">
                         {/* Service Listings */}
                         {serviceListings && serviceListings.length > 0 && (
                             <div className="bg-white rounded-lg shadow-md p-8">
@@ -232,75 +301,6 @@ export default function BusinessShow() {
                                         </p>
                                     </div>
                                 )}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Sidebar */}
-                    <div className="space-y-6">
-                        {/* Business Info */}
-                        <div className="bg-white rounded-lg shadow-md p-6">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Business Information</h3>
-                            <div className="space-y-4">
-                                {business.email && (
-                                    <div>
-                                        <p className="text-sm text-gray-600">Email</p>
-                                        <p className="font-semibold text-gray-900">{business.email}</p>
-                                    </div>
-                                )}
-                                {business.phone && (
-                                    <div>
-                                        <p className="text-sm text-gray-600">Phone</p>
-                                        <p className="font-semibold text-gray-900">{business.phone}</p>
-                                    </div>
-                                )}
-                                {business.address && (
-                                    <div>
-                                        <p className="text-sm text-gray-600">Address</p>
-                                        <p className="font-semibold text-gray-900">{business.address}</p>
-                                    </div>
-                                )}
-                                {business.city && (
-                                    <div>
-                                        <p className="text-sm text-gray-600">Location</p>
-                                        <p className="font-semibold text-gray-900">{business.city}, {business.area || "N/A"}</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Stats Card */}
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-md p-6">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Business Stats</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-600">Total Services</span>
-                                    <span className="font-bold text-blue-600 text-lg">{serviceListings.length}</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-600">Active Workers</span>
-                                    <span className="font-bold text-blue-600 text-lg">{workers.length}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        {user && (
-                            <div className="bg-white rounded-lg shadow-md p-6">
-                                <Link
-                                    to={route("service-listings.index", {
-                                        user_id: business.id,
-                                    })}
-                                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
-                                >
-                                    View All Services
-                                </Link>
-                                <Link
-                                    to={route("bookings.create")}
-                                    className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-300 font-semibold text-center block"
-                                >
-                                    Request Service
-                                </Link>
                             </div>
                         )}
                     </div>

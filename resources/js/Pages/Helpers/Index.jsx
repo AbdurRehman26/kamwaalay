@@ -1,13 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import axios from "axios";
 import { helpersService } from "@/services/helpers";
 import { bookingsService } from "@/services/bookings";
+import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 
 export default function HelpersIndex({ helperId: initialHelperId, filters: initialFilters }) {
-    const [helpers, setHelpers] = useState({ data: [], links: {}, meta: {} });
+    const { user } = useAuth();
+    const navigate = useNavigate();
+    const [helpers, setHelpers] = useState({ data: [], links: [], meta: {} });
     const [filters, setFilters] = useState(initialFilters || {});
     const [loading, setLoading] = useState(true);
     const [serviceType, setServiceType] = useState(filters?.service_type || "");
@@ -26,6 +29,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
     const [locationFilterQuery, setLocationFilterQuery] = useState("");
     const [locationFilterSuggestions, setLocationFilterSuggestions] = useState([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const [formData, setFormData] = useState({
         service_type: "",
@@ -155,6 +159,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
             location_id: locationId || undefined,
             sort_by: sortBy,
             user_type: userType,
+            page: currentPage,
         };
 
         // Remove undefined values
@@ -163,18 +168,42 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         setLoading(true);
         helpersService.getHelpers(params)
             .then((data) => {
-                setHelpers(data.helpers || { data: [], links: {}, meta: {} });
+                // Handle pagination response structure
+                const helpersData = data.helpers || {};
+                // Ensure links is always an array
+                const helpersWithArrayLinks = {
+                    ...helpersData,
+                    data: helpersData.data || [],
+                    links: Array.isArray(helpersData.links) ? helpersData.links : [],
+                    meta: helpersData.meta || {},
+                    // Also support direct properties (Laravel pagination structure)
+                    total: helpersData.total || helpersData.meta?.total,
+                    from: helpersData.from || helpersData.meta?.from,
+                    to: helpersData.to || helpersData.meta?.to,
+                    current_page: helpersData.current_page || helpersData.meta?.current_page,
+                    last_page: helpersData.last_page || helpersData.meta?.last_page,
+                };
+                setHelpers(helpersWithArrayLinks);
                 setFilters(data.filters || {});
+                // Debug: Log pagination data
+                console.log('Helpers pagination data:', {
+                    links: helpersWithArrayLinks.links,
+                    linksLength: helpersWithArrayLinks.links?.length,
+                    meta: helpersWithArrayLinks.meta,
+                    total: helpersWithArrayLinks.total,
+                    last_page: helpersWithArrayLinks.last_page,
+                });
                 setLoading(false);
             })
             .catch((error) => {
                 console.error("Error fetching helpers:", error);
                 setLoading(false);
             });
-    }, [serviceType, locationId, sortBy, userType]);
+    }, [serviceType, locationId, sortBy, userType, currentPage]);
 
     const handleFilter = () => {
-        // Filters are applied via useEffect dependency
+        // Reset to first page when filters change
+        setCurrentPage(1);
         // Just update URL without navigation
         const params = new URLSearchParams();
         if (serviceType) params.append("service_type", serviceType);
@@ -184,8 +213,27 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         window.history.pushState({}, "", `${route("helpers.index")}?${params.toString()}`);
     };
 
+    const handlePageChange = (url) => {
+        if (!url) return;
+        
+        // Extract page number from URL
+        const urlObj = new URL(url, window.location.origin);
+        const page = urlObj.searchParams.get('page') || 1;
+        setCurrentPage(parseInt(page));
+        
+        // Scroll to top of results
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleBookingSubmit = async (e) => {
         e.preventDefault();
+        
+        // Check if user is authenticated
+        if (!user) {
+            navigate(route("login"));
+            return;
+        }
+        
         setProcessing(true);
         setFormErrors({});
 
@@ -254,7 +302,14 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-gray-900">Filter Helpers</h2>
                         <button
-                            onClick={() => setShowBookingForm(!showBookingForm)}
+                            onClick={() => {
+                                if (!user) {
+                                    // Redirect to login if not authenticated
+                                    navigate(route("login"));
+                                    return;
+                                }
+                                setShowBookingForm(!showBookingForm);
+                            }}
                             className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                         >
                             {showBookingForm ? "Cancel Booking" : "Post Service Request"}
@@ -345,7 +400,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 </div>
 
                 {/* Booking Form */}
-                {showBookingForm && (
+                {showBookingForm && user && (
                     <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
                         <h2 className="text-2xl font-bold mb-6 text-gray-900">Post Service Request</h2>
                         <form onSubmit={handleBookingSubmit}>
@@ -642,28 +697,29 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         </div>
 
                         {/* Pagination */}
-                        {helpers.links && helpers.links.length > 1 && (
+                        {helpers.links && Array.isArray(helpers.links) && helpers.links.length > 0 && (
                             <div className="mt-12">
                                 {/* Results Info */}
-                                {helpers.total !== undefined && (
+                                {helpers.meta && (helpers.meta.total !== undefined || helpers.total !== undefined) && (
                                     <div className="text-center mb-6 text-gray-600">
                                         <p className="text-sm">
-                                            Showing {helpers.from || 0} to {helpers.to || 0} of {helpers.total || 0} results
+                                            Showing {helpers.meta?.from || helpers.from || 0} to {helpers.meta?.to || helpers.to || 0} of {helpers.meta?.total || helpers.total || 0} results
                                         </p>
                                     </div>
                                 )}
                                 <div className="flex justify-center">
                                     <div className="flex flex-wrap gap-2 justify-center">
                                         {helpers.links.map((link, index) => (
-                                            <Link
+                                            <button
                                                 key={index}
-                                                to={link.url || "#"}
+                                                onClick={() => handlePageChange(link.url)}
+                                                disabled={!link.url || link.active}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
-                                                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg cursor-default"
                                                         : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
-                                                } ${!link.url && "cursor-not-allowed opacity-50"}`}
+                                                } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                                             />
                                         ))}
                                     </div>
@@ -684,6 +740,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 setLocationFilterQuery("");
                                 setUserType("all");
                                 setSortBy("rating");
+                                setCurrentPage(1);
                                 handleFilter();
                             }}
                             className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"

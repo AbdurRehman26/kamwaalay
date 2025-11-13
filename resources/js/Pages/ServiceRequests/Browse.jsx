@@ -20,6 +20,7 @@ export default function ServiceRequestsBrowse() {
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
     const locationFilterRef = useRef(null);
     const searchTimeoutRef = useRef(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const serviceTypes = [
         { value: "", label: "All Services" },
@@ -94,6 +95,7 @@ export default function ServiceRequestsBrowse() {
             service_type: serviceType || undefined,
             work_type: workType || undefined,
             location_id: locationId || undefined,
+            page: currentPage,
         };
         
         // Remove undefined values
@@ -102,7 +104,22 @@ export default function ServiceRequestsBrowse() {
         setLoading(true);
         bookingsService.browseBookings(params)
             .then((data) => {
-                setBookings(data.bookings || { data: [], links: [], meta: {} });
+                // Handle pagination response structure
+                const bookingsData = data.bookings || {};
+                // Ensure links is always an array
+                const bookingsWithArrayLinks = {
+                    ...bookingsData,
+                    data: bookingsData.data || [],
+                    links: Array.isArray(bookingsData.links) ? bookingsData.links : [],
+                    meta: bookingsData.meta || {},
+                    // Also support direct properties (Laravel pagination structure)
+                    total: bookingsData.total || bookingsData.meta?.total,
+                    from: bookingsData.from || bookingsData.meta?.from,
+                    to: bookingsData.to || bookingsData.meta?.to,
+                    current_page: bookingsData.current_page || bookingsData.meta?.current_page,
+                    last_page: bookingsData.last_page || bookingsData.meta?.last_page,
+                };
+                setBookings(bookingsWithArrayLinks);
                 setFilters(data.filters || {});
                 setLoading(false);
             })
@@ -110,10 +127,23 @@ export default function ServiceRequestsBrowse() {
                 console.error("Error fetching bookings:", error);
                 setLoading(false);
             });
-    }, [serviceType, workType, locationId]);
+    }, [serviceType, workType, locationId, currentPage]);
 
     const handleFilter = () => {
-        // Filters are applied via useEffect above
+        // Reset to first page when filters change
+        setCurrentPage(1);
+    };
+
+    const handlePageChange = (url) => {
+        if (!url) return;
+        
+        // Extract page number from URL
+        const urlObj = new URL(url, window.location.origin);
+        const page = urlObj.searchParams.get('page') || 1;
+        setCurrentPage(parseInt(page));
+        
+        // Scroll to top of results
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const getStatusColor = (status) => {
@@ -238,6 +268,7 @@ export default function ServiceRequestsBrowse() {
                                         setLocationId("");
                                         setLocationDisplay("");
                                         setLocationFilterQuery("");
+                                        setCurrentPage(1);
                                         handleFilter();
                                     }}
                                     className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-300 font-semibold"
@@ -330,28 +361,29 @@ export default function ServiceRequestsBrowse() {
                         </div>
 
                         {/* Pagination */}
-                        {bookings.links && bookings.links.length > 1 && (
+                        {bookings.links && Array.isArray(bookings.links) && bookings.links.length > 0 && (
                             <div className="mt-12">
                                 {/* Results Info */}
-                                {bookings.total !== undefined && (
+                                {bookings.meta && (bookings.meta.total !== undefined || bookings.total !== undefined) && (
                                     <div className="text-center mb-6 text-gray-600">
                                         <p className="text-sm">
-                                            Showing {bookings.from || 0} to {bookings.to || 0} of {bookings.total || 0} results
+                                            Showing {bookings.meta?.from || bookings.from || 0} to {bookings.meta?.to || bookings.to || 0} of {bookings.meta?.total || bookings.total || 0} results
                                         </p>
                                     </div>
                                 )}
                                 <div className="flex justify-center">
                                     <div className="flex flex-wrap gap-2 justify-center">
                                         {bookings.links.map((link, index) => (
-                                            <Link
+                                            <button
                                                 key={index}
-                                                to={link.url || "#"}
+                                                onClick={() => handlePageChange(link.url)}
+                                                disabled={!link.url || link.active}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
-                                                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg cursor-default"
                                                         : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
-                                                } ${!link.url && "cursor-not-allowed opacity-50"}`}
+                                                } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                                             />
                                         ))}
                                     </div>
