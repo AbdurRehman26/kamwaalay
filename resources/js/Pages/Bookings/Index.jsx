@@ -26,7 +26,7 @@ export default function BookingsIndex() {
             case "confirmed":
                 return "bg-green-100 text-green-800";
             case "in_progress":
-                return "bg-blue-100 text-blue-800";
+                return "bg-primary-100 text-primary-800";
             case "completed":
                 return "bg-gray-100 text-gray-800";
             case "cancelled":
@@ -38,7 +38,7 @@ export default function BookingsIndex() {
 
     return (
         <PublicLayout>
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <div className="flex justify-between items-center">
                         <div>
@@ -47,7 +47,7 @@ export default function BookingsIndex() {
                         </div>
                         <Link
                             to={route("bookings.create")}
-                            className="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition duration-300 font-semibold"
+                            className="bg-white text-primary-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition duration-300 font-semibold"
                         >
                             + New Request
                         </Link>
@@ -108,7 +108,7 @@ export default function BookingsIndex() {
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                 link.active
-                                                    ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                    ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg"
                                                     : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
                                             } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                         />
@@ -124,7 +124,7 @@ export default function BookingsIndex() {
                         <p className="text-gray-500 mb-8">Post your first service request to get started</p>
                         <Link
                             to={route("bookings.create")}
-                            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold inline-block"
+                            className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold inline-block"
                         >
                             Post Service Request
                         </Link>

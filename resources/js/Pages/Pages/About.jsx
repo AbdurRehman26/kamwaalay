@@ -5,7 +5,7 @@ export default function About() {
     return (
         <PublicLayout>
 
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
 valet                     <h1 className="text-4xl font-bold mb-4">About Kamwaalay</h1>
                 </div>
@@ -21,11 +21,11 @@ valet                     <h1 className="text-4xl font-bold mb-4">About Kamwaala
                         </p>
                         <h2 className="text-3xl font-bold mb-6">Why Choose Us</h2>
                         <div className="grid md:grid-cols-2 gap-6 mb-8">
-                            <div className="bg-blue-50 p-6 rounded-lg">
+                            <div className="bg-primary-50 p-6 rounded-lg">
                                 <h3 className="text-xl font-bold mb-2">Verified Helpers</h3>
                                 <p className="text-gray-700">All our helpers undergo thorough background checks and verification.</p>
                             </div>
-                            <div className="bg-blue-50 p-6 rounded-lg">
+                            <div className="bg-primary-50 p-6 rounded-lg">
                                 <h3 className="text-xl font-bold mb-2">Quick Booking</h3>
                                 <p className="text-gray-700">Find and book your perfect helper in minutes.</p>
                             </div>

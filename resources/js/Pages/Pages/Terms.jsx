@@ -5,7 +5,7 @@ export default function Terms() {
     return (
         <PublicLayout>
 
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Terms & Conditions</h1>
                 </div>

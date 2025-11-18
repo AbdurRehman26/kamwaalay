@@ -38,7 +38,7 @@ export default function MyApplications() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">My Applications</h1>
                     <p className="text-xl text-white/90">Track your job applications</p>
@@ -79,7 +79,7 @@ export default function MyApplications() {
                                     <div className="flex gap-2 ml-4">
                                         <Link
                                             to={route("job-applications.show", application.id)}
-                                            className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-300 font-medium text-sm"
+                                            className="bg-primary-100 text-primary-600 px-4 py-2 rounded-lg hover:bg-primary-200 transition duration-300 font-medium text-sm"
                                         >
                                             View
                                         </Link>
@@ -118,7 +118,7 @@ export default function MyApplications() {
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                 link.active
-                                                    ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                    ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg"
                                                     : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
                                             } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                         />
@@ -134,7 +134,7 @@ export default function MyApplications() {
                         <p className="text-gray-500 mb-8">Browse service requests and apply to find work</p>
                         <Link
                             to={route("job-applications.index")}
-                            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold inline-block"
+                            className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold inline-block"
                         >
                             Browse Requests
                         </Link>

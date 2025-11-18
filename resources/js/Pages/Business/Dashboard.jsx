@@ -67,7 +67,7 @@ export default function BusinessDashboard() {
                     {/* Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                         <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                            <div className="text-2xl font-bold text-blue-600 mb-2">{stats?.total_workers || 0}</div>
+                            <div className="text-2xl font-bold text-primary-600 mb-2">{stats?.total_workers || 0}</div>
                             <div className="text-gray-600">Total Workers</div>
                         </div>
                         <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
@@ -79,11 +79,11 @@ export default function BusinessDashboard() {
                             <div className="text-gray-600">Pending</div>
                         </div>
                         <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                            <div className="text-2xl font-bold text-blue-600 mb-2">{stats?.verified_workers || 0}</div>
+                            <div className="text-2xl font-bold text-primary-600 mb-2">{stats?.verified_workers || 0}</div>
                             <div className="text-gray-600">Verified</div>
                         </div>
                         <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                            <div className="text-2xl font-bold text-blue-600 mb-2">{stats?.total_bookings || 0}</div>
+                            <div className="text-2xl font-bold text-primary-600 mb-2">{stats?.total_bookings || 0}</div>
                             <div className="text-gray-600">Bookings</div>
                         </div>
                     </div>
@@ -95,7 +95,7 @@ export default function BusinessDashboard() {
                                 <h3 className="text-lg font-semibold">Recent Workers</h3>
                                 <Link
                                     to={route("business.workers")}
-                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                    className="text-primary-600 hover:text-primary-800 text-sm font-medium"
                                 >
                                     View All
                                 </Link>
@@ -127,7 +127,7 @@ export default function BusinessDashboard() {
                                     <p>No workers yet</p>
                                     <Link
                                         to={route("business.workers.create")}
-                                        className="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium"
+                                        className="mt-4 inline-block text-primary-600 hover:text-primary-800 font-medium"
                                     >
                                         Add Your First Worker
                                     </Link>
@@ -141,7 +141,7 @@ export default function BusinessDashboard() {
                                 <h3 className="text-lg font-semibold">Recent Bookings</h3>
                                 <Link
                                     to={route("bookings.index")}
-                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                    className="text-primary-600 hover:text-primary-800 text-sm font-medium"
                                 >
                                     View All
                                 </Link>
@@ -170,7 +170,7 @@ export default function BusinessDashboard() {
                     <div className="mt-8">
                         <Link
                             to={route("business.workers.create")}
-                            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-300 shadow-lg"
+                            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg hover:from-primary-700 hover:to-primary-800 transition duration-300 shadow-lg"
                         >
                             ➕ Add New Worker
                         </Link>

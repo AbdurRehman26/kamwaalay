@@ -96,7 +96,7 @@ export default function Register() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-primary-100 to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-2xl w-full space-y-8">
                     <div>
                         <h2 className="mt-6 text-center text-4xl font-extrabold text-gray-900">
@@ -106,7 +106,7 @@ export default function Register() {
                             Already have an account?{" "}
                             <Link
                                 to={route("login")}
-                                className="font-medium text-blue-600 hover:text-blue-500"
+                                className="font-medium text-primary-600 hover:text-primary-500"
                             >
                                 Sign in
                             </Link>
@@ -143,8 +143,8 @@ export default function Register() {
                                     }}
                                     className={`p-4 rounded-xl border-2 transition-all duration-300 ${
                                         signupMethod === "email"
-                                            ? "border-blue-500 bg-blue-50 shadow-lg"
-                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                            ? "border-primary-500 bg-primary-50 shadow-lg"
+                                            : "border-gray-200 hover:border-primary-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">📧</div>
@@ -159,8 +159,8 @@ export default function Register() {
                                     }}
                                     className={`p-4 rounded-xl border-2 transition-all duration-300 ${
                                         signupMethod === "phone"
-                                            ? "border-blue-500 bg-blue-50 shadow-lg"
-                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                            ? "border-primary-500 bg-primary-50 shadow-lg"
+                                            : "border-gray-200 hover:border-primary-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">📱</div>
@@ -178,8 +178,8 @@ export default function Register() {
                                     onClick={() => handleRoleChange("user")}
                                     className={`p-6 rounded-xl border-2 transition-all duration-300 ${
                                         selectedRole === "user"
-                                            ? "border-blue-500 bg-blue-50 shadow-lg"
-                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                            ? "border-primary-500 bg-primary-50 shadow-lg"
+                                            : "border-gray-200 hover:border-primary-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-4xl mb-3">👤</div>
@@ -191,8 +191,8 @@ export default function Register() {
                                     onClick={() => handleRoleChange("helper")}
                                     className={`p-6 rounded-xl border-2 transition-all duration-300 ${
                                         selectedRole === "helper"
-                                            ? "border-blue-500 bg-blue-50 shadow-lg"
-                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                            ? "border-primary-500 bg-primary-50 shadow-lg"
+                                            : "border-gray-200 hover:border-primary-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-4xl mb-3">💼</div>
@@ -204,8 +204,8 @@ export default function Register() {
                                     onClick={() => handleRoleChange("business")}
                                     className={`p-6 rounded-xl border-2 transition-all duration-300 ${
                                         selectedRole === "business"
-                                            ? "border-blue-500 bg-blue-50 shadow-lg"
-                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                            ? "border-primary-500 bg-primary-50 shadow-lg"
+                                            : "border-gray-200 hover:border-primary-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-4xl mb-3">🏢</div>
@@ -223,7 +223,7 @@ export default function Register() {
                                     id="name"
                                     name="name"
                                     value={formData.name}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                     autoComplete="name"
                                     isFocused={true}
                                     onChange={(e) => handleInputChange("name", e.target.value)}
@@ -240,7 +240,7 @@ export default function Register() {
                                         type="email"
                                         name="email"
                                         value={formData.email}
-                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                         autoComplete="username"
                                         onChange={(e) => handleInputChange("email", e.target.value)}
                                         required
@@ -255,7 +255,7 @@ export default function Register() {
                                         type="tel"
                                         name="phone"
                                         value={formData.phone}
-                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                         autoComplete="tel"
                                         onChange={(e) => handleInputChange("phone", e.target.value)}
                                         placeholder="+92 300 1234567"
@@ -272,7 +272,7 @@ export default function Register() {
                                     type="text"
                                     name="address"
                                     value={formData.address}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                     autoComplete="street-address"
                                     onChange={(e) => handleInputChange("address", e.target.value)}
                                     placeholder="Your address (optional)"
@@ -287,7 +287,7 @@ export default function Register() {
                                     type="password"
                                     name="password"
                                     value={formData.password}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                     autoComplete="new-password"
                                     onChange={(e) => handleInputChange("password", e.target.value)}
                                     required
@@ -306,7 +306,7 @@ export default function Register() {
                                     type="password"
                                     name="password_confirmation"
                                     value={formData.password_confirmation}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                     autoComplete="new-password"
                                     onChange={(e) => handleInputChange("password_confirmation", e.target.value)}
                                     required
@@ -320,7 +320,7 @@ export default function Register() {
 
                         <div>
                             <PrimaryButton
-                                className="w-full flex justify-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex justify-center bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white py-3 px-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={processing}
                             >
                                 {processing ? (
@@ -347,11 +347,11 @@ export default function Register() {
                         <div className="text-center">
                             <p className="text-sm text-gray-600">
                                 By registering, you agree to our{" "}
-                                <Link to={route("terms")} className="text-blue-600 hover:text-blue-500">
+                                <Link to={route("terms")} className="text-primary-600 hover:text-primary-500">
                                     Terms
                                 </Link>{" "}
                                 and{" "}
-                                <Link to={route("privacy")} className="text-blue-600 hover:text-blue-500">
+                                <Link to={route("privacy")} className="text-primary-600 hover:text-primary-500">
                                     Privacy Policy
                                 </Link>
                             </p>

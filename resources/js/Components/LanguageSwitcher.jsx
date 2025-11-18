@@ -17,8 +17,8 @@ export default function LanguageSwitcher() {
                 onClick={() => handleSwitchLanguage("en")}
                 className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                     locale === "en"
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                        ? "bg-primary-600 text-white"
+                        : "text-gray-700 hover:text-primary-600 hover:bg-primary-50"
                 }`}
             >
                 English
@@ -27,8 +27,8 @@ export default function LanguageSwitcher() {
                 onClick={() => handleSwitchLanguage("ur")}
                 className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                     locale === "ur"
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                        ? "bg-primary-600 text-white"
+                        : "text-gray-700 hover:text-primary-600 hover:bg-primary-50"
                 }`}
             >
                 اردو

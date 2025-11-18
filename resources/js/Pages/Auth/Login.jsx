@@ -101,7 +101,7 @@ export default function Login() {
     return (
         <PublicLayout>
 
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-primary-100 to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full space-y-8">
                     <div>
                         <h2 className="mt-6 text-center text-4xl font-extrabold text-gray-900">
@@ -111,7 +111,7 @@ export default function Login() {
                             Or{" "}
                             <Link
                                 to={route("register")}
-                                className="font-medium text-blue-600 hover:text-blue-500"
+                                className="font-medium text-primary-600 hover:text-primary-500"
                             >
                                 create a new account
                             </Link>
@@ -147,12 +147,12 @@ export default function Login() {
                                     }}
                                     className={`p-4 rounded-xl border-2 transition-all duration-300 ${
                                         loginMethod === "email"
-                                            ? "border-blue-500 bg-blue-50 shadow-lg"
-                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                            ? "border-primary-500 bg-primary-50 shadow-lg"
+                                            : "border-gray-200 hover:border-primary-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">📧</div>
-                                    <h3 className={`font-bold text-base ${loginMethod === "email" ? "text-blue-600" : "text-gray-900"}`}>Email</h3>
+                                    <h3 className={`font-bold text-base ${loginMethod === "email" ? "text-primary-600" : "text-gray-900"}`}>Email</h3>
                                 </button>
                                 <button
                                     type="button"
@@ -163,12 +163,12 @@ export default function Login() {
                                     }}
                                     className={`p-4 rounded-xl border-2 transition-all duration-300 ${
                                         loginMethod === "phone"
-                                            ? "border-blue-500 bg-blue-50 shadow-lg"
-                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                            ? "border-primary-500 bg-primary-50 shadow-lg"
+                                            : "border-gray-200 hover:border-primary-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">📱</div>
-                                    <h3 className={`font-bold text-base ${loginMethod === "phone" ? "text-blue-600" : "text-gray-900"}`}>Phone</h3>
+                                    <h3 className={`font-bold text-base ${loginMethod === "phone" ? "text-primary-600" : "text-gray-900"}`}>Phone</h3>
                                 </button>
                             </div>
                         </div>
@@ -185,12 +185,12 @@ export default function Login() {
                                     }}
                                     className={`p-4 rounded-xl border-2 transition-all duration-300 ${
                                         authMethod === "otp"
-                                            ? "border-blue-500 bg-blue-50 shadow-lg"
-                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                            ? "border-primary-500 bg-primary-50 shadow-lg"
+                                            : "border-gray-200 hover:border-primary-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">💬</div>
-                                    <h3 className={`font-bold text-base ${authMethod === "otp" ? "text-blue-600" : "text-gray-900"}`}>OTP</h3>
+                                    <h3 className={`font-bold text-base ${authMethod === "otp" ? "text-primary-600" : "text-gray-900"}`}>OTP</h3>
                                 </button>
                                 <button
                                     type="button"
@@ -199,12 +199,12 @@ export default function Login() {
                                     }}
                                     className={`p-4 rounded-xl border-2 transition-all duration-300 ${
                                         authMethod === "password"
-                                            ? "border-blue-500 bg-blue-50 shadow-lg"
-                                            : "border-gray-200 hover:border-blue-300 bg-white"
+                                            ? "border-primary-500 bg-primary-50 shadow-lg"
+                                            : "border-gray-200 hover:border-primary-300 bg-white"
                                     }`}
                                 >
                                     <div className="text-2xl mb-2">🔒</div>
-                                    <h3 className={`font-bold text-base ${authMethod === "password" ? "text-blue-600" : "text-gray-900"}`}>Password</h3>
+                                    <h3 className={`font-bold text-base ${authMethod === "password" ? "text-primary-600" : "text-gray-900"}`}>Password</h3>
                                 </button>
                             </div>
                         </div>
@@ -218,7 +218,7 @@ export default function Login() {
                                         type="email"
                                         name="email"
                                         value={email}
-                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                         autoComplete="username"
                                         isFocused={true}
                                         onChange={(e) => setEmail(e.target.value)}
@@ -242,7 +242,7 @@ export default function Login() {
                                             type="tel"
                                             name="phone"
                                             value={phone}
-                                            className="flex-1 rounded-r-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            className="flex-1 rounded-r-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                             autoComplete="tel"
                                             isFocused={true}
                                             onChange={(e) => setPhone(e.target.value)}
@@ -272,7 +272,7 @@ export default function Login() {
                                         type="password"
                                         name="password"
                                         value={password}
-                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                         autoComplete="current-password"
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
@@ -289,14 +289,14 @@ export default function Login() {
                                         name="remember"
                                         checked={remember}
                                         onChange={(e) => setRemember(e.target.checked)}
-                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                                     />
                                     <span className="ml-2 text-sm text-gray-600">Remember me</span>
                                 </label>
 
                                 <Link
                                     to="/forgot-password"
-                                    className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                                    className="text-sm font-medium text-primary-600 hover:text-primary-500"
                                 >
                                     Forgot password?
                                 </Link>
@@ -308,7 +308,7 @@ export default function Login() {
                                 className={`w-full flex justify-center text-white py-3 px-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 ${
                                     authMethod === "otp"
                                         ? "bg-gray-400 hover:bg-gray-500"
-                                        : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                                        : "bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800"
                                 }`}
                                 disabled={processing || (authMethod === "otp" && !phone && !email)}
                             >
@@ -326,7 +326,7 @@ export default function Login() {
                                 Don't have an account?{" "}
                                 <Link
                                     to={route("register")}
-                                    className="font-medium text-blue-600 hover:text-blue-500"
+                                    className="font-medium text-primary-600 hover:text-primary-500"
                                 >
                                     Sign up
                                 </Link>

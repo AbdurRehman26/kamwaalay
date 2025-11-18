@@ -239,7 +239,7 @@ export default function ServiceListingEdit() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Edit Service Listing</h1>
                 </div>
@@ -260,14 +260,14 @@ export default function ServiceListingEdit() {
                                             return (
                                                 <span
                                                     key={serviceType}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold"
+                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-800 rounded-full text-sm font-semibold"
                                                 >
                                                     <span>{service?.icon}</span>
                                                     <span>{service?.label}</span>
                                                     <button
                                                         type="button"
                                                         onClick={() => removeServiceType(serviceType)}
-                                                        className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                                                        className="ml-1 text-primary-600 hover:text-primary-800 font-bold"
                                                     >
                                                         ×
                                                     </button>
@@ -288,8 +288,8 @@ export default function ServiceListingEdit() {
                                         disabled={selectedServiceTypes.includes(service.value)}
                                         className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
                                             selectedServiceTypes.includes(service.value)
-                                                ? "border-blue-500 bg-blue-50 opacity-50 cursor-not-allowed"
-                                                : "border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
+                                                ? "border-primary-500 bg-primary-50 opacity-50 cursor-not-allowed"
+                                                : "border-gray-200 hover:border-primary-300 hover:bg-primary-50 cursor-pointer"
                                         }`}
                                     >
                                         <div className="text-3xl mb-2">{service.icon}</div>
@@ -356,7 +356,7 @@ export default function ServiceListingEdit() {
                                             setShowLocationSuggestions(true);
                                         }
                                     }}
-                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
+                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 px-4 py-3"
                                     placeholder="Search location (e.g., Karachi, Clifton or type area name)..."
                                 />
                                 {showLocationSuggestions && locationSuggestions.length > 0 && (
@@ -367,7 +367,7 @@ export default function ServiceListingEdit() {
                                                 <div
                                                     key={index}
                                                     onClick={() => handleLocationSelect(suggestion)}
-                                                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                    className="px-4 py-2 hover:bg-primary-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                                                 >
                                                     {suggestion.display_text}
                                                 </div>
@@ -392,7 +392,7 @@ export default function ServiceListingEdit() {
                                     <select
                                         value={data.work_type}
                                         onChange={(e) => setData({ ...data, work_type: e.target.value })}
-                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         required
                                     >
                                         <option value="">Select Type</option>
@@ -409,7 +409,7 @@ export default function ServiceListingEdit() {
                                         step="0.01"
                                         value={data.monthly_rate}
                                         onChange={(e) => setData({ ...data, monthly_rate: e.target.value })}
-                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         placeholder="e.g., 500"
                                     />
                                     {errors.monthly_rate && <div className="text-red-500 text-sm mt-1">{errors.monthly_rate}</div>}
@@ -420,7 +420,7 @@ export default function ServiceListingEdit() {
                                     <select
                                         value={data.status}
                                         onChange={(e) => setData({ ...data, status: e.target.value })}
-                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         required
                                     >
                                         <option value="active">Active</option>
@@ -435,7 +435,7 @@ export default function ServiceListingEdit() {
                                         type="checkbox"
                                         checked={data.is_active}
                                         onChange={(e) => setData({ ...data, is_active: e.target.checked })}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                                     />
                                     <label className="ml-2 block text-sm text-gray-700">Active Listing</label>
                                 </div>
@@ -446,7 +446,7 @@ export default function ServiceListingEdit() {
                                         value={data.description}
                                         onChange={(e) => setData({ ...data, description: e.target.value })}
                                         rows={6}
-                                        className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         placeholder="Describe the services you offer, your experience, skills, etc..."
                                     />
                                     {errors.description && <div className="text-red-500 text-sm mt-1">{errors.description}</div>}
@@ -461,7 +461,7 @@ export default function ServiceListingEdit() {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold disabled:opacity-50"
+                                    className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition duration-300 font-semibold disabled:opacity-50"
                                 >
                                     {processing ? "Updating..." : "Update Service Listing"}
                                 </button>

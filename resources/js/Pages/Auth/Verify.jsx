@@ -203,7 +203,7 @@ export default function Verify() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-primary-100 to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full space-y-8">
                     <div>
                         <h2 className="mt-6 text-center text-4xl font-extrabold text-gray-900">
@@ -217,7 +217,7 @@ export default function Verify() {
                             {!is_login && identifier && (
                                 <>
                                     <br />
-                                    <span className="font-semibold text-blue-600">{identifier}</span>
+                                    <span className="font-semibold text-primary-600">{identifier}</span>
                                 </>
                             )}
                         </p>
@@ -247,7 +247,7 @@ export default function Verify() {
                                 name="otp"
                                 type="text"
                                 value={otp}
-                                className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-center text-2xl tracking-widest font-bold"
+                                className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-center text-2xl tracking-widest font-bold"
                                 placeholder="000000"
                                 maxLength={6}
                                 autoComplete="one-time-code"
@@ -269,7 +269,7 @@ export default function Verify() {
                         {timeLeft > 0 && (
                             <div className="text-center">
                                 <p className="text-sm text-gray-600">
-                                    Code expires in: <span className="font-semibold text-blue-600">{formatTime(timeLeft)}</span>
+                                    Code expires in: <span className="font-semibold text-primary-600">{formatTime(timeLeft)}</span>
                                 </p>
                             </div>
                         )}
@@ -284,7 +284,7 @@ export default function Verify() {
 
                         <div>
                             <PrimaryButton
-                                className="w-full flex justify-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex justify-center bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white py-3 px-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={processing || otp.length !== 6}
                             >
                                 {processing ? (
@@ -306,7 +306,7 @@ export default function Verify() {
                                 type="button"
                                 onClick={handleResend}
                                 disabled={timeLeft > 0 || processing}
-                                className="text-sm font-medium text-blue-600 hover:text-blue-500 disabled:text-gray-400 disabled:cursor-not-allowed"
+                                className="text-sm font-medium text-primary-600 hover:text-primary-500 disabled:text-gray-400 disabled:cursor-not-allowed"
                             >
                                 {timeLeft > 0 ? (
                                     <>Resend code in {formatTime(timeLeft)}</>
@@ -321,14 +321,14 @@ export default function Verify() {
                                 {is_login ? (
                                     <Link
                                         to="/login"
-                                        className="font-medium text-blue-600 hover:text-blue-500"
+                                        className="font-medium text-primary-600 hover:text-primary-500"
                                     >
                                         Back to login
                                     </Link>
                                 ) : (
                                     <Link
                                         to="/register"
-                                        className="font-medium text-blue-600 hover:text-blue-500"
+                                        className="font-medium text-primary-600 hover:text-primary-500"
                                     >
                                         Back to registration
                                     </Link>

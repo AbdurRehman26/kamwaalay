@@ -178,7 +178,7 @@ export default function MessagesIndex() {
                                                 key={conversation.id}
                                                 onClick={() => handleSelectConversation(conversation)}
                                                 className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
-                                                    selectedConversation?.id === conversation.id ? "bg-blue-50" : ""
+                                                    selectedConversation?.id === conversation.id ? "bg-primary-50" : ""
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-3">
@@ -201,7 +201,7 @@ export default function MessagesIndex() {
                                                                 {conversation.other_user.name}
                                                             </p>
                                                             {conversation.unread_count > 0 && (
-                                                                <span className="flex-shrink-0 bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                                                                <span className="flex-shrink-0 bg-primary-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
                                                                     {conversation.unread_count}
                                                                 </span>
                                                             )}
@@ -255,14 +255,14 @@ export default function MessagesIndex() {
                                                         <div
                                                             className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                                                                 isOwnMessage
-                                                                    ? "bg-blue-600 text-white"
+                                                                    ? "bg-primary-600 text-white"
                                                                     : "bg-gray-200 text-gray-900"
                                                             }`}
                                                         >
                                                             <p className="text-sm">{message.message}</p>
                                                             <p
                                                                 className={`text-xs mt-1 ${
-                                                                    isOwnMessage ? "text-blue-100" : "text-gray-500"
+                                                                    isOwnMessage ? "text-primary-100" : "text-gray-500"
                                                                 }`}
                                                             >
                                                                 {new Date(message.created_at).toLocaleTimeString([], {
@@ -285,13 +285,13 @@ export default function MessagesIndex() {
                                                     value={newMessage}
                                                     onChange={(e) => setNewMessage(e.target.value)}
                                                     placeholder="Type a message..."
-                                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
                                                     disabled={sending}
                                                 />
                                                 <button
                                                     type="submit"
                                                     disabled={!newMessage.trim() || sending}
-                                                    className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                    className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                                 >
                                                     {sending ? "Sending..." : "Send"}
                                                 </button>

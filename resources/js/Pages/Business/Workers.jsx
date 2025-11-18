@@ -73,7 +73,7 @@ export default function Workers() {
                         </div>
                         <Link
                             to={route("business.workers.create")}
-                            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
+                            className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold"
                         >
                             ➕ Add Worker
                         </Link>
@@ -85,7 +85,7 @@ export default function Workers() {
                                 {workers.data.map((worker) => (
                                     <div key={worker.id} className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
                                         <div className="flex items-center justify-between mb-4">
-                                            <div className="h-20 w-20 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center overflow-hidden">
+                                            <div className="h-20 w-20 bg-gradient-to-br from-primary-400 to-primary-500 rounded-full flex items-center justify-center overflow-hidden">
                                                 {worker.photo ? (
                                                     <img src={`/storage/${worker.photo}`} alt={worker.user?.name} className="w-full h-full object-cover" />
                                                 ) : (
@@ -111,7 +111,7 @@ export default function Workers() {
                                         <div className="flex gap-2">
                                             <Link
                                                 to={route("business.workers.edit", worker.id)}
-                                                className="flex-1 text-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                                                className="flex-1 text-center bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
                                             >
                                                 Edit
                                             </Link>
@@ -137,7 +137,7 @@ export default function Workers() {
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
-                                                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                        ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg"
                                                         : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
                                                 } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                             />
@@ -153,7 +153,7 @@ export default function Workers() {
                             <p className="text-gray-600 mb-6">Start building your agency by adding your first worker</p>
                             <Link
                                 to={route("business.workers.create")}
-                                className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
+                                className="inline-block bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold"
                             >
                                 Add Your First Worker
                             </Link>

@@ -44,7 +44,7 @@ export default function Contact() {
     return (
         <PublicLayout>
 
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
                     <p className="text-xl text-white/90">We'd love to hear from you</p>
@@ -66,7 +66,7 @@ export default function Contact() {
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                     required
                                 />
                                 <InputError message={errors.name} className="mt-2" />
@@ -78,7 +78,7 @@ export default function Contact() {
                                     type="tel"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                     placeholder="+92 300 1234567"
                                 />
                                 <InputError message={errors.phone} className="mt-2" />
@@ -90,7 +90,7 @@ export default function Contact() {
                                     value={formData.message}
                                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                     rows={6}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                     required
                                 />
                                 <InputError message={errors.message} className="mt-2" />
@@ -98,7 +98,7 @@ export default function Contact() {
                             <PrimaryButton
                                 type="submit"
                                 disabled={processing}
-                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-300 font-semibold shadow-lg hover:shadow-xl"
+                                className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition duration-300 font-semibold shadow-lg hover:shadow-xl"
                             >
                                 {processing ? "Sending..." : "Send Message"}
                             </PrimaryButton>
@@ -108,14 +108,14 @@ export default function Contact() {
                         <div className="bg-white rounded-lg shadow-md p-6 text-center">
                             <div className="text-4xl mb-3">📧</div>
                             <h3 className="font-bold text-gray-900 mb-2">Email</h3>
-                            <a href="mailto:contact@kamwaalay.com" className="text-blue-600 hover:text-blue-800 transition-colors">
+                            <a href="mailto:contact@kamwaalay.com" className="text-primary-600 hover:text-primary-800 transition-colors">
                                 contact@kamwaalay.com
                             </a>
                         </div>
                         <div className="bg-white rounded-lg shadow-md p-6 text-center">
                             <div className="text-4xl mb-3">📞</div>
                             <h3 className="font-bold text-gray-900 mb-2">Phone</h3>
-                            <a href="tel:+923001234567" className="text-blue-600 hover:text-blue-800 transition-colors">
+                            <a href="tel:+923001234567" className="text-primary-600 hover:text-primary-800 transition-colors">
                                 +92 300 1234567
                             </a>
                         </div>

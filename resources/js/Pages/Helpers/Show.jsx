@@ -56,7 +56,7 @@ export default function HelperShow() {
             
             
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-16">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row gap-8 items-center">
                         <div className="flex-shrink-0">
@@ -87,7 +87,7 @@ export default function HelperShow() {
                                     </span>
                                 )}
                                 {helper.police_verified && (
-                                    <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                    <span className="bg-primary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                                         👮 Police Verified
                                     </span>
                                 )}
@@ -115,18 +115,18 @@ export default function HelperShow() {
                                         <Link
                                             key={listing.id}
                                             to={route("service-listings.show", listing.id)}
-                                            className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-blue-300"
+                                            className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-primary-300"
                                         >
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex flex-wrap gap-2">
                                                     {listing.service_types && listing.service_types.length > 0 ? (
                                                         listing.service_types.map((serviceType, idx) => (
-                                                            <span key={idx} className="bg-blue-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
+                                                            <span key={idx} className="bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
                                                                 {serviceType?.service_type?.replace("_", " ") || "Service"}
                                                             </span>
                                                         ))
                                                     ) : (
-                                                        <span className="bg-blue-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
+                                                        <span className="bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
                                                             Service
                                                         </span>
                                                     )}
@@ -155,7 +155,7 @@ export default function HelperShow() {
                                                 </p>
                                             )}
                                             <div className="flex items-center justify-end">
-                                                <span className="text-blue-600 font-semibold text-sm">View Details →</span>
+                                                <span className="text-primary-600 font-semibold text-sm">View Details →</span>
                                             </div>
                                         </Link>
                                     ))}
@@ -177,7 +177,7 @@ export default function HelperShow() {
                                         <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="flex items-center">
-                                                    <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center mr-3">
+                                                    <div className="w-10 h-10 rounded-full bg-primary-200 flex items-center justify-center mr-3">
                                                         {review.user?.name?.charAt(0) || "U"}
                                                     </div>
                                                     <div>
@@ -246,7 +246,7 @@ export default function HelperShow() {
                                                 ? helper.service_listings[0].service_types[0].service_type 
                                                 : null,
                                         })}
-                                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
+                                        className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
                                     >
                                         Post Service Request
                                     </Link>
@@ -281,7 +281,7 @@ export default function HelperShow() {
                                     )}
                                     <Link
                                         to={route("login")}
-                                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
+                                        className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
                                     >
                                         Login to Post Request
                                     </Link>

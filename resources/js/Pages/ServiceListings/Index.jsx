@@ -112,7 +112,7 @@ export default function ServiceListingsIndex() {
 
     return (
         <PublicLayout>
-            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-orange-500 text-white py-16">
+            <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 text-white py-16">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Browse Services Offered</h1>
                     <p className="text-xl text-white/90">Find services offered by verified helpers and businesses</p>
@@ -138,7 +138,7 @@ export default function ServiceListingsIndex() {
                             <select
                                 value={serviceType}
                                 onChange={(e) => setServiceType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 {serviceTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
@@ -152,7 +152,7 @@ export default function ServiceListingsIndex() {
                             <select
                                 value={workType}
                                 onChange={(e) => setWorkType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 <option value="">All Types</option>
                                 <option value="full_time">Full Time</option>
@@ -176,7 +176,7 @@ export default function ServiceListingsIndex() {
                                         setShowLocationSuggestions(true);
                                     }
                                 }}
-                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                                 placeholder="Search location..."
                             />
                             {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
@@ -185,7 +185,7 @@ export default function ServiceListingsIndex() {
                                         <div
                                             key={index}
                                             onClick={() => handleLocationSelect(suggestion)}
-                                            className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                            className="px-4 py-2 hover:bg-primary-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                                         >
                                             {suggestion.display_text}
                                         </div>
@@ -198,7 +198,7 @@ export default function ServiceListingsIndex() {
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 <option value="created_at">Newest</option>
                                 <option value="rate_low">Rate: Low to High</option>
@@ -208,7 +208,7 @@ export default function ServiceListingsIndex() {
                         <div className="flex items-end">
                             <button
                                 onClick={handleFilter}
-                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
+                                className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                             >
                                 Apply Filters
                             </button>
@@ -238,12 +238,12 @@ export default function ServiceListingsIndex() {
                                                 <div className="flex flex-wrap gap-2">
                                                     {listing.service_types && listing.service_types.length > 0 ? (
                                                         listing.service_types.slice(0, 2).map((st, idx) => (
-                                                            <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
+                                                            <span key={idx} className="bg-primary-100 text-primary-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
                                                                 {/*{st?.service_type?.replace('_', ' ') || 'Service'}*/}
                                                             </span>
                                                         ))
                                                     ) : (
-                                                        <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
+                                                        <span className="bg-primary-100 text-primary-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
                                                             Service
                                                         </span>
                                                     )}
@@ -254,7 +254,7 @@ export default function ServiceListingsIndex() {
                                                     </span>
                                                 )}
                                             </div>
-                                            <h3 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-blue-600 transition-colors">
+                                            <h3 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-primary-600 transition-colors">
                                                 {listing.user?.name || "Helper"}
                                             </h3>
                                             <p className="text-sm text-gray-600 mb-3 capitalize">
@@ -269,7 +269,7 @@ export default function ServiceListingsIndex() {
                                                 <span className="text-xs text-gray-500 capitalize">
                                                     {listing.work_type?.replace("_", " ") || "Available"}
                                                 </span>
-                                                <span className="text-blue-600 font-semibold text-sm">View Details →</span>
+                                                <span className="text-primary-600 font-semibold text-sm">View Details →</span>
                                             </div>
                                         </div>
                                     </Link>
@@ -311,7 +311,7 @@ export default function ServiceListingsIndex() {
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
-                                                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                                        ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg"
                                                         : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
                                                 } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                             />

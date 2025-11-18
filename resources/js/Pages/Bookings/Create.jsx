@@ -163,7 +163,7 @@ export default function BookingCreate() {
     return (
         <PublicLayout>
             
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Post Service Request</h1>
                     <p className="text-xl text-white/90">Fill in the form below to post your service request</p>
@@ -198,7 +198,7 @@ export default function BookingCreate() {
                                 <select
                                     value={data.service_type}
                                     onChange={(e) => setData(prev => ({ ...prev, service_type: e.target.value }))}
-                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                     required
                                 >
                                     <option value="">Select Service</option>
@@ -216,7 +216,7 @@ export default function BookingCreate() {
                                 <select
                                     value={data.work_type}
                                     onChange={(e) => setData(prev => ({ ...prev, work_type: e.target.value }))}
-                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                     required
                                 >
                                     <option value="">Select Type</option>
@@ -240,7 +240,7 @@ export default function BookingCreate() {
                                             setShowSuggestions(true);
                                         }
                                     }}
-                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                     placeholder="Type to search area..."
                                     required
                                 />
@@ -250,7 +250,7 @@ export default function BookingCreate() {
                                             <div
                                                 key={index}
                                                 onClick={() => handleAreaSelect(suggestion)}
-                                                className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                className="px-4 py-2 hover:bg-primary-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                                             >
                                                 {suggestion}
                                             </div>
@@ -266,7 +266,7 @@ export default function BookingCreate() {
                                     type="date"
                                     value={data.start_date}
                                     onChange={(e) => setData(prev => ({ ...prev, start_date: e.target.value }))}
-                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                 />
                                 {errors.start_date && <div className="text-red-500 text-sm mt-1">{errors.start_date}</div>}
                             </div>
@@ -277,7 +277,7 @@ export default function BookingCreate() {
                                     type="time"
                                     value={data.start_time}
                                     onChange={(e) => setData(prev => ({ ...prev, start_time: e.target.value }))}
-                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                 />
                                 {errors.start_time && <div className="text-red-500 text-sm mt-1">{errors.start_time}</div>}
                             </div>
@@ -289,7 +289,7 @@ export default function BookingCreate() {
                                     value={data.name}
                                     onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}
                                     disabled={!!user}
-                                    className={`w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 ${
+                                    className={`w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 ${
                                         user ? "bg-gray-100 cursor-not-allowed" : ""
                                     }`}
                                     required
@@ -304,7 +304,7 @@ export default function BookingCreate() {
                                     value={data.phone}
                                     onChange={(e) => setData(prev => ({ ...prev, phone: e.target.value }))}
                                     disabled={!!user}
-                                    className={`w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 ${
+                                    className={`w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 ${
                                         user ? "bg-gray-100 cursor-not-allowed" : ""
                                     }`}
                                     required
@@ -319,7 +319,7 @@ export default function BookingCreate() {
                                     value={data.email}
                                     onChange={(e) => setData(prev => ({ ...prev, email: e.target.value }))}
                                     disabled={!!user}
-                                    className={`w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 ${
+                                    className={`w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 ${
                                         user ? "bg-gray-100 cursor-not-allowed" : ""
                                     }`}
                                     required
@@ -333,7 +333,7 @@ export default function BookingCreate() {
                                     value={data.address}
                                     onChange={(e) => setData(prev => ({ ...prev, address: e.target.value }))}
                                     rows={3}
-                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                 />
                                 {errors.address && <div className="text-red-500 text-sm mt-1">{errors.address}</div>}
                             </div>
@@ -344,7 +344,7 @@ export default function BookingCreate() {
                                     value={data.special_requirements}
                                     onChange={(e) => setData(prev => ({ ...prev, special_requirements: e.target.value }))}
                                     rows={4}
-                                    className="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                     placeholder="Any special requirements or preferences..."
                                 />
                                 {errors.special_requirements && <div className="text-red-500 text-sm mt-1">{errors.special_requirements}</div>}
@@ -355,7 +355,7 @@ export default function BookingCreate() {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold"
+                                className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition duration-300 font-semibold"
                             >
                                 {processing ? "Submitting..." : "Submit Booking"}
                             </button>
