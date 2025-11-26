@@ -79,35 +79,61 @@ export default function Dashboard() {
     return (
         <PublicLayout>
 
-            <div className="py-12">
+            <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 py-8">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Welcome Header */}
+                    <div className="mb-8">
+                        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                            Welcome back, {user?.name || "User"}!
+                        </h1>
+                        <p className="text-sm text-gray-600">Manage your services and track your activity</p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                         {/* Service Requests (Users) */}
                         {user && user.role === "user" && (
                             <>
                                 <Link
                                     to={route("bookings.create")}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-primary-500"
+                                    className="group relative bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
                                 >
-                                    <div className="text-4xl mb-4">📝</div>
-                                    <h3 className="text-xl font-bold mb-2 text-gray-900">Post Service Request</h3>
-                                    <p className="text-gray-600">Post a service request and get help from verified helpers</p>
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12"></div>
+                                    <div className="relative z-10">
+                                        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                            <span className="text-2xl">📝</span>
+                                        </div>
+                                        <h3 className="text-lg font-bold mb-2 text-white">Post Service Request</h3>
+                                        <p className="text-primary-100 text-sm leading-relaxed">Post a service request and get help from verified helpers</p>
+                                        <div className="mt-4 flex items-center text-white text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
+                                            Get Started <span className="ml-1">→</span>
+                                        </div>
+                                    </div>
                                 </Link>
                                 <Link
                                     to={route("job-applications.my-request-applications")}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-primary-500"
+                                    className="group relative bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
                                 >
-                                    <div className="text-4xl mb-4">📋</div>
-                                    <h3 className="text-xl font-bold mb-2 text-gray-900">My Request Applications</h3>
-                                    <p className="text-gray-600">View and manage applications to your service requests</p>
+                                    <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary-200 transition-colors duration-300">
+                                        <span className="text-2xl">📋</span>
+                                    </div>
+                                    <h3 className="text-lg font-bold mb-2 text-gray-900">My Request Applications</h3>
+                                    <p className="text-gray-600 text-sm leading-relaxed">View and manage applications to your service requests</p>
+                                    <div className="mt-4 flex items-center text-primary-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
+                                        View All <span className="ml-1">→</span>
+                                    </div>
                                 </Link>
                                 <Link
                                     to={route("bookings.index")}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-primary-500"
+                                    className="group relative bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
                                 >
-                                    <div className="text-4xl mb-4">📅</div>
-                                    <h3 className="text-xl font-bold mb-2 text-gray-900">My Bookings</h3>
-                                    <p className="text-gray-600">View all your service requests and bookings</p>
+                                    <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary-200 transition-colors duration-300">
+                                        <span className="text-2xl">📅</span>
+                                    </div>
+                                    <h3 className="text-lg font-bold mb-2 text-gray-900">My Bookings</h3>
+                                    <p className="text-gray-600 text-sm leading-relaxed">View all your service requests and bookings</p>
+                                    <div className="mt-4 flex items-center text-primary-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
+                                        View All <span className="ml-1">→</span>
+                                    </div>
                                 </Link>
                             </>
                         )}
@@ -117,37 +143,60 @@ export default function Dashboard() {
                             <>
                                 <Link
                                     to={route("service-listings.create")}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-primary-500"
+                                    className="group relative bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
                                 >
-                                    <div className="text-4xl mb-4">➕</div>
-                                    <h3 className="text-xl font-bold mb-2 text-gray-900">Create Service Listing</h3>
-                                    <p className="text-gray-600">Post a service you offer and get clients</p>
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12"></div>
+                                    <div className="relative z-10">
+                                        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                            <span className="text-2xl">➕</span>
+                                        </div>
+                                        <h3 className="text-lg font-bold mb-2 text-white">Create Service Listing</h3>
+                                        <p className="text-primary-100 text-sm leading-relaxed">Post a service you offer and get clients</p>
+                                        <div className="mt-4 flex items-center text-white text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
+                                            Create Now <span className="ml-1">→</span>
+                                        </div>
+                                    </div>
                                 </Link>
                                 <Link
                                     to={route("service-listings.my-listings")}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-primary-500"
+                                    className="group relative bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
                                 >
-                                    <div className="text-4xl mb-4">📋</div>
-                                    <h3 className="text-xl font-bold mb-2 text-gray-900">My Service Listings</h3>
-                                    <p className="text-gray-600">Manage your service offerings</p>
+                                    <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary-200 transition-colors duration-300">
+                                        <span className="text-2xl">📋</span>
+                                    </div>
+                                    <h3 className="text-lg font-bold mb-2 text-gray-900">My Service Listings</h3>
+                                    <p className="text-gray-600 text-sm leading-relaxed">Manage your service offerings</p>
+                                    <div className="mt-4 flex items-center text-primary-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
+                                        Manage <span className="ml-1">→</span>
+                                    </div>
                                 </Link>
                                 {user?.role === "business" && (
                                     <Link
                                         to={route("job-applications.index")}
-                                        className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-primary-500"
+                                        className="group relative bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
                                     >
-                                        <div className="text-4xl mb-4">🔍</div>
-                                        <h3 className="text-xl font-bold mb-2 text-gray-900">Browse Job Requests</h3>
-                                        <p className="text-gray-600">Browse service requests from users and apply</p>
+                                        <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary-200 transition-colors duration-300">
+                                            <span className="text-2xl">🔍</span>
+                                        </div>
+                                        <h3 className="text-lg font-bold mb-2 text-gray-900">Browse Job Requests</h3>
+                                        <p className="text-gray-600 text-sm leading-relaxed">Browse service requests from users and apply</p>
+                                        <div className="mt-4 flex items-center text-primary-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
+                                            Browse <span className="ml-1">→</span>
+                                        </div>
                                     </Link>
                                 )}
                                 <Link
                                     to={route("job-applications.my-applications")}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-primary-500"
+                                    className="group relative bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
                                 >
-                                    <div className="text-4xl mb-4">📝</div>
-                                    <h3 className="text-xl font-bold mb-2 text-gray-900">My Applications</h3>
-                                    <p className="text-gray-600">Track your job applications</p>
+                                    <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary-200 transition-colors duration-300">
+                                        <span className="text-2xl">📝</span>
+                                    </div>
+                                    <h3 className="text-lg font-bold mb-2 text-gray-900">My Applications</h3>
+                                    <p className="text-gray-600 text-sm leading-relaxed">Track your job applications</p>
+                                    <div className="mt-4 flex items-center text-primary-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
+                                        Track <span className="ml-1">→</span>
+                                    </div>
                                 </Link>
                             </>
                         )}
@@ -157,11 +206,19 @@ export default function Dashboard() {
                             <>
                                 <Link
                                     to={route("admin.dashboard")}
-                                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 border-2 border-transparent hover:border-primary-500"
+                                    className="group relative bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
                                 >
-                                    <div className="text-4xl mb-4">⚙️</div>
-                                    <h3 className="text-xl font-bold mb-2 text-gray-900">Admin Dashboard</h3>
-                                    <p className="text-gray-600">Manage the platform</p>
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12"></div>
+                                    <div className="relative z-10">
+                                        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                            <span className="text-2xl">⚙️</span>
+                                        </div>
+                                        <h3 className="text-lg font-bold mb-2 text-white">Admin Dashboard</h3>
+                                        <p className="text-primary-100 text-sm leading-relaxed">Manage the platform</p>
+                                        <div className="mt-4 flex items-center text-white text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
+                                            Go to Admin <span className="ml-1">→</span>
+                                        </div>
+                                    </div>
                                 </Link>
                             </>
                         )}
@@ -170,103 +227,116 @@ export default function Dashboard() {
 
                     {/* Documents & Verification Status Section (Helpers/Businesses) */}
                     {(user?.role === "helper" || user?.role === "business") && (
-                        <div className="mt-12">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Verification Status</h2>
+                        <div className="mb-8">
+                            <h2 className="text-xl font-bold text-gray-900 mb-6">Verification Status</h2>
                             
-                            <div className="grid md:grid-cols-2 gap-6 mb-6">
+                            <div className="grid md:grid-cols-2 gap-4 mb-6">
                                 {/* Onboarding Status */}
-                                <div className="bg-white rounded-lg shadow-md p-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Onboarding Status</h3>
-                                    <div className="flex items-center gap-3">
+                                <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-lg font-bold text-gray-900">Onboarding Status</h3>
                                         {user.onboarding_complete ? (
-                                            <>
-                                                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                                    <span className="text-2xl">✓</span>
-                                                </div>
-                                                <div>
-                                                    <p className="font-semibold text-green-700">Completed</p>
-                                                    <p className="text-sm text-gray-600">Your profile is complete</p>
-                                                </div>
-                                            </>
+                                            <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-500 rounded-xl flex items-center justify-center shadow-md">
+                                                <span className="text-xl text-white">✓</span>
+                                            </div>
                                         ) : (
-                                            <>
-                                                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                                                    <span className="text-2xl">⏳</span>
-                                                </div>
-                                                <div>
-                                                    <p className="font-semibold text-yellow-700">In Progress</p>
-                                                    <p className="text-sm text-gray-600">Complete your onboarding</p>
-                                                </div>
-                                            </>
+                                            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-md">
+                                                <span className="text-xl text-white">⏳</span>
+                                            </div>
                                         )}
                                     </div>
+                                    {user.onboarding_complete ? (
+                                        <div>
+                                            <p className="text-lg font-bold text-green-600 mb-1">Completed</p>
+                                            <p className="text-sm text-gray-600">Your profile is complete and ready</p>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <p className="text-lg font-bold text-yellow-600 mb-1">In Progress</p>
+                                            <p className="text-sm text-gray-600">Complete your onboarding to get started</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Verification Status */}
-                                <div className="bg-white rounded-lg shadow-md p-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Verification Status</h3>
-                                    <div className="flex items-center gap-3">
+                                <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-lg font-bold text-gray-900">Verification Status</h3>
                                         {user.verification_status === "verified" ? (
-                                            <>
-                                                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                                    <span className="text-2xl">✓</span>
-                                                </div>
-                                                <div>
-                                                    <p className="font-semibold text-green-700">Verified</p>
-                                                    <p className="text-sm text-gray-600">Your documents are verified</p>
-                                                </div>
-                                            </>
+                                            <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-500 rounded-xl flex items-center justify-center shadow-md">
+                                                <span className="text-xl text-white">✓</span>
+                                            </div>
                                         ) : (
-                                            <>
-                                                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                                                    <span className="text-2xl">⏳</span>
-                                                </div>
-                                                <div>
-                                                    <p className="font-semibold text-yellow-700">Pending</p>
-                                                    <p className="text-sm text-gray-600">Awaiting verification</p>
-                                                </div>
-                                            </>
+                                            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-md">
+                                                <span className="text-xl text-white">⏳</span>
+                                            </div>
                                         )}
                                     </div>
+                                    {user.verification_status === "verified" ? (
+                                        <div>
+                                            <p className="text-lg font-bold text-green-600 mb-1">Verified</p>
+                                            <p className="text-sm text-gray-600">Your documents are verified</p>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <p className="text-lg font-bold text-yellow-600 mb-1">Pending</p>
+                                            <p className="text-sm text-gray-600">Awaiting document verification</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
                             {/* Documents Section */}
-                            <div className="bg-white rounded-lg shadow-md p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Uploaded Documents</h3>
+                            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-bold text-gray-900">Uploaded Documents</h3>
+                                    <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                        <span className="text-lg">📄</span>
+                                    </div>
+                                </div>
                                 {loadingDocuments ? (
-                                    <p className="text-gray-600">Loading documents...</p>
+                                    <div className="text-center py-8">
+                                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                                        <p className="text-gray-600 mt-3 text-sm">Loading documents...</p>
+                                    </div>
                                 ) : documents.length > 0 ? (
-                                    <div className="space-y-4">
+                                    <div className="space-y-3">
                                         {documents.map((document) => (
-                                            <div key={document.id} className="border border-gray-200 rounded-lg p-4">
+                                            <div key={document.id} className="border-2 border-gray-100 rounded-lg p-4 hover:border-primary-200 hover:shadow-md transition-all duration-300">
                                                 <div className="flex justify-between items-start">
                                                     <div className="flex-1">
                                                         <div className="flex items-center gap-3 mb-2">
-                                                            <h4 className="font-semibold text-gray-900">
-                                                                {document.document_type_label || document.document_type}
-                                                            </h4>
-                                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                                                document.status === "verified" 
-                                                                    ? "bg-green-100 text-green-800"
-                                                                    : document.status === "rejected"
-                                                                    ? "bg-red-100 text-red-800"
-                                                                    : "bg-yellow-100 text-yellow-800"
-                                                            }`}>
-                                                                {document.status}
-                                                            </span>
+                                                            <div className="w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center">
+                                                                <span className="text-lg">📋</span>
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h4 className="text-base font-bold text-gray-900 mb-1">
+                                                                    {document.document_type_label || document.document_type}
+                                                                </h4>
+                                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                                                                    document.status === "verified" 
+                                                                        ? "bg-green-100 text-green-700"
+                                                                        : document.status === "rejected"
+                                                                        ? "bg-red-100 text-red-700"
+                                                                        : "bg-yellow-100 text-yellow-700"
+                                                                }`}>
+                                                                    {document.status.charAt(0).toUpperCase() + document.status.slice(1)}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                         {document.document_number && (
-                                                            <p className="text-sm text-gray-600 mb-1">
-                                                                Number: {document.document_number}
+                                                            <p className="text-xs text-gray-600 mb-1 ml-13">
+                                                                <span className="font-semibold">Number:</span> {document.document_number}
                                                             </p>
                                                         )}
                                                         {document.admin_notes && (
-                                                            <p className="text-sm text-gray-600 italic">
-                                                                Note: {document.admin_notes}
-                                                            </p>
+                                                            <div className="ml-13 mt-2 p-2 bg-gray-50 rounded-lg border-l-4 border-primary-500">
+                                                                <p className="text-xs text-gray-700">
+                                                                    <span className="font-semibold">Admin Note:</span> {document.admin_notes}
+                                                                </p>
+                                                            </div>
                                                         )}
-                                                        <p className="text-xs text-gray-500 mt-2">
+                                                        <p className="text-xs text-gray-500 mt-2 ml-13">
                                                             Uploaded: {new Date(document.created_at).toLocaleDateString()}
                                                         </p>
                                                     </div>
@@ -275,9 +345,9 @@ export default function Dashboard() {
                                                             href={`/storage/${document.file_path}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-primary-600 hover:text-primary-800 font-medium text-sm"
+                                                            className="ml-3 px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-300 font-semibold text-xs shadow-md hover:shadow-lg"
                                                         >
-                                                            View →
+                                                            View
                                                         </a>
                                                     )}
                                                 </div>
@@ -285,9 +355,10 @@ export default function Dashboard() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-8 text-gray-500">
-                                        <p>No documents uploaded yet.</p>
-                                        <p className="text-sm mt-2">Documents will appear here after you complete onboarding.</p>
+                                    <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                                        <div className="text-4xl mb-3">📄</div>
+                                        <p className="text-gray-600 font-medium mb-1 text-sm">No documents uploaded yet.</p>
+                                        <p className="text-xs text-gray-500">Documents will appear here after you complete onboarding.</p>
                                     </div>
                                 )}
                             </div>
@@ -296,113 +367,128 @@ export default function Dashboard() {
 
                     {/* Applications Section */}
                     {user && (user.role === "helper" || user.role === "business" || user.role === "user") && (
-                        <div className="mt-12">
+                        <div className="mb-8">
                             <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-bold text-gray-900">
-                                    {user.role === "user" ? "Applications for My Requests" : "My Applications"}
-                                </h2>
+                                <div>
+                                    <h2 className="text-xl font-bold text-gray-900 mb-1">
+                                        {user.role === "user" ? "Applications for My Requests" : "My Applications"}
+                                    </h2>
+                                    <p className="text-sm text-gray-600">Track and manage your job applications</p>
+                                </div>
                                 <Link
                                     to={user.role === "user" 
                                         ? route("job-applications.my-request-applications")
                                         : route("job-applications.my-applications")
                                     }
-                                    className="text-primary-600 hover:text-primary-800 font-semibold"
+                                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition duration-300 font-semibold text-sm shadow-md hover:shadow-lg"
                                 >
-                                    View All →
+                                    View All
                                 </Link>
                             </div>
                             
                             {loadingApplications ? (
-                                <div className="bg-white rounded-lg shadow-md p-8 text-center">
-                                    <p className="text-gray-600">Loading applications...</p>
+                                <div className="bg-white rounded-xl shadow-md p-8 text-center border border-gray-100">
+                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mb-3"></div>
+                                    <p className="text-gray-600 text-sm">Loading applications...</p>
                                 </div>
                             ) : applications.data && applications.data.length > 0 ? (
-                                <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                                    <div className="divide-y divide-gray-200">
+                                <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                                    <div className="divide-y divide-gray-100">
                                         {applications.data.slice(0, 5).map((application) => (
                                             <Link
                                                 key={application.id}
                                                 to={route("job-applications.show", application.id)}
-                                                className="block p-6 hover:bg-gray-50 transition-colors"
+                                                className="block p-4 hover:bg-primary-50 transition-all duration-300 border-l-4 border-transparent hover:border-primary-500"
                                             >
                                                 <div className="flex justify-between items-start">
                                                     <div className="flex-1">
                                                         <div className="flex items-center gap-3 mb-2">
-                                                            <h3 className="text-lg font-semibold text-gray-900">
+                                                            <h3 className="text-base font-bold text-gray-900">
                                                                 {application.booking?.service_type_label || application.booking?.service_type || "Service Request"}
                                                             </h3>
-                                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(application.status)}`}>
-                                                                {application.status}
+                                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(application.status)}`}>
+                                                                {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
                                                             </span>
                                                         </div>
                                                         {application.booking && (
-                                                            <div className="text-sm text-gray-600 space-y-1">
-                                                                <p>
-                                                                    <span className="font-semibold">Location:</span> {application.booking.city}{application.booking.area ? `, ${application.booking.area}` : ""}
-                                                                </p>
+                                                            <div className="text-xs text-gray-600 space-y-1 mb-2">
+                                                                <div className="flex items-center gap-1">
+                                                                    <span className="text-primary-600">📍</span>
+                                                                    <span><span className="font-semibold">Location:</span> {application.booking.city}{application.booking.area ? `, ${application.booking.area}` : ""}</span>
+                                                                </div>
                                                                 {user.role === "user" ? (
-                                                                    <p>
-                                                                        <span className="font-semibold">Applied by:</span> {application.user?.name || "N/A"}
-                                                                    </p>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <span className="text-primary-600">👤</span>
+                                                                        <span><span className="font-semibold">Applied by:</span> {application.user?.name || "N/A"}</span>
+                                                                    </div>
                                                                 ) : (
-                                                                    <p>
-                                                                        <span className="font-semibold">Requested by:</span> {application.booking.user?.name || "N/A"}
-                                                                    </p>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <span className="text-primary-600">👤</span>
+                                                                        <span><span className="font-semibold">Requested by:</span> {application.booking.user?.name || "N/A"}</span>
+                                                                    </div>
                                                                 )}
                                                                 {application.proposed_rate && (
-                                                                    <p>
-                                                                        <span className="font-semibold">Proposed Rate:</span> PKR {application.proposed_rate}/month
-                                                                    </p>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <span className="text-primary-600">💰</span>
+                                                                        <span><span className="font-semibold">Proposed Rate:</span> PKR {application.proposed_rate.toLocaleString()}/month</span>
+                                                                    </div>
                                                                 )}
                                                             </div>
                                                         )}
                                                         {application.message && (
-                                                            <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                                                            <p className="text-xs text-gray-600 mt-2 p-2 bg-gray-50 rounded-lg line-clamp-2">
                                                                 {application.message}
                                                             </p>
                                                         )}
                                                     </div>
-                                                    <div className="ml-4 text-sm text-gray-500">
+                                                    <div className="ml-4 text-right">
                                                         {application.applied_at && (
-                                                            <p>{new Date(application.applied_at).toLocaleDateString()}</p>
+                                                            <p className="text-xs font-semibold text-gray-900 mb-1">
+                                                                {new Date(application.applied_at).toLocaleDateString()}
+                                                            </p>
                                                         )}
+                                                        <span className="text-primary-600 font-semibold text-xs">View →</span>
                                                     </div>
                                                 </div>
                                             </Link>
                                         ))}
                                     </div>
                                     {applications.meta?.total > 5 && (
-                                        <div className="bg-gray-50 px-6 py-4 text-center">
+                                        <div className="bg-gradient-to-r from-primary-50 to-primary-100 px-4 py-3 text-center border-t border-primary-200">
                                             <Link
                                                 to={user.role === "user" 
                                                     ? route("job-applications.my-request-applications")
                                                     : route("job-applications.my-applications")
                                                 }
-                                                className="text-primary-600 hover:text-primary-800 font-semibold"
+                                                className="inline-flex items-center text-primary-700 hover:text-primary-900 font-bold text-sm transition-colors duration-300"
                                             >
-                                                View all {applications.meta.total} applications →
+                                                View all {applications.meta.total} applications
+                                                <span className="ml-1">→</span>
                                             </Link>
                                         </div>
                                     )}
                                 </div>
                             ) : (
-                                <div className="bg-white rounded-lg shadow-md p-8 text-center">
+                                <div className="bg-white rounded-xl shadow-md p-8 text-center border border-gray-100">
+                                    <div className="text-4xl mb-4">📋</div>
                                     {user.role === "user" ? (
                                         <>
-                                            <p className="text-gray-600 mb-4">You haven't received any applications for your service requests yet.</p>
+                                            <p className="text-gray-700 font-medium mb-1 text-base">No applications yet</p>
+                                            <p className="text-gray-600 mb-4 text-sm">You haven't received any applications for your service requests.</p>
                                             <Link
                                                 to={route("bookings.create")}
-                                                className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition duration-300 font-semibold"
+                                                className="inline-block bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition duration-300 font-bold text-sm shadow-md hover:shadow-lg"
                                             >
                                                 Post a Service Request
                                             </Link>
                                         </>
                                     ) : (
                                         <>
-                                            <p className="text-gray-600 mb-4">You haven't applied to any service requests yet.</p>
+                                            <p className="text-gray-700 font-medium mb-1 text-base">No applications yet</p>
+                                            <p className="text-gray-600 mb-4 text-sm">You haven't applied to any service requests yet.</p>
                                             <Link
                                                 to={route("job-applications.index")}
-                                                className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition duration-300 font-semibold"
+                                                className="inline-block bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition duration-300 font-bold text-sm shadow-md hover:shadow-lg"
                                             >
                                                 Browse Service Requests
                                             </Link>
