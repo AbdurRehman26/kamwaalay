@@ -34,7 +34,7 @@ export default function BusinessShow() {
     if (loading) {
         return (
             <PublicLayout>
-                
+
                 <div className="container mx-auto px-4 py-12 text-center">
                     <p className="text-gray-600">Loading business profile...</p>
                 </div>
@@ -45,7 +45,7 @@ export default function BusinessShow() {
     if (error || !business) {
         return (
             <PublicLayout>
-                
+
                 <div className="container mx-auto px-4 py-12 text-center">
                     <p className="text-red-600">{error || "Business not found"}</p>
                 </div>
@@ -55,8 +55,8 @@ export default function BusinessShow() {
 
     return (
         <PublicLayout>
-            
-            
+
+
             {/* Hero Section */}
             <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 text-white py-16">
                 <div className="container mx-auto px-4">
@@ -155,12 +155,14 @@ export default function BusinessShow() {
                                 >
                                     View All Services
                                 </Link>
-                                <Link
-                                    to={route("bookings.create")}
-                                    className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-300 font-semibold text-center block"
-                                >
-                                    Request Service
-                                </Link>
+                                {user.role === "user" && (
+                                    <Link
+                                        to={route("bookings.create")}
+                                        className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-300 font-semibold text-center block"
+                                    >
+                                        Request Service
+                                    </Link>
+                                )}
                             </div>
                         )}
                     </div>
@@ -238,63 +240,63 @@ export default function BusinessShow() {
                                             return null;
                                         }
                                         return (
-                                        <Link
-                                            key={worker.id}
-                                            to={route("helpers.show", worker.id)}
-                                            className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-primary-300"
-                                        >
-                                            <div className="flex items-center gap-4 mb-4">
-                                                {worker.photo ? (
-                                                    <img 
-                                                        src={`/storage/${worker.photo}`} 
-                                                        alt={worker.name} 
-                                                        className="w-16 h-16 rounded-full object-cover border-2 border-primary-300"
-                                                    />
-                                                ) : (
-                                                    <div className="w-16 h-16 rounded-full bg-primary-300 flex items-center justify-center text-2xl">
-                                                        👤
+                                            <Link
+                                                key={worker.id}
+                                                to={route("helpers.show", worker.id)}
+                                                className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-primary-300"
+                                            >
+                                                <div className="flex items-center gap-4 mb-4">
+                                                    {worker.photo ? (
+                                                        <img
+                                                            src={`/storage/${worker.photo}`}
+                                                            alt={worker.name}
+                                                            className="w-16 h-16 rounded-full object-cover border-2 border-primary-300"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-16 h-16 rounded-full bg-primary-300 flex items-center justify-center text-2xl">
+                                                            👤
+                                                        </div>
+                                                    )}
+                                                    <div className="flex-1">
+                                                        <h3 className="font-bold text-gray-900">{worker.name}</h3>
+                                                        {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].service_types && worker.service_listings[0].service_types.length > 0 && (
+                                                            <p className="text-sm text-gray-600 capitalize">
+                                                                {worker.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "No service type"}
+                                                            </p>
+                                                        )}
                                                     </div>
-                                                )}
-                                                <div className="flex-1">
-                                                    <h3 className="font-bold text-gray-900">{worker.name}</h3>
-                                                    {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].service_types && worker.service_listings[0].service_types.length > 0 && (
-                                                        <p className="text-sm text-gray-600 capitalize">
-                                                            {worker.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "No service type"}
-                                                        </p>
+                                                </div>
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div className="flex items-center">
+                                                        <span className="text-yellow-400 text-lg mr-1">⭐</span>
+                                                        <span className="font-semibold">{worker.rating || 0}</span>
+                                                        <span className="text-gray-500 text-sm ml-1">({worker.total_reviews || 0})</span>
+                                                    </div>
+                                                    {worker.verification_status === "verified" && (
+                                                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">
+                                                            ✓ Verified
+                                                        </span>
                                                     )}
                                                 </div>
-                                            </div>
-                                            <div className="flex items-center justify-between mb-3">
-                                                <div className="flex items-center">
-                                                    <span className="text-yellow-400 text-lg mr-1">⭐</span>
-                                                    <span className="font-semibold">{worker.rating || 0}</span>
-                                                    <span className="text-gray-500 text-sm ml-1">({worker.total_reviews || 0})</span>
-                                                </div>
-                                                {worker.verification_status === "verified" && (
-                                                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">
-                                                        ✓ Verified
-                                                    </span>
+                                                {worker.experience_years && (
+                                                    <p className="text-sm text-gray-600 mb-2">
+                                                        💼 {worker.experience_years} years experience
+                                                    </p>
                                                 )}
-                                            </div>
-                                            {worker.experience_years && (
-                                                <p className="text-sm text-gray-600 mb-2">
-                                                    💼 {worker.experience_years} years experience
-                                                </p>
-                                            )}
-                                            {worker.service_listings && worker.service_listings.length > 0 && (
-                                                <p className="text-xs text-gray-500">
-                                                    📋 {worker.service_listings.length} service listing{worker.service_listings.length !== 1 ? "s" : ""}
-                                                </p>
-                                            )}
-                                            <span className="text-primary-600 font-semibold text-sm mt-2 block">View Profile →</span>
-                                        </Link>
+                                                {worker.service_listings && worker.service_listings.length > 0 && (
+                                                    <p className="text-xs text-gray-500">
+                                                        📋 {worker.service_listings.length} service listing{worker.service_listings.length !== 1 ? "s" : ""}
+                                                    </p>
+                                                )}
+                                                <span className="text-primary-600 font-semibold text-sm mt-2 block">View Profile →</span>
+                                            </Link>
                                         );
                                     })}
                                 </div>
                                 {workers.length > 10 && (
                                     <div className="mt-6 text-center">
                                         <p className="text-sm text-gray-600">
-                                            Showing 10 of {business.helpers_count || workers.length} workers. 
+                                            Showing 10 of {business.helpers_count || workers.length} workers.
                                             <Link to={route("business.workers")} className="text-primary-600 hover:text-primary-800 ml-1 font-semibold">
                                                 View All →
                                             </Link>

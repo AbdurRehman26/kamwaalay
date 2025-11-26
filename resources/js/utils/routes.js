@@ -43,9 +43,11 @@ export const routes = {
     },
     business: {
         dashboard: () => "/business/dashboard",
-        workers: () => "/business/workers",
-        "workers.create": () => "/business/workers/create",
-        "workers.edit": (id) => `/business/workers/${id}/edit`,
+        workers: {
+            index: () => "/business/workers",
+            create: () => "/business/workers/create",
+            edit: (id) => `/business/workers/${id}/edit`,
+        },
     },
     onboarding: {
         helper: () => "/onboarding/helper",
@@ -68,7 +70,7 @@ export const routes = {
 export function route(name, params = {}) {
     const parts = name.split(".");
     let path = routes;
-    
+
     for (const part of parts) {
         if (path[part]) {
             path = path[part];
@@ -77,7 +79,7 @@ export function route(name, params = {}) {
             return "#";
         }
     }
-    
+
     if (typeof path === "function") {
         if (Array.isArray(params)) {
             return path(...params);
@@ -91,7 +93,7 @@ export function route(name, params = {}) {
         }
         return path();
     }
-    
+
     return path;
 }
 

@@ -117,6 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit']);
     Route::patch('/profile', [ProfileController::class, 'update']);
     Route::delete('/profile', [ProfileController::class, 'destroy']);
+    Route::get('/profile/documents', [ProfileController::class, 'documents']);
 
     // Password
     Route::put('/password', [PasswordController::class, 'update']);

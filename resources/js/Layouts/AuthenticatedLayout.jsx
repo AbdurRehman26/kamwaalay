@@ -6,6 +6,11 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
+import {
+    isUser,
+    isHelper,
+    isHelperOrBusiness
+} from "@/utils/permissions";
 
 export default function AuthenticatedLayout({ header, children }) {
     const { user, logout } = useAuth();
@@ -40,7 +45,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Messages
                                 </NavLink>
-                                {user && (user.role === "helper" || user.role === "business") && (
+                                {isHelperOrBusiness(user) && (
                                     <>
                                         <NavLink
                                             href={route("service-listings.my-listings")}
@@ -48,12 +53,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             My Listings
                                         </NavLink>
-                                        <NavLink
-                                            href={route("job-applications.index")}
-                                            active={location.pathname === route("job-applications.index")}
-                                        >
-                                            Browse Requests
-                                        </NavLink>
+                                        {isHelper(user) && (
+                                            <NavLink
+                                                href={route("job-applications.index")}
+                                                active={location.pathname === route("job-applications.index")}
+                                            >
+                                                Browse Requests
+                                            </NavLink>
+                                        )}
                                         <NavLink
                                             href={route("job-applications.my-applications")}
                                             active={location.pathname === route("job-applications.my-applications")}
@@ -62,7 +69,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         </NavLink>
                                     </>
                                 )}
-                                {user && user.role === "user" && (
+                                {isUser(user) && (
                                     <>
                                         <NavLink
                                             href={route("service-listings.index")}
@@ -195,7 +202,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         >
                             Messages
                         </ResponsiveNavLink>
-                        {user && (user.role === "helper" || user.role === "business") && (
+                        {isHelperOrBusiness(user) && (
                             <>
                                 <ResponsiveNavLink
                                     href={route("service-listings.my-listings")}
@@ -203,12 +210,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     My Listings
                                 </ResponsiveNavLink>
-                                <ResponsiveNavLink
-                                    href={route("job-applications.index")}
-                                    active={location.pathname === route("job-applications.index")}
-                                >
-                                    Browse Requests
-                                </ResponsiveNavLink>
+                                {isHelper(user) && (
+                                    <ResponsiveNavLink
+                                        href={route("job-applications.index")}
+                                        active={location.pathname === route("job-applications.index")}
+                                    >
+                                        Browse Requests
+                                    </ResponsiveNavLink>
+                                )}
                                 <ResponsiveNavLink
                                     href={route("job-applications.my-applications")}
                                     active={location.pathname === route("job-applications.my-applications")}
@@ -217,7 +226,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </ResponsiveNavLink>
                             </>
                         )}
-                        {user && user.role === "user" && (
+                        {isUser(user) && (
                             <>
                                 <ResponsiveNavLink
                                     href={route("service-listings.index")}

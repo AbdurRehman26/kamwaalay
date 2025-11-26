@@ -4,11 +4,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import { useState, useEffect } from "react";
 import { jobApplicationsService } from "@/services/jobApplications";
+import { profileService } from "@/services/profile";
 
 export default function Dashboard() {
     const { user } = useAuth();
     const [applications, setApplications] = useState({ data: [], links: [], meta: {} });
     const [loadingApplications, setLoadingApplications] = useState(false);
+    const [documents, setDocuments] = useState([]);
+    const [loadingDocuments, setLoadingDocuments] = useState(false);
 
     // Fetch applications based on user role
     useEffect(() => {
@@ -39,6 +42,22 @@ export default function Dashboard() {
             } else {
                 setLoadingApplications(false);
             }
+        }
+    }, [user]);
+
+    // Fetch documents for helpers/businesses
+    useEffect(() => {
+        if (user && (user.role === "helper" || user.role === "business")) {
+            setLoadingDocuments(true);
+            profileService.getDocuments()
+                .then((data) => {
+                    setDocuments(data.documents || []);
+                    setLoadingDocuments(false);
+                })
+                .catch((error) => {
+                    console.error("Error fetching documents:", error);
+                    setLoadingDocuments(false);
+                });
         }
     }, [user]);
 
@@ -148,6 +167,132 @@ export default function Dashboard() {
                         )}
 
                     </div>
+
+                    {/* Documents & Verification Status Section (Helpers/Businesses) */}
+                    {(user?.role === "helper" || user?.role === "business") && (
+                        <div className="mt-12">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Verification Status</h2>
+                            
+                            <div className="grid md:grid-cols-2 gap-6 mb-6">
+                                {/* Onboarding Status */}
+                                <div className="bg-white rounded-lg shadow-md p-6">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Onboarding Status</h3>
+                                    <div className="flex items-center gap-3">
+                                        {user.onboarding_complete ? (
+                                            <>
+                                                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                                    <span className="text-2xl">✓</span>
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-green-700">Completed</p>
+                                                    <p className="text-sm text-gray-600">Your profile is complete</p>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                                                    <span className="text-2xl">⏳</span>
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-yellow-700">In Progress</p>
+                                                    <p className="text-sm text-gray-600">Complete your onboarding</p>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Verification Status */}
+                                <div className="bg-white rounded-lg shadow-md p-6">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Verification Status</h3>
+                                    <div className="flex items-center gap-3">
+                                        {user.verification_status === "verified" ? (
+                                            <>
+                                                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                                    <span className="text-2xl">✓</span>
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-green-700">Verified</p>
+                                                    <p className="text-sm text-gray-600">Your documents are verified</p>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                                                    <span className="text-2xl">⏳</span>
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-yellow-700">Pending</p>
+                                                    <p className="text-sm text-gray-600">Awaiting verification</p>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Documents Section */}
+                            <div className="bg-white rounded-lg shadow-md p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Uploaded Documents</h3>
+                                {loadingDocuments ? (
+                                    <p className="text-gray-600">Loading documents...</p>
+                                ) : documents.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {documents.map((document) => (
+                                            <div key={document.id} className="border border-gray-200 rounded-lg p-4">
+                                                <div className="flex justify-between items-start">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-3 mb-2">
+                                                            <h4 className="font-semibold text-gray-900">
+                                                                {document.document_type_label || document.document_type}
+                                                            </h4>
+                                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                                document.status === "verified" 
+                                                                    ? "bg-green-100 text-green-800"
+                                                                    : document.status === "rejected"
+                                                                    ? "bg-red-100 text-red-800"
+                                                                    : "bg-yellow-100 text-yellow-800"
+                                                            }`}>
+                                                                {document.status}
+                                                            </span>
+                                                        </div>
+                                                        {document.document_number && (
+                                                            <p className="text-sm text-gray-600 mb-1">
+                                                                Number: {document.document_number}
+                                                            </p>
+                                                        )}
+                                                        {document.admin_notes && (
+                                                            <p className="text-sm text-gray-600 italic">
+                                                                Note: {document.admin_notes}
+                                                            </p>
+                                                        )}
+                                                        <p className="text-xs text-gray-500 mt-2">
+                                                            Uploaded: {new Date(document.created_at).toLocaleDateString()}
+                                                        </p>
+                                                    </div>
+                                                    {document.file_path && (
+                                                        <a
+                                                            href={`/storage/${document.file_path}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-primary-600 hover:text-primary-800 font-medium text-sm"
+                                                        >
+                                                            View →
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8 text-gray-500">
+                                        <p>No documents uploaded yet.</p>
+                                        <p className="text-sm mt-2">Documents will appear here after you complete onboarding.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Applications Section */}
                     {user && (user.role === "helper" || user.role === "business" || user.role === "user") && (

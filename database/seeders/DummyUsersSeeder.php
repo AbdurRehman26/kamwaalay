@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Profile;
 use App\Models\ServiceListing;
 use App\Models\City;
 use App\Models\Location;
@@ -31,8 +32,10 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'user',
                     'phone' => '03001234567',
                     'address' => 'House 123, Street 4, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'DHA',
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'DHA',
+                    ]
                 ],
                 [
                     'name' => 'Fatima Khan',
@@ -41,8 +44,10 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'user',
                     'phone' => '03001234568',
                     'address' => 'Apartment 45, Block 2, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'Clifton',
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'Clifton',
+                    ]
                 ],
                 [
                     'name' => 'Hassan Raza',
@@ -51,12 +56,17 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'user',
                     'phone' => '03001234569',
                     'address' => 'Villa 789, Phase 5, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'Gulshan-e-Iqbal',
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'Gulshan-e-Iqbal',
+                    ]
                 ],
             ];
 
             foreach ($users as $userData) {
+                $profileData = $userData['profile'] ?? [];
+                unset($userData['profile']);
+                
                 // Remove 'role' from data array
                 $role = $userData['role'];
                 unset($userData['role']);
@@ -68,6 +78,13 @@ class DummyUsersSeeder extends Seeder
                 if (!$user->hasRole('user')) {
                     $user->assignRole('user');
                 }
+
+                // Create or update profile
+                $user->profile()->updateOrCreate(
+                    ['profileable_id' => $user->id, 'profileable_type' => User::class],
+                    $profileData
+                );
+
                 $this->command->info("Created user: {$user->email}");
             }
         }
@@ -83,16 +100,19 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'helper',
                     'phone' => '03001234570',
                     'address' => 'Quarter 12, Workers Colony, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'Saddar',
-                    'skills' => 'Cleaning, Laundry, Cooking basics',
-                    'experience_years' => 5,
-                    'bio' => 'Experienced and reliable maid with 5 years of experience. Good with cleaning and household chores.',
-                    'verification_status' => 'verified',
-                    'police_verified' => true,
                     'is_active' => true,
-                    'rating' => 4.8,
-                    'total_reviews' => 12,
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'Saddar',
+                        'skills' => 'Cleaning, Laundry, Cooking basics',
+                        'experience_years' => 5,
+                        'bio' => 'Experienced and reliable maid with 5 years of experience. Good with cleaning and household chores.',
+                        'verification_status' => 'verified',
+                        'police_verified' => true,
+                        'is_active' => true,
+                        'rating' => 4.8,
+                        'total_reviews' => 12,
+                    ],
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'maid', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'Saddar', 'monthly_rate' => 15000, 'description' => 'Professional maid service'],
@@ -106,16 +126,19 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'helper',
                     'phone' => '03001234571',
                     'address' => 'Street 5, Block A, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'PECHS',
-                    'skills' => 'Pakistani cuisine, BBQ, Baking',
-                    'experience_years' => 8,
-                    'bio' => 'Professional cook specializing in Pakistani and continental dishes. Available for part-time cooking.',
-                    'verification_status' => 'verified',
-                    'police_verified' => true,
                     'is_active' => true,
-                    'rating' => 4.9,
-                    'total_reviews' => 25,
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'PECHS',
+                        'skills' => 'Pakistani cuisine, BBQ, Baking',
+                        'experience_years' => 8,
+                        'bio' => 'Professional cook specializing in Pakistani and continental dishes. Available for part-time cooking.',
+                        'verification_status' => 'verified',
+                        'police_verified' => true,
+                        'is_active' => true,
+                        'rating' => 4.9,
+                        'total_reviews' => 25,
+                    ],
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'cook', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'PECHS', 'monthly_rate' => 21000, 'description' => 'Pakistani and continental cuisine'],
@@ -129,16 +152,19 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'helper',
                     'phone' => '03001234572',
                     'address' => 'Flat 302, Building B, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'DHA',
-                    'skills' => 'Childcare, Homework help, First aid',
-                    'experience_years' => 3,
-                    'bio' => 'Caring and patient babysitter with experience in childcare. Good with kids of all ages.',
-                    'verification_status' => 'verified',
-                    'police_verified' => true,
                     'is_active' => true,
-                    'rating' => 4.7,
-                    'total_reviews' => 8,
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'DHA',
+                        'skills' => 'Childcare, Homework help, First aid',
+                        'experience_years' => 3,
+                        'bio' => 'Caring and patient babysitter with experience in childcare. Good with kids of all ages.',
+                        'verification_status' => 'verified',
+                        'police_verified' => true,
+                        'is_active' => true,
+                        'rating' => 4.7,
+                        'total_reviews' => 8,
+                    ],
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'babysitter', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'DHA', 'monthly_rate' => 18000, 'description' => 'Full-time babysitting'],
@@ -152,16 +178,19 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'helper',
                     'phone' => '03001234573',
                     'address' => 'House 56, Sector 11, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'North Karachi',
-                    'skills' => 'Elderly care, Medication management, Physical therapy',
-                    'experience_years' => 10,
-                    'bio' => 'Experienced caregiver specializing in elderly care. Trained in basic medical assistance.',
-                    'verification_status' => 'verified',
-                    'police_verified' => true,
                     'is_active' => true,
-                    'rating' => 5.0,
-                    'total_reviews' => 15,
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'North Karachi',
+                        'skills' => 'Elderly care, Medication management, Physical therapy',
+                        'experience_years' => 10,
+                        'bio' => 'Experienced caregiver specializing in elderly care. Trained in basic medical assistance.',
+                        'verification_status' => 'verified',
+                        'police_verified' => true,
+                        'is_active' => true,
+                        'rating' => 5.0,
+                        'total_reviews' => 15,
+                    ],
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'North Karachi', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
@@ -175,16 +204,19 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'helper',
                     'phone' => '03001234574',
                     'address' => 'Shop 23, Main Road, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'Korangi',
-                    'skills' => 'Deep cleaning, Window cleaning, Carpet cleaning',
-                    'experience_years' => 4,
-                    'bio' => 'Professional cleaner with expertise in deep cleaning and maintenance.',
-                    'verification_status' => 'verified',
-                    'police_verified' => true,
                     'is_active' => true,
-                    'rating' => 4.6,
-                    'total_reviews' => 10,
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'Korangi',
+                        'skills' => 'Deep cleaning, Window cleaning, Carpet cleaning',
+                        'experience_years' => 4,
+                        'bio' => 'Professional cleaner with expertise in deep cleaning and maintenance.',
+                        'verification_status' => 'verified',
+                        'police_verified' => true,
+                        'is_active' => true,
+                        'rating' => 4.6,
+                        'total_reviews' => 10,
+                    ],
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'Korangi', 'monthly_rate' => 13500, 'description' => 'Deep cleaning services'],
@@ -198,16 +230,19 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'helper',
                     'phone' => '03001234575',
                     'address' => 'Flat 201, Tower C, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'Bahadurabad',
-                    'skills' => 'Cooking, Cleaning, Childcare, Errands',
-                    'experience_years' => 6,
-                    'bio' => 'Versatile all-rounder helper capable of handling multiple household tasks efficiently.',
-                    'verification_status' => 'verified',
-                    'police_verified' => true,
                     'is_active' => true,
-                    'rating' => 4.8,
-                    'total_reviews' => 18,
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'Bahadurabad',
+                        'skills' => 'Cooking, Cleaning, Childcare, Errands',
+                        'experience_years' => 6,
+                        'bio' => 'Versatile all-rounder helper capable of handling multiple household tasks efficiently.',
+                        'verification_status' => 'verified',
+                        'police_verified' => true,
+                        'is_active' => true,
+                        'rating' => 4.8,
+                        'total_reviews' => 18,
+                    ],
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'Bahadurabad', 'monthly_rate' => 19500, 'description' => 'Complete household management'],
@@ -222,6 +257,9 @@ class DummyUsersSeeder extends Seeder
                 $services = $helperData['services'] ?? [];
                 unset($helperData['services']);
 
+                $profileData = $helperData['profile'] ?? [];
+                unset($helperData['profile']);
+
                 // Remove 'role' from data array
                 $role = $helperData['role'];
                 unset($helperData['role']);
@@ -233,6 +271,12 @@ class DummyUsersSeeder extends Seeder
                 if (!$helper->hasRole('helper')) {
                     $helper->assignRole('helper');
                 }
+
+                // Create or update profile
+                $helper->profile()->updateOrCreate(
+                    ['profileable_id' => $helper->id, 'profileable_type' => User::class],
+                    $profileData
+                );
 
                 // Create service listings if provided
                 if (!empty($services)) {
@@ -248,7 +292,7 @@ class DummyUsersSeeder extends Seeder
                         if (!isset($groupedServices[$key])) {
                             $groupedServices[$key] = [
                                 'common' => [
-                                    'user_id' => $helper->id,
+                                    'profile_id' => $helper->profile->id, // Link to profile
                                     'work_type' => $serviceData['work_type'] ?? 'full_time',
                                     'monthly_rate' => $serviceData['monthly_rate'] ?? null,
                                     'description' => $serviceData['description'] ?? null,
@@ -266,35 +310,27 @@ class DummyUsersSeeder extends Seeder
                         }
 
                         // Add location
-                        $locationKey = $serviceData['city'] . '|' . $serviceData['area'];
-                        if (!isset($groupedServices[$key]['locations'][$locationKey])) {
-                            $groupedServices[$key]['locations'][$locationKey] = [
-                                'city' => $serviceData['city'],
-                                'area' => $serviceData['area'],
-                            ];
+                        $city = City::where('name', $serviceData['city'])->first();
+                        if ($city) {
+                            $location = Location::where('city_id', $city->id)
+                                ->where('area', $serviceData['area'])
+                                ->first();
+                            
+                            if ($location) {
+                                if (!in_array($location->id, $groupedServices[$key]['locations'])) {
+                                    $groupedServices[$key]['locations'][] = $location->id;
+                                }
+                            }
                         }
                     }
 
                     // Create service listings for each group
                     foreach ($groupedServices as $group) {
-                        $listing = \App\Models\ServiceListing::create($group['common']);
+                        // Add JSON columns
+                        $group['common']['service_types'] = $group['service_types'];
+                        $group['common']['locations'] = $group['locations'];
 
-                        // Attach service types
-                        foreach ($group['service_types'] as $serviceType) {
-                            \App\Models\ServiceListingServiceType::create([
-                                'service_listing_id' => $listing->id,
-                                'service_type' => $serviceType,
-                            ]);
-                        }
-
-                        // Attach locations
-                        foreach ($group['locations'] as $location) {
-                            \App\Models\ServiceListingLocation::create([
-                                'service_listing_id' => $listing->id,
-                                'city' => $location['city'],
-                                'area' => $location['area'],
-                            ]);
-                        }
+                        \App\Models\ServiceListing::create($group['common']);
                     }
                 }
 
@@ -314,10 +350,13 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'business',
                     'phone' => '03001234576',
                     'address' => 'Office 101, Business Center, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'PECHS',
-                    'bio' => 'Leading agency providing verified domestic help services.',
                     'is_active' => true,
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'PECHS',
+                        'bio' => 'Leading agency providing verified domestic help services.',
+                        'is_active' => true,
+                    ],
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'maid', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'PECHS', 'monthly_rate' => 15000, 'description' => 'Professional maid services'],
@@ -333,10 +372,13 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'business',
                     'phone' => '03001234577',
                     'address' => 'Suite 205, Corporate Tower, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'Clifton',
-                    'bio' => 'Reliable and professional care services for homes and businesses.',
                     'is_active' => true,
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'Clifton',
+                        'bio' => 'Reliable and professional care services for homes and businesses.',
+                        'is_active' => true,
+                    ],
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'Clifton', 'monthly_rate' => 21000, 'description' => 'Complete household management'],
@@ -351,6 +393,9 @@ class DummyUsersSeeder extends Seeder
                 $services = $businessData['services'] ?? [];
                 unset($businessData['services']);
 
+                $profileData = $businessData['profile'] ?? [];
+                unset($businessData['profile']);
+
                 // Remove 'role' from data array
                 $role = $businessData['role'];
                 unset($businessData['role']);
@@ -362,6 +407,12 @@ class DummyUsersSeeder extends Seeder
                 if (!$business->hasRole('business')) {
                     $business->assignRole('business');
                 }
+
+                // Create or update profile
+                $business->profile()->updateOrCreate(
+                    ['profileable_id' => $business->id, 'profileable_type' => User::class],
+                    $profileData
+                );
 
                 // Create service listings if provided
                 if (!empty($services)) {
@@ -377,7 +428,7 @@ class DummyUsersSeeder extends Seeder
                         if (!isset($groupedServices[$key])) {
                             $groupedServices[$key] = [
                                 'common' => [
-                                    'user_id' => $business->id,
+                                    'profile_id' => $business->profile->id, // Link to profile
                                     'work_type' => $serviceData['work_type'] ?? 'full_time',
                                     'monthly_rate' => $serviceData['monthly_rate'] ?? null,
                                     'description' => $serviceData['description'] ?? null,
@@ -395,35 +446,27 @@ class DummyUsersSeeder extends Seeder
                         }
 
                         // Add location
-                        $locationKey = $serviceData['city'] . '|' . $serviceData['area'];
-                        if (!isset($groupedServices[$key]['locations'][$locationKey])) {
-                            $groupedServices[$key]['locations'][$locationKey] = [
-                                'city' => $serviceData['city'],
-                                'area' => $serviceData['area'],
-                            ];
+                        $city = City::where('name', $serviceData['city'])->first();
+                        if ($city) {
+                            $location = Location::where('city_id', $city->id)
+                                ->where('area', $serviceData['area'])
+                                ->first();
+                            
+                            if ($location) {
+                                if (!in_array($location->id, $groupedServices[$key]['locations'])) {
+                                    $groupedServices[$key]['locations'][] = $location->id;
+                                }
+                            }
                         }
                     }
 
                     // Create service listings for each group
                     foreach ($groupedServices as $group) {
-                        $listing = \App\Models\ServiceListing::create($group['common']);
+                        // Add JSON columns
+                        $group['common']['service_types'] = $group['service_types'];
+                        $group['common']['locations'] = $group['locations'];
 
-                        // Attach service types
-                        foreach ($group['service_types'] as $serviceType) {
-                            \App\Models\ServiceListingServiceType::create([
-                                'service_listing_id' => $listing->id,
-                                'service_type' => $serviceType,
-                            ]);
-                        }
-
-                        // Attach locations
-                        foreach ($group['locations'] as $location) {
-                            \App\Models\ServiceListingLocation::create([
-                                'service_listing_id' => $listing->id,
-                                'city' => $location['city'],
-                                'area' => $location['area'],
-                            ]);
-                        }
+                        \App\Models\ServiceListing::create($group['common']);
                     }
 
                     $listingCount = count($groupedServices);
@@ -445,12 +488,17 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'admin',
                     'phone' => '03001234578',
                     'address' => 'Admin Office, Main Building, Karachi',
-                    'city' => 'Karachi',
-                    'area' => 'DHA',
+                    'profile' => [
+                        'city' => 'Karachi',
+                        'area' => 'DHA',
+                    ]
                 ],
             ];
 
             foreach ($admins as $adminData) {
+                $profileData = $adminData['profile'] ?? [];
+                unset($adminData['profile']);
+
                 // Remove 'role' from data array
                 $role = $adminData['role'];
                 unset($adminData['role']);
@@ -462,6 +510,13 @@ class DummyUsersSeeder extends Seeder
                 if (!$admin->hasRole('admin')) {
                     $admin->assignRole('admin');
                 }
+
+                // Create or update profile
+                $admin->profile()->updateOrCreate(
+                    ['profileable_id' => $admin->id, 'profileable_type' => User::class],
+                    $profileData
+                );
+
                 $this->command->info("Created admin: {$admin->email}");
             }
         }

@@ -97,10 +97,10 @@ export default function ServiceRequestsBrowse() {
             location_id: locationId || undefined,
             page: currentPage,
         };
-        
+
         // Remove undefined values
         Object.keys(params).forEach(key => params[key] === undefined && delete params[key]);
-        
+
         setLoading(true);
         bookingsService.browseBookings(params)
             .then((data) => {
@@ -136,12 +136,12 @@ export default function ServiceRequestsBrowse() {
 
     const handlePageChange = (url) => {
         if (!url) return;
-        
+
         // Extract page number from URL
         const urlObj = new URL(url, window.location.origin);
         const page = urlObj.searchParams.get('page') || 1;
         setCurrentPage(parseInt(page));
-        
+
         // Scroll to top of results
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -159,7 +159,7 @@ export default function ServiceRequestsBrowse() {
 
     return (
         <PublicLayout>
-            
+
             <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 text-white py-16">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Services Required</h1>
@@ -289,13 +289,13 @@ export default function ServiceRequestsBrowse() {
                     <>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {bookings.data.map((booking) => {
-                                const hasApplied = user && booking.job_applications && 
+                                const hasApplied = user && booking.job_applications &&
                                     booking.job_applications.some(app => app.user_id === user.id);
                                 const isHelper = user && (user.role === "helper" || user.role === "business");
-                                
+
                                 return (
-                                    <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                                        <div className="p-6">
+                                    <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col">
+                                        <div className="p-6 flex flex-col flex-grow">
                                             <div className="flex items-center justify-between mb-4">
                                                 <span className="bg-primary-100 text-primary-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
                                                     {booking.service_type?.replace("_", " ") || "N/A"}
@@ -328,7 +328,7 @@ export default function ServiceRequestsBrowse() {
                                                     📋 {booking.job_applications.length} application{booking.job_applications.length !== 1 ? "s" : ""} received
                                                 </p>
                                             )}
-                                            <div className="mt-4">
+                                            <div className="mt-auto">
                                                 {isHelper ? (
                                                     hasApplied ? (
                                                         <Link
@@ -379,11 +379,10 @@ export default function ServiceRequestsBrowse() {
                                                 onClick={() => handlePageChange(link.url)}
                                                 disabled={!link.url || link.active}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
-                                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                                    link.active
+                                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${link.active
                                                         ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
                                                         : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
-                                                } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                                                    } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                                             />
                                         ))}
                                     </div>

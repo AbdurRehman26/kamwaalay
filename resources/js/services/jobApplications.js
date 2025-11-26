@@ -12,7 +12,8 @@ export const jobApplicationsService = {
     },
 
     async createApplication(bookingId, data) {
-        const response = await api.post(`/job-applications/${bookingId}/apply`, data);
+        // Correct endpoint: /bookings/{booking}/apply
+        const response = await api.post(`/bookings/${bookingId}/apply`, data);
         return response.data;
     },
 
@@ -37,18 +38,18 @@ export const jobApplicationsService = {
     },
 
     async getMyApplications() {
-        const response = await api.get("/job-applications/my-applications");
+        const response = await api.get("/my-applications");
         return response.data;
     },
 
     async getMyRequestApplications() {
-        const response = await api.get("/job-applications/my-request-applications");
+        const response = await api.get("/my-request-applications");
         return response.data;
     },
 
     async getApplicationCreate(bookingId) {
-        const response = await api.get(`/job-applications/${bookingId}/apply`);
+        // Correct endpoint: /bookings/{booking}/apply
+        const response = await api.get(`/bookings/${bookingId}/apply`);
         return response.data;
     },
 };
-

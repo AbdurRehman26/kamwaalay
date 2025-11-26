@@ -34,6 +34,16 @@ export default function OnboardingHelper() {
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
+    const [fieldErrors, setFieldErrors] = useState({
+        serviceTypes: "",
+        locations: "",
+        workType: "",
+        nicFileType: "",
+        nicFileSize: "",
+        photoFileType: "",
+        photoFileSize: "",
+        locationSelect: "",
+    });
 
     // Update profile data when user loads
     useEffect(() => {
@@ -138,9 +148,12 @@ export default function OnboardingHelper() {
     const handleLocationSelect = (location, offerIndex) => {
         // Only allow selection if location has an id (actual location from database)
         if (!location.id) {
-            alert("Please select a specific location (area) from the list, not just a city.");
+            setFieldErrors(prev => ({ ...prev, locationSelect: "Please select a specific location (area) from the list, not just a city." }));
+            setTimeout(() => setFieldErrors(prev => ({ ...prev, locationSelect: "" })), 5000);
             return;
         }
+        // Clear error when valid location is selected
+        setFieldErrors(prev => ({ ...prev, locationSelect: "" }));
         // Check if location already exists
         const newOffers = [...offers];
         const exists = newOffers[offerIndex].selectedLocations.some(loc => loc.id === location.id);
@@ -192,21 +205,41 @@ export default function OnboardingHelper() {
         const offer = offers[0];
         
         // Validate
+        const validationErrors = {};
         if (!offer.selectedServiceTypes.length) {
-            alert("Please select at least one service type.");
-            setProcessing(false);
-            return;
+            validationErrors.serviceTypes = "Please select at least one service type.";
         }
         if (!offer.selectedLocations.length) {
-            alert("Please select at least one location.");
-            setProcessing(false);
-            return;
+            validationErrors.locations = "Please select at least one location.";
         }
         if (!offer.work_type) {
-            alert("Please select a work type.");
+            validationErrors.workType = "Please select a work type.";
+        }
+
+        if (Object.keys(validationErrors).length > 0) {
+            setFieldErrors(prev => ({ ...prev, ...validationErrors }));
             setProcessing(false);
+            // Scroll to first error
+            setTimeout(() => {
+                const firstErrorElement = document.querySelector('[data-error-field]');
+                if (firstErrorElement) {
+                    firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
             return;
         }
+
+        // Clear validation errors
+        setFieldErrors({
+            serviceTypes: "",
+            locations: "",
+            workType: "",
+            nicFileType: "",
+            nicFileSize: "",
+            photoFileType: "",
+            photoFileSize: "",
+            locationSelect: "",
+        });
 
         // Prepare data in the expected format
         const services = offer.selectedServiceTypes; // Array of strings
@@ -239,8 +272,8 @@ export default function OnboardingHelper() {
 
         try {
             await onboardingService.completeHelper(formData);
-            // Redirect to dashboard on success
-            navigate(route("dashboard"));
+            // Redirect to home page on success
+            navigate(route("home"));
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
@@ -263,16 +296,20 @@ export default function OnboardingHelper() {
                 // Validate file type
                 const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
                 if (!validTypes.includes(selectedFile.type)) {
-                    alert("Invalid file type. Please upload JPG, PNG, or PDF.");
+                    setFieldErrors(prev => ({ ...prev, nicFileType: "Invalid file type. Please upload JPG, PNG, or PDF." }));
                     e.target.value = ""; // Reset input
+                    setTimeout(() => setFieldErrors(prev => ({ ...prev, nicFileType: "" })), 5000);
                     return;
                 }
                 // Validate file size (5MB)
                 if (selectedFile.size > 5 * 1024 * 1024) {
-                    alert("File size exceeds 5MB limit.");
+                    setFieldErrors(prev => ({ ...prev, nicFileSize: "File size exceeds 5MB limit." }));
                     e.target.value = ""; // Reset input
+                    setTimeout(() => setFieldErrors(prev => ({ ...prev, nicFileSize: "" })), 5000);
                     return;
                 }
+                // Clear errors on successful file selection
+                setFieldErrors(prev => ({ ...prev, nicFileType: "", nicFileSize: "" }));
                 onFileAccepted(selectedFile);
             }
         };
@@ -299,14 +336,18 @@ export default function OnboardingHelper() {
                 // Validate file type
                 const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
                 if (!validTypes.includes(droppedFile.type)) {
-                    alert("Invalid file type. Please upload JPG, PNG, or PDF.");
+                    setFieldErrors(prev => ({ ...prev, nicFileType: "Invalid file type. Please upload JPG, PNG, or PDF." }));
+                    setTimeout(() => setFieldErrors(prev => ({ ...prev, nicFileType: "" })), 5000);
                     return;
                 }
                 // Validate file size (5MB)
                 if (droppedFile.size > 5 * 1024 * 1024) {
-                    alert("File size exceeds 5MB limit.");
+                    setFieldErrors(prev => ({ ...prev, nicFileSize: "File size exceeds 5MB limit." }));
+                    setTimeout(() => setFieldErrors(prev => ({ ...prev, nicFileSize: "" })), 5000);
                     return;
                 }
+                // Clear errors on successful file selection
+                setFieldErrors(prev => ({ ...prev, nicFileType: "", nicFileSize: "" }));
                 onFileAccepted(droppedFile);
             }
         };
@@ -370,16 +411,20 @@ export default function OnboardingHelper() {
                 // Validate file type
                 const validTypes = ["image/jpeg", "image/jpg", "image/png"];
                 if (!validTypes.includes(selectedFile.type)) {
-                    alert("Invalid file type. Please upload JPG or PNG.");
+                    setFieldErrors(prev => ({ ...prev, photoFileType: "Invalid file type. Please upload JPG or PNG." }));
                     e.target.value = ""; // Reset input
+                    setTimeout(() => setFieldErrors(prev => ({ ...prev, photoFileType: "" })), 5000);
                     return;
                 }
                 // Validate file size (2MB)
                 if (selectedFile.size > 2 * 1024 * 1024) {
-                    alert("File size exceeds 2MB limit.");
+                    setFieldErrors(prev => ({ ...prev, photoFileSize: "File size exceeds 2MB limit." }));
                     e.target.value = ""; // Reset input
+                    setTimeout(() => setFieldErrors(prev => ({ ...prev, photoFileSize: "" })), 5000);
                     return;
                 }
+                // Clear errors on successful file selection
+                setFieldErrors(prev => ({ ...prev, photoFileType: "", photoFileSize: "" }));
                 onFileAccepted(selectedFile);
             }
         };
@@ -406,14 +451,18 @@ export default function OnboardingHelper() {
                 // Validate file type
                 const validTypes = ["image/jpeg", "image/jpg", "image/png"];
                 if (!validTypes.includes(droppedFile.type)) {
-                    alert("Invalid file type. Please upload JPG or PNG.");
+                    setFieldErrors(prev => ({ ...prev, photoFileType: "Invalid file type. Please upload JPG or PNG." }));
+                    setTimeout(() => setFieldErrors(prev => ({ ...prev, photoFileType: "" })), 5000);
                     return;
                 }
                 // Validate file size (2MB)
                 if (droppedFile.size > 2 * 1024 * 1024) {
-                    alert("File size exceeds 2MB limit.");
+                    setFieldErrors(prev => ({ ...prev, photoFileSize: "File size exceeds 2MB limit." }));
+                    setTimeout(() => setFieldErrors(prev => ({ ...prev, photoFileSize: "" })), 5000);
                     return;
                 }
+                // Clear errors on successful file selection
+                setFieldErrors(prev => ({ ...prev, photoFileType: "", photoFileSize: "" }));
                 onFileAccepted(droppedFile);
             }
         };
@@ -494,9 +543,14 @@ export default function OnboardingHelper() {
                                 </div>
 
                                 {/* Service Types Selection */}
-                                <div className="mb-8">
+                                <div className="mb-8" data-error-field={fieldErrors.serviceTypes ? "true" : undefined}>
                                     <h3 className="text-lg font-bold text-gray-900 mb-4">Select Service Types *</h3>
                                     <p className="text-sm text-gray-600 mb-4">Choose the services for this offer. You can select multiple.</p>
+                                    {fieldErrors.serviceTypes && (
+                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                            <p className="text-sm text-red-600">{fieldErrors.serviceTypes}</p>
+                                        </div>
+                                    )}
                                     
                                     {/* Selected Service Types as Tags */}
                                     {offer.selectedServiceTypes.length > 0 && (
@@ -547,9 +601,19 @@ export default function OnboardingHelper() {
                                 </div>
 
                                 {/* Locations Selection */}
-                                <div className="mb-8">
+                                <div className="mb-8" data-error-field={fieldErrors.locations || fieldErrors.locationSelect ? "true" : undefined}>
                                     <h3 className="text-lg font-bold text-gray-900 mb-4">Select Locations *</h3>
                                     <p className="text-sm text-gray-600 mb-4">Add locations for this offer. You can add multiple locations.</p>
+                                    {fieldErrors.locations && (
+                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                            <p className="text-sm text-red-600">{fieldErrors.locations}</p>
+                                        </div>
+                                    )}
+                                    {fieldErrors.locationSelect && (
+                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                            <p className="text-sm text-red-600">{fieldErrors.locationSelect}</p>
+                                        </div>
+                                    )}
                                     
                                     {/* Selected Locations as Tags */}
                                     {offer.selectedLocations.length > 0 && (
@@ -615,18 +679,30 @@ export default function OnboardingHelper() {
 
                                 {/* Offer Details */}
                                 <div className="grid md:grid-cols-2 gap-6 mb-6">
-                                    <div>
+                                    <div data-error-field={fieldErrors.workType ? "true" : undefined}>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Work Type *</label>
                                         <select
                                             value={offer.work_type}
-                                            onChange={(e) => updateOffer(offerIndex, "work_type", e.target.value)}
-                                            className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                            onChange={(e) => {
+                                                updateOffer(offerIndex, "work_type", e.target.value);
+                                                if (e.target.value) {
+                                                    setFieldErrors(prev => ({ ...prev, workType: "" }));
+                                                }
+                                            }}
+                                            className={`w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 ${
+                                                fieldErrors.workType ? "border-red-300" : ""
+                                            }`}
                                             required
                                         >
                                             <option value="">Select Type</option>
                                             <option value="full_time">Full Time</option>
                                             <option value="part_time">Part Time</option>
                                         </select>
+                                        {fieldErrors.workType && (
+                                            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                                                <p className="text-sm text-red-600">{fieldErrors.workType}</p>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div>
@@ -698,10 +774,18 @@ export default function OnboardingHelper() {
                                     </label>
                                     <p className="text-xs text-gray-500 mb-2">Upload a clear photo or scan of your NIC (front and back if needed)</p>
                                     <NICDropzone
-                                        onFileAccepted={(file) => setProfileData({ ...profileData, nic: file })}
+                                        onFileAccepted={(file) => {
+                                            setProfileData({ ...profileData, nic: file });
+                                            setFieldErrors(prev => ({ ...prev, nicFileType: "", nicFileSize: "" }));
+                                        }}
                                         file={profileData.nic}
-                                        error={errors.nic}
+                                        error={errors.nic || fieldErrors.nicFileType || fieldErrors.nicFileSize}
                                     />
+                                    {(fieldErrors.nicFileType || fieldErrors.nicFileSize) && (
+                                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                                            <p className="text-sm text-red-600">{fieldErrors.nicFileType || fieldErrors.nicFileSize}</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>
@@ -725,10 +809,18 @@ export default function OnboardingHelper() {
                                     </label>
                                     <p className="text-xs text-gray-500 mb-2">Upload your profile photo (optional)</p>
                                     <PhotoDropzone
-                                        onFileAccepted={(file) => setProfileData({ ...profileData, photo: file })}
+                                        onFileAccepted={(file) => {
+                                            setProfileData({ ...profileData, photo: file });
+                                            setFieldErrors(prev => ({ ...prev, photoFileType: "", photoFileSize: "" }));
+                                        }}
                                         file={profileData.photo}
-                                        error={errors.photo}
+                                        error={errors.photo || fieldErrors.photoFileType || fieldErrors.photoFileSize}
                                     />
+                                    {(fieldErrors.photoFileType || fieldErrors.photoFileSize) && (
+                                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                                            <p className="text-sm text-red-600">{fieldErrors.photoFileType || fieldErrors.photoFileSize}</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -766,6 +858,24 @@ export default function OnboardingHelper() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* General Error Message */}
+                        {errors.submit && (
+                            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+                                <div className="flex items-start">
+                                    <div className="flex-shrink-0">
+                                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div className="ml-3">
+                                        <p className="text-sm font-medium text-red-800">
+                                            {Array.isArray(errors.submit) ? errors.submit[0] : errors.submit}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Submit Button */}
                         <div className="bg-white rounded-lg shadow-md p-8">

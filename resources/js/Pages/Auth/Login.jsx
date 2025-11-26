@@ -13,9 +13,7 @@ import { route } from "@/utils/routes";
 export default function Login() {
     const navigate = useNavigate();
     const { login, updateUser } = useAuth();
-    const [loginMethod, setLoginMethod] = useState("phone"); // 'email' or 'phone'
     const [authMethod, setAuthMethod] = useState("otp"); // 'otp' or 'password'
-    const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [remember, setRemember] = useState(false);
@@ -31,8 +29,7 @@ export default function Login() {
 
         try {
             const data = {
-                email: loginMethod === "email" ? email : "",
-                phone: loginMethod === "phone" ? phone : "",
+                phone: phone,
                 password: authMethod === "password" ? password : "",
                 remember: remember,
             };
@@ -41,7 +38,7 @@ export default function Login() {
             
             if (response.verification_method) {
                 // OTP verification required (account not verified)
-                setMessage(response.message || "Please check your email/phone for the verification code.");
+                setMessage(response.message || "Please check your phone for the verification code.");
                 // Store verification token for OTP verification
                 if (response.verification_token) {
                     authService.setVerificationToken(response.verification_token);
@@ -91,7 +88,7 @@ export default function Login() {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
-                setErrors({ email: [error.response?.data?.message || "Login failed. Please try again."] });
+                setErrors({ phone: [error.response?.data?.message || "Login failed. Please try again."] });
             }
         } finally {
             setProcessing(false);
@@ -134,45 +131,6 @@ export default function Login() {
                     )}
 
                     <form className="mt-8 space-y-6 bg-white rounded-2xl shadow-xl p-8" onSubmit={submit}>
-                        {/* Login Method Selection */}
-                        <div>
-                            <InputLabel value="Log in with" className="text-gray-700 font-medium mb-4" />
-                            <div className="grid grid-cols-2 gap-4">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setLoginMethod("email");
-                                        setEmail("");
-                                        setPhone("");
-                                    }}
-                                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                                        loginMethod === "email"
-                                            ? "border-primary-500 bg-primary-50 shadow-lg"
-                                            : "border-gray-200 hover:border-primary-300 bg-white"
-                                    }`}
-                                >
-                                    <div className="text-2xl mb-2">📧</div>
-                                    <h3 className={`font-bold text-base ${loginMethod === "email" ? "text-primary-600" : "text-gray-900"}`}>Email</h3>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setLoginMethod("phone");
-                                        setEmail("");
-                                        setPhone("");
-                                    }}
-                                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                                        loginMethod === "phone"
-                                            ? "border-primary-500 bg-primary-50 shadow-lg"
-                                            : "border-gray-200 hover:border-primary-300 bg-white"
-                                    }`}
-                                >
-                                    <div className="text-2xl mb-2">📱</div>
-                                    <h3 className={`font-bold text-base ${loginMethod === "phone" ? "text-primary-600" : "text-gray-900"}`}>Phone</h3>
-                                </button>
-                            </div>
-                        </div>
-
                         {/* Authenticate Method Selection */}
                         <div>
                             <InputLabel value="Authenticate with" className="text-gray-700 font-medium mb-4" />
@@ -210,59 +168,41 @@ export default function Login() {
                         </div>
 
                         <div className="space-y-6">
-                            {loginMethod === "email" ? (
-                                <div>
-                                    <InputLabel htmlFor="email" value="Email Address" className="text-gray-700 font-medium" />
+                            <div>
+                                <InputLabel htmlFor="phone" value="Phone Number" className="text-gray-700 font-medium" />
+                                <div className="mt-2 flex items-center gap-2">
+                                    <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-l-lg">
+                                        <span className="text-2xl">🇵🇰</span>
+                                        <span className="text-sm font-medium text-gray-700">+92</span>
+                                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
                                     <TextInput
-                                        id="email"
-                                        type="email"
-                                        name="email"
-                                        value={email}
-                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                                        autoComplete="username"
+                                        id="phone"
+                                        type="tel"
+                                        name="phone"
+                                        value={phone}
+                                        className="flex-1 rounded-r-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                        autoComplete="tel"
                                         isFocused={true}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        placeholder="Enter your phone number"
                                         required
                                     />
-                                    <InputError message={errors.email} className="mt-2" />
                                 </div>
-                            ) : (
-                                <div>
-                                    <InputLabel htmlFor="phone" value="Phone Number" className="text-gray-700 font-medium" />
-                                    <div className="mt-2 flex items-center gap-2">
-                                        <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-l-lg">
-                                            <span className="text-2xl">🇵🇰</span>
-                                            <span className="text-sm font-medium text-gray-700">+92</span>
-                                            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </div>
-                                        <TextInput
-                                            id="phone"
-                                            type="tel"
-                                            name="phone"
-                                            value={phone}
-                                            className="flex-1 rounded-r-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                                            autoComplete="tel"
-                                            isFocused={true}
-                                            onChange={(e) => setPhone(e.target.value)}
-                                            placeholder="Enter your phone number"
-                                            required
-                                        />
-                                    </div>
-                                    <InputError message={errors.phone} className="mt-2" />
-                                    {authMethod === "otp" && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setPhone("9876543210")}
-                                            className="mt-2 w-full bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-lg hover:bg-green-100 transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            <span>🔒</span>
-                                            <span className="text-sm font-medium">Use Demo Number: 9876543210</span>
-                                        </button>
-                                    )}
-                                </div>
-                            )}
+                                <InputError message={errors.phone} className="mt-2" />
+                                {authMethod === "otp" && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setPhone("9876543210")}
+                                        className="mt-2 w-full bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-lg hover:bg-green-100 transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <span>🔒</span>
+                                        <span className="text-sm font-medium">Use Demo Number: 9876543210</span>
+                                    </button>
+                                )}
+                            </div>
 
                             {authMethod === "password" && (
                                 <div>
@@ -310,7 +250,7 @@ export default function Login() {
                                         ? "bg-gray-400 hover:bg-gray-500"
                                         : "bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800"
                                 }`}
-                                disabled={processing || (authMethod === "otp" && !phone && !email)}
+                                disabled={processing || (authMethod === "otp" && !phone)}
                             >
                                 {processing 
                                     ? "Processing..." 

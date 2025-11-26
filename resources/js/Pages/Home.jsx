@@ -4,6 +4,11 @@ import PublicLayout from "@/Layouts/PublicLayout";
 import { homeService } from "@/services/home";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
+import {
+    isUser,
+    isUserOrGuest,
+    isHelperOrBusiness
+} from "@/utils/permissions";
 
 export default function Home() {
     const { user } = useAuth();
@@ -93,7 +98,7 @@ export default function Home() {
                             Connect with verified domestic helpers - maids, cooks, babysitters, and more. Your trusted partner for quality home care.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            {user?.role !== "helper" && (
+                            {isUserOrGuest(user) && (
                                 <Link
                                     to={route("helpers.index")}
                                     className="bg-white text-primary-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
@@ -107,7 +112,7 @@ export default function Home() {
                             >
                                 Services Required
                             </Link>
-                            {user?.role !== "helper" && (
+                            {isUser(user) && (
                                 <Link
                                     to={route("bookings.create")}
                                     className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300 min-w-[200px] text-center"
@@ -115,7 +120,7 @@ export default function Home() {
                                     Post Request
                                 </Link>
                             )}
-                            {user && (user.role === "helper" || user.role === "business") && (
+                            {isHelperOrBusiness(user) && (
                                 <Link
                                     to={route("service-listings.create")}
                                     className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300 min-w-[200px] text-center"
@@ -346,7 +351,7 @@ export default function Home() {
                     )}
                     {user && (
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            {(user.role === "helper" || user.role === "business") && (
+                            {isHelperOrBusiness(user) && (
                                 <Link
                                     to={route("service-listings.create")}
                                     className="bg-white text-primary-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px]"
@@ -354,7 +359,7 @@ export default function Home() {
                                     Offer Your Service
                                 </Link>
                             )}
-                            {user.role !== "helper" && (
+                            {isUser(user) && (
                                 <Link
                                     to={route("bookings.create")}
                                     className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300 min-w-[200px]"

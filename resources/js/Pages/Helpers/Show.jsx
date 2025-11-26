@@ -11,7 +11,7 @@ export default function HelperShow() {
     const navigate = useNavigate();
     const [helper, setHelper] = useState(null);
     const [loading, setLoading] = useState(true);
-    
+
     const serviceListings = helper?.service_listings || [];
     const reviews = helper?.helper_reviews || [];
 
@@ -32,7 +32,7 @@ export default function HelperShow() {
     if (loading) {
         return (
             <PublicLayout>
-                
+
                 <div className="min-h-screen flex items-center justify-center">
                     <p className="text-gray-600">Loading helper profile...</p>
                 </div>
@@ -43,7 +43,7 @@ export default function HelperShow() {
     if (!helper) {
         return (
             <PublicLayout>
-                
+
                 <div className="min-h-screen flex items-center justify-center">
                     <p className="text-gray-600">Helper not found.</p>
                 </div>
@@ -53,17 +53,17 @@ export default function HelperShow() {
 
     return (
         <PublicLayout>
-            
-            
+
+
             {/* Hero Section */}
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-16">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row gap-8 items-center">
                         <div className="flex-shrink-0">
                             {helper.photo ? (
-                                <img 
-                                    src={`/storage/${helper.photo}`} 
-                                    alt={helper.name} 
+                                <img
+                                    src={`/storage/${helper.photo}`}
+                                    alt={helper.name}
                                     className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
                                 />
                             ) : (
@@ -227,6 +227,24 @@ export default function HelperShow() {
                                         <p className="font-semibold text-gray-900">{helper.city}, {helper.area || "N/A"}</p>
                                     </div>
                                 )}
+                                {helper.availability && (
+                                    <div>
+                                        <p className="text-sm text-gray-600">Availability</p>
+                                        <p className="font-semibold text-gray-900 capitalize">{helper.availability.replace("_", " ")}</p>
+                                    </div>
+                                )}
+                                {helper.created_at && (
+                                    <div>
+                                        <p className="text-sm text-gray-600">Member Since</p>
+                                        <p className="font-semibold text-gray-900">{new Date(helper.created_at).toLocaleDateString()}</p>
+                                    </div>
+                                )}
+                                {helper.email && (
+                                    <div>
+                                        <p className="text-sm text-gray-600">Email</p>
+                                        <p className="font-semibold text-gray-900">{helper.email}</p>
+                                    </div>
+                                )}
                                 {helper.phone && (
                                     <div>
                                         <p className="text-sm text-gray-600">Phone</p>
@@ -240,19 +258,21 @@ export default function HelperShow() {
                         <div className="bg-white rounded-lg shadow-md p-6">
                             {user ? (
                                 <>
-                                    <Link
-                                        to={route("bookings.create", {
-                                            service_type: helper.service_listings && helper.service_listings.length > 0 && helper.service_listings[0].service_types && helper.service_listings[0].service_types.length > 0 
-                                                ? helper.service_listings[0].service_types[0].service_type 
-                                                : null,
-                                        })}
-                                        className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
-                                    >
-                                        Post Service Request
-                                    </Link>
-                                    {helper.phone && (
+                                    {user.role === "user" && (
+                                        <Link
+                                            to={route("bookings.create", {
+                                                service_type: helper.service_listings && helper.service_listings.length > 0 && helper.service_listings[0].service_types && helper.service_listings[0].service_types.length > 0
+                                                    ? helper.service_listings[0].service_types[0].service_type
+                                                    : null,
+                                            })}
+                                            className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
+                                        >
+                                            Post Service Request
+                                        </Link>
+                                    )}
+                                    {helper.phone && user.role === "user" && (
                                         <a
-                                            to={`tel:${helper.phone}`}
+                                            href={`tel:${helper.phone}`}
                                             className="w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3 flex items-center justify-center gap-2"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -811,11 +811,18 @@ class VerificationController extends Controller
     }
 
     /**
-     * Send SMS (mock implementation)
+     * Send SMS using Twilio
      */
     private function sendSms(string $phone, string $otp): void
     {
-        Log::info("OTP for {$phone}: {$otp}");
+        try {
+            $twilioService = app(\App\Services\TwilioService::class);
+            $twilioService->sendOtp($phone, $otp, 'verification');
+        } catch (\Exception $e) {
+            // Log error but don't fail - OTP is still logged for development
+            Log::error("Failed to send SMS via Twilio for {$phone}: " . $e->getMessage());
+            Log::info("OTP for {$phone}: {$otp}");
+        }
     }
 
     /**

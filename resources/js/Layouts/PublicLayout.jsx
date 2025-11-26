@@ -3,6 +3,13 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { route } from "@/utils/routes";
+import {
+    isUser,
+    isUserOrGuest,
+    isHelperOrGuest,
+    isBusiness,
+    isAdmin
+} from "@/utils/permissions";
 
 export default function PublicLayout({ children }) {
     const { user, logout } = useAuth();
@@ -29,30 +36,34 @@ export default function PublicLayout({ children }) {
             <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20 w-full">
-                        <Link to={route("home")} className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
-                            kamwaalay
+                        <Link to={route("home")} className="flex items-center">
+                            <img 
+                                src="/kamwaalay-logo.png" 
+                                alt="kamwaalay" 
+                                className="h-12 w-auto"
+                            />
                         </Link>
 
                         <div className="hidden lg:flex items-center space-x-8">
                             <Link to={route("home")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("common.home")}</Link>
-                            {user?.role !== "helper" && (
+                            {isUserOrGuest(user) && (
                                 <Link to={route("helpers.index")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.find_help")}</Link>
                             )}
-                            {(!user || user.role === "helper") && (
+                            {isHelperOrGuest(user) && (
                                 <Link to={route("service-requests.browse")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.services_required")}</Link>
                             )}
 
                             {user ? (
                                 <>
-                                    {(user.role === "user" || user.role === "business") && (
+                                    {isUser(user) && (
                                         <Link to={route("bookings.create")} className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium">
                                             {t("navigation.post_service_request")}
                                         </Link>
                                     )}
-                                    {user.role === "admin" && (
+                                    {isAdmin(user) && (
                                         <Link to={route("admin.dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.admin")}</Link>
                                     )}
-                                    {user.role === "business" && (
+                                    {isBusiness(user) && (
                                         <Link to={route("business.dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.business")}</Link>
                                     )}
                                     <Link to={route("dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("common.dashboard")}</Link>
@@ -97,16 +108,16 @@ export default function PublicLayout({ children }) {
                     {/* Mobile Menu */}
                     {mobileMenuOpen && (
                         <div className="lg:hidden py-4 space-y-2 border-t border-gray-100">
-                                    <Link to={route("home")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Home</Link>
-                                    {user?.role !== "helper" && (
-                                        <Link to={route("helpers.index")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Find Help</Link>
-                                    )}
-                                    {(!user || user.role === "helper") && (
-                                        <Link to={route("service-requests.browse")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Services Required</Link>
-                                    )}
+                            <Link to={route("home")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">{t("common.home")}</Link>
+                            {isUserOrGuest(user) && (
+                                <Link to={route("helpers.index")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">{t("navigation.find_help")}</Link>
+                            )}
+                            {isHelperOrGuest(user) && (
+                                <Link to={route("service-requests.browse")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">{t("navigation.services_required")}</Link>
+                            )}
                             {user ? (
                                 <>
-                                    {(user.role === "user" || user.role === "business") && (
+                                    {isUser(user) && (
                                         <Link to={route("bookings.create")} className="block py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all font-medium text-center">
                                             Post Service Request
                                         </Link>
@@ -147,7 +158,13 @@ export default function PublicLayout({ children }) {
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
                         <div className="col-span-1 md:col-span-2">
-                            <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-primary-400 to-primary-500 bg-clip-text text-transparent">kamwaalay</h3>
+                            <div className="mb-4">
+                                <img 
+                                    src="/kamwaalay-logo.png" 
+                                    alt="kamwaalay" 
+                                    className="h-10 w-auto"
+                                />
+                            </div>
                             <p className="text-gray-400 mb-4 max-w-md">Connecting households with trusted domestic help. Your reliable partner for all home care services.</p>
                             <div className="flex space-x-4 mt-6">
                                 <a href="#" className="text-gray-400 hover:text-white transition-colors">Facebook</a>
@@ -157,10 +174,10 @@ export default function PublicLayout({ children }) {
                         </div>
                         <div>
                             <h4 className="font-semibold mb-4 text-lg">Services</h4>
-                                    <ul className="space-y-3 text-gray-400">
-                                        <li><Link to={route("helpers.index")} className="hover:text-white transition-colors">Find Helpers</Link></li>
-                                        <li><Link to={route("bookings.create")} className="hover:text-white transition-colors">Post Service Request</Link></li>
-                                    </ul>
+                            <ul className="space-y-3 text-gray-400">
+                                <li><Link to={route("helpers.index")} className="hover:text-white transition-colors">Find Helpers</Link></li>
+                                <li><Link to={route("bookings.create")} className="hover:text-white transition-colors">Post Service Request</Link></li>
+                            </ul>
                         </div>
                         <div>
                             <h4 className="font-semibold mb-4 text-lg">Company</h4>

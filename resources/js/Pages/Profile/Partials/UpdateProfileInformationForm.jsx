@@ -17,6 +17,7 @@ export default function UpdateProfileInformation({
     const [data, setData] = useState({
         name: user?.name || "",
         email: user?.email || "",
+        phone: user?.phone || "",
     });
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
@@ -29,6 +30,7 @@ export default function UpdateProfileInformation({
             setData({
                 name: user.name || "",
                 email: user.email || "",
+                phone: user.phone || "",
             });
         }
     }, [user]);
@@ -88,23 +90,37 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.name} />
                 </div>
 
+                {user?.email && (
+                    <div>
+                        <InputLabel htmlFor="email" value="Email" />
+
+                        <TextInput
+                            id="email"
+                            type="email"
+                            className="mt-1 block w-full bg-gray-100 cursor-not-allowed"
+                            value={data.email}
+                            disabled
+                        />
+
+                        <InputError className="mt-2" message={errors.email} />
+                    </div>
+                )}
+
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="phone" value="Phone" />
 
                     <TextInput
-                        id="email"
-                        type="email"
-                        className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData({ ...data, email: e.target.value })}
-                        required
-                        autoComplete="username"
+                        id="phone"
+                        type="tel"
+                        className="mt-1 block w-full bg-gray-100 cursor-not-allowed"
+                        value={data.phone}
+                        disabled
                     />
 
-                    <InputError className="mt-2" message={errors.email} />
+                    <InputError className="mt-2" message={errors.phone} />
                 </div>
 
-                {mustVerifyEmail && user?.email_verified_at === null && (
+                {mustVerifyEmail && user?.email && user?.email_verified_at === null && (
                     <div>
                         <p className="mt-2 text-sm text-gray-800">
                             Your email address is unverified.

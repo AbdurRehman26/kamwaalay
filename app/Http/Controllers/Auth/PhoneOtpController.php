@@ -184,18 +184,17 @@ class PhoneOtpController extends Controller
     }
 
     /**
-     * Send SMS (mock implementation - replace with actual SMS service like Twilio)
+     * Send SMS using Twilio
      */
     private function sendSms(string $phone, string $otp): void
     {
-        // TODO: Replace with actual SMS service integration
-        // For development, log the OTP
-        Log::info("OTP for {$phone}: {$otp}");
-
-        // In production, use a service like:
-        // Twilio::sms($phone, "Your kamwaalay OTP is: {$otp}. Valid for 3 minutes.");
-
-        // For now, we'll just log it
-        // You can also use Laravel Notification with SMS channel
+        try {
+            $twilioService = app(\App\Services\TwilioService::class);
+            $twilioService->sendOtp($phone, $otp, 'verification');
+        } catch (\Exception $e) {
+            // Log error but don't fail - OTP is still logged for development
+            Log::error("Failed to send SMS via Twilio for {$phone}: " . $e->getMessage());
+            Log::info("OTP for {$phone}: {$otp}");
+        }
     }
 }

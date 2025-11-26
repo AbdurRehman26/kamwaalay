@@ -276,15 +276,17 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Send SMS (mock implementation - replace with actual SMS service like Twilio)
+     * Send SMS using Twilio
      */
     private function sendSms(string $phone, string $otp): void
     {
-        // TODO: Replace with actual SMS service integration
-        // For development, log the OTP
-        Log::info("OTP for {$phone}: {$otp}");
-
-        // In production, use a service like:
-        // Twilio::sms($phone, "Your kamwaalay verification code is: {$otp}. Valid for 3 minutes.");
+        try {
+            $twilioService = app(\App\Services\TwilioService::class);
+            $twilioService->sendOtp($phone, $otp, 'registration');
+        } catch (\Exception $e) {
+            // Log error but don't fail registration - OTP is still logged for development
+            Log::error("Failed to send SMS via Twilio for {$phone}: " . $e->getMessage());
+            Log::info("Registration OTP for {$phone}: {$otp}");
+        }
     }
 }

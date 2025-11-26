@@ -22,5 +22,10 @@ export const profileService = {
         });
         return response.data;
     },
+
+    async getDocuments() {
+        const response = await api.get("/profile/documents");
+        return response.data;
+    },
 };
 

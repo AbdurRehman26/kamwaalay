@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Document;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -205,5 +206,50 @@ class ProfileController extends Controller
         }
 
         return response()->json(['message' => 'Account deleted successfully.']);
+    }
+
+    #[OA\Get(
+        path: "/api/profile/documents",
+        summary: "Get user documents",
+        description: "Get the authenticated user's uploaded documents",
+        tags: ["Profile"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "User documents",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "documents", type: "array", items: new OA\Items(type: "object")),
+                    ]
+                )
+            ),
+        ]
+    )]
+    /**
+     * Get user's documents
+     */
+    public function documents(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $documents = Document::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'documents' => $documents->map(function ($document) {
+                return [
+                    'id' => $document->id,
+                    'document_type' => $document->document_type,
+                    'document_type_label' => $document->document_type_label,
+                    'document_number' => $document->document_number,
+                    'file_path' => $document->file_path,
+                    'status' => $document->status,
+                    'admin_notes' => $document->admin_notes,
+                    'created_at' => $document->created_at->toIso8601String(),
+                    'updated_at' => $document->updated_at->toIso8601String(),
+                ];
+            }),
+        ]);
     }
 }

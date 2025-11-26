@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             DummyUsersSeeder::class,
             ServiceRequestsSeeder::class,
+            AdditionalDataSeeder::class,
         ]);
     }
 }

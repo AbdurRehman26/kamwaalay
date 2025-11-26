@@ -329,37 +329,71 @@ class BusinessController extends Controller
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|max:20',
             'photo' => 'nullable|image|max:2048',
-            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'service_types' => 'required|array|min:1',
+            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'locations' => 'required|array|min:1',
+            'locations.*.city' => 'required|string|max:255',
+            'locations.*.area' => 'required|string|max:255',
             'skills' => 'nullable|string',
             'experience_years' => 'required|integer|min:0',
-            'city' => 'required|string|max:255',
-            'area' => 'required|string|max:255',
             'availability' => 'required|in:full_time,part_time,available',
             'bio' => 'nullable|string',
             'password' => 'required|min:8|confirmed',
         ]);
 
         // Create user account for the worker
-        $helperData = [
+        $userData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
             'password' => Hash::make($validated['password']),
-            'service_type' => $validated['service_type'],
+            'is_active' => true,
+        ];
+
+        $helper = User::create($userData);
+        $helper->assignRole('helper');
+
+        // Use first location for profile (primary location)
+        $primaryLocation = $validated['locations'][0];
+
+        // Create profile for the worker
+        $profileData = [
+            'service_type' => $validated['service_types'][0], // Primary service type
             'skills' => $validated['skills'] ?? null,
             'experience_years' => $validated['experience_years'],
-            'city' => $validated['city'],
-            'area' => $validated['area'],
+            'city' => $primaryLocation['city'],
+            'area' => $primaryLocation['area'],
             'availability' => $validated['availability'],
             'bio' => $validated['bio'] ?? null,
+            'is_active' => true,
+            'verification_status' => 'pending', // Default status
         ];
 
         if ($request->hasFile('photo')) {
-            $helperData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
+            $profileData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
         }
 
-        $helper = User::create($helperData);
-        $helper->assignRole('helper');
+        $profile = $helper->profile()->create($profileData);
+
+        // Create service listing with all service types and locations
+        $serviceListingData = [
+            'profile_id' => $profile->id,
+            'work_type' => $validated['availability'], // Map availability to work_type
+            'service_types' => $validated['service_types'], // JSON array
+            'locations' => array_map(function($location) {
+                // Find or create location ID
+                $locationModel = \App\Models\Location::firstOrCreate([
+                    'city_id' => \App\Models\City::firstOrCreate(['name' => $location['city']])->id,
+                    'area' => $location['area'],
+                ]);
+                return $locationModel->id;
+            }, $validated['locations']), // JSON array of location IDs
+            'description' => $validated['bio'],
+            'is_active' => true,
+            'status' => 'active',
+        ];
+
+        \App\Models\ServiceListing::create($serviceListingData);
 
         // Attach to business via pivot table
         $business->helpers()->attach($helper->id, [

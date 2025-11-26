@@ -122,13 +122,17 @@ class AuthenticatedSessionController extends Controller
         $normalizedPhone = $request->filled('phone') ? preg_replace('/[^0-9+]/', '', $request->input('phone')) : null;
 
         if ($normalizedPhone === $demoPhoneNumber || $normalizedPhone === '+' . $demoPhoneNumber) {
-            // Find first user with helper or business role
-            $user = User::find(6);
+            // Find first user with ONLY business role
+            $user = User::role('business')->get()->filter(function ($user) {
+                return $user->roles->count() === 1 && $user->roles->first()->name === 'business';
+            })->first();
 
             if (!$user) {
+                // Fallback: Try to find any business user if strict check fails, or return error
+                // For strict compliance with "only business", we'll return error if no exclusive business user found
                 return response()->json([
-                    'message' => 'No helper or business users found in database.',
-                    'errors' => ['phone' => ['No helper or business users found in database.']]
+                    'message' => 'No exclusive business users found in database.',
+                    'errors' => ['phone' => ['No exclusive business users found in database.']]
                 ], 422);
             }
 
@@ -433,16 +437,18 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Send SMS (mock implementation - replace with actual SMS service like Twilio)
+     * Send SMS using Twilio
      */
     private function sendSms(string $phone, string $otp): void
     {
-        // TODO: Replace with actual SMS service integration
-        // For development, log the OTP
-        Log::info("Login OTP for {$phone}: {$otp}");
-
-        // In production, use a service like:
-        // Twilio::sms($phone, "Your kamwaalay login verification code is: {$otp}. Valid for 3 minutes.");
+        try {
+            $twilioService = app(\App\Services\TwilioService::class);
+            $twilioService->sendOtp($phone, $otp, 'login');
+        } catch (\Exception $e) {
+            // Log error but don't fail login - OTP is still logged for development
+            Log::error("Failed to send SMS via Twilio for {$phone}: " . $e->getMessage());
+            Log::info("Login OTP for {$phone}: {$otp}");
+        }
     }
 
     /**
