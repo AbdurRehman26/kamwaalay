@@ -41,13 +41,13 @@ test('users can update their profile', function () {
         'Accept' => 'application/json',
     ])->patchJson('/api/profile', [
         'name' => 'New Name',
-        'email' => 'new@example.com',
     ]);
 
     $response->assertStatus(200);
     $user->refresh();
     expect($user->name)->toBe('New Name');
-    expect($user->email)->toBe('new@example.com');
+    // Email should remain unchanged as it's no longer part of profile updates
+    expect($user->email)->toBe('old@example.com');
 });
 
 test('users can delete their account', function () {
@@ -95,7 +95,7 @@ test('users must provide correct password to delete account', function () {
     ]);
 });
 
-test('email verification is reset when email is changed', function () {
+test('email verification is not reset when profile is updated', function () {
     $user = User::factory()->create([
         'email' => 'old@example.com',
         'verified_at' => now(),
@@ -108,12 +108,12 @@ test('email verification is reset when email is changed', function () {
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->patchJson('/api/profile', [
-        'name' => $user->name,
-        'email' => 'new@example.com',
+        'name' => 'Updated Name',
     ]);
 
     $response->assertStatus(200);
     $user->refresh();
-    expect($user->verified_at)->toBeNull();
+    // Email verification should remain unchanged as email is not part of profile updates
+    expect($user->verified_at)->not->toBeNull();
 });
 

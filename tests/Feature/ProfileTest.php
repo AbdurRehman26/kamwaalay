@@ -25,7 +25,9 @@ class ProfileTest extends TestCase
 
     public function test_profile_information_can_be_updated(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'email' => 'original@example.com',
+        ]);
         $token = $user->createToken('test-token')->plainTextToken;
 
         $response = $this->withHeaders([
@@ -33,7 +35,6 @@ class ProfileTest extends TestCase
             'Accept' => 'application/json',
         ])->patchJson('/api/profile', [
             'name' => 'Test User',
-            'email' => 'test@example.com',
         ]);
 
         $response->assertStatus(200);
@@ -41,11 +42,11 @@ class ProfileTest extends TestCase
         $user->refresh();
 
         $this->assertSame('Test User', $user->name);
-        $this->assertSame('test@example.com', $user->email);
-        $this->assertNull($user->verified_at);
+        // Email should remain unchanged as it's no longer part of profile updates
+        $this->assertSame('original@example.com', $user->email);
     }
 
-    public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
+    public function test_email_verification_status_is_unchanged_when_profile_is_updated(): void
     {
         $user = User::factory()->create([
             'verified_at' => now(),
@@ -57,11 +58,11 @@ class ProfileTest extends TestCase
             'Accept' => 'application/json',
         ])->patchJson('/api/profile', [
             'name' => 'Test User',
-            'email' => $user->email,
         ]);
 
         $response->assertStatus(200);
 
+        // Email verification should remain unchanged as email is not part of profile updates
         $this->assertNotNull($user->refresh()->verified_at);
     }
 
