@@ -59,11 +59,6 @@ export default function PublicLayout({ children }) {
 
                             {user ? (
                                 <>
-                                    {isHelperOrBusiness(user) && (
-                                        <>
-                                            <Link to={route("job-applications.index")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">Browse Requests</Link>
-                                        </>
-                                    )}
                                     {isUser(user) && (
                                         <>
                                             <Link to={route("bookings.create")} className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium">
@@ -132,11 +127,6 @@ export default function PublicLayout({ children }) {
                             )}
                             {user ? (
                                 <>
-                                    {isHelperOrBusiness(user) && (
-                                        <>
-                                            <Link to={route("job-applications.index")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Browse Requests</Link>
-                                        </>
-                                    )}
                                     {isUser(user) && (
                                         <>
                                             <Link to={route("bookings.create")} className="block py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all font-medium text-center">

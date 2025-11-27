@@ -5,6 +5,7 @@ import { route } from "@/utils/routes";
 import { useState, useEffect } from "react";
 import { jobApplicationsService } from "@/services/jobApplications";
 import { profileService } from "@/services/profile";
+import { messagesService } from "@/services/messages";
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -12,6 +13,8 @@ export default function Dashboard() {
     const [loadingApplications, setLoadingApplications] = useState(false);
     const [documents, setDocuments] = useState([]);
     const [loadingDocuments, setLoadingDocuments] = useState(false);
+    const [conversations, setConversations] = useState([]);
+    const [loadingConversations, setLoadingConversations] = useState(false);
 
     // Fetch applications based on user role
     useEffect(() => {
@@ -57,6 +60,22 @@ export default function Dashboard() {
                 .catch((error) => {
                     console.error("Error fetching documents:", error);
                     setLoadingDocuments(false);
+                });
+        }
+    }, [user]);
+
+    // Fetch conversations for chat section
+    useEffect(() => {
+        if (user) {
+            setLoadingConversations(true);
+            messagesService.getConversations()
+                .then((data) => {
+                    setConversations(data.conversations || []);
+                    setLoadingConversations(false);
+                })
+                .catch((error) => {
+                    console.error("Error fetching conversations:", error);
+                    setLoadingConversations(false);
                 });
         }
     }, [user]);
@@ -224,6 +243,107 @@ export default function Dashboard() {
                         )}
 
                     </div>
+
+                    {/* Recent Conversations / Chat Section */}
+                    {user && (
+                        <div className="mb-8">
+                            <div className="flex justify-between items-center mb-6">
+                                <div>
+                                    <h2 className="text-xl font-bold text-gray-900 mb-1">Recent Conversations</h2>
+                                    <p className="text-sm text-gray-600">Your recent chat messages</p>
+                                </div>
+                                <Link
+                                    to={route("messages")}
+                                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition duration-300 font-semibold text-sm shadow-md hover:shadow-lg"
+                                >
+                                    View All
+                                </Link>
+                            </div>
+                            
+                            {loadingConversations ? (
+                                <div className="bg-white rounded-xl shadow-md p-8 text-center border border-gray-100">
+                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mb-3"></div>
+                                    <p className="text-gray-600 text-sm">Loading conversations...</p>
+                                </div>
+                            ) : conversations.length > 0 ? (
+                                <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                                    <div className="divide-y divide-gray-100">
+                                        {conversations.slice(0, 5).map((conversation) => (
+                                            <Link
+                                                key={conversation.id}
+                                                to={route("messages")}
+                                                className="block p-4 hover:bg-primary-50 transition-all duration-300 border-l-4 border-transparent hover:border-primary-500"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex-shrink-0">
+                                                        {conversation.other_user.photo ? (
+                                                            <img
+                                                                src={`/storage/${conversation.other_user.photo}`}
+                                                                alt={conversation.other_user.name}
+                                                                className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                                                                {conversation.other_user.name.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <p className="text-base font-bold text-gray-900 truncate">
+                                                                {conversation.other_user.name}
+                                                            </p>
+                                                            {conversation.unread_count > 0 && (
+                                                                <span className="flex-shrink-0 bg-primary-600 text-white text-xs font-bold px-2.5 py-1 rounded-full min-w-[20px] text-center">
+                                                                    {conversation.unread_count}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {conversation.last_message && (
+                                                            <p className="text-sm text-gray-600 truncate">
+                                                                {conversation.last_message.message}
+                                                            </p>
+                                                        )}
+                                                        {conversation.last_message && (
+                                                            <p className="text-xs text-gray-400 mt-1">
+                                                                {new Date(conversation.last_message.created_at).toLocaleDateString() === new Date().toLocaleDateString()
+                                                                    ? new Date(conversation.last_message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                                                    : new Date(conversation.last_message.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                    {conversations.length > 5 && (
+                                        <div className="bg-gradient-to-r from-primary-50 to-primary-100 px-4 py-3 text-center border-t border-primary-200">
+                                            <Link
+                                                to={route("messages")}
+                                                className="inline-flex items-center text-primary-700 hover:text-primary-900 font-bold text-sm transition-colors duration-300"
+                                            >
+                                                View all {conversations.length} conversations
+                                                <span className="ml-1">→</span>
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="bg-white rounded-xl shadow-md p-8 text-center border border-gray-100">
+                                    <div className="text-4xl mb-4">💬</div>
+                                    <p className="text-gray-700 font-medium mb-1 text-base">No conversations yet</p>
+                                    <p className="text-gray-600 text-sm mb-4">Start a conversation by contacting someone</p>
+                                    <Link
+                                        to={route("messages")}
+                                        className="inline-block bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition duration-300 font-bold text-sm shadow-md hover:shadow-lg"
+                                    >
+                                        Go to Messages
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Documents & Verification Status Section (Helpers/Businesses) */}
                     {(user?.role === "helper" || user?.role === "business") && (

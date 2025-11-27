@@ -60,7 +60,7 @@ export default function MyApplications() {
                                                 {application.booking.service_type_label}
                                             </h3>
                                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(application.status)}`}>
-                                                {application.status}
+                                                {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
                                             </span>
                                         </div>
                                         <p className="text-gray-600 mb-2 capitalize">
@@ -73,7 +73,7 @@ export default function MyApplications() {
                                             <p className="text-gray-600 text-sm mt-3 line-clamp-2">{application.message}</p>
                                         )}
                                         {application.proposed_rate && (
-                                            <p className="text-green-600 font-bold mt-2">Proposed Rate: PKR {application.proposed_rate}/hr</p>
+                                            <p className="text-green-600 font-bold mt-2">Proposed Rate: PKR {application.proposed_rate}/month</p>
                                         )}
                                     </div>
                                     <div className="flex gap-2 ml-4">

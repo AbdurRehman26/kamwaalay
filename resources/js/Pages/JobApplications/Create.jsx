@@ -55,7 +55,7 @@ export default function JobApplicationCreate() {
         try {
             const response = await jobApplicationsService.createApplication(bookingId, data);
             // Redirect to applications index or show success message
-            navigate(route("job-applications.index")); // Use navigate instead of router.visit for React Router
+            navigate(route("job-applications.my-applications")); // Use navigate instead of router.visit for React Router
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
@@ -85,7 +85,7 @@ export default function JobApplicationCreate() {
                     <div className="text-center py-12">
                         <div className="text-red-600 text-xl mb-4">⚠️ {errorMessage}</div>
                         <button
-                            onClick={() => navigate(route("service-requests.index"))}
+                            onClick={() => navigate(route("service-requests.browse"))}
                             className="mt-4 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                         >
                             Back to Service Requests
@@ -95,7 +95,7 @@ export default function JobApplicationCreate() {
                     <div className="text-center py-12">
                         <p className="text-red-600">Booking not found</p>
                         <button
-                            onClick={() => navigate(route("service-requests.index"))}
+                            onClick={() => navigate(route("service-requests.browse"))}
                             className="mt-4 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                         >
                             Back to Service Requests
@@ -122,7 +122,13 @@ export default function JobApplicationCreate() {
                                 {booking.start_date && (
                                     <div>
                                         <h3 className="text-lg font-semibold text-gray-700 mb-2">Start Date</h3>
-                                        <p className="text-gray-900">{booking.start_date}</p>
+                                        <p className="text-gray-900">
+                                            {new Date(booking.start_date).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}
+                                        </p>
                                     </div>
                                 )}
                                 {booking.special_requirements && (
@@ -177,7 +183,7 @@ export default function JobApplicationCreate() {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => navigate(route("service-requests.index"))}
+                                    onClick={() => navigate(route("service-requests.browse"))}
                                     className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
                                 >
                                     Cancel

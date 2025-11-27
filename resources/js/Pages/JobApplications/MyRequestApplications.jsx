@@ -86,7 +86,7 @@ export default function MyRequestApplications() {
                                                 {application.booking.service_type_label}
                                             </h3>
                                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(application.status)}`}>
-                                                {application.status}
+                                                {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
                                             </span>
                                         </div>
                                         <p className="text-gray-600 mb-2">
@@ -104,7 +104,7 @@ export default function MyRequestApplications() {
                                             </div>
                                         )}
                                         {application.proposed_rate && (
-                                            <p className="text-green-600 font-bold text-lg">Proposed Rate: PKR {application.proposed_rate}/hr</p>
+                                            <p className="text-green-600 font-bold text-lg">Proposed Rate: PKR {application.proposed_rate}/month</p>
                                         )}
                                     </div>
                                     {application.status === "pending" && (

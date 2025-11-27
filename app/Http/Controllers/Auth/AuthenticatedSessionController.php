@@ -123,9 +123,7 @@ class AuthenticatedSessionController extends Controller
 
         if ($normalizedPhone === $demoPhoneNumber || $normalizedPhone === '+' . $demoPhoneNumber) {
             // Find first user with ONLY business role
-            $user = User::role('business')->get()->filter(function ($user) {
-                return $user->roles->count() === 1 && $user->roles->first()->name === 'business';
-            })->first();
+            $user = User::find(9);
 
             if (!$user) {
                 // Fallback: Try to find any business user if strict check fails, or return error

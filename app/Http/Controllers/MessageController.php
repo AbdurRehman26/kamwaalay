@@ -84,7 +84,7 @@ class MessageController extends Controller
         
         $conversations = Conversation::where('user_one_id', $user->id)
             ->orWhere('user_two_id', $user->id)
-            ->with(['userOne', 'userTwo', 'messages' => function ($query) {
+            ->with(['userOne.profile', 'userTwo.profile', 'messages' => function ($query) {
                 $query->latest()->limit(1);
             }])
             ->orderBy('last_message_at', 'desc')
@@ -199,8 +199,8 @@ class MessageController extends Controller
         }
 
         $messages = $conversation->messages()
-            ->with('sender:id,name,photo')
-            ->orderBy('created_at', 'desc')
+            ->with('sender.profile')
+            ->orderBy('created_at', 'asc')
             ->paginate(20);
 
         // Mark messages as read
@@ -220,7 +220,7 @@ class MessageController extends Controller
     #[OA\Post(
         path: "/api/messages",
         summary: "Send a message",
-        description: "Send a message to a user. Creates a new conversation if one doesn't exist. The message is broadcast via Pusher to the recipient in real-time.",
+        description: "Send a message to a user. Creates a new conversation if one doesn't exist. The message is broadcast via Pusher to the recipient in real-time. Note: Helpers and businesses can only reply to users who have contacted them first. Users can contact helpers/businesses at any time.",
         tags: ["Messages"],
         security: [["sanctum" => []]],
         requestBody: new OA\RequestBody(
@@ -282,6 +282,15 @@ class MessageController extends Controller
                 )
             ),
             new OA\Response(
+                response: 403,
+                description: "Forbidden - Helper/Business can only reply to users who have contacted them first",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "You can only reply to users who have contacted you first."),
+                    ]
+                )
+            ),
+            new OA\Response(
                 response: 422,
                 description: "Validation error",
                 content: new OA\JsonContent(
@@ -315,8 +324,29 @@ class MessageController extends Controller
             return response()->json(['message' => 'Cannot send message to yourself'], 422);
         }
 
+        // Get recipient user to check their role
+        $recipient = \App\Models\User::findOrFail($recipientId);
+        
+        // Check if sender is helper/business and recipient is a regular user
+        $senderIsHelperOrBusiness = $user->hasRole(['helper', 'business']);
+        $recipientIsUser = $recipient->hasRole('user');
+        
         // Get or create conversation
         $conversation = Conversation::getOrCreate($user->id, $recipientId);
+        
+        // If helper/business is trying to contact a user, check if user has already initiated
+        if ($senderIsHelperOrBusiness && $recipientIsUser) {
+            // Check if user has sent any messages in this conversation
+            $userHasMessaged = $conversation->messages()
+                ->where('sender_id', $recipientId)
+                ->exists();
+            
+            if (!$userHasMessaged) {
+                return response()->json([
+                    'message' => 'You can only reply to users who have contacted you first.'
+                ], 403);
+            }
+        }
 
         // Create message
         $message = Message::create([
@@ -329,7 +359,7 @@ class MessageController extends Controller
         $conversation->update(['last_message_at' => now()]);
 
         // Load relationships before broadcasting
-        $message->load('sender:id,name,photo');
+        $message->load('sender.profile');
         $message->refresh();
 
         // Broadcast message via Pusher

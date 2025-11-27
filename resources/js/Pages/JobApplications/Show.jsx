@@ -86,7 +86,7 @@ export default function JobApplicationShow() {
                     <div className="bg-white rounded-lg shadow-md p-8 mb-8">
                         <div className="flex items-center gap-3 mb-6">
                             <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(application.status)}`}>
-                                {application.status.toUpperCase()}
+                                {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
                             </span>
                             <span className="text-gray-500 text-sm">Applied on {new Date(application.applied_at).toLocaleDateString()}</span>
                         </div>
@@ -122,7 +122,7 @@ export default function JobApplicationShow() {
                         {application.proposed_rate && (
                             <div className="mb-6">
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Proposed Rate</h3>
-                                <p className="text-2xl font-bold text-green-600">PKR {application.proposed_rate}/hr</p>
+                                <p className="text-2xl font-bold text-green-600">PKR {application.proposed_rate}/month</p>
                             </div>
                         )}
                     </div>
