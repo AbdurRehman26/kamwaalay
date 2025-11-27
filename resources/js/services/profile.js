@@ -36,5 +36,11 @@ export const profileService = {
         const response = await api.post("/profile/photo", formData);
         return response.data;
     },
+
+    async uploadDocument(formData) {
+        // FormData handling is done automatically by api.js interceptor
+        const response = await api.post("/profile/documents", formData);
+        return response.data;
+    },
 };
 

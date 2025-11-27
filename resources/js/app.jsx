@@ -43,6 +43,7 @@ import PageFAQ from "./Pages/Pages/FAQ";
 import PageTerms from "./Pages/Pages/Terms";
 import PagePrivacy from "./Pages/Pages/Privacy";
 import MessagesIndex from "./Pages/Messages/Index";
+import NotificationsIndex from "./Pages/Notifications/Index";
 
 // Routes Component (inside providers)
 function AppRoutes() {
@@ -212,6 +213,11 @@ function AppRoutes() {
             <Route path="/messages" element={
                 <ProtectedRoute>
                     <MessagesIndex />
+                </ProtectedRoute>
+            } />
+            <Route path="/notifications" element={
+                <ProtectedRoute>
+                    <NotificationsIndex />
                 </ProtectedRoute>
             } />
 

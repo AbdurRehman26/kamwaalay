@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\User;
 use App\Models\Review;
 use App\Models\Document;
+use App\Notifications\DocumentVerified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -301,7 +302,9 @@ class AdminController extends Controller
             'admin_notes' => 'nullable|string',
         ]);
 
+        $oldStatus = $document->status;
         $document->update($validated);
+        $document->refresh();
 
         // If all documents are verified, mark helper as verified
         if ($validated['status'] === 'verified') {
@@ -318,6 +321,11 @@ class AdminController extends Controller
                     );
                 }
             }
+        }
+
+        // Notify user about document status change (if status changed)
+        if ($oldStatus !== $validated['status'] && ($validated['status'] === 'verified' || $validated['status'] === 'rejected')) {
+            $document->user->notify(new DocumentVerified($document, $validated['status']));
         }
 
         return response()->json([

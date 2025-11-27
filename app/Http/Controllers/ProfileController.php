@@ -220,6 +220,24 @@ class ProfileController extends Controller
             ),
         ]
     )]
+    #[OA\Get(
+        path: "/api/profile/documents",
+        summary: "Get user documents",
+        description: "Get the authenticated user's uploaded documents",
+        tags: ["Profile"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "User documents",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "documents", type: "array", items: new OA\Items(type: "object")),
+                    ]
+                )
+            ),
+        ]
+    )]
     /**
      * Get user's documents
      */
@@ -244,6 +262,78 @@ class ProfileController extends Controller
                     'updated_at' => $document->updated_at->toIso8601String(),
                 ];
             }),
+        ]);
+    }
+
+    #[OA\Post(
+        path: "/api/profile/documents",
+        summary: "Upload document",
+        description: "Upload a verification document (NIC, Aadhaar, Police Verification, etc.)",
+        tags: ["Profile"],
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: "multipart/form-data",
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(property: "document_type", type: "string", enum: ["nic", "aadhaar", "police_verification", "other"], description: "Type of document"),
+                        new OA\Property(property: "document_number", type: "string", nullable: true, description: "Document number (optional)"),
+                        new OA\Property(property: "file", type: "string", format: "binary", description: "Document file (PDF, JPG, PNG - max 5MB)"),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Document uploaded successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Document uploaded successfully."),
+                        new OA\Property(property: "document", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
+    /**
+     * Upload a document
+     */
+    public function storeDocument(Request $request): JsonResponse
+    {
+        $request->validate([
+            'document_type' => ['required', 'in:nic,police_verification,other'],
+            'document_number' => ['nullable', 'string', 'max:255'],
+            'file' => ['required', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'], // 5MB max
+        ]);
+
+        $user = $request->user();
+
+        // Store the file
+        $filePath = $request->file('file')->store('documents', 'public');
+
+        // Create document record
+        $document = Document::create([
+            'user_id' => $user->id,
+            'document_type' => $request->document_type,
+            'document_number' => $request->document_number,
+            'file_path' => $filePath,
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'message' => 'Document uploaded successfully.',
+            'document' => [
+                'id' => $document->id,
+                'document_type' => $document->document_type,
+                'document_type_label' => $document->document_type_label,
+                'document_number' => $document->document_number,
+                'file_path' => $document->file_path,
+                'status' => $document->status,
+                'created_at' => $document->created_at->toIso8601String(),
+            ],
         ]);
     }
 
@@ -318,6 +408,143 @@ class ProfileController extends Controller
         return response()->json([
             'message' => 'Profile photo updated successfully.',
             'user' => new UserResource($user),
+        ]);
+    }
+
+    #[OA\Get(
+        path: "/api/notifications",
+        summary: "Get user notifications",
+        description: "Get paginated list of notifications for the authenticated user",
+        tags: ["Profile"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "page", in: "query", required: false, schema: new OA\Schema(type: "integer")),
+            new OA\Parameter(name: "per_page", in: "query", required: false, schema: new OA\Schema(type: "integer")),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of notifications",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "notifications", type: "object", description: "Paginated list of notifications"),
+                    ]
+                )
+            ),
+        ]
+    )]
+    /**
+     * Get user's notifications
+     */
+    public function notifications(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $perPage = $request->get('per_page', 15);
+        
+        $notifications = $user->notifications()->paginate($perPage);
+
+        return response()->json([
+            'notifications' => $notifications,
+        ]);
+    }
+
+    #[OA\Get(
+        path: "/api/notifications/unread-count",
+        summary: "Get unread notifications count",
+        description: "Get count of unread notifications for the authenticated user",
+        tags: ["Profile"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Unread notifications count",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "unread_count", type: "integer", example: 5),
+                    ]
+                )
+            ),
+        ]
+    )]
+    /**
+     * Get unread notifications count
+     */
+    public function unreadCount(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $unreadCount = $user->unreadNotifications()->count();
+
+        return response()->json([
+            'unread_count' => $unreadCount,
+        ]);
+    }
+
+    #[OA\Post(
+        path: "/api/notifications/{notification}/read",
+        summary: "Mark notification as read",
+        description: "Mark a specific notification as read",
+        tags: ["Profile"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(name: "notification", in: "path", required: true, schema: new OA\Schema(type: "string"), description: "Notification ID"),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Notification marked as read",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Notification marked as read."),
+                    ]
+                )
+            ),
+        ]
+    )]
+    /**
+     * Mark notification as read
+     */
+    public function markAsRead(Request $request, string $notification): JsonResponse
+    {
+        $user = $request->user();
+        $notification = $user->notifications()->find($notification);
+        
+        if ($notification) {
+            $notification->markAsRead();
+        }
+
+        return response()->json([
+            'message' => 'Notification marked as read.',
+        ]);
+    }
+
+    #[OA\Post(
+        path: "/api/notifications/mark-all-read",
+        summary: "Mark all notifications as read",
+        description: "Mark all notifications as read for the authenticated user",
+        tags: ["Profile"],
+        security: [["sanctum" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "All notifications marked as read",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "All notifications marked as read."),
+                    ]
+                )
+            ),
+        ]
+    )]
+    /**
+     * Mark all notifications as read
+     */
+    public function markAllAsRead(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $user->unreadNotifications->markAsRead();
+
+        return response()->json([
+            'message' => 'All notifications marked as read.',
         ]);
     }
 }

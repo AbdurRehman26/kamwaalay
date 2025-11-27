@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { jobApplicationsService } from "@/services/jobApplications";
 import { profileService } from "@/services/profile";
 import { messagesService } from "@/services/messages";
+import UploadDocumentModal from "./Dashboard/UploadDocumentModal";
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -15,6 +16,7 @@ export default function Dashboard() {
     const [loadingDocuments, setLoadingDocuments] = useState(false);
     const [conversations, setConversations] = useState([]);
     const [loadingConversations, setLoadingConversations] = useState(false);
+    const [showUploadModal, setShowUploadModal] = useState(false);
 
     // Fetch applications based on user role
     useEffect(() => {
@@ -410,8 +412,17 @@ export default function Dashboard() {
                             <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-bold text-gray-900">Uploaded Documents</h3>
-                                    <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                                        <span className="text-lg">📄</span>
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={() => setShowUploadModal(true)}
+                                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition duration-300 font-semibold text-sm shadow-md hover:shadow-lg flex items-center gap-2"
+                                        >
+                                            <span>+</span>
+                                            <span>Upload Document</span>
+                                        </button>
+                                        <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                            <span className="text-lg">📄</span>
+                                        </div>
                                     </div>
                                 </div>
                                 {loadingDocuments ? (
@@ -478,7 +489,13 @@ export default function Dashboard() {
                                     <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
                                         <div className="text-4xl mb-3">📄</div>
                                         <p className="text-gray-600 font-medium mb-1 text-sm">No documents uploaded yet.</p>
-                                        <p className="text-xs text-gray-500">Documents will appear here after you complete onboarding.</p>
+                                        <p className="text-xs text-gray-500 mb-4">Upload verification documents to get verified.</p>
+                                        <button
+                                            onClick={() => setShowUploadModal(true)}
+                                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition duration-300 font-semibold text-sm shadow-md hover:shadow-lg"
+                                        >
+                                            Upload Your First Document
+                                        </button>
                                     </div>
                                 )}
                             </div>
@@ -620,6 +637,26 @@ export default function Dashboard() {
                     )}
                 </div>
             </div>
+
+            <UploadDocumentModal
+                isOpen={showUploadModal}
+                onClose={() => setShowUploadModal(false)}
+                onSuccess={() => {
+                    // Refresh documents after successful upload
+                    if (user && (user.role === "helper" || user.role === "business")) {
+                        setLoadingDocuments(true);
+                        profileService.getDocuments()
+                            .then((data) => {
+                                setDocuments(data.documents || []);
+                                setLoadingDocuments(false);
+                            })
+                            .catch((error) => {
+                                console.error("Error fetching documents:", error);
+                                setLoadingDocuments(false);
+                            });
+                    }
+                }}
+            />
         </PublicLayout>
     );
 }

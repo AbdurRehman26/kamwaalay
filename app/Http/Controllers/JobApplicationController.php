@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\JobApplication;
+use App\Notifications\JobApplicationReceived;
+use App\Notifications\JobApplicationStatusChanged;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -158,10 +160,10 @@ class JobApplicationController extends Controller
             ], 422);
         }
 
-        $booking->load('user');
+        $booking->load('user.profile');
 
         return response()->json([
-            'booking' => $booking->load('user'),
+            'booking' => $booking,
         ]);
     }
 
@@ -238,14 +240,19 @@ class JobApplicationController extends Controller
         $validated['status'] = 'pending';
         $validated['applied_at'] = now();
 
-        JobApplication::create($validated);
+        $application = JobApplication::create($validated);
+        $application->load(['booking.user', 'user']);
+        
+        // Refresh booking to ensure it's up to date
+        $booking->refresh();
+        $booking->load('user');
+
+        // Notify booking owner about new application
+        $booking->user->notify(new JobApplicationReceived($application));
 
         return response()->json([
             'message' => 'Application submitted successfully!',
-            'application' => JobApplication::where('booking_id', $booking->id)
-                ->where('user_id', Auth::id())
-                ->first()
-                ->load(['booking.user', 'user']),
+            'application' => $application,
         ]);
     }
 
@@ -407,13 +414,31 @@ class JobApplicationController extends Controller
             ], 422);
         }
 
+        $oldStatus = $jobApplication->status;
+        
         // Reject other applications for the same booking
-        JobApplication::where('booking_id', $jobApplication->booking_id)
+        $otherApplications = JobApplication::where('booking_id', $jobApplication->booking_id)
             ->where('id', '!=', $jobApplication->id)
-            ->update(['status' => 'rejected']);
+            ->where('status', '!=', 'rejected')
+            ->with(['booking', 'user'])
+            ->get();
+        
+        foreach ($otherApplications as $otherApp) {
+            $otherOldStatus = $otherApp->status;
+            $otherApp->update(['status' => 'rejected']);
+            $otherApp->refresh();
+            $otherApp->load(['booking', 'user']);
+            // Notify helper about rejection
+            $otherApp->user->notify(new JobApplicationStatusChanged($otherApp, $otherOldStatus, 'rejected'));
+        }
 
         // Accept this application
         $jobApplication->update(['status' => 'accepted']);
+        $jobApplication->refresh();
+        $jobApplication->load(['booking', 'user']);
+        
+        // Notify helper about acceptance
+        $jobApplication->user->notify(new JobApplicationStatusChanged($jobApplication, $oldStatus, 'accepted'));
 
         // Update booking with assigned helper
         $jobApplication->booking->update([
@@ -460,7 +485,13 @@ class JobApplicationController extends Controller
             abort(403);
         }
 
+        $oldStatus = $jobApplication->status;
         $jobApplication->update(['status' => 'rejected']);
+        $jobApplication->refresh();
+        $jobApplication->load(['booking', 'user']);
+        
+        // Notify helper about rejection
+        $jobApplication->user->notify(new JobApplicationStatusChanged($jobApplication, $oldStatus, 'rejected'));
 
         return response()->json([
             'message' => 'Application rejected.',
@@ -501,7 +532,13 @@ class JobApplicationController extends Controller
             abort(403);
         }
 
+        $oldStatus = $jobApplication->status;
         $jobApplication->update(['status' => 'withdrawn']);
+        $jobApplication->refresh();
+        $jobApplication->load(['booking.user', 'user']);
+        
+        // Notify booking owner about withdrawal
+        $jobApplication->booking->user->notify(new JobApplicationStatusChanged($jobApplication, $oldStatus, 'withdrawn'));
 
         return response()->json([
             'message' => 'Application withdrawn.',

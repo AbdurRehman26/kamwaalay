@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Notifications\NewMessage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -364,6 +365,12 @@ class MessageController extends Controller
 
         // Broadcast message via Pusher
         event(new MessageSent($message, $conversation));
+
+        // Send notification to recipient (only if they're not the sender)
+        if ($recipientId !== $user->id) {
+            $message->load(['sender', 'conversation']);
+            $recipient->notify(new NewMessage($message));
+        }
 
         return response()->json([
             'message' => [

@@ -61,19 +61,19 @@ export default function Home() {
 
     const testimonials = [
         {
-            name: "Priya Sharma",
+            name: "Warish Batool",
             service: "Maid",
             rating: 5,
             comment: "Excellent service! Found a reliable maid within minutes.",
         },
         {
-            name: "Raj Kumar",
+            name: "M. Ali",
             service: "Cook",
             rating: 5,
             comment: "Best cook we ever had. Highly recommended!",
         },
         {
-            name: "Anjali Mehta",
+            name: "Aayat",
             service: "Babysitter",
             rating: 5,
             comment: "Trustworthy and professional. My kids love her!",

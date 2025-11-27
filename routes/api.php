@@ -118,7 +118,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update']);
     Route::delete('/profile', [ProfileController::class, 'destroy']);
     Route::get('/profile/documents', [ProfileController::class, 'documents']);
+    Route::post('/profile/documents', [ProfileController::class, 'storeDocument']);
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto']);
+
+    // Notifications
+    Route::get('/notifications', [ProfileController::class, 'notifications']);
+    Route::get('/notifications/unread-count', [ProfileController::class, 'unreadCount']);
+    Route::post('/notifications/{notification}/read', [ProfileController::class, 'markAsRead']);
+    Route::post('/notifications/mark-all-read', [ProfileController::class, 'markAllAsRead']);
 
     // Password
     Route::put('/password', [PasswordController::class, 'update']);

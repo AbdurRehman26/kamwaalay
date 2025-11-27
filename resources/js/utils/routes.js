@@ -6,6 +6,7 @@ export const routes = {
     verifyOtp: () => "/verify-otp",
     dashboard: () => "/dashboard",
     messages: () => "/messages",
+    notifications: () => "/notifications",
     profile: {
         edit: () => "/profile",
     },

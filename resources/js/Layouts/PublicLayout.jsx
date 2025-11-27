@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { route } from "@/utils/routes";
+import NotificationDropdown from "@/Components/NotificationDropdown";
 import {
     isUser,
     isUserOrGuest,
@@ -74,6 +75,7 @@ export default function PublicLayout({ children }) {
                                         <Link to={route("business.dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.business")}</Link>
                                     )}
                                     <Link to={route("dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("common.dashboard")}</Link>
+                                    <NotificationDropdown />
                                     <button
                                         onClick={async () => {
                                             try {
@@ -136,6 +138,9 @@ export default function PublicLayout({ children }) {
                                         </>
                                     )}
                                     <Link to={route("messages")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Messages</Link>
+                                    <div className="block py-3 px-4">
+                                        <NotificationDropdown />
+                                    </div>
                                     <Link to={route("dashboard")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Dashboard</Link>
                                     <button
                                         onClick={async () => {
