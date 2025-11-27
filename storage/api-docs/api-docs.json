@@ -1173,12 +1173,7 @@
                                                     "example": "+923001234567",
                                                     "nullable": true
                                                 },
-                                                "email_verified_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "nullable": true
-                                                },
-                                                "phone_verified_at": {
+                                                "verified_at": {
                                                     "type": "string",
                                                     "format": "date-time",
                                                     "nullable": true
@@ -2276,11 +2271,6 @@
                                             "available"
                                         ]
                                     },
-                                    "monthly_rate": {
-                                        "type": "number",
-                                        "minimum": 0,
-                                        "nullable": true
-                                    },
                                     "bio": {
                                         "type": "string",
                                         "nullable": true
@@ -2543,11 +2533,6 @@
                                             "available"
                                         ]
                                     },
-                                    "monthly_rate": {
-                                        "type": "number",
-                                        "minimum": 0,
-                                        "nullable": true
-                                    },
                                     "bio": {
                                         "type": "string",
                                         "nullable": true
@@ -2703,11 +2688,6 @@
                                             "part_time",
                                             "available"
                                         ]
-                                    },
-                                    "monthly_rate": {
-                                        "type": "number",
-                                        "minimum": 0,
-                                        "nullable": true
                                     },
                                     "bio": {
                                         "type": "string",
@@ -3519,6 +3499,386 @@
                 }
             }
         },
+        "/api/conversations": {
+            "get": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Get user's conversations",
+                "description": "Get list of all conversations for the authenticated user with last message and unread count",
+                "operationId": "c121b708165c911bebcb7b578af2dd23",
+                "responses": {
+                    "200": {
+                        "description": "List of conversations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "conversations": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "other_user": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "John Doe"
+                                                            },
+                                                            "photo": {
+                                                                "type": "string",
+                                                                "example": "/storage/photos/user.jpg",
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "last_message": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 10
+                                                            },
+                                                            "message": {
+                                                                "type": "string",
+                                                                "example": "Hello, how are you?"
+                                                            },
+                                                            "sender_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2024-01-15T10:30:00Z"
+                                                            }
+                                                        },
+                                                        "type": "object",
+                                                        "nullable": true
+                                                    },
+                                                    "unread_count": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2024-01-15T10:30:00Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/conversations/{conversation}/messages": {
+            "get": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Get messages for a conversation",
+                "description": "Get paginated messages for a specific conversation. Messages are ordered by created_at descending. Unread messages are automatically marked as read when fetched.",
+                "operationId": "8018cdab1814e293bb90306c77fc2132",
+                "parameters": [
+                    {
+                        "name": "conversation",
+                        "in": "path",
+                        "description": "Conversation ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "messages": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "conversation_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "sender_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "sender": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "John Doe"
+                                                                    },
+                                                                    "photo": {
+                                                                        "type": "string",
+                                                                        "nullable": true
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "message": {
+                                                                "type": "string",
+                                                                "example": "Hello, how are you?"
+                                                            },
+                                                            "is_read": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "read_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "nullable": true
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2024-01-15T10:30:00Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2024-01-15T10:30:00Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - User is not part of this conversation"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/messages": {
+            "post": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Send a message",
+                "description": "Send a message to a user. Creates a new conversation if one doesn't exist. The message is broadcast via Pusher to the recipient in real-time.",
+                "operationId": "3e47d2913697e7cf8d2e9e609d25c110",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "recipient_id",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "recipient_id": {
+                                        "description": "ID of the recipient user",
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "message": {
+                                        "description": "Message content (max 5000 characters)",
+                                        "type": "string",
+                                        "maxLength": 5000,
+                                        "example": "Hello, I'm interested in your service listing."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Message sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "conversation_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "sender_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "sender": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "John Doe"
+                                                        },
+                                                        "photo": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Hello, I'm interested in your service listing."
+                                                },
+                                                "is_read": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-15T10:30:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "conversation": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "recipient_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "message": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/onboarding/helper": {
             "get": {
                 "tags": [
@@ -3566,9 +3926,7 @@
                         "multipart/form-data": {
                             "schema": {
                                 "required": [
-                                    "services",
-                                    "nic",
-                                    "nic_number"
+                                    "services"
                                 ],
                                 "properties": {
                                     "services": {
@@ -3616,21 +3974,19 @@
                                         }
                                     },
                                     "nic": {
-                                        "description": "NIC document file (jpeg, jpg, png, pdf, max 5MB)",
-                                        "type": "string",
-                                        "format": "binary"
-                                    },
-                                    "nic_number": {
-                                        "type": "string",
-                                        "maxLength": 255
-                                    },
-                                    "photo": {
+                                        "description": "NIC document file (jpeg, jpg, png, pdf, max 5MB) - optional",
                                         "type": "string",
                                         "format": "binary",
                                         "nullable": true
                                     },
-                                    "skills": {
+                                    "nic_number": {
                                         "type": "string",
+                                        "maxLength": 255,
+                                        "nullable": true
+                                    },
+                                    "photo": {
+                                        "type": "string",
+                                        "format": "binary",
                                         "nullable": true
                                     },
                                     "experience_years": {
@@ -3830,6 +4186,79 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Contact page content"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Send contact form message",
+                "description": "Submit a contact form message",
+                "operationId": "a29e947bb9776fdcf985bcd75be00cd3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "Contact name",
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "description": "Contact phone number",
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "message": {
+                                        "description": "Message content",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Message sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Thank you for contacting us. We'll get back to you soon."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -4266,6 +4695,41 @@
                                             "description": "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)",
                                             "type": "boolean",
                                             "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/profile/documents": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get user documents",
+                "description": "Get the authenticated user's uploaded documents",
+                "operationId": "683e83b26b816b92f582705b0b44667a",
+                "responses": {
+                    "200": {
+                        "description": "User documents",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "documents": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -5138,14 +5602,14 @@
                 ]
             }
         },
-        "/api/my-service-listings": {
+        "/api/service-listings/my-service-listings": {
             "get": {
                 "tags": [
                     "Service Listings"
                 ],
                 "summary": "Get my service listings",
                 "description": "Get paginated list of service listings created by the authenticated user (helper/business)",
-                "operationId": "fa12fee747f26a62d52791b6950b0070",
+                "operationId": "8895da6a88c7b82d53897342cc96204f",
                 "responses": {
                     "200": {
                         "description": "List of user's service listings",
@@ -5222,6 +5686,10 @@
         {
             "name": "Language",
             "description": "Language and translation endpoints"
+        },
+        {
+            "name": "Messages",
+            "description": "Chat messaging endpoints with real-time broadcasting via Pusher"
         },
         {
             "name": "Onboarding",
