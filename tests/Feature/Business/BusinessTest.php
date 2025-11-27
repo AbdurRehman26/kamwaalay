@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\Booking;
+use App\Models\Country;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -13,6 +14,16 @@ beforeEach(function () {
     }
     if (!Role::where('name', 'helper')->exists()) {
         Role::create(['name' => 'helper']);
+    }
+    // Create a default country for cities
+    if (!Country::where('id', 1)->exists()) {
+        Country::create([
+            'id' => 1,
+            'name' => 'Pakistan',
+            'code' => 'PK',
+            'phone_code' => '+92',
+            'is_active' => true,
+        ]);
     }
 });
 
@@ -63,11 +74,15 @@ test('businesses can create a worker', function () {
         'name' => 'Worker Name',
         'email' => 'worker@example.com',
         'phone' => '03001234567',
-        'service_type' => 'maid',
+        'service_types' => ['maid'],
+        'locations' => [
+            [
+                'city' => 'Karachi',
+                'area' => 'Saddar',
+            ],
+        ],
         'skills' => 'Cleaning, Laundry',
         'experience_years' => 5,
-        'city' => 'Karachi',
-        'area' => 'Saddar',
         'availability' => 'full_time',
         'bio' => 'Experienced worker',
         'password' => 'password123',

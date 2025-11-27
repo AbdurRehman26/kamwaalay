@@ -382,8 +382,12 @@ class BusinessController extends Controller
             'service_types' => $validated['service_types'], // JSON array
             'locations' => array_map(function($location) {
                 // Find or create location ID
+                $city = \App\Models\City::firstOrCreate(
+                    ['name' => $location['city']],
+                    ['country_id' => \App\Models\Country::firstOrCreate(['name' => 'Pakistan'], ['code' => 'PK', 'phone_code' => '+92'])->id]
+                );
                 $locationModel = \App\Models\Location::firstOrCreate([
-                    'city_id' => \App\Models\City::firstOrCreate(['name' => $location['city']])->id,
+                    'city_id' => $city->id,
                     'area' => $location['area'],
                 ]);
                 return $locationModel->id;
