@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import {
     isUser,
-    isHelper,
     isHelperOrBusiness
 } from "@/utils/permissions";
 
@@ -48,19 +47,23 @@ export default function AuthenticatedLayout({ header, children }) {
                                 {isHelperOrBusiness(user) && (
                                     <>
                                         <NavLink
+                                            href={route("service-listings.index")}
+                                            active={location.pathname === route("service-listings.index")}
+                                        >
+                                            Browse Services
+                                        </NavLink>
+                                        <NavLink
                                             href={route("service-listings.my-listings")}
                                             active={location.pathname === route("service-listings.my-listings")}
                                         >
                                             My Listings
                                         </NavLink>
-                                        {isHelper(user) && (
-                                            <NavLink
-                                                href={route("job-applications.index")}
-                                                active={location.pathname === route("job-applications.index")}
-                                            >
-                                                Browse Requests
-                                            </NavLink>
-                                        )}
+                                        <NavLink
+                                            href={route("job-applications.index")}
+                                            active={location.pathname === route("job-applications.index")}
+                                        >
+                                            Browse Requests
+                                        </NavLink>
                                         <NavLink
                                             href={route("job-applications.my-applications")}
                                             active={location.pathname === route("job-applications.my-applications")}
@@ -205,19 +208,23 @@ export default function AuthenticatedLayout({ header, children }) {
                         {isHelperOrBusiness(user) && (
                             <>
                                 <ResponsiveNavLink
+                                    href={route("service-listings.index")}
+                                    active={location.pathname === route("service-listings.index")}
+                                >
+                                    Browse Services
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
                                     href={route("service-listings.my-listings")}
                                     active={location.pathname === route("service-listings.my-listings")}
                                 >
                                     My Listings
                                 </ResponsiveNavLink>
-                                {isHelper(user) && (
-                                    <ResponsiveNavLink
-                                        href={route("job-applications.index")}
-                                        active={location.pathname === route("job-applications.index")}
-                                    >
-                                        Browse Requests
-                                    </ResponsiveNavLink>
-                                )}
+                                <ResponsiveNavLink
+                                    href={route("job-applications.index")}
+                                    active={location.pathname === route("job-applications.index")}
+                                >
+                                    Browse Requests
+                                </ResponsiveNavLink>
                                 <ResponsiveNavLink
                                     href={route("job-applications.my-applications")}
                                     active={location.pathname === route("job-applications.my-applications")}

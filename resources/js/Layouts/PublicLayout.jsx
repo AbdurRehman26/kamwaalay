@@ -7,6 +7,7 @@ import {
     isUser,
     isUserOrGuest,
     isHelperOrGuest,
+    isHelperOrBusiness,
     isBusiness,
     isAdmin
 } from "@/utils/permissions";
@@ -37,15 +38,18 @@ export default function PublicLayout({ children }) {
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20 w-full">
                         <Link to={route("home")} className="flex items-center">
-                            <img 
-                                src="/kamwaalay-logo.png" 
-                                alt="kamwaalay" 
+                            <img
+                                src="/kamwaalay-logo.png"
+                                alt="kamwaalay"
                                 className="h-12 w-auto"
                             />
                         </Link>
 
                         <div className="hidden lg:flex items-center space-x-8">
                             <Link to={route("home")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("common.home")}</Link>
+                            {isUser(user) && (
+                                <Link to={route("service-listings.index")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">Browse Services</Link>
+                            )}
                             {isUserOrGuest(user) && (
                                 <Link to={route("helpers.index")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.find_help")}</Link>
                             )}
@@ -55,10 +59,18 @@ export default function PublicLayout({ children }) {
 
                             {user ? (
                                 <>
+                                    {isHelperOrBusiness(user) && (
+                                        <>
+                                            <Link to={route("job-applications.index")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">Browse Requests</Link>
+                                        </>
+                                    )}
                                     {isUser(user) && (
-                                        <Link to={route("bookings.create")} className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium">
-                                            {t("navigation.post_service_request")}
-                                        </Link>
+                                        <>
+                                            <Link to={route("bookings.create")} className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium">
+                                                {t("navigation.post_service_request")}
+                                            </Link>
+                                            <Link to={route("job-applications.my-request-applications")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">Applications</Link>
+                                        </>
                                     )}
                                     {isAdmin(user) && (
                                         <Link to={route("admin.dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.admin")}</Link>
@@ -109,6 +121,9 @@ export default function PublicLayout({ children }) {
                     {mobileMenuOpen && (
                         <div className="lg:hidden py-4 space-y-2 border-t border-gray-100">
                             <Link to={route("home")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">{t("common.home")}</Link>
+                            {isUser(user) && (
+                                <Link to={route("service-listings.index")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Browse Services</Link>
+                            )}
                             {isUserOrGuest(user) && (
                                 <Link to={route("helpers.index")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">{t("navigation.find_help")}</Link>
                             )}
@@ -117,11 +132,20 @@ export default function PublicLayout({ children }) {
                             )}
                             {user ? (
                                 <>
-                                    {isUser(user) && (
-                                        <Link to={route("bookings.create")} className="block py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all font-medium text-center">
-                                            Post Service Request
-                                        </Link>
+                                    {isHelperOrBusiness(user) && (
+                                        <>
+                                            <Link to={route("job-applications.index")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Browse Requests</Link>
+                                        </>
                                     )}
+                                    {isUser(user) && (
+                                        <>
+                                            <Link to={route("bookings.create")} className="block py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all font-medium text-center">
+                                                Post Service Request
+                                            </Link>
+                                            <Link to={route("job-applications.my-request-applications")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Applications</Link>
+                                        </>
+                                    )}
+                                    <Link to={route("messages")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Messages</Link>
                                     <Link to={route("dashboard")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Dashboard</Link>
                                     <button
                                         onClick={async () => {
@@ -159,9 +183,9 @@ export default function PublicLayout({ children }) {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
                         <div className="col-span-1 md:col-span-2">
                             <div className="mb-4">
-                                <img 
-                                    src="/kamwaalay-logo.png" 
-                                    alt="kamwaalay" 
+                                <img
+                                    src="/kamwaalay-logo.png"
+                                    alt="kamwaalay"
                                     className="h-10 w-auto"
                                 />
                             </div>
