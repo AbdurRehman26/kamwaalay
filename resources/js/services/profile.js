@@ -7,6 +7,8 @@ export const profileService = {
     },
 
     async updateProfile(data) {
+        // FormData handling is done automatically by api.js interceptor
+        // It will remove Content-Type header to let browser set it with boundary
         const response = await api.patch("/profile", data);
         return response.data;
     },
@@ -25,6 +27,13 @@ export const profileService = {
 
     async getDocuments() {
         const response = await api.get("/profile/documents");
+        return response.data;
+    },
+
+    async updatePhoto(formData) {
+        // FormData handling is done automatically by api.js interceptor
+        // It will remove Content-Type header to let browser set it with boundary
+        const response = await api.post("/profile/photo", formData);
         return response.data;
     },
 };

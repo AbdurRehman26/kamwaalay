@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Profile", description: "User profile management endpoints")]
@@ -73,7 +74,7 @@ class ProfileController extends Controller
     public function user(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => new UserResource($request->user()->load('roles'))
+            'user' => new UserResource($request->user()->load(['roles', 'profile']))
         ]);
     }
 
@@ -83,7 +84,7 @@ class ProfileController extends Controller
     public function edit(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => new UserResource($request->user()->load('roles')),
+            'user' => new UserResource($request->user()->load(['roles', 'profile'])),
             'must_verify_email' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
         ]);
@@ -100,8 +101,6 @@ class ProfileController extends Controller
             content: new OA\JsonContent(
                 properties: [
                     new OA\Property(property: "name", type: "string", maxLength: 255),
-                    new OA\Property(property: "email", type: "string", format: "email", maxLength: 255),
-                    new OA\Property(property: "phone", type: "string", nullable: true, maxLength: 20),
                 ]
             )
         ),
@@ -118,7 +117,6 @@ class ProfileController extends Controller
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
                                 new OA\Property(property: "name", type: "string", example: "John Doe"),
-                                new OA\Property(property: "email", type: "string", nullable: true, example: "user@example.com"),
                                 new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
                                 new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
                             ]
@@ -136,10 +134,6 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         $user->fill($request->validated());
-
-        if ($user->isDirty('email')) {
-            $user->verified_at = null; // Email changed, needs re-verification
-        }
 
         // Mark profile as updated for normal users (not helper/business) on first update
         if (!$user->hasRole(['helper', 'business']) && $user->profile_updated_at === null) {
@@ -250,6 +244,80 @@ class ProfileController extends Controller
                     'updated_at' => $document->updated_at->toIso8601String(),
                 ];
             }),
+        ]);
+    }
+
+    #[OA\Post(
+        path: "/api/profile/photo",
+        summary: "Update profile photo",
+        description: "Upload or update the authenticated user's profile photo",
+        tags: ["Profile"],
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: "multipart/form-data",
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(property: "photo", type: "string", format: "binary", description: "Profile photo image file (max 2MB)"),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Photo updated successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Profile photo updated successfully."),
+                        new OA\Property(
+                            property: "user",
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "name", type: "string", example: "John Doe"),
+                                new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
+                                new OA\Property(property: "photo", type: "string", nullable: true, example: "profiles/photos/abc123.jpg"),
+                            ]
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
+    /**
+     * Update the user's profile photo.
+     */
+    public function updatePhoto(Request $request): JsonResponse
+    {
+        $request->validate([
+            'photo' => ['required', 'image', 'max:2048'],
+        ]);
+
+        $user = $request->user();
+
+        // Delete old photo if exists
+        if ($user->profile && $user->profile->photo) {
+            Storage::disk('public')->delete($user->profile->photo);
+        }
+
+        // Store new photo
+        $photoPath = $request->file('photo')->store('profiles/photos', 'public');
+
+        // Update or create profile with photo
+        $user->profile()->updateOrCreate(
+            ['profileable_id' => $user->id, 'profileable_type' => 'App\Models\User'],
+            ['photo' => $photoPath]
+        );
+
+        // Reload user with profile to get updated photo
+        $user->load(['roles', 'profile']);
+
+        return response()->json([
+            'message' => 'Profile photo updated successfully.',
+            'user' => new UserResource($user),
         ]);
     }
 }

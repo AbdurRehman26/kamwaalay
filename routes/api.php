@@ -118,6 +118,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update']);
     Route::delete('/profile', [ProfileController::class, 'destroy']);
     Route::get('/profile/documents', [ProfileController::class, 'documents']);
+    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto']);
 
     // Password
     Route::put('/password', [PasswordController::class, 'update']);

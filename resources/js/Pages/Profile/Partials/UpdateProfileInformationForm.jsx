@@ -16,20 +16,17 @@ export default function UpdateProfileInformation({
 
     const [data, setData] = useState({
         name: user?.name || "",
-        email: user?.email || "",
         phone: user?.phone || "",
     });
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
-    const [verificationStatus, setVerificationStatus] = useState(status);
 
     // Update form data when user changes
     useEffect(() => {
         if (user) {
             setData({
                 name: user.name || "",
-                email: user.email || "",
                 phone: user.phone || "",
             });
         }
@@ -69,7 +66,7 @@ export default function UpdateProfileInformation({
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
+                    Update your account's profile information.
                 </p>
             </header>
 
@@ -90,22 +87,6 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.name} />
                 </div>
 
-                {user?.email && (
-                    <div>
-                        <InputLabel htmlFor="email" value="Email" />
-
-                        <TextInput
-                            id="email"
-                            type="email"
-                            className="mt-1 block w-full bg-gray-100 cursor-not-allowed"
-                            value={data.email}
-                            disabled
-                        />
-
-                        <InputError className="mt-2" message={errors.email} />
-                    </div>
-                )}
-
                 <div>
                     <InputLabel htmlFor="phone" value="Phone" />
 
@@ -119,36 +100,6 @@ export default function UpdateProfileInformation({
 
                     <InputError className="mt-2" message={errors.phone} />
                 </div>
-
-                {mustVerifyEmail && user?.email && user?.email_verified_at === null && (
-                    <div>
-                        <p className="mt-2 text-sm text-gray-800">
-                            Your email address is unverified.
-                            <button
-                                type="button"
-                                onClick={async () => {
-                                    try {
-                                        // TODO: Implement email verification resend endpoint
-                                        // await api.post('/email/verification-notification');
-                                        setVerificationStatus("verification-link-sent");
-                                    } catch (error) {
-                                        console.error("Failed to send verification email:", error);
-                                    }
-                                }}
-                                className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                            >
-                                Click here to re-send the verification email.
-                            </button>
-                        </p>
-
-                        {verificationStatus === "verification-link-sent" && (
-                            <div className="mt-2 text-sm font-medium text-green-600">
-                                A new verification link has been sent to your
-                                email address.
-                            </div>
-                        )}
-                    </div>
-                )}
 
                 <div className="flex items-center gap-4">
                     <PrimaryButton disabled={processing}>Save</PrimaryButton>

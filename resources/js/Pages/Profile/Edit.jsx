@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import DeleteUserForm from "./Partials/DeleteUserForm";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
+import UpdateProfilePhoto from "./Partials/UpdateProfilePhoto";
 import { profileService } from "@/services/profile";
 
 export default function Edit() {
@@ -52,6 +53,10 @@ export default function Edit() {
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+                    <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+                        <UpdateProfilePhoto className="max-w-xl" />
+                    </div>
+
                     <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
                         <UpdateProfileInformationForm
                             mustVerifyEmail={profileData.must_verify_email}
