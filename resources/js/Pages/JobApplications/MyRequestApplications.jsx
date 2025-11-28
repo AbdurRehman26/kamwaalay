@@ -95,9 +95,6 @@ export default function MyRequestApplications() {
                                         {application.user?.phone && (
                                             <p className="text-gray-500 text-sm mb-2">📞 {application.user.phone}</p>
                                         )}
-                                        {application.user?.email && (
-                                            <p className="text-gray-500 text-sm mb-2">✉️ {application.user.email}</p>
-                                        )}
                                         {application.message && (
                                             <div className="bg-gray-50 rounded-lg p-4 mt-3 mb-3">
                                                 <p className="text-gray-700 text-sm whitespace-pre-wrap">{application.message}</p>

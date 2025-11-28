@@ -239,12 +239,6 @@ export default function HelperShow() {
                                         <p className="font-semibold text-gray-900">{new Date(helper.created_at).toLocaleDateString()}</p>
                                     </div>
                                 )}
-                                {helper.email && (
-                                    <div>
-                                        <p className="text-sm text-gray-600">Email</p>
-                                        <p className="font-semibold text-gray-900">{helper.email}</p>
-                                    </div>
-                                )}
                                 {helper.phone && (
                                     <div>
                                         <p className="text-sm text-gray-600">Phone</p>

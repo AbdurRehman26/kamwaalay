@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { homeService } from "@/services/home";
+import { bookingsService } from "@/services/bookings";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import {
@@ -13,8 +14,10 @@ import {
 export default function Home() {
     const { user } = useAuth();
     const [featuredHelpers, setFeaturedHelpers] = useState([]);
+    const [serviceRequests, setServiceRequests] = useState({ data: [], links: [], meta: {} });
     const [stats, setStats] = useState({});
     const [loading, setLoading] = useState(true);
+    const [loadingServiceRequests, setLoadingServiceRequests] = useState(false);
 
     useEffect(() => {
         // Fetch home data from API
@@ -29,6 +32,28 @@ export default function Home() {
                 setLoading(false);
             });
     }, []);
+
+    useEffect(() => {
+        // Fetch service requests for helpers/businesses
+        if (isHelperOrBusiness(user)) {
+            setLoadingServiceRequests(true);
+            bookingsService.browseBookings({ per_page: 6 })
+                .then((data) => {
+                    const bookingsData = data.bookings || {};
+                    setServiceRequests({
+                        ...bookingsData,
+                        data: bookingsData.data || [],
+                        links: Array.isArray(bookingsData.links) ? bookingsData.links : [],
+                        meta: bookingsData.meta || {},
+                    });
+                    setLoadingServiceRequests(false);
+                })
+                .catch((error) => {
+                    console.error("Error fetching service requests:", error);
+                    setLoadingServiceRequests(false);
+                });
+        }
+    }, [user]);
     const services = [
         { name: "Maid", icon: "🧹", color: "from-primary-500 to-primary-600" },
         { name: "Cook", icon: "👨‍🍳", color: "from-orange-500 to-orange-600" },
@@ -233,8 +258,110 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* Featured Helpers */}
-            {!loading && featuredHelpers && featuredHelpers.length > 0 && (
+            {/* Service Requests for Helpers/Businesses */}
+            {isHelperOrBusiness(user) && (
+                <section className="py-24 bg-white">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Services Required</h2>
+                            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                                Browse available service requests and apply to help customers
+                            </p>
+                        </div>
+                        {loadingServiceRequests ? (
+                            <div className="text-center py-12">
+                                <p className="text-gray-600">Loading service requests...</p>
+                            </div>
+                        ) : serviceRequests.data && serviceRequests.data.length > 0 ? (
+                            <>
+                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {serviceRequests.data.map((booking) => {
+                                        const hasApplied = booking.job_applications &&
+                                            booking.job_applications.some(app => app.user_id === user?.id);
+
+                                        return (
+                                            <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col border border-gray-100">
+                                                <div className="p-6 flex flex-col flex-grow">
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <span className="bg-primary-100 text-primary-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
+                                                            {booking.service_type?.replace("_", " ") || "N/A"}
+                                                        </span>
+                                                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                                            {booking.status?.replace("_", " ") || "Pending"}
+                                                        </span>
+                                                    </div>
+                                                    <h3 className="text-xl font-bold mb-2 text-gray-900">
+                                                        {booking.service_type_label || booking.service_type?.replace("_", " ") || "Service"} Service
+                                                    </h3>
+                                                    <p className="text-gray-600 mb-3 capitalize text-sm">
+                                                        {booking.work_type?.replace("_", " ") || "N/A"} • {booking.city || "N/A"}, {booking.area || "N/A"}
+                                                    </p>
+                                                    {booking.start_date && (
+                                                        <p className="text-gray-500 text-sm mb-2">
+                                                            📅 Start Date: {new Date(booking.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                                        </p>
+                                                    )}
+                                                    {booking.special_requirements && (
+                                                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                                                            💬 {booking.special_requirements}
+                                                        </p>
+                                                    )}
+                                                    <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
+                                                        <span>👤 Posted by: {booking.user?.name || "Customer"}</span>
+                                                    </div>
+                                                    {booking.job_applications && booking.job_applications.length > 0 && (
+                                                        <p className="text-sm text-primary-600 mb-3">
+                                                            📋 {booking.job_applications.length} application{booking.job_applications.length !== 1 ? "s" : ""} received
+                                                        </p>
+                                                    )}
+                                                    <div className="mt-auto">
+                                                        {hasApplied ? (
+                                                            <Link
+                                                                to={route("job-applications.my-applications")}
+                                                                className="block w-full text-center bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold cursor-not-allowed"
+                                                            >
+                                                                Already Applied
+                                                            </Link>
+                                                        ) : (
+                                                            <Link
+                                                                to={route("job-applications.create", booking.id)}
+                                                                className="block w-full text-center bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold"
+                                                            >
+                                                                Apply Now
+                                                            </Link>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <div className="text-center mt-12">
+                                    <Link
+                                        to={route("service-requests.browse")}
+                                        className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl inline-block"
+                                    >
+                                        View All Service Requests
+                                    </Link>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="text-center py-12">
+                                <p className="text-gray-600">No service requests available at the moment.</p>
+                                <Link
+                                    to={route("service-requests.browse")}
+                                    className="mt-4 inline-block text-primary-600 hover:text-primary-700 font-semibold"
+                                >
+                                    Browse All Requests →
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                </section>
+            )}
+
+            {/* Featured Helpers for Users and Guests */}
+            {isUserOrGuest(user) && !loading && featuredHelpers && featuredHelpers.length > 0 && (
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
                         <div className="text-center mb-16">

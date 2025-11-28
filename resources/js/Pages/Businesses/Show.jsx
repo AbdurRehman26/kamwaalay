@@ -102,12 +102,6 @@ export default function BusinessShow() {
                         <div className="bg-white rounded-lg shadow-md p-6">
                             <h3 className="text-xl font-bold text-gray-900 mb-4">Business Information</h3>
                             <div className="space-y-4">
-                                {business.email && (
-                                    <div>
-                                        <p className="text-sm text-gray-600">Email</p>
-                                        <p className="font-semibold text-gray-900">{business.email}</p>
-                                    </div>
-                                )}
                                 {business.phone && (
                                     <div>
                                         <p className="text-sm text-gray-600">Phone</p>

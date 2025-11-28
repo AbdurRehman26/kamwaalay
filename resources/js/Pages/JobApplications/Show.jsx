@@ -202,15 +202,6 @@ export default function JobApplicationShow() {
                                             </p>
                                         </div>
                                     )}
-                                    {application.user?.email && (
-                                        <div>
-                                            <p className="text-sm text-gray-600 mb-1">Email</p>
-                                            <p className="text-base text-gray-900 flex items-center gap-2">
-                                                <span>✉️</span>
-                                                {application.user.email}
-                                            </p>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
 
