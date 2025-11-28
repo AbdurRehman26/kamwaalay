@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\HelperController;
@@ -122,10 +123,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto']);
 
     // Notifications
-    Route::get('/notifications', [ProfileController::class, 'notifications']);
-    Route::get('/notifications/unread-count', [ProfileController::class, 'unreadCount']);
-    Route::post('/notifications/{notification}/read', [ProfileController::class, 'markAsRead']);
-    Route::post('/notifications/mark-all-read', [ProfileController::class, 'markAllAsRead']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/all', [NotificationController::class, 'all']);
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/bulk-read', [NotificationController::class, 'bulkMarkAsRead']);
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
 
     // Password
     Route::put('/password', [PasswordController::class, 'update']);

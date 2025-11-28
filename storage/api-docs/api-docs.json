@@ -3737,7 +3737,7 @@
                     "Messages"
                 ],
                 "summary": "Send a message",
-                "description": "Send a message to a user. Creates a new conversation if one doesn't exist. The message is broadcast via Pusher to the recipient in real-time.",
+                "description": "Send a message to a user. Creates a new conversation if one doesn't exist. The message is broadcast via Pusher to the recipient in real-time. Note: Helpers and businesses can only reply to users who have contacted them first. Users can contact helpers/businesses at any time.",
                 "operationId": "3e47d2913697e7cf8d2e9e609d25c110",
                 "requestBody": {
                     "required": true,
@@ -3835,6 +3835,22 @@
                             }
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Helper/Business can only reply to users who have contacted them first",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "You can only reply to users who have contacted you first."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
                     "422": {
                         "description": "Validation error",
                         "content": {
@@ -3870,6 +3886,655 @@
                     },
                     "401": {
                         "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get user notifications",
+                "description": "Get paginated list of notifications for the authenticated user. Notifications include job applications, messages, and document verification updates.",
+                "operationId": "911565ad9aff9ba7eded3f189509e578",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of notifications per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "unread_only",
+                        "in": "query",
+                        "description": "Return only unread notifications",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": false
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter by notification type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "job_application_received",
+                                "job_application_status_changed",
+                                "new_message",
+                                "document_verified"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of notifications",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "notifications": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": "550e8400-e29b-41d4-a716-446655440000"
+                                                            },
+                                                            "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "job_application_received",
+                                                                    "job_application_status_changed",
+                                                                    "new_message",
+                                                                    "document_verified"
+                                                                ],
+                                                                "example": "job_application_received"
+                                                            },
+                                                            "notifiable_type": {
+                                                                "type": "string",
+                                                                "example": "App\\Models\\User"
+                                                            },
+                                                            "notifiable_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "data": {
+                                                                "description": "Notification data (varies by type). Contains type-specific information.",
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "description": "Notification type",
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "job_application_received",
+                                                                            "job_application_status_changed",
+                                                                            "new_message",
+                                                                            "document_verified"
+                                                                        ],
+                                                                        "example": "job_application_received"
+                                                                    },
+                                                                    "title": {
+                                                                        "description": "Notification title",
+                                                                        "type": "string",
+                                                                        "example": "New Job Application Received"
+                                                                    },
+                                                                    "message": {
+                                                                        "description": "Notification message",
+                                                                        "type": "string",
+                                                                        "example": "John Doe has applied for your Maid service request."
+                                                                    },
+                                                                    "application_id": {
+                                                                        "description": "Job application ID (for job_application_received type)",
+                                                                        "type": "integer",
+                                                                        "example": 1,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "booking_id": {
+                                                                        "description": "Booking ID (for job_application_received type)",
+                                                                        "type": "integer",
+                                                                        "example": 1,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "applicant_id": {
+                                                                        "description": "Applicant user ID (for job_application_received type)",
+                                                                        "type": "integer",
+                                                                        "example": 5,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "applicant_name": {
+                                                                        "description": "Applicant name (for job_application_received type)",
+                                                                        "type": "string",
+                                                                        "example": "John Doe",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "service_type": {
+                                                                        "description": "Service type (for job_application_received type)",
+                                                                        "type": "string",
+                                                                        "example": "maid",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "service_type_label": {
+                                                                        "description": "Service type label (for job_application_received type)",
+                                                                        "type": "string",
+                                                                        "example": "Maid",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "old_status": {
+                                                                        "description": "Previous status (for job_application_status_changed type)",
+                                                                        "type": "string",
+                                                                        "example": "pending",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "new_status": {
+                                                                        "description": "New status (for job_application_status_changed type)",
+                                                                        "type": "string",
+                                                                        "example": "accepted",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "booking_owner_name": {
+                                                                        "description": "Booking owner name (for job_application_status_changed type)",
+                                                                        "type": "string",
+                                                                        "example": "Jane Smith",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "message_id": {
+                                                                        "description": "Message ID (for new_message type)",
+                                                                        "type": "integer",
+                                                                        "example": 10,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "conversation_id": {
+                                                                        "description": "Conversation ID (for new_message type)",
+                                                                        "type": "integer",
+                                                                        "example": 3,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "sender_id": {
+                                                                        "description": "Sender user ID (for new_message type)",
+                                                                        "type": "integer",
+                                                                        "example": 5,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "sender_name": {
+                                                                        "description": "Sender name (for new_message type)",
+                                                                        "type": "string",
+                                                                        "example": "John Doe",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "message_preview": {
+                                                                        "description": "Message preview (for new_message type)",
+                                                                        "type": "string",
+                                                                        "example": "Hello, I'm interested in your service...",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "document_id": {
+                                                                        "description": "Document ID (for document_verified type)",
+                                                                        "type": "integer",
+                                                                        "example": 2,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "document_type": {
+                                                                        "description": "Document type (for document_verified type)",
+                                                                        "type": "string",
+                                                                        "example": "nic",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "document_type_label": {
+                                                                        "description": "Document type label (for document_verified type)",
+                                                                        "type": "string",
+                                                                        "example": "NIC",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "status": {
+                                                                        "description": "Document verification status (for document_verified type)",
+                                                                        "type": "string",
+                                                                        "example": "verified",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "admin_notes": {
+                                                                        "description": "Admin notes (for document_verified type)",
+                                                                        "type": "string",
+                                                                        "example": "Document verified successfully",
+                                                                        "nullable": true
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "read_at": {
+                                                                "type": "string",
+                                                                "example": "2025-11-27T10:30:00.000000Z",
+                                                                "nullable": true
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "example": "2025-11-27T10:00:00.000000Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "example": "2025-11-27T10:00:00.000000Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string",
+                                                    "example": "http://kamwaalay.test/api/notifications?page=1"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string",
+                                                    "example": "http://kamwaalay.test/api/notifications?page=5"
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "path": {
+                                                    "type": "string",
+                                                    "example": "http://kamwaalay.test/api/notifications"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 75
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/all": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get all notifications",
+                "description": "Get all notifications for the authenticated user without pagination. Supports filtering by read status and notification type.",
+                "operationId": "b4b7a4aaa2244990cc2de4505d358145",
+                "parameters": [
+                    {
+                        "name": "unread_only",
+                        "in": "query",
+                        "description": "Return only unread notifications",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": false
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter by notification type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "job_application_received",
+                                "job_application_status_changed",
+                                "new_message",
+                                "document_verified"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of notifications to return (default: no limit)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of all notifications",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "notifications": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "job_application_received",
+                                                            "job_application_status_changed",
+                                                            "new_message",
+                                                            "document_verified"
+                                                        ],
+                                                        "example": "job_application_received"
+                                                    },
+                                                    "notifiable_type": {
+                                                        "type": "string",
+                                                        "example": "App\\Models\\User"
+                                                    },
+                                                    "notifiable_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "data": {
+                                                        "description": "Notification data",
+                                                        "type": "object"
+                                                    },
+                                                    "read_at": {
+                                                        "type": "string",
+                                                        "example": "2025-11-27T10:30:00.000000Z",
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "example": "2025-11-27T10:00:00.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "example": "2025-11-27T10:00:00.000000Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total": {
+                                            "description": "Total number of notifications returned",
+                                            "type": "integer",
+                                            "example": 50
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/unread-count": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get unread notifications count",
+                "description": "Get count of unread notifications for the authenticated user. Useful for displaying notification badges.",
+                "operationId": "0272623bed30dd4d72141741fb3f25da",
+                "responses": {
+                    "200": {
+                        "description": "Unread notifications count",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "unread_count": {
+                                            "description": "Number of unread notifications",
+                                            "type": "integer",
+                                            "example": 5
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/{notification}/read": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark notification as read",
+                "description": "Mark a specific notification as read. The notification must belong to the authenticated user.",
+                "operationId": "4a042fe38bb643ed71057aabf3819ff4",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "description": "Notification ID (UUID)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notification marked as read successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Notification marked as read."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Notification not found or does not belong to user"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/mark-all-read": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark all notifications as read",
+                "description": "Mark all unread notifications as read for the authenticated user. This is useful for clearing all notification badges at once.",
+                "operationId": "e1e017838e0e1ed1cd321ccf80869335",
+                "responses": {
+                    "200": {
+                        "description": "All notifications marked as read successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "All notifications marked as read."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/bulk-read": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark multiple notifications as read",
+                "description": "Mark multiple notifications as read by providing their IDs. All notifications must belong to the authenticated user.",
+                "operationId": "c6b9cd081e6a737d3f0bc1e9ed7d3c2d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "notification_ids"
+                                ],
+                                "properties": {
+                                    "notification_ids": {
+                                        "description": "Array of notification IDs to mark as read",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "550e8400-e29b-41d4-a716-446655440000",
+                                            "660e8400-e29b-41d4-a716-446655440001"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Notifications marked as read successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "3 notifications marked as read."
+                                        },
+                                        "marked_count": {
+                                            "description": "Number of notifications successfully marked as read",
+                                            "type": "integer",
+                                            "example": 3
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The notification ids field is required."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -4585,16 +5250,6 @@
                                     "name": {
                                         "type": "string",
                                         "maxLength": 255
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "maxLength": 255
-                                    },
-                                    "phone": {
-                                        "type": "string",
-                                        "maxLength": 20,
-                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -4622,11 +5277,6 @@
                                                 "name": {
                                                     "type": "string",
                                                     "example": "John Doe"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "example": "user@example.com",
-                                                    "nullable": true
                                                 },
                                                 "phone": {
                                                     "type": "string",
@@ -4736,6 +5386,151 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Upload document",
+                "description": "Upload a verification document (NIC, Aadhaar, Police Verification, etc.)",
+                "operationId": "5604ef1064eb8841ff5b6ff0524c2682",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "document_type": {
+                                        "description": "Type of document",
+                                        "type": "string",
+                                        "enum": [
+                                            "nic",
+                                            "aadhaar",
+                                            "police_verification",
+                                            "other"
+                                        ]
+                                    },
+                                    "document_number": {
+                                        "description": "Document number (optional)",
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "file": {
+                                        "description": "Document file (PDF, JPG, PNG - max 5MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Document uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Document uploaded successfully."
+                                        },
+                                        "document": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/profile/photo": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update profile photo",
+                "description": "Upload or update the authenticated user's profile photo",
+                "operationId": "376cc4319cd0a63c0fb2b5ab2820f59e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "photo": {
+                                        "description": "Profile photo image file (max 2MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Photo updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile photo updated successfully."
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+923001234567",
+                                                    "nullable": true
+                                                },
+                                                "photo": {
+                                                    "type": "string",
+                                                    "example": "profiles/photos/abc123.jpg",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [
@@ -5690,6 +6485,10 @@
         {
             "name": "Messages",
             "description": "Chat messaging endpoints with real-time broadcasting via Pusher"
+        },
+        {
+            "name": "Notifications",
+            "description": "User notification management endpoints"
         },
         {
             "name": "Onboarding",
