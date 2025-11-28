@@ -233,8 +233,17 @@ class BusinessController extends Controller
         }
 
         $workers = $business->helpers()
+            ->with(['profile', 'serviceListings' => function ($query) {
+                $query->where('service_listings.is_active', true)
+                      ->where('service_listings.status', 'active');
+            }])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
+
+        // Transform workers using UserResource
+        $workers->through(function ($worker) {
+            return new UserResource($worker);
+        });
 
         return response()->json([
             'workers' => $workers,
@@ -282,21 +291,26 @@ class BusinessController extends Controller
             content: new OA\MediaType(
                 mediaType: "multipart/form-data",
                 schema: new OA\Schema(
-                    required: ["name", "email", "phone", "service_type", "experience_years", "city", "area", "availability", "password"],
+                    required: ["name", "phone", "service_types", "experience_years", "locations", "availability"],
                     properties: [
                         new OA\Property(property: "name", type: "string", maxLength: 255),
-                        new OA\Property(property: "email", type: "string", format: "email", maxLength: 255),
+                        new OA\Property(property: "email", type: "string", format: "email", maxLength: 255, nullable: true, description: "Optional. If not provided, a unique email will be auto-generated."),
                         new OA\Property(property: "phone", type: "string", maxLength: 20),
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
-                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                        new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]), description: "Array of service types"),
+                        new OA\Property(property: "locations", type: "array", items: new OA\Items(
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "city", type: "string"),
+                                new OA\Property(property: "area", type: "string"),
+                            ]
+                        ), description: "Array of locations"),
                         new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
-                        new OA\Property(property: "city", type: "string", maxLength: 255),
-                        new OA\Property(property: "area", type: "string", maxLength: 255),
                         new OA\Property(property: "availability", type: "string", enum: ["full_time", "part_time", "available"]),
                         new OA\Property(property: "bio", type: "string", nullable: true),
-                        new OA\Property(property: "password", type: "string", format: "password", minLength: 8),
-                        new OA\Property(property: "password_confirmation", type: "string", format: "password"),
+                        new OA\Property(property: "password", type: "string", format: "password", minLength: 8, nullable: true, description: "Optional. If not provided, a random password will be auto-generated."),
+                        new OA\Property(property: "password_confirmation", type: "string", format: "password", nullable: true),
                     ]
                 )
             )
@@ -326,7 +340,7 @@ class BusinessController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'nullable|email|unique:users,email',
             'phone' => 'required|string|max:20',
             'photo' => 'nullable|image|max:2048',
             'service_types' => 'required|array|min:1',
@@ -338,15 +352,36 @@ class BusinessController extends Controller
             'experience_years' => 'required|integer|min:0',
             'availability' => 'required|in:full_time,part_time,available',
             'bio' => 'nullable|string',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'nullable|min:8|confirmed',
         ]);
+
+        // Generate email if not provided (using phone number as base)
+        $email = $validated['email'] ?? null;
+        if (!$email) {
+            // Generate a unique email based on phone and timestamp
+            $baseEmail = 'worker_' . preg_replace('/[^0-9]/', '', $validated['phone']) . '_' . time() . '@kamwaalay.local';
+            $email = $baseEmail;
+            // Ensure uniqueness
+            $counter = 1;
+            while (User::where('email', $email)->exists()) {
+                $email = 'worker_' . preg_replace('/[^0-9]/', '', $validated['phone']) . '_' . time() . '_' . $counter . '@kamwaalay.local';
+                $counter++;
+            }
+        }
+
+        // Generate password if not provided
+        $password = $validated['password'] ?? null;
+        if (!$password) {
+            // Generate a random password
+            $password = \Illuminate\Support\Str::random(12);
+        }
 
         // Create user account for the worker
         $userData = [
             'name' => $validated['name'],
-            'email' => $validated['email'],
+            'email' => $email,
             'phone' => $validated['phone'],
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($password),
             'is_active' => true,
         ];
 

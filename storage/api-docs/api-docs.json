@@ -2001,14 +2001,11 @@
                             "schema": {
                                 "required": [
                                     "name",
-                                    "email",
                                     "phone",
-                                    "service_type",
+                                    "service_types",
                                     "experience_years",
-                                    "city",
-                                    "area",
-                                    "availability",
-                                    "password"
+                                    "locations",
+                                    "availability"
                                 ],
                                 "properties": {
                                     "name": {
@@ -2016,9 +2013,11 @@
                                         "maxLength": 255
                                     },
                                     "email": {
+                                        "description": "Optional. If not provided, a unique email will be auto-generated.",
                                         "type": "string",
                                         "format": "email",
-                                        "maxLength": 255
+                                        "maxLength": 255,
+                                        "nullable": true
                                     },
                                     "phone": {
                                         "type": "string",
@@ -2029,16 +2028,35 @@
                                         "format": "binary",
                                         "nullable": true
                                     },
-                                    "service_type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "maid",
-                                            "cook",
-                                            "babysitter",
-                                            "caregiver",
-                                            "cleaner",
-                                            "all_rounder"
-                                        ]
+                                    "service_types": {
+                                        "description": "Array of service types",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "maid",
+                                                "cook",
+                                                "babysitter",
+                                                "caregiver",
+                                                "cleaner",
+                                                "all_rounder"
+                                            ]
+                                        }
+                                    },
+                                    "locations": {
+                                        "description": "Array of locations",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "city": {
+                                                    "type": "string"
+                                                },
+                                                "area": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
                                     },
                                     "skills": {
                                         "type": "string",
@@ -2047,14 +2065,6 @@
                                     "experience_years": {
                                         "type": "integer",
                                         "minimum": 0
-                                    },
-                                    "city": {
-                                        "type": "string",
-                                        "maxLength": 255
-                                    },
-                                    "area": {
-                                        "type": "string",
-                                        "maxLength": 255
                                     },
                                     "availability": {
                                         "type": "string",
@@ -2069,13 +2079,16 @@
                                         "nullable": true
                                     },
                                     "password": {
+                                        "description": "Optional. If not provided, a random password will be auto-generated.",
                                         "type": "string",
                                         "format": "password",
-                                        "minLength": 8
+                                        "minLength": 8,
+                                        "nullable": true
                                     },
                                     "password_confirmation": {
                                         "type": "string",
-                                        "format": "password"
+                                        "format": "password",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"

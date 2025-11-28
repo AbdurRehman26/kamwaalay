@@ -1,7 +1,8 @@
-// Head removed
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { businessesService } from "@/services/businesses";
+import { route } from "@/utils/routes";
 
 export default function Workers() {
     const [workers, setWorkers] = useState(null);
@@ -87,7 +88,7 @@ export default function Workers() {
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="h-20 w-20 bg-gradient-to-br from-primary-400 to-primary-500 rounded-full flex items-center justify-center overflow-hidden">
                                                 {worker.photo ? (
-                                                    <img src={`/storage/${worker.photo}`} alt={worker.user?.name} className="w-full h-full object-cover" />
+                                                    <img src={worker.photo.startsWith("http") ? worker.photo : `/storage/${worker.photo}`} alt={worker.name} className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="text-4xl text-white">👤</div>
                                                 )}
@@ -96,18 +97,24 @@ export default function Workers() {
                                                 <span className="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-semibold">✓ Verified</span>
                                             )}
                                         </div>
-                                        <h3 className="text-xl font-bold mb-2">{worker.user?.name}</h3>
+                                        <h3 className="text-xl font-bold mb-2">{worker.name || "Worker"}</h3>
                                         <p className="text-gray-600 mb-2 capitalize">
                                             {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].service_types && worker.service_listings[0].service_types.length > 0
-                                                ? worker.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "No service type"
-                                                : "No service type"}
+                                                ? (typeof worker.service_listings[0].service_types[0] === "object" 
+                                                    ? worker.service_listings[0].service_types[0].service_type?.replace("_", " ") 
+                                                    : worker.service_listings[0].service_types[0]?.replace("_", " ")) || "No service type"
+                                                : worker.service_type ? worker.service_type.replace("_", " ") : "No service type"}
                                         </p>
                                         <div className="flex items-center mb-2">
                                             <span className="text-yellow-500 mr-2">⭐</span>
                                             <span className="font-semibold">{worker.rating || 0}</span>
                                             <span className="text-gray-500 ml-2 text-sm">({worker.total_reviews || 0} reviews)</span>
                                         </div>
-                                        <p className="text-sm text-gray-500 mb-4">{worker.city}, {worker.area}</p>
+                                        {(worker.city || worker.area) && (
+                                            <p className="text-sm text-gray-500 mb-4">
+                                                {worker.city || ""}{worker.city && worker.area ? ", " : ""}{worker.area || ""}
+                                            </p>
+                                        )}
                                         <div className="flex gap-2">
                                             <Link
                                                 to={route("business.workers.edit", worker.id)}

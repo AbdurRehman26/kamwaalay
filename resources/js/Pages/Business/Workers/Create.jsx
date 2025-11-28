@@ -24,10 +24,7 @@ export default function CreateWorker() {
 
     const [data, setData] = useState({
         name: "",
-        email: "",
         phone: "",
-        password: "",
-        password_confirmation: "",
         experience_years: "",
         availability: "full_time",
         bio: "",
@@ -142,10 +139,7 @@ export default function CreateWorker() {
 
         const formData = new FormData();
         formData.append("name", data.name);
-        formData.append("email", data.email);
         formData.append("phone", data.phone);
-        formData.append("password", data.password);
-        formData.append("password_confirmation", data.password_confirmation);
         formData.append("experience_years", data.experience_years);
         formData.append("availability", data.availability);
         formData.append("bio", data.bio);
@@ -211,19 +205,6 @@ export default function CreateWorker() {
                                 </div>
 
                                 <div>
-                                    <InputLabel htmlFor="email" value="Email *" />
-                                    <TextInput
-                                        id="email"
-                                        type="email"
-                                        className="mt-1 block w-full"
-                                        value={data.email}
-                                        onChange={(e) => setData({ ...data, email: e.target.value })}
-                                        required
-                                    />
-                                    <InputError message={errors.email} className="mt-2" />
-                                </div>
-
-                                <div>
                                     <InputLabel htmlFor="phone" value="Phone *" />
                                     <TextInput
                                         id="phone"
@@ -248,30 +229,6 @@ export default function CreateWorker() {
                                     <InputError message={errors.photo} className="mt-2" />
                                 </div>
 
-                                <div>
-                                    <InputLabel htmlFor="password" value="Password *" />
-                                    <TextInput
-                                        id="password"
-                                        type="password"
-                                        className="mt-1 block w-full"
-                                        value={data.password}
-                                        onChange={(e) => setData({ ...data, password: e.target.value })}
-                                        required
-                                    />
-                                    <InputError message={errors.password} className="mt-2" />
-                                </div>
-
-                                <div>
-                                    <InputLabel htmlFor="password_confirmation" value="Confirm Password *" />
-                                    <TextInput
-                                        id="password_confirmation"
-                                        type="password"
-                                        className="mt-1 block w-full"
-                                        value={data.password_confirmation}
-                                        onChange={(e) => setData({ ...data, password_confirmation: e.target.value })}
-                                        required
-                                    />
-                                </div>
                             </div>
                         </div>
 
