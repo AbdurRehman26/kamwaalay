@@ -32,7 +32,7 @@ export default function UpdateProfilePhoto({ className = "" }) {
                 return;
             }
             // Validate file type
-            if (!file.type.startsWith('image/')) {
+            if (!file.type.startsWith("image/")) {
                 setErrors({ photo: ["File must be an image"] });
                 return;
             }
@@ -52,7 +52,7 @@ export default function UpdateProfilePhoto({ className = "" }) {
         setPhotoPreview(user?.photo ? `/storage/${user.photo}` : null);
         setErrors({});
         if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+            fileInputRef.current.value = "";
         }
     };
 
@@ -69,7 +69,7 @@ export default function UpdateProfilePhoto({ className = "" }) {
 
         try {
             const formData = new FormData();
-            formData.append('photo', photo);
+            formData.append("photo", photo);
 
             const response = await profileService.updatePhoto(formData);
             setRecentlySuccessful(true);

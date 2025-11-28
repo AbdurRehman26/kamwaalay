@@ -171,10 +171,10 @@ export default function JobApplicationShow() {
                                         {statusLabel}
                                     </span>
                                     <span className="text-sm text-gray-500">
-                                        Applied on {new Date(application.applied_at).toLocaleDateString('en-US', { 
-                                            year: 'numeric', 
-                                            month: 'long', 
-                                            day: 'numeric' 
+                                        Applied on {new Date(application.applied_at).toLocaleDateString("en-US", { 
+                                            year: "numeric", 
+                                            month: "long", 
+                                            day: "numeric" 
                                         })}
                                     </span>
                                 </div>
@@ -237,10 +237,10 @@ export default function JobApplicationShow() {
                                         <div>
                                             <p className="text-sm text-gray-600 mb-1">Start Date</p>
                                             <p className="text-base text-gray-900">
-                                                {new Date(application.booking.start_date).toLocaleDateString('en-US', { 
-                                                    year: 'numeric', 
-                                                    month: 'long', 
-                                                    day: 'numeric' 
+                                                {new Date(application.booking.start_date).toLocaleDateString("en-US", { 
+                                                    year: "numeric", 
+                                                    month: "long", 
+                                                    day: "numeric" 
                                                 })}
                                             </p>
                                         </div>

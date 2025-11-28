@@ -139,11 +139,11 @@ export default function ServiceRequestsBrowse() {
 
         // Extract page number from URL
         const urlObj = new URL(url, window.location.origin);
-        const page = urlObj.searchParams.get('page') || 1;
+        const page = urlObj.searchParams.get("page") || 1;
         setCurrentPage(parseInt(page));
 
         // Scroll to top of results
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const getStatusColor = (status) => {

@@ -240,8 +240,8 @@ export default function MessagesIndex() {
                                                         {conversation.last_message && (
                                                             <p className="text-xs text-gray-400 mt-1">
                                                                 {new Date(conversation.last_message.created_at).toLocaleDateString() === new Date().toLocaleDateString()
-                                                                    ? new Date(conversation.last_message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                                                                    : new Date(conversation.last_message.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })
+                                                                    ? new Date(conversation.last_message.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                                                                    : new Date(conversation.last_message.created_at).toLocaleDateString([], { month: "short", day: "numeric" })
                                                                 }
                                                             </p>
                                                         )}
@@ -299,7 +299,7 @@ export default function MessagesIndex() {
                                                             <div className="flex items-end gap-2 max-w-[70%]">
                                                                 {!isOwnMessage && (
                                                                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                                                        {message.sender?.name?.charAt(0).toUpperCase() || 'U'}
+                                                                        {message.sender?.name?.charAt(0).toUpperCase() || "U"}
                                                                     </div>
                                                                 )}
                                                                 <div
@@ -311,7 +311,7 @@ export default function MessagesIndex() {
                                                                 >
                                                                     {!isOwnMessage && (
                                                                         <p className="text-xs font-semibold mb-1 opacity-75">
-                                                                            {message.sender?.name || 'Unknown'}
+                                                                            {message.sender?.name || "Unknown"}
                                                                         </p>
                                                                     )}
                                                                     <p className="text-sm leading-relaxed">{message.message}</p>
@@ -328,7 +328,7 @@ export default function MessagesIndex() {
                                                                 </div>
                                                                 {isOwnMessage && (
                                                                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                                                        {user?.name?.charAt(0).toUpperCase() || 'U'}
+                                                                        {user?.name?.charAt(0).toUpperCase() || "U"}
                                                                     </div>
                                                                 )}
                                                             </div>

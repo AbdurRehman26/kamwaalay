@@ -221,9 +221,9 @@ export default function OnboardingHelper() {
             setProcessing(false);
             // Scroll to first error
             setTimeout(() => {
-                const firstErrorElement = document.querySelector('[data-error-field]');
+                const firstErrorElement = document.querySelector("[data-error-field]");
                 if (firstErrorElement) {
-                    firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstErrorElement.scrollIntoView({ behavior: "smooth", block: "center" });
                 }
             }, 100);
             return;

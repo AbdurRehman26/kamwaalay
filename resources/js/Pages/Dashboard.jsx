@@ -309,8 +309,8 @@ export default function Dashboard() {
                                                         {conversation.last_message && (
                                                             <p className="text-xs text-gray-400 mt-1">
                                                                 {new Date(conversation.last_message.created_at).toLocaleDateString() === new Date().toLocaleDateString()
-                                                                    ? new Date(conversation.last_message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                                                                    : new Date(conversation.last_message.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })
+                                                                    ? new Date(conversation.last_message.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                                                                    : new Date(conversation.last_message.created_at).toLocaleDateString([], { month: "short", day: "numeric" })
                                                                 }
                                                             </p>
                                                         )}

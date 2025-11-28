@@ -73,7 +73,7 @@ export default function MyServiceListings() {
                             <div className="mb-4 flex items-center justify-between">
                                 <div>
                                     <h2 className="text-lg font-bold text-gray-900">
-                                        {listings.meta?.total || listings.data.length} {listings.meta?.total === 1 ? 'Listing' : 'Listings'}
+                                        {listings.meta?.total || listings.data.length} {listings.meta?.total === 1 ? "Listing" : "Listings"}
                                     </h2>
                                     <p className="text-gray-600 mt-0.5 text-sm">All your service offerings</p>
                                 </div>

@@ -25,7 +25,7 @@ export default function UploadDocumentModal({ isOpen, onClose, onSuccess }) {
                 return;
             }
             // Validate file type
-            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            const allowedTypes = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
             if (!allowedTypes.includes(selectedFile.type)) {
                 setErrors({ file: ["File must be PDF, JPG, or PNG"] });
                 return;
@@ -39,7 +39,7 @@ export default function UploadDocumentModal({ isOpen, onClose, onSuccess }) {
         setFile(null);
         setErrors({});
         if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+            fileInputRef.current.value = "";
         }
     };
 
@@ -55,11 +55,11 @@ export default function UploadDocumentModal({ isOpen, onClose, onSuccess }) {
 
         try {
             const formData = new FormData();
-            formData.append('document_type', data.document_type);
+            formData.append("document_type", data.document_type);
             if (data.document_number) {
-                formData.append('document_number', data.document_number);
+                formData.append("document_number", data.document_number);
             }
-            formData.append('file', file);
+            formData.append("file", file);
 
             await profileService.uploadDocument(formData);
             onSuccess();

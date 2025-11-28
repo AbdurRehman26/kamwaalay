@@ -132,7 +132,7 @@ export default function JobApplicationCreate() {
                                         <div className="flex items-start gap-4">
                                             {booking.user.photo ? (
                                                 <img
-                                                    src={booking.user.photo.startsWith('http') ? booking.user.photo : `/storage/${booking.user.photo}`}
+                                                    src={booking.user.photo.startsWith("http") ? booking.user.photo : `/storage/${booking.user.photo}`}
                                                     alt={booking.user.name}
                                                     className="w-16 h-16 rounded-full object-cover border-2 border-primary-200"
                                                 />
@@ -182,10 +182,10 @@ export default function JobApplicationCreate() {
                                             <div>
                                                 <p className="text-xs text-gray-600 mb-1">Start Date</p>
                                                 <p className="text-base text-gray-900">
-                                                    {new Date(booking.start_date).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
+                                                    {new Date(booking.start_date).toLocaleDateString("en-US", {
+                                                        year: "numeric",
+                                                        month: "long",
+                                                        day: "numeric"
                                                     })}
                                                 </p>
                                             </div>
@@ -221,7 +221,7 @@ export default function JobApplicationCreate() {
                                             onChange={(e) => setData(prev => ({ ...prev, message: e.target.value }))}
                                             rows={6}
                                             className={`w-full border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
-                                                errors.message ? 'border-red-300' : 'border-gray-300'
+                                                errors.message ? "border-red-300" : "border-gray-300"
                                             }`}
                                             placeholder="Tell the client why you're perfect for this job. Mention your experience, skills, and availability..."
                                         />
@@ -246,7 +246,7 @@ export default function JobApplicationCreate() {
                                                 value={data.proposed_rate}
                                                 onChange={(e) => setData(prev => ({ ...prev, proposed_rate: e.target.value }))}
                                                 className={`w-full pl-12 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
-                                                    errors.proposed_rate ? 'border-red-300' : 'border-gray-300'
+                                                    errors.proposed_rate ? "border-red-300" : "border-gray-300"
                                                 }`}
                                                 placeholder="e.g., 5000"
                                             />

@@ -62,16 +62,16 @@ export default function NotificationsIndex() {
     const getNotificationLink = (notification) => {
         const data = notification.data;
         switch (data.type) {
-            case 'job_application_received':
+            case "job_application_received":
                 return route("job-applications.my-request-applications");
-            case 'job_application_status_changed':
+            case "job_application_status_changed":
                 if (data.application_id) {
                     return route("job-applications.show", data.application_id);
                 }
                 return route("job-applications.my-applications");
-            case 'new_message':
+            case "new_message":
                 return route("messages");
-            case 'document_verified':
+            case "document_verified":
                 return route("dashboard");
             default:
                 return route("dashboard");
@@ -80,30 +80,30 @@ export default function NotificationsIndex() {
 
     const getNotificationIcon = (type) => {
         switch (type) {
-            case 'job_application_received':
-            case 'job_application_status_changed':
-                return '📋';
-            case 'new_message':
-                return '💬';
-            case 'document_verified':
-                return '📄';
+            case "job_application_received":
+            case "job_application_status_changed":
+                return "📋";
+            case "new_message":
+                return "💬";
+            case "document_verified":
+                return "📄";
             default:
-                return '🔔';
+                return "🔔";
         }
     };
 
     const getNotificationColor = (type) => {
         switch (type) {
-            case 'job_application_received':
-                return 'bg-blue-100 text-blue-800';
-            case 'job_application_status_changed':
-                return 'bg-green-100 text-green-800';
-            case 'new_message':
-                return 'bg-purple-100 text-purple-800';
-            case 'document_verified':
-                return 'bg-yellow-100 text-yellow-800';
+            case "job_application_received":
+                return "bg-blue-100 text-blue-800";
+            case "job_application_status_changed":
+                return "bg-green-100 text-green-800";
+            case "new_message":
+                return "bg-purple-100 text-purple-800";
+            case "document_verified":
+                return "bg-yellow-100 text-yellow-800";
             default:
-                return 'bg-gray-100 text-gray-800';
+                return "bg-gray-100 text-gray-800";
         }
     };
 
@@ -152,8 +152,8 @@ export default function NotificationsIndex() {
                                                 }}
                                                 className={`block p-4 rounded-lg border-2 transition-all ${
                                                     isUnread 
-                                                        ? 'border-primary-300 bg-primary-50 hover:bg-primary-100' 
-                                                        : 'border-gray-100 bg-white hover:bg-gray-50'
+                                                        ? "border-primary-300 bg-primary-50 hover:bg-primary-100" 
+                                                        : "border-gray-100 bg-white hover:bg-gray-50"
                                                 }`}
                                             >
                                                 <div className="flex items-start gap-4">
@@ -163,16 +163,16 @@ export default function NotificationsIndex() {
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center justify-between mb-1">
                                                             <h3 className={`text-base font-bold ${
-                                                                isUnread ? 'text-gray-900' : 'text-gray-700'
+                                                                isUnread ? "text-gray-900" : "text-gray-700"
                                                             }`}>
-                                                                {notification.data?.title || 'Notification'}
+                                                                {notification.data?.title || "Notification"}
                                                             </h3>
                                                             {isUnread && (
                                                                 <span className="w-2 h-2 bg-primary-600 rounded-full flex-shrink-0"></span>
                                                             )}
                                                         </div>
                                                         <p className="text-sm text-gray-600 mb-2">
-                                                            {notification.data?.message || ''}
+                                                            {notification.data?.message || ""}
                                                         </p>
                                                         <p className="text-xs text-gray-400">
                                                             {new Date(notification.created_at).toLocaleString()}
@@ -198,7 +198,7 @@ export default function NotificationsIndex() {
                                                 );
                                             }
 
-                                            const page = link.url ? new URL(link.url).searchParams.get('page') : null;
+                                            const page = link.url ? new URL(link.url).searchParams.get("page") : null;
                                             const isActive = link.active;
 
                                             return (
@@ -207,8 +207,8 @@ export default function NotificationsIndex() {
                                                     onClick={() => page && handlePageChange(page)}
                                                     className={`px-4 py-2 rounded-lg border transition-colors ${
                                                         isActive
-                                                            ? 'bg-primary-600 text-white border-primary-600'
-                                                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                                            ? "bg-primary-600 text-white border-primary-600"
+                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                                                     }`}
                                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                                 />

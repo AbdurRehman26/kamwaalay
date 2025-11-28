@@ -96,16 +96,16 @@ export default function NotificationDropdown() {
     const getNotificationLink = (notification) => {
         const data = notification.data;
         switch (data.type) {
-            case 'job_application_received':
+            case "job_application_received":
                 return route("job-applications.my-request-applications");
-            case 'job_application_status_changed':
+            case "job_application_status_changed":
                 if (data.application_id) {
                     return route("job-applications.show", data.application_id);
                 }
                 return route("job-applications.my-applications");
-            case 'new_message':
+            case "new_message":
                 return route("messages");
-            case 'document_verified':
+            case "document_verified":
                 return route("dashboard");
             default:
                 return route("dashboard");
@@ -114,15 +114,15 @@ export default function NotificationDropdown() {
 
     const getNotificationIcon = (type) => {
         switch (type) {
-            case 'job_application_received':
-            case 'job_application_status_changed':
-                return '📋';
-            case 'new_message':
-                return '💬';
-            case 'document_verified':
-                return '📄';
+            case "job_application_received":
+            case "job_application_status_changed":
+                return "📋";
+            case "new_message":
+                return "💬";
+            case "document_verified":
+                return "📄";
             default:
-                return '🔔';
+                return "🔔";
         }
     };
 
@@ -135,7 +135,7 @@ export default function NotificationDropdown() {
                 <span className="text-2xl">🔔</span>
                 {unreadCount > 0 && (
                     <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                        {unreadCount > 9 ? '9+' : unreadCount}
+                        {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                 )}
             </button>
@@ -178,19 +178,19 @@ export default function NotificationDropdown() {
                                                 setIsOpen(false);
                                             }}
                                             className={`block p-4 hover:bg-gray-50 transition-colors ${
-                                                isUnread ? 'bg-primary-50' : ''
+                                                isUnread ? "bg-primary-50" : ""
                                             }`}
                                         >
                                             <div className="flex items-start gap-3">
                                                 <span className="text-2xl">{icon}</span>
                                                 <div className="flex-1 min-w-0">
                                                     <p className={`text-sm font-semibold ${
-                                                        isUnread ? 'text-gray-900' : 'text-gray-700'
+                                                        isUnread ? "text-gray-900" : "text-gray-700"
                                                     }`}>
-                                                        {notification.data?.title || 'Notification'}
+                                                        {notification.data?.title || "Notification"}
                                                     </p>
                                                     <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                                                        {notification.data?.message || ''}
+                                                        {notification.data?.message || ""}
                                                     </p>
                                                     <p className="text-xs text-gray-400 mt-2">
                                                         {new Date(notification.created_at).toLocaleString()}

@@ -198,7 +198,7 @@ export default function JobApplicationsIndex() {
                         <>
                             <div className="mb-4">
                                 <p className="text-sm text-gray-600">
-                                    Found {bookings.meta?.total || bookings.data.length} {bookings.meta?.total === 1 ? 'request' : 'requests'}
+                                    Found {bookings.meta?.total || bookings.data.length} {bookings.meta?.total === 1 ? "request" : "requests"}
                                 </p>
                             </div>
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -222,7 +222,7 @@ export default function JobApplicationsIndex() {
                                                 {booking.start_date && (
                                                     <p className="text-gray-500 text-xs flex items-center gap-1">
                                                         <span>📅</span>
-                                                        Start: {new Date(booking.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                                        Start: {new Date(booking.start_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                                                     </p>
                                                 )}
                                             </div>

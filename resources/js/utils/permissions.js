@@ -9,7 +9,7 @@
  * @returns {boolean}
  */
 export const isUser = (user) => {
-    return user?.role === 'user';
+    return user?.role === "user";
 };
 
 /**
@@ -18,7 +18,7 @@ export const isUser = (user) => {
  * @returns {boolean}
  */
 export const isHelper = (user) => {
-    return user?.role === 'helper';
+    return user?.role === "helper";
 };
 
 /**
@@ -27,7 +27,7 @@ export const isHelper = (user) => {
  * @returns {boolean}
  */
 export const isBusiness = (user) => {
-    return user?.role === 'business';
+    return user?.role === "business";
 };
 
 /**
@@ -36,7 +36,7 @@ export const isBusiness = (user) => {
  * @returns {boolean}
  */
 export const isAdmin = (user) => {
-    return user?.role === 'admin';
+    return user?.role === "admin";
 };
 
 /**
@@ -72,9 +72,9 @@ export const isHelperOrGuest = (user) => {
  * @returns {string}
  */
 export const getDashboardRoute = (user) => {
-    if (!user) return 'home';
+    if (!user) return "home";
 
-    if (isAdmin(user)) return 'admin.dashboard';
-    if (isBusiness(user)) return 'business.dashboard';
-    return 'dashboard';
+    if (isAdmin(user)) return "admin.dashboard";
+    if (isBusiness(user)) return "business.dashboard";
+    return "dashboard";
 };

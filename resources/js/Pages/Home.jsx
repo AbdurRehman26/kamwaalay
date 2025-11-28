@@ -298,7 +298,7 @@ export default function Home() {
                                                     </p>
                                                     {booking.start_date && (
                                                         <p className="text-gray-500 text-sm mb-2">
-                                                            📅 Start Date: {new Date(booking.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                                            📅 Start Date: {new Date(booking.start_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                                                         </p>
                                                     )}
                                                     {booking.special_requirements && (

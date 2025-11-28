@@ -186,7 +186,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 setHelpers(helpersWithArrayLinks);
                 setFilters(data.filters || {});
                 // Debug: Log pagination data
-                console.log('Helpers pagination data:', {
+                console.log("Helpers pagination data:", {
                     links: helpersWithArrayLinks.links,
                     linksLength: helpersWithArrayLinks.links?.length,
                     meta: helpersWithArrayLinks.meta,
@@ -218,11 +218,11 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         
         // Extract page number from URL
         const urlObj = new URL(url, window.location.origin);
-        const page = urlObj.searchParams.get('page') || 1;
+        const page = urlObj.searchParams.get("page") || 1;
         setCurrentPage(parseInt(page));
         
         // Scroll to top of results
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const handleBookingSubmit = async (e) => {
