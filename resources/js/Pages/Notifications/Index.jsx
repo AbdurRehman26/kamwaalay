@@ -153,17 +153,19 @@ export default function NotificationsIndex() {
                                                 className={`block p-4 rounded-lg border-2 transition-all ${
                                                     isUnread 
                                                         ? "border-primary-300 bg-primary-50 hover:bg-primary-100" 
-                                                        : "border-gray-100 bg-white hover:bg-gray-50"
+                                                        : "border-gray-200 bg-gray-50 hover:bg-gray-100 opacity-90"
                                                 }`}
                                             >
                                                 <div className="flex items-start gap-4">
-                                                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${colorClass}`}>
+                                                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${colorClass} ${
+                                                        !isUnread ? "opacity-70" : ""
+                                                    }`}>
                                                         {icon}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center justify-between mb-1">
                                                             <h3 className={`text-base font-bold ${
-                                                                isUnread ? "text-gray-900" : "text-gray-700"
+                                                                isUnread ? "text-gray-900" : "text-gray-600"
                                                             }`}>
                                                                 {notification.data?.title || "Notification"}
                                                             </h3>
@@ -171,12 +173,19 @@ export default function NotificationsIndex() {
                                                                 <span className="w-2 h-2 bg-primary-600 rounded-full flex-shrink-0"></span>
                                                             )}
                                                         </div>
-                                                        <p className="text-sm text-gray-600 mb-2">
+                                                        <p className={`text-sm mb-2 ${
+                                                            isUnread ? "text-gray-600" : "text-gray-500"
+                                                        }`}>
                                                             {notification.data?.message || ""}
                                                         </p>
-                                                        <p className="text-xs text-gray-400">
-                                                            {new Date(notification.created_at).toLocaleString()}
-                                                        </p>
+                                                        <div className="flex items-center justify-between">
+                                                            <p className="text-xs text-gray-400">
+                                                                {new Date(notification.created_at).toLocaleString()}
+                                                            </p>
+                                                            {!isUnread && (
+                                                                <span className="text-xs text-gray-400 italic">Read</span>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </Link>
