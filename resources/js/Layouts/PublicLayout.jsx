@@ -42,7 +42,7 @@ export default function PublicLayout({ children }) {
                             <img
                                 src="/kamwaalay-logo.png"
                                 alt="kamwaalay"
-                                className="h-12 w-auto"
+                                className="h-24 w-auto"
                             />
                         </Link>
 
