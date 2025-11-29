@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class UserResource extends JsonResource
 {
@@ -29,6 +30,31 @@ class UserResource extends JsonResource
     }
 
     /**
+     * Safely convert date to ISO8601 string
+     * Handles both Carbon instances and strings
+     */
+    private function toIso8601String($date): ?string
+    {
+        if ($date === null) {
+            return null;
+        }
+
+        if (is_string($date)) {
+            try {
+                return Carbon::parse($date)->toIso8601String();
+            } catch (\Exception $e) {
+                return $date; // Return as-is if parsing fails
+            }
+        }
+
+        if ($date instanceof \Carbon\Carbon || $date instanceof \DateTime) {
+            return $date->toIso8601String();
+        }
+
+        return null;
+    }
+
+    /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
@@ -43,10 +69,10 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'address' => $this->address,
-            'verified_at' => $this->verified_at?->toIso8601String(),
-            'profile_updated_at' => $this->profile_updated_at?->toIso8601String(),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'verified_at' => $this->toIso8601String($this->verified_at),
+            'profile_updated_at' => $this->toIso8601String($this->profile_updated_at),
+            'created_at' => $this->toIso8601String($this->created_at),
+            'updated_at' => $this->toIso8601String($this->updated_at),
             'onboarding_complete' => $this->hasCompletedOnboarding(),
             'role' => $this->getRoleAttribute(),
             'roles' => $this->getRolesArray(),
