@@ -21,16 +21,28 @@ class ServiceListingResource extends JsonResource
         // Get locations from JSON column (location IDs)
         $locationIds = $this->locations ?? [];
         
-        // Get first location details for display (if needed)
+        // Fetch all location details
+        $locationDetails = [];
         $firstLocation = null;
         if (!empty($locationIds)) {
-            $location = \App\Models\Location::find($locationIds[0]);
-            if ($location) {
-                $location->load('city');
-                $firstLocation = [
-                    'city' => $location->city->name,
+            $locations = \App\Models\Location::whereIn('id', $locationIds)
+                ->with('city')
+                ->get();
+            
+            $locationDetails = $locations->map(function ($location) {
+                return [
+                    'id' => $location->id,
+                    'city_name' => $location->city->name,
                     'area' => $location->area ?? '',
+                    'display_text' => $location->area 
+                        ? $location->city->name . ', ' . $location->area 
+                        : $location->city->name,
                 ];
+            })->toArray();
+            
+            // Get first location for backward compatibility
+            if (!empty($locationDetails)) {
+                $firstLocation = $locationDetails[0];
             }
         }
         
@@ -45,8 +57,9 @@ class ServiceListingResource extends JsonResource
             'service_types' => $serviceTypes,
             'service_type' => $firstServiceType,
             'service_type_label' => $this->service_type_label,
-            'locations' => $locationIds,
-            'city' => $firstLocation ? $firstLocation['city'] : null,
+            'locations' => $locationIds, // Keep IDs for backward compatibility
+            'location_details' => $locationDetails, // Full location data array
+            'city' => $firstLocation ? $firstLocation['city_name'] : null,
             'area' => $firstLocation ? $firstLocation['area'] : null,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

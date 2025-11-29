@@ -461,31 +461,8 @@ class ServiceListingController extends Controller
 
         $serviceListing->load(['profile.profileable']);
 
-        // Get location details for all locations in the listing
-        $locationDetails = [];
-        if (!empty($serviceListing->locations)) {
-            $locations = \App\Models\Location::whereIn('id', $serviceListing->locations)
-                ->with('city')
-                ->get();
-            
-            $locationDetails = $locations->map(function ($location) {
-                return [
-                    'id' => $location->id,
-                    'city_name' => $location->city->name,
-                    'area' => $location->area ?? '',
-                    'display_text' => $location->area 
-                        ? $location->city->name . ', ' . $location->area 
-                        : $location->city->name,
-                ];
-            })->toArray();
-        }
-
-        $listingResource = new ServiceListingResource($serviceListing);
-        $listingArray = $listingResource->toArray(request());
-        $listingArray['location_details'] = $locationDetails;
-
         return response()->json([
-            'listing' => $listingArray,
+            'listing' => new ServiceListingResource($serviceListing),
         ]);
     }
 
