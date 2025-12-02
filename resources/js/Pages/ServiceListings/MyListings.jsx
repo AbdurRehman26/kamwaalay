@@ -1,5 +1,4 @@
-// Head removed
-import PublicLayout from "@/Layouts/PublicLayout";
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { route } from "@/utils/routes";
@@ -34,7 +33,7 @@ export default function MyServiceListings() {
     };
 
     return (
-        <PublicLayout>
+        <DashboardLayout>
             <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50">
                 {/* Header Section */}
                 <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-600 text-white py-10 shadow-lg">
@@ -172,7 +171,7 @@ export default function MyServiceListings() {
                     )}
                 </div>
             </div>
-        </PublicLayout>
+        </DashboardLayout>
     );
 }
 

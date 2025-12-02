@@ -113,6 +113,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <Dropdown.Content>
                                         <Dropdown.Link
                                             href={route("profile.edit")}
+                                            className="!bg-gradient-to-r !from-primary-600 !to-primary-700 !text-white hover:!from-primary-700 hover:!to-primary-800 !font-medium hover:!bg-transparent"
                                         >
                                             Profile
                                         </Dropdown.Link>
@@ -243,9 +244,12 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route("profile.edit")}>
+                            <Link
+                                to={route("profile.edit")}
+                                className="block w-full px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium text-center"
+                            >
                                 Profile
-                            </ResponsiveNavLink>
+                            </Link>
                             <button
                                 onClick={async () => {
                                     try {

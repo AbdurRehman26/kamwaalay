@@ -1,5 +1,4 @@
-// Head removed
-import PublicLayout from "@/Layouts/PublicLayout";
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import { useState, useEffect } from "react";
 import { jobApplicationsService } from "@/services/jobApplications";
 
@@ -62,7 +61,7 @@ export default function MyRequestApplications() {
     };
 
     return (
-        <PublicLayout>
+        <DashboardLayout>
             
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
@@ -161,7 +160,7 @@ export default function MyRequestApplications() {
                     </div>
                 )}
             </div>
-        </PublicLayout>
+        </DashboardLayout>
     );
 }
 

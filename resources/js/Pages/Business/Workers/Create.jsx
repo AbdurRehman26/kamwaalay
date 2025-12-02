@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import PublicLayout from "@/Layouts/PublicLayout";
+import { useNavigate, useParams } from "react-router-dom";
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import { businessesService } from "@/services/businesses";
 import { route } from "@/utils/routes";
 import api from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
@@ -11,7 +12,10 @@ import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
 
 export default function CreateWorker() {
+    const { workerId } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const isEditMode = !!workerId;
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
     const [selectedServiceTypes, setSelectedServiceTypes] = useState([]);
@@ -119,6 +123,83 @@ export default function CreateWorker() {
         };
     }, []);
 
+    // Load worker data if in edit mode
+    useEffect(() => {
+        if (isEditMode && workerId) {
+            // Prevent users from editing themselves
+            if (user && parseInt(workerId) === user.id) {
+                alert("You cannot edit yourself.");
+                navigate(route("business.workers.index"));
+                return;
+            }
+
+            businessesService.getWorkerEdit(workerId)
+                .then((response) => {
+                    console.log("Worker edit response:", response);
+                    // Backend returns 'helper' in the response
+                    const worker = response.helper || response.worker;
+                    
+                    if (!worker) {
+                        throw new Error("Worker data not found in response");
+                    }
+                    
+                    // Double check - prevent editing self
+                    if (user && worker.id === user.id) {
+                        alert("You cannot edit yourself.");
+                        navigate(route("business.workers.index"));
+                        return;
+                    }
+                    setData({
+                        name: worker.name || "",
+                        phone: worker.phone || "",
+                        experience_years: worker.profile?.experience_years || worker.experience_years || "",
+                        availability: worker.profile?.availability || worker.availability || "full_time",
+                        bio: worker.profile?.bio || worker.bio || "",
+                        skills: worker.profile?.skills || worker.skills || "",
+                        photo: null, // Don't set existing photo as file
+                    });
+
+                    // Set service types from worker's service listings
+                    if (worker.service_listings && worker.service_listings.length > 0) {
+                        const serviceTypesFromListings = worker.service_listings
+                            .flatMap(listing => listing.service_types || [])
+                            .map(st => typeof st === "object" ? st.service_type : st)
+                            .filter((value, index, self) => self.indexOf(value) === index); // Remove duplicates
+                        setSelectedServiceTypes(serviceTypesFromListings);
+                    }
+
+                    // Set locations from worker's service listings
+                    if (worker.service_listings && worker.service_listings.length > 0) {
+                        const locationsFromListings = worker.service_listings
+                            .flatMap(listing => {
+                                // Handle both location_details array and locations array
+                                if (listing.location_details && listing.location_details.length > 0) {
+                                    return listing.location_details.map(loc => ({
+                                        id: loc.id || loc.display_text,
+                                        display_text: loc.display_text || `${loc.city_name || loc.city || ""}${loc.area ? ", " + loc.area : ""}`,
+                                        city: loc.city_name || loc.city || "",
+                                        area: loc.area || "",
+                                    }));
+                                }
+                                return [];
+                            })
+                            .filter((loc, index, self) => 
+                                self.findIndex(l => l.id === loc.id) === index
+                            ); // Remove duplicates
+                        setSelectedLocations(locationsFromListings);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error loading worker:", error);
+                    console.error("Error response:", error.response);
+                    const errorMessage = error.response?.data?.message || error.message || "Failed to load worker data";
+                    alert(errorMessage);
+                    // Navigate back to workers list on error
+                    navigate(route("business.workers.index"));
+                });
+        }
+    }, [isEditMode, workerId, user, navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setProcessing(true);
@@ -161,7 +242,11 @@ export default function CreateWorker() {
         });
 
         try {
-            await businessesService.createWorker(formData);
+            if (isEditMode) {
+                await businessesService.updateWorker(workerId, formData);
+            } else {
+                await businessesService.createWorker(formData);
+            }
             navigate(route("business.workers.index"));
         } catch (error) {
             if (error.response && error.response.data.errors) {
@@ -175,11 +260,11 @@ export default function CreateWorker() {
     };
 
     return (
-        <PublicLayout>
+        <DashboardLayout>
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">Add New Worker</h1>
-                    <p className="text-xl text-white/90">Add a new worker to your agency</p>
+                    <h1 className="text-4xl font-bold mb-4">{isEditMode ? "Edit Worker" : "Add New Worker"}</h1>
+                    <p className="text-xl text-white/90">{isEditMode ? "Update worker information" : "Add a new worker to your agency"}</p>
                 </div>
             </div>
 
@@ -426,13 +511,16 @@ export default function CreateWorker() {
                                     Cancel
                                 </button>
                                 <PrimaryButton disabled={processing}>
-                                    {processing ? "Adding Worker..." : "Add Worker"}
+                                    {processing 
+                                        ? (isEditMode ? "Updating Worker..." : "Adding Worker...") 
+                                        : (isEditMode ? "Update Worker" : "Add Worker")
+                                    }
                                 </PrimaryButton>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
-        </PublicLayout>
+        </DashboardLayout>
     );
 }

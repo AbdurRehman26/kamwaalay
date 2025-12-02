@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { route } from "@/utils/routes";
 import NotificationDropdown from "@/Components/NotificationDropdown";
+import LogoutModal from "@/Components/LogoutModal";
 import {
     isUser,
     isUserOrGuest,
@@ -19,6 +20,7 @@ export default function PublicLayout({ children }) {
     const navigate = useNavigate();
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     // Handle RTL for Urdu
     useEffect(() => {
@@ -48,14 +50,20 @@ export default function PublicLayout({ children }) {
 
                         <div className="hidden lg:flex items-center space-x-8">
                             <Link to={route("home")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("common.home")}</Link>
+                            {user && (
+                                <Link to={route("dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("common.dashboard")}</Link>
+                            )}
                             {isUser(user) && (
                                 <Link to={route("service-listings.index")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">Browse Services</Link>
                             )}
                             {isUserOrGuest(user) && (
                                 <Link to={route("helpers.index")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.find_help")}</Link>
                             )}
-                            {isHelperOrGuest(user) && (
+                            {!user && (
                                 <Link to={route("service-requests.browse")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.services_required")}</Link>
+                            )}
+                            {user && (
+                                <Link to={route("job-applications.index")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">Search Jobs</Link>
                             )}
 
                             {user ? (
@@ -63,25 +71,7 @@ export default function PublicLayout({ children }) {
                                     {isAdmin(user) && (
                                         <Link to={route("admin.dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.admin")}</Link>
                                     )}
-                                    {isBusiness(user) && (
-                                        <Link to={route("business.dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.business")}</Link>
-                                    )}
-                                    <Link to={route("dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("common.dashboard")}</Link>
                                     <NotificationDropdown />
-                                    <button
-                                        onClick={async () => {
-                                            try {
-                                                await logout();
-                                                navigate("/login");
-                                            } catch (error) {
-                                                console.error("Logout error:", error);
-                                                navigate("/login");
-                                            }
-                                        }}
-                                        className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
-                                    >
-                                        {t("common.logout")}
-                                    </button>
                                     {isUser(user) && (
                                         <Link to={route("bookings.create")} className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium">
                                             {t("navigation.post_service_request")}
@@ -90,6 +80,12 @@ export default function PublicLayout({ children }) {
                                     <Link to={route("profile.edit")} className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium">
                                         {t("common.profile")}
                                     </Link>
+                                    <button
+                                        onClick={() => setShowLogoutModal(true)}
+                                        className="text-red-600 hover:text-red-700 font-medium transition-colors"
+                                    >
+                                        {t("common.logout")}
+                                    </button>
                                 </>
                             ) : (
                                 <>
@@ -115,14 +111,20 @@ export default function PublicLayout({ children }) {
                     {mobileMenuOpen && (
                         <div className="lg:hidden py-4 space-y-2 border-t border-gray-100">
                             <Link to={route("home")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">{t("common.home")}</Link>
+                            {user && (
+                                <Link to={route("dashboard")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Dashboard</Link>
+                            )}
                             {isUser(user) && (
                                 <Link to={route("service-listings.index")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Browse Services</Link>
                             )}
                             {isUserOrGuest(user) && (
                                 <Link to={route("helpers.index")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">{t("navigation.find_help")}</Link>
                             )}
-                            {isHelperOrGuest(user) && (
+                            {!user && (
                                 <Link to={route("service-requests.browse")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">{t("navigation.services_required")}</Link>
+                            )}
+                            {user && (
+                                <Link to={route("job-applications.index")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Search Jobs</Link>
                             )}
                             {user ? (
                                 <>
@@ -130,18 +132,9 @@ export default function PublicLayout({ children }) {
                                     <div className="block py-3 px-4">
                                         <NotificationDropdown />
                                     </div>
-                                    <Link to={route("dashboard")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Dashboard</Link>
                                     <button
-                                        onClick={async () => {
-                                            try {
-                                                await logout();
-                                                navigate("/login");
-                                            } catch (error) {
-                                                console.error("Logout error:", error);
-                                                navigate("/login");
-                                            }
-                                        }}
-                                        className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors w-full text-left"
+                                        onClick={() => setShowLogoutModal(true)}
+                                        className="block py-3 px-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors w-full text-left font-medium"
                                     >
                                         Logout
                                     </button>
@@ -150,7 +143,7 @@ export default function PublicLayout({ children }) {
                                             Post Service Request
                                         </Link>
                                     )}
-                                    <Link to={route("profile.edit")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Profile</Link>
+                                    <Link to={route("profile.edit")} className="block py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium text-center">Profile</Link>
                                 </>
                             ) : (
                                 <>
@@ -208,6 +201,8 @@ export default function PublicLayout({ children }) {
                     </div>
                 </div>
             </footer>
+
+            <LogoutModal show={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
         </div>
     );
 }

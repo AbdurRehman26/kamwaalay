@@ -172,26 +172,29 @@ class BusinessController extends Controller
             abort(403);
         }
 
+        // Exclude business owner from all worker-related queries
+        $helpersQuery = $business->helpers()->where('users.id', '!=', $business->id);
+        
         $stats = [
-            'total_workers' => $business->helpers()->count(),
-            'active_workers' => $business->helpers()->whereHas('profile', function ($q) {
+            'total_workers' => $helpersQuery->count(),
+            'active_workers' => $helpersQuery->whereHas('profile', function ($q) {
                 $q->where('is_active', true);
             })->count(),
-            'pending_verification' => $business->helpers()->whereHas('profile', function ($q) {
+            'pending_verification' => $helpersQuery->whereHas('profile', function ($q) {
                 $q->where('verification_status', 'pending');
             })->count(),
-            'verified_workers' => $business->helpers()->whereHas('profile', function ($q) {
+            'verified_workers' => $helpersQuery->whereHas('profile', function ($q) {
                 $q->where('verification_status', 'verified');
             })->count(),
-            'total_bookings' => Booking::whereIn('assigned_user_id', $business->helpers()->pluck('users.id')->toArray())->count(),
+            'total_bookings' => Booking::whereIn('assigned_user_id', $helpersQuery->pluck('users.id')->toArray())->count(),
         ];
 
-        $recentWorkers = $business->helpers()
+        $recentWorkers = $helpersQuery
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
 
-        $helperIds = $business->helpers()->pluck('users.id')->toArray();
+        $helperIds = $helpersQuery->pluck('users.id')->toArray();
         $recentBookings = Booking::whereIn('assigned_user_id', $helperIds)
         ->with(['user', 'assignedUser'])
         ->orderBy('created_at', 'desc')
@@ -232,7 +235,9 @@ class BusinessController extends Controller
             abort(403);
         }
 
+        // Exclude the business owner from workers list
         $workers = $business->helpers()
+            ->where('users.id', '!=', $business->id) // Exclude business owner
             ->with(['profile', 'serviceListings' => function ($query) {
                 $query->where('service_listings.is_active', true)
                       ->where('service_listings.status', 'active');
@@ -476,12 +481,27 @@ class BusinessController extends Controller
             abort(403);
         }
 
+        // Prevent users from editing themselves
+        if ($business->id === $helper->id) {
+            abort(403, 'You cannot edit yourself.');
+        }
+
         if (!$helper->hasRole('helper')) {
             abort(404);
         }
 
+        // Load necessary relationships for editing
+        $helper->load([
+            'roles',
+            'profile',
+            'serviceListings' => function ($query) {
+                $query->where('service_listings.is_active', true)
+                      ->where('service_listings.status', 'active');
+            }
+        ]);
+
         return response()->json([
-            'helper' => new UserResource($helper->load('roles')),
+            'helper' => new UserResource($helper),
         ]);
     }
 
@@ -534,6 +554,11 @@ class BusinessController extends Controller
         
         if (!$business->isBusiness() || !$business->helpers()->where('users.id', $helper->id)->exists()) {
             abort(403);
+        }
+
+        // Prevent users from updating themselves
+        if ($business->id === $helper->id) {
+            abort(403, 'You cannot update yourself.');
         }
 
         if (!$helper->hasRole('helper')) {
@@ -622,6 +647,11 @@ class BusinessController extends Controller
         
         if (!$business->isBusiness() || !$business->helpers()->where('users.id', $helper->id)->exists()) {
             abort(403);
+        }
+
+        // Prevent users from deleting themselves
+        if ($business->id === $helper->id) {
+            abort(403, 'You cannot remove yourself from the agency.');
         }
 
         // Detach from business (don't delete the user, just remove relationship)

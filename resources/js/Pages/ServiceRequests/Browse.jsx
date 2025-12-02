@@ -162,8 +162,8 @@ export default function ServiceRequestsBrowse() {
 
             <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 text-white py-16">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4">Services Required</h1>
-                    <p className="text-xl text-white/90">Browse services required by customers looking to hire helpers or businesses</p>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4">Search Jobs</h1>
+                    <p className="text-xl text-white/90">Browse jobs posted by customers looking to hire helpers or businesses</p>
                 </div>
             </div>
 
@@ -280,7 +280,7 @@ export default function ServiceRequestsBrowse() {
                     </div>
                 </div>
 
-                {/* Services Required Grid */}
+                {/* Search Jobs Grid */}
                 {loading ? (
                     <div className="text-center py-12">
                         <p className="text-gray-600">Loading service requests...</p>
@@ -393,7 +393,7 @@ export default function ServiceRequestsBrowse() {
                 ) : (
                     <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">🔍</div>
-                        <p className="text-gray-600 text-xl mb-6">No services required found</p>
+                        <p className="text-gray-600 text-xl mb-6">No jobs found</p>
                         <p className="text-gray-500 mb-8">Try adjusting your filters or check back later</p>
                         {user && (user.role === "user") && (
                             <Link

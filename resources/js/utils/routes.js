@@ -4,7 +4,10 @@ export const routes = {
     login: () => "/login",
     register: () => "/register",
     verifyOtp: () => "/verify-otp",
-    dashboard: () => "/dashboard",
+    dashboard: {
+        overview: () => "/dashboard",
+        documents: () => "/dashboard/documents",
+    },
     messages: () => "/messages",
     notifications: () => "/notifications",
     profile: {
@@ -18,6 +21,13 @@ export const routes = {
     },
     businesses: {
         show: (id) => `/businesses/${id}`,
+    },
+    business: {
+        workers: {
+            index: () => "/business/workers",
+            create: () => "/business/workers/create",
+            edit: (id) => `/business/workers/${id}/edit`,
+        },
     },
     bookings: {
         index: () => "/bookings",
@@ -42,17 +52,8 @@ export const routes = {
         "my-applications": () => "/my-applications",
         "my-request-applications": () => "/my-request-applications",
     },
-    business: {
-        dashboard: () => "/business/dashboard",
-        workers: {
-            index: () => "/business/workers",
-            create: () => "/business/workers/create",
-            edit: (id) => `/business/workers/${id}/edit`,
-        },
-    },
     onboarding: {
         helper: () => "/onboarding/helper",
-        business: () => "/onboarding/business",
     },
     admin: {
         dashboard: () => "/admin/dashboard",
@@ -77,6 +78,16 @@ export function route(name, params = {}) {
             path = path[part];
         } else {
             console.warn(`Route "${name}" not found`);
+            return "#";
+        }
+    }
+
+    // If path is an object (like dashboard: { overview: ... }), try to use 'overview' as default
+    if (typeof path === "object" && path !== null && !Array.isArray(path)) {
+        if (path.overview && typeof path.overview === "function") {
+            path = path.overview;
+        } else {
+            console.warn(`Route "${name}" is an object but has no 'overview' property`);
             return "#";
         }
     }

@@ -3,7 +3,7 @@
 return [
     'home' => 'Home',
     'find_help' => 'Find Househelp',
-    'services_required' => 'Services Required',
+    'services_required' => 'Search Jobs',
     'post_service_request' => 'Post Service Request',
     'admin' => 'Admin',
     'business' => 'Business',

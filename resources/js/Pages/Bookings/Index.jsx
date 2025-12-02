@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import PublicLayout from "@/Layouts/PublicLayout";
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import { route } from "@/utils/routes";
 import { useState, useEffect } from "react";
 import { bookingsService } from "@/services/bookings";
@@ -37,7 +37,7 @@ export default function BookingsIndex() {
     };
 
     return (
-        <PublicLayout>
+        <DashboardLayout>
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <div className="flex justify-between items-center">
@@ -131,7 +131,7 @@ export default function BookingsIndex() {
                     </div>
                 )}
             </div>
-        </PublicLayout>
+        </DashboardLayout>
     );
 }
 

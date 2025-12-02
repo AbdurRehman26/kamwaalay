@@ -1,4 +1,4 @@
-import PublicLayout from "@/Layouts/PublicLayout";
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import { useState, useEffect } from "react";
 import DeleteUserForm from "./Partials/DeleteUserForm";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
@@ -26,29 +26,29 @@ export default function Edit() {
 
     if (loading) {
         return (
-            <PublicLayout>
+            <DashboardLayout>
                 <div className="py-12">
                     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 text-center">
                         <p className="text-gray-600">Loading profile...</p>
                     </div>
                 </div>
-            </PublicLayout>
+            </DashboardLayout>
         );
     }
 
     if (error || !profileData) {
         return (
-            <PublicLayout>
+            <DashboardLayout>
                 <div className="py-12">
                     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 text-center">
                         <p className="text-red-600">{error || "Failed to load profile"}</p>
                     </div>
                 </div>
-            </PublicLayout>
+            </DashboardLayout>
         );
     }
     return (
-        <PublicLayout>
+        <DashboardLayout>
             
 
             <div className="py-12">
@@ -74,6 +74,6 @@ export default function Edit() {
                     </div>
                 </div>
             </div>
-        </PublicLayout>
+        </DashboardLayout>
     );
 }

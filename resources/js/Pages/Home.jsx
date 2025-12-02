@@ -136,7 +136,7 @@ export default function Home() {
                                     to={route("service-requests.browse")}
                                     className="bg-white text-primary-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
                                 >
-                                    Services Required
+                                    Search Jobs
                                 </Link>
                             )}
                             {isUser(user) && (
@@ -475,7 +475,7 @@ export default function Home() {
                                     to={route("service-requests.browse")}
                                     className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300 min-w-[200px]"
                                 >
-                                    Services Required
+                                    Search Jobs
                                 </Link>
                             )}
                         </div>

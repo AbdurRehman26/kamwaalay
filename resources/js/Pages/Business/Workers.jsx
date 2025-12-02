@@ -1,13 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import PublicLayout from "@/Layouts/PublicLayout";
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import { businessesService } from "@/services/businesses";
 import { route } from "@/utils/routes";
+import { useAuth } from "@/contexts/AuthContext";
+import RemoveWorkerModal from "@/Components/RemoveWorkerModal";
 
 export default function Workers() {
+    const { user } = useAuth();
     const [workers, setWorkers] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showRemoveModal, setShowRemoveModal] = useState(false);
+    const [workerToRemove, setWorkerToRemove] = useState(null);
 
     useEffect(() => {
         businessesService.getWorkers()
@@ -22,47 +27,53 @@ export default function Workers() {
             });
     }, []);
 
-    const handleDelete = async (workerId) => {
-        if (confirm("Are you sure you want to remove this worker?")) {
-            try {
-                await businessesService.deleteWorker(workerId);
-                // Refresh workers list
-                const response = await businessesService.getWorkers();
-                setWorkers(response.workers || { data: [], links: [] });
-            } catch (err) {
-                console.error("Error deleting worker:", err);
-                alert(err.response?.data?.message || "Failed to delete worker");
-            }
+    const handleDeleteClick = (worker) => {
+        setWorkerToRemove(worker);
+        setShowRemoveModal(true);
+    };
+
+    const handleDeleteConfirm = async (workerId) => {
+        try {
+            await businessesService.deleteWorker(workerId);
+            // Refresh workers list
+            const response = await businessesService.getWorkers();
+            setWorkers(response.workers || { data: [], links: [] });
+            setShowRemoveModal(false);
+            setWorkerToRemove(null);
+        } catch (err) {
+            console.error("Error deleting worker:", err);
+            alert(err.response?.data?.message || "Failed to delete worker");
+            throw err; // Re-throw to let modal handle it
         }
     };
 
     if (loading) {
         return (
-            <PublicLayout>
+            <DashboardLayout>
                 
                 <div className="py-12">
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 text-center">
                         <p className="text-gray-600">Loading workers...</p>
                     </div>
                 </div>
-            </PublicLayout>
+            </DashboardLayout>
         );
     }
 
     if (error) {
         return (
-            <PublicLayout>
+            <DashboardLayout>
                 
                 <div className="py-12">
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 text-center">
                         <p className="text-red-600">{error}</p>
                     </div>
                 </div>
-            </PublicLayout>
+            </DashboardLayout>
         );
     }
     return (
-        <PublicLayout>
+        <DashboardLayout>
             
 
             <div className="py-12">
@@ -97,38 +108,95 @@ export default function Workers() {
                                                 <span className="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-semibold">✓ Verified</span>
                                             )}
                                         </div>
-                                        <h3 className="text-xl font-bold mb-2">{worker.name || "Worker"}</h3>
-                                        <p className="text-gray-600 mb-2 capitalize">
-                                            {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].service_types && worker.service_listings[0].service_types.length > 0
-                                                ? (typeof worker.service_listings[0].service_types[0] === "object" 
-                                                    ? worker.service_listings[0].service_types[0].service_type?.replace("_", " ") 
-                                                    : worker.service_listings[0].service_types[0]?.replace("_", " ")) || "No service type"
-                                                : worker.service_type ? worker.service_type.replace("_", " ") : "No service type"}
-                                        </p>
-                                        <div className="flex items-center mb-2">
-                                            <span className="text-yellow-500 mr-2">⭐</span>
-                                            <span className="font-semibold">{worker.rating || 0}</span>
-                                            <span className="text-gray-500 ml-2 text-sm">({worker.total_reviews || 0} reviews)</span>
-                                        </div>
-                                        {(worker.city || worker.area) && (
-                                            <p className="text-sm text-gray-500 mb-4">
-                                                {worker.city || ""}{worker.city && worker.area ? ", " : ""}{worker.area || ""}
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2">{worker.name || "Worker"}</h3>
+                                        
+                                        {/* Services */}
+                                        {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].service_types && worker.service_listings[0].service_types.length > 0 ? (
+                                            <div className="mb-3">
+                                                <p className="text-xs font-semibold text-gray-700 mb-1">Services:</p>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {worker.service_listings[0].service_types.map((st, idx) => {
+                                                        const serviceType = typeof st === "object" ? st.service_type : st;
+                                                        const serviceLabels = {
+                                                            maid: "🧹 Maid",
+                                                            cook: "👨‍🍳 Cook",
+                                                            babysitter: "👶 Babysitter",
+                                                            caregiver: "👵 Caregiver",
+                                                            cleaner: "✨ Cleaner",
+                                                            all_rounder: "🌟 All Rounder"
+                                                        };
+                                                        return (
+                                                            <span key={idx} className="text-xs bg-primary-100 text-primary-800 px-2 py-1 rounded-full capitalize">
+                                                                {serviceLabels[serviceType] || serviceType?.replace("_", " ")}
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        ) : worker.service_type ? (
+                                            <p className="text-gray-600 mb-2 capitalize text-sm">
+                                                {worker.service_type.replace("_", " ")}
                                             </p>
+                                        ) : null}
+
+                                        {/* Skills */}
+                                        {worker.skills && (
+                                            <div className="mb-3">
+                                                <p className="text-xs font-semibold text-gray-700 mb-1">Skills:</p>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {worker.skills.split(",").map((skill, idx) => {
+                                                        const trimmedSkill = skill.trim();
+                                                        return trimmedSkill ? (
+                                                            <span key={idx} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                                                {trimmedSkill}
+                                                            </span>
+                                                        ) : null;
+                                                    })}
+                                                </div>
+                                            </div>
                                         )}
-                                        <div className="flex gap-2">
-                                            <Link
-                                                to={route("business.workers.edit", worker.id)}
-                                                className="flex-1 text-center bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(worker.id)}
-                                                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-                                            >
-                                                Remove
-                                            </button>
-                                        </div>
+
+                                        {/* Locations */}
+                                        {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].location_details && worker.service_listings[0].location_details.length > 0 ? (
+                                            <div className="mb-3">
+                                                <p className="text-xs font-semibold text-gray-700 mb-1">Locations:</p>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {worker.service_listings[0].location_details.map((loc, idx) => (
+                                                        <span key={idx} className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                                                            📍 {loc.city_name || loc.city}{loc.area ? `, ${loc.area}` : ""}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (worker.city || worker.area) ? (
+                                            <div className="mb-3">
+                                                <p className="text-xs font-semibold text-gray-700 mb-1">Location:</p>
+                                                <p className="text-sm text-gray-600">
+                                                    {worker.city || ""}{worker.city && worker.area ? ", " : ""}{worker.area || ""}
+                                                </p>
+                                            </div>
+                                        ) : null}
+
+                                        {user && user.id === worker.id ? (
+                                            <div className="text-center py-2 text-sm text-gray-500 italic">
+                                                This is you
+                                            </div>
+                                        ) : (
+                                            <div className="flex gap-2">
+                                                <Link
+                                                    to={route("business.workers.edit", worker.id)}
+                                                    className="flex-1 text-center bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
+                                                >
+                                                    Edit
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDeleteClick(worker)}
+                                                    className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -168,7 +236,17 @@ export default function Workers() {
                     )}
                 </div>
             </div>
-        </PublicLayout>
+
+            <RemoveWorkerModal
+                show={showRemoveModal}
+                onClose={() => {
+                    setShowRemoveModal(false);
+                    setWorkerToRemove(null);
+                }}
+                worker={workerToRemove}
+                onConfirm={handleDeleteConfirm}
+            />
+        </DashboardLayout>
     );
 }
 

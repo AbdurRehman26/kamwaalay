@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { messagesService } from "@/services/messages";
 import { authService } from "@/services/auth";
-import PublicLayout from "@/Layouts/PublicLayout";
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import Pusher from "pusher-js";
 
 export default function MessagesIndex() {
@@ -171,7 +171,7 @@ export default function MessagesIndex() {
     }, [messages]);
 
     return (
-        <PublicLayout>
+        <DashboardLayout>
             <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-6">
@@ -382,7 +382,7 @@ export default function MessagesIndex() {
                     </div>
                 </div>
             </div>
-        </PublicLayout>
+        </DashboardLayout>
     );
 }
 
