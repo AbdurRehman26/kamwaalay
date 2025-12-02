@@ -1,18 +1,47 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { businessesService } from "@/services/businesses";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
+import ChatPopup from "@/Components/ChatPopup";
 
 export default function BusinessShow() {
     const { businessId } = useParams();
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [business, setBusiness] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [serviceListings, setServiceListings] = useState([]);
     const [workers, setWorkers] = useState([]);
+    const [chatOpen, setChatOpen] = useState(false);
+
+    // Format phone number for WhatsApp (add +92 if needed)
+    const formatPhoneForWhatsApp = (phone) => {
+        if (!phone) return "";
+        
+        // Check if it starts with +92 (with or without spaces)
+        const trimmed = phone.trim();
+        if (trimmed.startsWith("+92") || trimmed.startsWith("+ 92")) {
+            // Remove all non-digit characters, which will keep 92 at the start
+            return trimmed.replace(/\D/g, "");
+        }
+        
+        // Remove all non-digit characters
+        let cleaned = phone.replace(/\D/g, "");
+        
+        // If starts with 0, replace with 92
+        if (cleaned.startsWith("0")) {
+            cleaned = "92" + cleaned.substring(1);
+        }
+        // If doesn't start with 92, add it
+        else if (!cleaned.startsWith("92")) {
+            cleaned = "92" + cleaned;
+        }
+        
+        return cleaned;
+    };
 
     useEffect(() => {
         if (businessId) {
@@ -138,25 +167,64 @@ export default function BusinessShow() {
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        {user && (
+                        {/* Contact Options */}
+                        {business.phone && (
                             <div className="bg-white rounded-lg shadow-md p-6">
-                                <Link
-                                    to={route("service-listings.index", {
-                                        user_id: business.id,
-                                    })}
-                                    className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-center block mb-3"
-                                >
-                                    View All Services
-                                </Link>
-                                {user.role === "user" && (
-                                    <Link
-                                        to={route("bookings.create")}
-                                        className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-300 font-semibold text-center block"
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">Contact Business</h3>
+                                <div className="flex items-center justify-center gap-4">
+                                    {/* In-app Message Icon */}
+                                    {user ? (
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setChatOpen(true);
+                                            }}
+                                            className="flex items-center justify-center w-14 h-14 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg"
+                                            title="Send Message"
+                                        >
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                            </svg>
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                navigate(route("login"));
+                                            }}
+                                            className="flex items-center justify-center w-14 h-14 bg-gray-400 text-white rounded-full cursor-not-allowed opacity-60 hover:bg-gray-500 transition-all duration-300 shadow-md"
+                                            title="Please login to send message"
+                                        >
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                    
+                                    {/* Call Icon */}
+                                    <a
+                                        href={`tel:${business.phone}`}
+                                        className="flex items-center justify-center w-14 h-14 bg-green-600 text-white rounded-full hover:bg-green-700 transition-all duration-300 shadow-md hover:shadow-lg"
+                                        title="Call"
                                     >
-                                        Request Service
-                                    </Link>
-                                )}
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                    </a>
+                                    
+                                    {/* WhatsApp Icon */}
+                                    <a
+                                        href={`https://wa.me/${formatPhoneForWhatsApp(business.phone)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full hover:bg-[#20BA5A] transition-all duration-300 shadow-md hover:shadow-lg"
+                                        title="WhatsApp"
+                                    >
+                                        <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                                        </svg>
+                                    </a>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -177,11 +245,18 @@ export default function BusinessShow() {
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex flex-wrap gap-2">
                                                     {listing.service_types && listing.service_types.length > 0 ? (
-                                                        listing.service_types.slice(0, 2).map((st, idx) => (
-                                                            <span key={idx} className="bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
-                                                                {st?.service_type?.replace("_", " ") || "Service"}
-                                                            </span>
-                                                        ))
+                                                        <>
+                                                            {listing.service_types.slice(0, 2).map((st, idx) => (
+                                                                <span key={idx} className="bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
+                                                                    {typeof st === "string" ? st.replace("_", " ") : (st?.service_type?.replace("_", " ") || "Service")}
+                                                                </span>
+                                                            ))}
+                                                            {listing.service_types.length > 2 && (
+                                                                <span className="bg-primary-500 text-white text-sm px-3 py-1 rounded-full font-semibold">
+                                                                    +{listing.service_types.length - 2}
+                                                                </span>
+                                                            )}
+                                                        </>
                                                     ) : (
                                                         <span className="bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
                                                             Service
@@ -197,9 +272,28 @@ export default function BusinessShow() {
                                             <h3 className="text-lg font-bold text-gray-900 mb-2 capitalize">
                                                 {listing.work_type?.replace("_", " ") || "Service"} Service
                                             </h3>
-                                            <p className="text-sm text-gray-600 mb-3">
-                                                📍 {listing.locations && listing.locations.length > 0 ? `${listing.locations[0].city}, ${listing.locations[0].area}` : "Location not specified"}
-                                            </p>
+                                            {listing.location_details && listing.location_details.length > 0 ? (
+                                                <div className="text-sm text-gray-600 mb-3 space-y-1">
+                                                    {listing.location_details.slice(0, 2).map((location, idx) => (
+                                                        <p key={idx}>
+                                                            📍 {location.city_name}{location.area ? ", " + location.area : ""}
+                                                        </p>
+                                                    ))}
+                                                    {listing.location_details.length > 2 && (
+                                                        <p className="text-gray-500 font-medium">
+                                                            +{listing.location_details.length - 2} more location{listing.location_details.length - 2 !== 1 ? "s" : ""}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            ) : listing.city ? (
+                                                <p className="text-sm text-gray-600 mb-3">
+                                                    📍 {listing.city}{listing.area ? ", " + listing.area : ""}
+                                                </p>
+                                            ) : (
+                                                <p className="text-sm text-gray-600 mb-3">
+                                                    📍 Location not specified
+                                                </p>
+                                            )}
                                             {listing.description && (
                                                 <p className="text-gray-600 text-sm line-clamp-2 mb-3">
                                                     {listing.description}
@@ -291,9 +385,6 @@ export default function BusinessShow() {
                                     <div className="mt-6 text-center">
                                         <p className="text-sm text-gray-600">
                                             Showing 10 of {business.helpers_count || workers.length} workers.
-                                            <Link to={route("business.workers")} className="text-primary-600 hover:text-primary-800 ml-1 font-semibold">
-                                                View All →
-                                            </Link>
                                         </p>
                                     </div>
                                 )}
@@ -302,6 +393,17 @@ export default function BusinessShow() {
                     </div>
                 </div>
             </div>
+            
+            {/* Chat Popup */}
+            {business && (
+                <ChatPopup
+                    recipientId={business.id}
+                    recipientName={business.name}
+                    recipientPhoto={business.photo}
+                    isOpen={chatOpen}
+                    onClose={() => setChatOpen(false)}
+                />
+            )}
         </PublicLayout>
     );
 }

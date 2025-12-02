@@ -73,20 +73,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </>
                                 )}
                                 {isUser(user) && (
-                                    <>
-                                        <NavLink
-                                            href={route("service-listings.index")}
-                                            active={location.pathname === route("service-listings.index")}
-                                        >
-                                            Browse Services
-                                        </NavLink>
-                                        <NavLink
-                                            href={route("job-applications.my-request-applications")}
-                                            active={location.pathname === route("job-applications.my-request-applications")}
-                                        >
-                                            Applications
-                                        </NavLink>
-                                    </>
+                                    <NavLink
+                                        href={route("service-listings.index")}
+                                        active={location.pathname === route("service-listings.index")}
+                                    >
+                                        Browse Services
+                                    </NavLink>
                                 )}
                             </div>
                         </div>
@@ -234,20 +226,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             </>
                         )}
                         {isUser(user) && (
-                            <>
-                                <ResponsiveNavLink
-                                    href={route("service-listings.index")}
-                                    active={location.pathname === route("service-listings.index")}
-                                >
-                                    Browse Services
-                                </ResponsiveNavLink>
-                                <ResponsiveNavLink
-                                    href={route("job-applications.my-request-applications")}
-                                    active={location.pathname === route("job-applications.my-request-applications")}
-                                >
-                                    Applications
-                                </ResponsiveNavLink>
-                            </>
+                            <ResponsiveNavLink
+                                href={route("service-listings.index")}
+                                active={location.pathname === route("service-listings.index")}
+                            >
+                                Browse Services
+                            </ResponsiveNavLink>
                         )}
                     </div>
 

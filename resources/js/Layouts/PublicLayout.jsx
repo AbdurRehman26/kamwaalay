@@ -60,14 +60,6 @@ export default function PublicLayout({ children }) {
 
                             {user ? (
                                 <>
-                                    {isUser(user) && (
-                                        <>
-                                            <Link to={route("bookings.create")} className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium">
-                                                {t("navigation.post_service_request")}
-                                            </Link>
-                                            <Link to={route("job-applications.my-request-applications")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">Applications</Link>
-                                        </>
-                                    )}
                                     {isAdmin(user) && (
                                         <Link to={route("admin.dashboard")} className="text-gray-700 hover:text-primary-600 font-medium transition-colors">{t("navigation.admin")}</Link>
                                     )}
@@ -90,6 +82,11 @@ export default function PublicLayout({ children }) {
                                     >
                                         {t("common.logout")}
                                     </button>
+                                    {isUser(user) && (
+                                        <Link to={route("bookings.create")} className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium">
+                                            {t("navigation.post_service_request")}
+                                        </Link>
+                                    )}
                                     <Link to={route("profile.edit")} className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium">
                                         {t("common.profile")}
                                     </Link>
@@ -129,14 +126,6 @@ export default function PublicLayout({ children }) {
                             )}
                             {user ? (
                                 <>
-                                    {isUser(user) && (
-                                        <>
-                                            <Link to={route("bookings.create")} className="block py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all font-medium text-center">
-                                                Post Service Request
-                                            </Link>
-                                            <Link to={route("job-applications.my-request-applications")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Applications</Link>
-                                        </>
-                                    )}
                                     <Link to={route("messages")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Messages</Link>
                                     <div className="block py-3 px-4">
                                         <NotificationDropdown />
@@ -156,6 +145,11 @@ export default function PublicLayout({ children }) {
                                     >
                                         Logout
                                     </button>
+                                    {isUser(user) && (
+                                        <Link to={route("bookings.create")} className="block py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all font-medium text-center">
+                                            Post Service Request
+                                        </Link>
+                                    )}
                                     <Link to={route("profile.edit")} className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Profile</Link>
                                 </>
                             ) : (
@@ -194,7 +188,7 @@ export default function PublicLayout({ children }) {
                         <div>
                             <h4 className="font-semibold mb-4 text-lg">Services</h4>
                             <ul className="space-y-3 text-gray-400">
-                                <li><Link to={route("helpers.index")} className="hover:text-white transition-colors">Find Helpers</Link></li>
+                                <li><Link to={route("helpers.index")} className="hover:text-white transition-colors">Find Househelp</Link></li>
                                 <li><Link to={route("bookings.create")} className="hover:text-white transition-colors">Post Service Request</Link></li>
                             </ul>
                         </div>

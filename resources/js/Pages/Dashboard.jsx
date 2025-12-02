@@ -108,6 +108,20 @@ export default function Dashboard() {
                             Welcome back, {user?.name || "User"}!
                         </h1>
                         <p className="text-sm text-gray-600">Manage your services and track your activity</p>
+                        
+                        {/* Skills Display for Helpers/Businesses */}
+                        {user && (user.role === "helper" || user.role === "business") && user.skills && (
+                            <div className="mt-4">
+                                <p className="text-sm text-gray-600 mb-2 font-medium">Skills:</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {user.skills.split(",").map((skill, idx) => (
+                                        <span key={idx} className="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium capitalize">
+                                            {skill.trim().replace(/_/g, " ")}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">

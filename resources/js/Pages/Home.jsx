@@ -131,12 +131,14 @@ export default function Home() {
                                     Browse Helpers
                                 </Link>
                             )}
-                            <Link
-                                to={route("service-requests.browse")}
-                                className="bg-white text-primary-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
-                            >
-                                Services Required
-                            </Link>
+                            {isHelperOrBusiness(user) && (
+                                <Link
+                                    to={route("service-requests.browse")}
+                                    className="bg-white text-primary-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
+                                >
+                                    Services Required
+                                </Link>
+                            )}
                             {isUser(user) && (
                                 <Link
                                     to={route("bookings.create")}
@@ -263,7 +265,7 @@ export default function Home() {
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
                         <div className="text-center mb-16">
-                            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Services Required</h2>
+                            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Available Service Requests</h2>
                             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                                 Browse available service requests and apply to help customers
                             </p>
@@ -468,12 +470,14 @@ export default function Home() {
                             >
                                 Browse Helpers
                             </Link>
-                            <Link
-                                to={route("service-requests.browse")}
-                                className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300 min-w-[200px]"
-                            >
-                                Services Required
-                            </Link>
+                            {isHelperOrBusiness(user) && (
+                                <Link
+                                    to={route("service-requests.browse")}
+                                    className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300 min-w-[200px]"
+                                >
+                                    Services Required
+                                </Link>
+                            )}
                         </div>
                     )}
                     {user && (

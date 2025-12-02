@@ -2,7 +2,7 @@
 
 return [
     'home' => 'Home',
-    'find_help' => 'Find Help',
+    'find_help' => 'Find Househelp',
     'services_required' => 'Services Required',
     'post_service_request' => 'Post Service Request',
     'admin' => 'Admin',

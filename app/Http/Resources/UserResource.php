@@ -95,37 +95,24 @@ class UserResource extends JsonResource
                     'id' => $this->profile->id,
                 ];
             }),
-            // Service listings (if loaded)
+            // Service listings (if loaded) - use ServiceListingResource for consistency
             'service_listings' => $this->when($this->relationLoaded('serviceListings'), function () {
                 return $this->serviceListings->map(function ($listing) {
-                    // Get service types from JSON column
-                    $serviceTypes = $listing->service_types ?? [];
-                    
-                    // Get locations from JSON column (location IDs)
-                    $locationIds = $listing->locations ?? [];
-                    $locationDetails = [];
-                    
-                    // Fetch location details if location IDs exist
-                    if (!empty($locationIds)) {
-                        $locations = \App\Models\Location::whereIn('id', $locationIds)->with('city')->get();
-                        $locationDetails = $locations->map(function ($location) {
-                            return [
-                                'id' => $location->id,
-                                'city' => $location->city->name,
-                                'area' => $location->area ?? '',
-                            ];
-                        })->toArray();
-                    }
-                    
+                    return (new ServiceListingResource($listing))->toArray(request());
+                });
+            }),
+            // Helper reviews (if loaded)
+            'helper_reviews' => $this->when($this->relationLoaded('helperReviews'), function () {
+                return $this->helperReviews->map(function ($review) {
                     return [
-                        'id' => $listing->id,
-                        'work_type' => $listing->work_type,
-                        'description' => $listing->description,
-                        'is_active' => $listing->is_active,
-                        'status' => $listing->status,
-                        'monthly_rate' => $listing->monthly_rate,
-                        'service_types' => $serviceTypes,
-                        'locations' => $locationDetails,
+                        'id' => $review->id,
+                        'rating' => $review->rating,
+                        'comment' => $review->comment,
+                        'created_at' => $this->toIso8601String($review->created_at),
+                        'user' => $review->relationLoaded('user') ? [
+                            'id' => $review->user->id,
+                            'name' => $review->user->name,
+                        ] : null,
                     ];
                 });
             }),
