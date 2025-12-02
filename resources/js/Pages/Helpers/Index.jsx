@@ -312,7 +312,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             }}
                             className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
                         >
-                            {showBookingForm ? "Cancel Booking" : "Post Service Request"}
+                            {showBookingForm ? "Cancel Booking" : "Post Job"}
                         </button>
                     </div>
 
@@ -402,7 +402,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 {/* Booking Form */}
                 {showBookingForm && user && (
                     <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                        <h2 className="text-2xl font-bold mb-6 text-gray-900">Post Service Request</h2>
+                        <h2 className="text-2xl font-bold mb-6 text-gray-900">Post Job</h2>
                         <form onSubmit={handleBookingSubmit}>
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>

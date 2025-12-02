@@ -187,7 +187,7 @@ export default function ServiceRequestsBrowse() {
             <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
                 {/* Filters */}
                 <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                    <h2 className="text-2xl font-bold mb-6 text-gray-900">Filter Requests</h2>
+                    <h2 className="text-2xl font-bold mb-6 text-gray-900">Filter Jobs</h2>
                     <div className="grid md:grid-cols-5 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-3">Service Type</label>
@@ -283,7 +283,7 @@ export default function ServiceRequestsBrowse() {
                 {/* Search Jobs Grid */}
                 {loading ? (
                     <div className="text-center py-12">
-                        <p className="text-gray-600">Loading service requests...</p>
+                        <p className="text-gray-600">Loading jobs...</p>
                     </div>
                 ) : bookings.data && bookings.data.length > 0 ? (
                     <>
@@ -294,35 +294,56 @@ export default function ServiceRequestsBrowse() {
                                 const isHelper = user && (user.role === "helper" || user.role === "business");
 
                                 return (
-                                    <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col">
+                                    <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col relative">
                                         <div className="p-6 flex flex-col flex-grow">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <span className="bg-primary-100 text-primary-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
-                                                    {booking.service_type?.replace("_", " ") || "N/A"}
-                                                </span>
+                                            {/* Status and Work Type - Top Right */}
+                                            <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
                                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
                                                     {booking.status?.replace("_", " ") || "N/A"}
                                                 </span>
+                                                <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1.5 rounded-full font-semibold capitalize">
+                                                    {booking.work_type?.replace("_", " ") || "N/A"}
+                                                </span>
                                             </div>
-                                            <h3 className="text-xl font-bold mb-2 text-gray-900">
-                                                {booking.service_type_label || booking.service_type?.replace("_", " ") || "Service"} Service
-                                            </h3>
-                                            <p className="text-gray-600 mb-3 capitalize text-sm">
-                                                {booking.work_type?.replace("_", " ") || "N/A"} • {booking.city || "N/A"}, {booking.area || "N/A"}
+                                            
+                                            {/* Service Type - Prominent */}
+                                            <div className="mb-3 pr-20">
+                                                <span className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm px-4 py-2 rounded-lg font-bold capitalize inline-block">
+                                                    {booking.service_type?.replace("_", " ") || "N/A"}
+                                                </span>
+                                            </div>
+                                            
+                                            {/* Name - Smaller */}
+                                            <p className="text-sm font-medium mb-3 text-gray-600">
+                                                👤 Posted by: {booking.user?.name || "Customer"}
                                             </p>
-                                            {booking.start_date && (
-                                                <p className="text-gray-500 text-sm mb-2">
-                                                    📅 Start Date: {new Date(booking.start_date).toLocaleDateString()}
+                                            
+                                            {/* Location - Highlighted */}
+                                            <div className="mb-3 flex items-center gap-2">
+                                                <span className="text-primary-600 text-lg">📍</span>
+                                                <p className="text-gray-900 font-semibold text-sm">
+                                                    {booking.area || booking.city || "N/A"}
                                                 </p>
-                                            )}
-                                            {booking.special_requirements && (
-                                                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                                                    💬 {booking.special_requirements}
-                                                </p>
-                                            )}
-                                            <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
-                                                <span>👤 Posted by: {booking.user?.name || "Customer"}</span>
                                             </div>
+                                            
+                                            {/* Start Date - Highlighted */}
+                                            {booking.start_date && (
+                                                <div className="mb-3 flex items-center gap-2">
+                                                    <span className="text-primary-600 text-lg">📅</span>
+                                                    <p className="text-gray-900 font-semibold text-sm">
+                                                        {new Date(booking.start_date).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            
+                                            {/* Special Requirements */}
+                                            {booking.special_requirements && (
+                                                <div className="mb-3 p-2.5 bg-gray-50 rounded-lg border-l-4 border-primary-500">
+                                                    <p className="text-gray-700 text-xs line-clamp-2">
+                                                        💬 {booking.special_requirements}
+                                                    </p>
+                                                </div>
+                                            )}
                                             {booking.job_applications && booking.job_applications.length > 0 && (
                                                 <p className="text-sm text-primary-600 mb-3">
                                                     📋 {booking.job_applications.length} application{booking.job_applications.length !== 1 ? "s" : ""} received
@@ -400,7 +421,7 @@ export default function ServiceRequestsBrowse() {
                                 to={route("bookings.create")}
                                 className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold inline-block"
                             >
-                                Post a Service Request
+                                Post a Job
                             </Link>
                         )}
                     </div>

@@ -51,7 +51,7 @@ export default function DashboardOverview() {
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    {/* Service Requests (Users) */}
+                    {/* Jobs (Users) */}
                     {user && user.role === "user" && (
                         <>
                             <Link
@@ -63,8 +63,8 @@ export default function DashboardOverview() {
                                     <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                                         <span className="text-2xl">📝</span>
                                     </div>
-                                    <h3 className="text-lg font-bold mb-2 text-white">Post Service Request</h3>
-                                    <p className="text-primary-100 text-sm leading-relaxed">Post a service request and get help from verified helpers</p>
+                                    <h3 className="text-lg font-bold mb-2 text-white">Post Job</h3>
+                                    <p className="text-primary-100 text-sm leading-relaxed">Post a job and get help from verified helpers</p>
                                     <div className="mt-4 flex items-center text-white text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
                                         Get Started <span className="ml-1">→</span>
                                     </div>
@@ -78,7 +78,7 @@ export default function DashboardOverview() {
                                     <span className="text-2xl">📋</span>
                                 </div>
                                 <h3 className="text-lg font-bold mb-2 text-gray-900">My Request Applications</h3>
-                                <p className="text-gray-600 text-sm leading-relaxed">View and manage applications to your service requests</p>
+                                <p className="text-gray-600 text-sm leading-relaxed">View and manage applications to your jobs</p>
                                 <div className="mt-4 flex items-center text-primary-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
                                     View All <span className="ml-1">→</span>
                                 </div>
@@ -91,7 +91,7 @@ export default function DashboardOverview() {
                                     <span className="text-2xl">📅</span>
                                 </div>
                                 <h3 className="text-lg font-bold mb-2 text-gray-900">My Bookings</h3>
-                                <p className="text-gray-600 text-sm leading-relaxed">View all your service requests and bookings</p>
+                                <p className="text-gray-600 text-sm leading-relaxed">View all your jobs and bookings</p>
                                 <div className="mt-4 flex items-center text-primary-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
                                     View All <span className="ml-1">→</span>
                                 </div>
@@ -140,7 +140,7 @@ export default function DashboardOverview() {
                                         <span className="text-2xl">🔍</span>
                                     </div>
                                     <h3 className="text-lg font-bold mb-2 text-gray-900">Browse Job Requests</h3>
-                                    <p className="text-gray-600 text-sm leading-relaxed">Browse service requests from users and apply</p>
+                                    <p className="text-gray-600 text-sm leading-relaxed">Browse jobs from users and apply</p>
                                     <div className="mt-4 flex items-center text-primary-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
                                         Browse <span className="ml-1">→</span>
                                     </div>

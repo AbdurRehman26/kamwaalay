@@ -130,7 +130,7 @@ export default function MyApplications() {
                     <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">📋</div>
                         <p className="text-gray-600 text-xl mb-6">No applications yet</p>
-                        <p className="text-gray-500 mb-8">Browse service requests and apply to find work</p>
+                        <p className="text-gray-500 mb-8">Browse jobs and apply to find work</p>
                         <Link
                             to={route("job-applications.index")}
                             className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold inline-block"

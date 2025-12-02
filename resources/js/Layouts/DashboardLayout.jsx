@@ -122,16 +122,16 @@ export default function DashboardLayout({ children }) {
                                 Home
                             </Link>
                             <Link
-                                to={route("dashboard")}
-                                className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
-                            >
-                                Dashboard
-                            </Link>
-                            <Link
                                 to={route("job-applications.index")}
                                 className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                             >
                                 Search Jobs
+                            </Link>
+                            <Link
+                                to={route("dashboard")}
+                                className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                            >
+                                Dashboard
                             </Link>
                             <NotificationDropdown />
                             <Link
@@ -212,20 +212,20 @@ export default function DashboardLayout({ children }) {
                                         <span>Home</span>
                                     </Link>
                                     <Link
-                                        to={route("dashboard")}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="group flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-700 hover:bg-gray-50 hover:text-primary-600"
-                                    >
-                                        <span className="mr-3 text-xl">📊</span>
-                                        <span>Dashboard</span>
-                                    </Link>
-                                    <Link
                                         to={route("job-applications.index")}
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="group flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-700 hover:bg-gray-50 hover:text-primary-600"
                                     >
                                         <span className="mr-3 text-xl">🔍</span>
                                         <span>Search Jobs</span>
+                                    </Link>
+                                    <Link
+                                        to={route("dashboard")}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="group flex items-center px-3 py-2 text-base font-medium rounded-lg text-gray-700 hover:bg-gray-50 hover:text-primary-600"
+                                    >
+                                        <span className="mr-3 text-xl">📊</span>
+                                        <span>Dashboard</span>
                                     </Link>
                                     {navItems.map((item) => (
                                         <Link

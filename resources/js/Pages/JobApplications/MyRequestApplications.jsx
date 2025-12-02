@@ -66,7 +66,7 @@ export default function MyRequestApplications() {
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Applications to My Requests</h1>
-                    <p className="text-xl text-white/90">Review and manage applications for your service requests</p>
+                    <p className="text-xl text-white/90">Review and manage applications for your jobs</p>
                 </div>
             </div>
             <div className="container mx-auto px-4 py-12">
@@ -156,7 +156,7 @@ export default function MyRequestApplications() {
                     <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">📋</div>
                         <p className="text-gray-600 text-xl mb-6">No applications yet</p>
-                        <p className="text-gray-500 mb-8">Applications to your service requests will appear here</p>
+                        <p className="text-gray-500 mb-8">Applications to your jobs will appear here</p>
                     </div>
                 )}
             </div>

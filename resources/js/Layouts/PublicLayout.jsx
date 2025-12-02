@@ -140,7 +140,7 @@ export default function PublicLayout({ children }) {
                                     </button>
                                     {isUser(user) && (
                                         <Link to={route("bookings.create")} className="block py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all font-medium text-center">
-                                            Post Service Request
+                                            Post Job
                                         </Link>
                                     )}
                                     <Link to={route("profile.edit")} className="block py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium text-center">Profile</Link>
@@ -182,7 +182,7 @@ export default function PublicLayout({ children }) {
                             <h4 className="font-semibold mb-4 text-lg">Services</h4>
                             <ul className="space-y-3 text-gray-400">
                                 <li><Link to={route("helpers.index")} className="hover:text-white transition-colors">Find Househelp</Link></li>
-                                <li><Link to={route("bookings.create")} className="hover:text-white transition-colors">Post Service Request</Link></li>
+                                <li><Link to={route("bookings.create")} className="hover:text-white transition-colors">Post Job</Link></li>
                             </ul>
                         </div>
                         <div>

@@ -314,7 +314,7 @@ export default function ServiceListingShow() {
                                     to={route("job-applications.index")}
                                     className="text-primary-600 hover:text-primary-800 font-semibold"
                                 >
-                                    View All Service Requests →
+                                    View All Jobs →
                                 </Link>
                             </div>
                         </div>

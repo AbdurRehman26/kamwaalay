@@ -294,10 +294,10 @@ export default function JobApplicationShow() {
                                 </div>
                             </div>
 
-                            {/* Service Request Information */}
+                            {/* Job Information */}
                             <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-lg font-bold text-gray-900">Service Request</h2>
+                                    <h2 className="text-lg font-bold text-gray-900">Job</h2>
                                     <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
                                         <span className="text-lg">🔧</span>
                                     </div>
@@ -389,7 +389,7 @@ export default function JobApplicationShow() {
                                         </DangerButton>
                                     </div>
                                     <p className="text-xs text-gray-500 mt-4">
-                                        Accepting this application will automatically reject all other pending applications for this service request.
+                                        Accepting this application will automatically reject all other pending applications for this job.
                                     </p>
                                 </div>
                             )}

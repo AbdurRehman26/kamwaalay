@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import DashboardLayout from "@/Layouts/DashboardLayout";
+import PublicLayout from "@/Layouts/PublicLayout";
 import api from "@/services/api";
 import { jobApplicationsService } from "@/services/jobApplications";
 import { route } from "@/utils/routes";
@@ -107,12 +107,12 @@ export default function JobApplicationsIndex() {
     };
 
     return (
-        <DashboardLayout>
+        <PublicLayout>
             <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50">
                 <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-600 text-white py-10 shadow-lg">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <h1 className="text-3xl font-bold mb-2">Browse Service Requests</h1>
-                        <p className="text-base text-white/90">Find service requests from users and apply</p>
+                        <h1 className="text-3xl font-bold mb-2">Jobs</h1>
+                        <p className="text-base text-white/90">Find jobs from users and apply</p>
                     </div>
                 </div>
 
@@ -127,14 +127,14 @@ export default function JobApplicationsIndex() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Filters */}
                     <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-100">
-                        <h2 className="text-lg font-bold mb-4 text-gray-900">Filter Requests</h2>
+                        <h2 className="text-lg font-bold mb-4 text-gray-900">Filter Jobs</h2>
                         <div className="grid md:grid-cols-3 gap-4">
                             <div>
                                 <label className="block text-xs font-medium text-gray-700 mb-2">Service Type</label>
                                 <select
                                     value={serviceType}
                                     onChange={(e) => setServiceType(e.target.value)}
-                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-2 px-3 shadow-sm text-sm"
+                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-2 px-3 shadow-sm text-sm text-gray-900 bg-white"
                                 >
                                     {serviceTypes.map((type) => (
                                         <option key={type.value} value={type.value}>
@@ -203,29 +203,45 @@ export default function JobApplicationsIndex() {
                             </div>
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {bookings.data.map((booking) => (
-                                    <div key={booking.id} className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 flex flex-col">
+                                    <div key={booking.id} className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 flex flex-col relative">
                                         <div className="p-5 flex flex-col flex-grow">
-                                            <div className="flex items-center justify-between mb-3">
-                                                <span className="bg-primary-100 text-primary-800 text-xs px-2.5 py-1 rounded-full font-semibold capitalize">
-                                                    {booking.service_type?.replace("_", " ") || "N/A"}
-                                                </span>
+                                            {/* Status and Work Type - Top Right */}
+                                            <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
                                                 <span className="bg-yellow-100 text-yellow-800 text-xs px-2.5 py-1 rounded-full font-semibold">
                                                     {booking.status || "N/A"}
                                                 </span>
+                                                <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1.5 rounded-full font-semibold capitalize">
+                                                    {booking.work_type?.replace("_", " ") || "N/A"}
+                                                </span>
                                             </div>
-                                            <h3 className="text-lg font-bold mb-2 text-gray-900">{booking.user?.name}</h3>
-                                            <div className="space-y-1.5 mb-3">
-                                                <p className="text-gray-600 capitalize text-xs flex items-center gap-1">
-                                                    <span className="text-primary-600">📍</span>
-                                                    {booking.work_type?.replace("_", " ") || "N/A"} • {booking.city || "N/A"}, {booking.area || "N/A"}
+                                            
+                                            {/* Service Type - Prominent */}
+                                            <div className="mb-3 pr-20">
+                                                <span className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm px-4 py-2 rounded-lg font-bold capitalize inline-block">
+                                                    {booking.service_type?.replace("_", " ") || "N/A"}
+                                                </span>
+                                            </div>
+                                            
+                                            {/* Name - Smaller */}
+                                            <h3 className="text-sm font-medium mb-3 text-gray-600">{booking.user?.name}</h3>
+                                            
+                                            {/* Location - Highlighted */}
+                                            <div className="mb-3 flex items-center gap-2">
+                                                <span className="text-primary-600 text-lg">📍</span>
+                                                <p className="text-gray-900 font-semibold text-sm">
+                                                    {booking.area || booking.city || "N/A"}
                                                 </p>
-                                                {booking.start_date && (
-                                                    <p className="text-gray-500 text-xs flex items-center gap-1">
-                                                        <span>📅</span>
-                                                        Start: {new Date(booking.start_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
-                                                    </p>
-                                                )}
                                             </div>
+                                            
+                                            {/* Start Date - Highlighted */}
+                                            {booking.start_date && (
+                                                <div className="mb-3 flex items-center gap-2">
+                                                    <span className="text-primary-600 text-lg">📅</span>
+                                                    <p className="text-gray-900 font-semibold text-sm">
+                                                        {new Date(booking.start_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                                                    </p>
+                                                </div>
+                                            )}
                                             {booking.special_requirements && (
                                                 <div className="mb-3 p-2.5 bg-gray-50 rounded-lg border-l-4 border-primary-500">
                                                     <p className="text-gray-700 text-xs line-clamp-2">
@@ -269,13 +285,13 @@ export default function JobApplicationsIndex() {
                     ) : (
                         <div className="text-center py-12 bg-white rounded-xl shadow-md border border-gray-100">
                             <div className="text-5xl mb-4">🔍</div>
-                            <p className="text-gray-700 font-medium mb-1 text-base">No service requests found</p>
+                            <p className="text-gray-700 font-medium mb-1 text-base">No jobs found</p>
                             <p className="text-gray-600 text-sm mb-4">Try adjusting your filters</p>
                         </div>
                     )}
                 </div>
             </div>
-        </DashboardLayout>
+        </PublicLayout>
     );
 }
 

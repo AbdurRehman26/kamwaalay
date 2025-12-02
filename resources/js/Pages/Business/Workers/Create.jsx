@@ -20,6 +20,8 @@ export default function CreateWorker() {
     const [errors, setErrors] = useState({});
     const [selectedServiceTypes, setSelectedServiceTypes] = useState([]);
     const [selectedLocations, setSelectedLocations] = useState([]);
+    const [selectedSkills, setSelectedSkills] = useState([]);
+    const [skillInput, setSkillInput] = useState("");
     const [locationQuery, setLocationQuery] = useState("");
     const [locationSuggestions, setLocationSuggestions] = useState([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
@@ -105,6 +107,27 @@ export default function CreateWorker() {
         setSelectedLocations(selectedLocations.filter(loc => loc.id !== locationId));
     };
 
+    const addSkill = (skill) => {
+        const trimmedSkill = skill.trim();
+        if (trimmedSkill && !selectedSkills.includes(trimmedSkill)) {
+            setSelectedSkills([...selectedSkills, trimmedSkill]);
+            setSkillInput("");
+        }
+    };
+
+    const removeSkill = (skill) => {
+        setSelectedSkills(selectedSkills.filter(s => s !== skill));
+    };
+
+    const handleSkillKeyPress = (e) => {
+        if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            if (skillInput.trim()) {
+                addSkill(skillInput);
+            }
+        }
+    };
+
     const addServiceType = (serviceType) => {
         if (!selectedServiceTypes.includes(serviceType)) {
             setSelectedServiceTypes([...selectedServiceTypes, serviceType]);
@@ -155,9 +178,16 @@ export default function CreateWorker() {
                         experience_years: worker.profile?.experience_years || worker.experience_years || "",
                         availability: worker.profile?.availability || worker.availability || "full_time",
                         bio: worker.profile?.bio || worker.bio || "",
-                        skills: worker.profile?.skills || worker.skills || "",
+                        skills: "", // We'll use selectedSkills array instead
                         photo: null, // Don't set existing photo as file
                     });
+
+                    // Parse skills from comma-separated string to array
+                    const skillsString = worker.profile?.skills || worker.skills || "";
+                    if (skillsString) {
+                        const skillsArray = skillsString.split(",").map(s => s.trim()).filter(s => s);
+                        setSelectedSkills(skillsArray);
+                    }
 
                     // Set service types from worker's service listings
                     if (worker.service_listings && worker.service_listings.length > 0) {
@@ -224,7 +254,8 @@ export default function CreateWorker() {
         formData.append("experience_years", data.experience_years);
         formData.append("availability", data.availability);
         formData.append("bio", data.bio);
-        formData.append("skills", data.skills);
+        // Convert skills array to comma-separated string
+        formData.append("skills", selectedSkills.join(", "));
 
         if (data.photo) {
             formData.append("photo", data.photo);
@@ -458,7 +489,7 @@ export default function CreateWorker() {
                                     <InputLabel htmlFor="availability" value="Availability *" />
                                     <select
                                         id="availability"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-gray-900 bg-white"
                                         value={data.availability}
                                         onChange={(e) => setData({ ...data, availability: e.target.value })}
                                         required
@@ -474,13 +505,40 @@ export default function CreateWorker() {
 
                                 <div className="md:col-span-2">
                                     <InputLabel htmlFor="skills" value="Skills" />
+                                    <p className="text-xs text-gray-500 mb-2">Add skills as tags. Press Enter or comma to add each skill.</p>
+                                    
+                                    {/* Selected Skills as Tags */}
+                                    {selectedSkills.length > 0 && (
+                                        <div className="mb-3">
+                                            <div className="flex flex-wrap gap-2">
+                                                {selectedSkills.map((skill, idx) => (
+                                                    <span
+                                                        key={idx}
+                                                        className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold"
+                                                    >
+                                                        <span>{skill}</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeSkill(skill)}
+                                                            className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Skill Input */}
                                     <TextInput
                                         id="skills"
                                         type="text"
                                         className="mt-1 block w-full"
-                                        value={data.skills}
-                                        onChange={(e) => setData({ ...data, skills: e.target.value })}
-                                        placeholder="e.g., Cooking, Cleaning, Child Care"
+                                        value={skillInput}
+                                        onChange={(e) => setSkillInput(e.target.value)}
+                                        onKeyPress={handleSkillKeyPress}
+                                        placeholder="Type a skill and press Enter or comma to add"
                                     />
                                     <InputError message={errors.skills} className="mt-2" />
                                 </div>

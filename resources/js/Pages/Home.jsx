@@ -34,7 +34,7 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-        // Fetch service requests for helpers/businesses
+        // Fetch jobs for helpers/businesses
         if (isHelperOrBusiness(user)) {
             setLoadingServiceRequests(true);
             bookingsService.browseBookings({ per_page: 6 })
@@ -49,7 +49,7 @@ export default function Home() {
                     setLoadingServiceRequests(false);
                 })
                 .catch((error) => {
-                    console.error("Error fetching service requests:", error);
+                    console.error("Error fetching jobs:", error);
                     setLoadingServiceRequests(false);
                 });
         }
@@ -260,19 +260,19 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* Service Requests for Helpers/Businesses */}
+            {/* Jobs for Helpers/Businesses */}
             {isHelperOrBusiness(user) && (
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
                         <div className="text-center mb-16">
-                            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Available Service Requests</h2>
+                            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Available Jobs</h2>
                             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                                Browse available service requests and apply to help customers
+                                Browse available jobs and apply to help customers
                             </p>
                         </div>
                         {loadingServiceRequests ? (
                             <div className="text-center py-12">
-                                <p className="text-gray-600">Loading service requests...</p>
+                                <p className="text-gray-600">Loading jobs...</p>
                             </div>
                         ) : serviceRequests.data && serviceRequests.data.length > 0 ? (
                             <>
@@ -343,13 +343,13 @@ export default function Home() {
                                         to={route("service-requests.browse")}
                                         className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl inline-block"
                                     >
-                                        View All Service Requests
+                                        View All Jobs
                                     </Link>
                                 </div>
                             </>
                         ) : (
                             <div className="text-center py-12">
-                                <p className="text-gray-600">No service requests available at the moment.</p>
+                                <p className="text-gray-600">No jobs available at the moment.</p>
                                 <Link
                                     to={route("service-requests.browse")}
                                     className="mt-4 inline-block text-primary-600 hover:text-primary-700 font-semibold"

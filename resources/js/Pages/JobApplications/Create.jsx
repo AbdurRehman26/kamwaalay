@@ -30,16 +30,16 @@ export default function JobApplicationCreate() {
                     console.error("Error fetching booking:", error);
                     if (error.response) {
                         if (error.response.status === 404) {
-                            setErrorMessage("Service request not found.");
+                            setErrorMessage("Job not found.");
                         } else if (error.response.status === 403) {
-                            setErrorMessage("You are not authorized to apply for this service request. Only helpers and businesses can apply.");
+                            setErrorMessage("You are not authorized to apply for this job. Only helpers and businesses can apply.");
                         } else if (error.response.status === 422) {
                             setErrorMessage(error.response.data.message || "Please complete your onboarding first.");
                             if (error.response.data.redirect) {
                                 // Optional: Auto redirect or show button
                             }
                         } else {
-                            setErrorMessage("Failed to load service request details.");
+                            setErrorMessage("Failed to load job details.");
                         }
                     } else {
                         setErrorMessage("Network error. Please try again.");
@@ -76,8 +76,8 @@ export default function JobApplicationCreate() {
                     {/* Header */}
                     <div className="mb-6 flex items-center justify-between">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900 mb-1">Apply for Service Request</h1>
-                            <p className="text-sm text-gray-600">Submit your application to this service request</p>
+                            <h1 className="text-2xl font-bold text-gray-900 mb-1">Apply for Job</h1>
+                            <p className="text-sm text-gray-600">Submit your application to this job</p>
                         </div>
                         <button
                             onClick={() => navigate(route("service-requests.browse"))}
@@ -101,7 +101,7 @@ export default function JobApplicationCreate() {
                             <SecondaryButton
                                 onClick={() => navigate(route("service-requests.browse"))}
                             >
-                                Back to Service Requests
+                                Back to Jobs
                             </SecondaryButton>
                         </div>
                     ) : !booking ? (
@@ -113,12 +113,12 @@ export default function JobApplicationCreate() {
                             <SecondaryButton
                                 onClick={() => navigate(route("service-requests.browse"))}
                             >
-                                Back to Service Requests
+                                Back to Jobs
                             </SecondaryButton>
                         </div>
                     ) : (
                         <div className="grid lg:grid-cols-3 gap-6">
-                            {/* Service Request Details */}
+                            {/* Job Details */}
                             <div className="lg:col-span-2 space-y-6">
                                 {/* Client Information */}
                                 {booking.user && (
@@ -153,7 +153,7 @@ export default function JobApplicationCreate() {
 
                                 <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h2 className="text-lg font-bold text-gray-900">Service Request Details</h2>
+                                        <h2 className="text-lg font-bold text-gray-900">Job Details</h2>
                                         <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
                                             <span className="text-lg">📋</span>
                                         </div>
