@@ -182,7 +182,7 @@ export default function BookingShow() {
                                     to={route("service-requests.browse")}
                                     className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold text-center"
                                 >
-                                    Back to Services Required
+                                    Back to Search Jobs
                                 </Link>
                                 <Link
                                     to={route("login")}
