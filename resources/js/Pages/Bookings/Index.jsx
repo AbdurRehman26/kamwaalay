@@ -85,12 +85,24 @@ export default function BookingsIndex() {
                                         {booking.start_date && (
                                             <p className="text-gray-500 text-sm mb-2">📅 Start: {booking.start_date}</p>
                                         )}
-                                        {booking.helper && (
-                                            <p className="text-green-600 font-semibold mt-2">
-                                                ✓ Assigned to: {booking.helper.name}
+                                        {booking.job_applications_count !== undefined && (
+                                            <p className={`font-semibold mt-2 flex items-center gap-2 ${
+                                                booking.job_applications_count > 0 
+                                                    ? "text-primary-600" 
+                                                    : "text-gray-500"
+                                            }`}>
+                                                <span>📋</span>
+                                                <span>
+                                                    {booking.job_applications_count} {booking.job_applications_count === 1 ? "application" : "applications"}
+                                                </span>
                                             </p>
                                         )}
-                                        {!booking.helper && (
+                                        {booking.assigned_user && (
+                                            <p className="text-green-600 font-semibold mt-2">
+                                                ✓ Assigned to: {booking.assigned_user?.name || booking.helper?.name}
+                                            </p>
+                                        )}
+                                        {!booking.assigned_user && (
                                             <p className="text-yellow-600 font-semibold mt-2">
                                                 ⏳ Waiting for helper assignment
                                             </p>
@@ -137,7 +149,7 @@ export default function BookingsIndex() {
                             to={route("bookings.create")}
                             className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold inline-block"
                         >
-                            Post Service Request
+                            Create Job Posting
                         </Link>
                     </div>
                 )}

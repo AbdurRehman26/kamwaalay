@@ -57,17 +57,19 @@ export default function MyApplications() {
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
                                             <h3 className="text-xl font-bold text-gray-900">
-                                                {application.booking.service_type_label}
+                                                {(application.job_post || application.booking)?.service_type_label || 
+                                                 (application.job_post || application.booking)?.service_type?.replace("_", " ") || 
+                                                 "Service Request"}
                                             </h3>
                                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(application.status)}`}>
                                                 {application.status}
                                             </span>
                                         </div>
                                         <p className="text-gray-600 mb-2 capitalize">
-                                            {application.booking?.work_type?.replace("_", " ") || "N/A"} • {application.booking?.city || "N/A"}, {application.booking?.area || "N/A"}
+                                            {(application.job_post || application.booking)?.work_type?.replace("_", " ") || "N/A"} • {(application.job_post || application.booking)?.city || "N/A"}, {(application.job_post || application.booking)?.area || "N/A"}
                                         </p>
                                         <p className="text-gray-500 text-sm mb-2">
-                                            Requested by: <span className="font-semibold">{application.booking.user?.name}</span>
+                                            Requested by: <span className="font-semibold">{(application.job_post || application.booking)?.user?.name}</span>
                                         </p>
                                         {application.message && (
                                             <p className="text-gray-600 text-sm mt-3 line-clamp-2">{application.message}</p>

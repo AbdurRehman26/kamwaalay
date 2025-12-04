@@ -35,7 +35,7 @@ export default function Login() {
             };
 
             const response = await login(data);
-            
+
             if (response.verification_method) {
                 // OTP verification required (account not verified)
                 setMessage(response.message || "Please check your phone for the verification code.");
@@ -50,7 +50,7 @@ export default function Login() {
                 if (response.user) {
                     updateUser(response.user);
                 }
-                
+
                 // Redirect based on onboarding status
                 if (response.redirect) {
                     // If redirect is an object with route info, convert route name to path
@@ -78,10 +78,11 @@ export default function Login() {
                     } else if (response.user.role === "business") {
                         navigate("/onboarding/business");
                     } else {
-                        navigate("/profile");
+                        navigate("/home");
                     }
                 } else {
-                    navigate("/dashboard");
+                    // Redirect to home if onboarding is completed
+                    navigate(route("home"));
                 }
             }
         } catch (error) {
@@ -252,10 +253,10 @@ export default function Login() {
                                 }`}
                                 disabled={processing || (authMethod === "otp" && !phone)}
                             >
-                                {processing 
-                                    ? "Processing..." 
-                                    : authMethod === "otp" 
-                                        ? "Send OTP" 
+                                {processing
+                                    ? "Processing..."
+                                    : authMethod === "otp"
+                                        ? "Send OTP"
                                         : "Log in"
                                 }
                             </PrimaryButton>

@@ -81,7 +81,7 @@ export default function BookingShow() {
             
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">Service Request Details</h1>
+                    <h1 className="text-4xl font-bold mb-4">Job Detail</h1>
                 </div>
             </div>
             <div className="container mx-auto px-4 py-12">

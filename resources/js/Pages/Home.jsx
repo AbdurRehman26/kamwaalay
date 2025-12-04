@@ -544,7 +544,7 @@ export default function Home() {
                                     to={route("bookings.create")}
                                     className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300 min-w-[200px]"
                                 >
-                                    Post Service Request
+                                    Create Job Posting
                                 </Link>
                             )}
                         </div>

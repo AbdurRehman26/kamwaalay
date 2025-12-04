@@ -400,7 +400,7 @@ export default function ServiceRequestsBrowse() {
                                 to={route("bookings.create")}
                                 className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold inline-block"
                             >
-                                Post a Service Request
+                                Create Job Posting
                             </Link>
                         )}
                     </div>

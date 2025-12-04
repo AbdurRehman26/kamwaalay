@@ -7,6 +7,7 @@ import PublicLayout from "@/Layouts/PublicLayout";
 import { useState, useEffect } from "react";
 import { authService } from "@/services/auth";
 import { useAuth } from "@/contexts/AuthContext";
+import { route } from "@/utils/routes";
 
 export default function Verify() {
     const navigate = useNavigate();
@@ -187,7 +188,8 @@ export default function Verify() {
                         navigate("/profile");
                     }
                 } else {
-                    navigate("/dashboard");
+                    // Redirect to home if onboarding is completed
+                    navigate(route("home"));
                 }
             }
         } catch (error) {

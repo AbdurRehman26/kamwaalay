@@ -182,7 +182,7 @@ export default function BookingEdit() {
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Edit Service Request</h1>
-                    <p className="text-xl text-white/90">Update your service request details</p>
+                    <p className="text-xl text-white/90">Update your job posting details</p>
                 </div>
             </div>
             <div className="container mx-auto px-4 py-12">

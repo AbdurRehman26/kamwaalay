@@ -378,7 +378,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 {/* Booking Form */}
                 {showBookingForm && user && (
                     <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                        <h2 className="text-2xl font-bold mb-6 text-gray-900">Post Service Request</h2>
+                        <h2 className="text-2xl font-bold mb-6 text-gray-900">Create Job Posting</h2>
                         <form onSubmit={handleBookingSubmit}>
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>

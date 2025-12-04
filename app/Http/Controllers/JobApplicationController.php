@@ -360,7 +360,7 @@ class JobApplicationController extends Controller
      */
     public function myRequestApplications()
     {
-        $applications = JobApplication::with(['user', 'jobPost'])
+        $applications = JobApplication::with(['user', 'jobPost.user'])
             ->whereHas('jobPost', function ($query) {
                 $query->where('user_id', Auth::id());
             })

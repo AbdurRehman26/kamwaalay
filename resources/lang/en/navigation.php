@@ -4,7 +4,7 @@ return [
     'home' => 'Home',
     'find_help' => 'Find Househelp',
     'services_required' => 'Search Jobs',
-    'post_service_request' => 'Post Service Request',
+    'post_service_request' => 'Create Job Posting',
     'admin' => 'Admin',
     'business' => 'Business',
     'profile' => 'Profile',

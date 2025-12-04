@@ -47,6 +47,7 @@ class JobPostResource extends JsonResource
             'job_applications' => $this->whenLoaded('jobApplications', function () {
                 return JobApplicationResource::collection($this->jobApplications);
             }),
+            'job_applications_count' => $this->job_applications_count ?? 0,
         ];
     }
 }

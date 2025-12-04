@@ -128,8 +128,8 @@ export default function DashboardOverview() {
                                     className="p-4 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors duration-300 border border-primary-200"
                                 >
                                     <div className="text-2xl mb-2">📅</div>
-                                    <div className="font-semibold text-primary-700">Create Booking</div>
-                                    <div className="text-sm text-gray-600">Post a service request</div>
+                                    <div className="font-semibold text-primary-700">Post a Job</div>
+                                    <div className="text-sm text-gray-600">Create a job posting</div>
                                 </Link>
                                 <Link
                                     to={route("bookings.index")}

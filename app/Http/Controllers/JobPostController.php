@@ -178,6 +178,7 @@ class JobPostController extends Controller
     public function index()
     {
         $jobPosts = JobPost::with(['user', 'assignedUser'])
+            ->withCount('jobApplications')
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->paginate(10);

@@ -37,7 +37,7 @@ export default function JobApplicationCreate() {
                                 // Optional: Auto redirect or show button
                             }
                         } else {
-                            setErrorMessage("Failed to load service request details.");
+                            setErrorMessage("Failed to load job details.");
                         }
                     } else {
                         setErrorMessage("Network error. Please try again.");
@@ -105,7 +105,7 @@ export default function JobApplicationCreate() {
                     <div className="max-w-4xl mx-auto">
                         {/* Booking Details */}
                         <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-                            <h2 className="text-2xl font-bold mb-6 text-gray-900">Service Request Details</h2>
+                            <h2 className="text-2xl font-bold mb-6 text-gray-900">Job Detail</h2>
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-700 mb-2">Service Type</h3>
