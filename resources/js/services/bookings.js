@@ -2,7 +2,7 @@ import api from "./api";
 
 export const bookingsService = {
     async getBookings(params = {}) {
-        const response = await api.get("/bookings", { params });
+        const response = await api.get("/job-posts", { params });
         return response.data;
     },
 
@@ -13,17 +13,17 @@ export const bookingsService = {
     },
 
     async createBooking(data) {
-        const response = await api.post("/bookings", data);
+        const response = await api.post("/job-posts", data);
         return response.data;
     },
 
     async updateBooking(id, data) {
-        const response = await api.put(`/bookings/${id}`, data);
+        const response = await api.patch(`/job-posts/${id}`, data);
         return response.data;
     },
 
     async deleteBooking(id) {
-        const response = await api.delete(`/bookings/${id}`);
+        const response = await api.delete(`/job-posts/${id}`);
         return response.data;
     },
 
@@ -33,7 +33,7 @@ export const bookingsService = {
     },
 
     async getBookingCreatePrefill() {
-        const response = await api.get("/bookings/create");
+        const response = await api.get("/job-posts/create");
         return response.data;
     },
 };

@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Models\Booking;
+use App\Models\JobPost;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -17,7 +17,7 @@ test('users can view their bookings', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
 
-    Booking::factory()->create([
+    JobPost::factory()->create([
         'user_id' => $user->id,
     ]);
     
@@ -26,17 +26,17 @@ test('users can view their bookings', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->getJson('/api/bookings');
+    ])->getJson('/api/job-posts');
 
     $response->assertStatus(200);
-    $response->assertJsonStructure(['bookings']);
+    $response->assertJsonStructure(['job_posts']);
 });
 
 test('users can update their booking status', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'status' => 'pending',
     ]);
@@ -46,20 +46,20 @@ test('users can update their booking status', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->patchJson("/api/bookings/{$booking->id}", [
+    ])->patchJson("/api/job-posts/{$jobPost->id}", [
         'status' => 'cancelled',
     ]);
 
     $response->assertStatus(200);
-    $booking->refresh();
-    expect($booking->status)->toBe('cancelled');
+    $jobPost->refresh();
+    expect($jobPost->status)->toBe('cancelled');
 });
 
 test('users can delete their booking', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
     ]);
     
@@ -68,11 +68,11 @@ test('users can delete their booking', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->deleteJson("/api/bookings/{$booking->id}");
+    ])->deleteJson("/api/job-posts/{$jobPost->id}");
 
     $response->assertStatus(200);
-    $this->assertDatabaseMissing('bookings', [
-        'id' => $booking->id,
+    $this->assertDatabaseMissing('job_posts', [
+        'id' => $jobPost->id,
     ]);
 });
 
@@ -82,7 +82,7 @@ test('users cannot update other users bookings', function () {
     $user2 = User::factory()->create();
     $user2->assignRole('user');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user1->id,
     ]);
     
@@ -91,7 +91,7 @@ test('users cannot update other users bookings', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->patchJson("/api/bookings/{$booking->id}", [
+    ])->patchJson("/api/job-posts/{$jobPost->id}", [
         'status' => 'cancelled',
     ]);
 
@@ -104,7 +104,7 @@ test('users cannot delete other users bookings', function () {
     $user2 = User::factory()->create();
     $user2->assignRole('user');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user1->id,
     ]);
     
@@ -113,7 +113,7 @@ test('users cannot delete other users bookings', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->deleteJson("/api/bookings/{$booking->id}");
+    ])->deleteJson("/api/job-posts/{$jobPost->id}");
 
     $response->assertStatus(403);
 });

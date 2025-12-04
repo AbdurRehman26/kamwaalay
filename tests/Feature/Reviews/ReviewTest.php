@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\Review;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -24,28 +24,28 @@ test('users can create a review for completed booking', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'assigned_user_id' => $helper->id,
         'status' => 'completed',
     ]);
 
     // Ensure booking has assigned_user_id for the review booted event
-    $booking->refresh();
+    $jobPost->refresh();
     
     $token = $user->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->postJson("/api/bookings/{$booking->id}/review", [
+    ])->postJson("/api/job-posts/{$jobPost->id}/review", [
         'rating' => 5,
         'comment' => 'Excellent service!',
     ]);
 
     $response->assertStatus(200);
     $this->assertDatabaseHas('reviews', [
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $user->id,
         'rating' => 5,
     ]);
@@ -60,7 +60,7 @@ test('only booking owner can create review', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user1->id,
         'assigned_user_id' => $helper->id,
     ]);
@@ -70,7 +70,7 @@ test('only booking owner can create review', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->postJson("/api/bookings/{$booking->id}/review", [
+    ])->postJson("/api/job-posts/{$jobPost->id}/review", [
         'rating' => 5,
         'comment' => 'Great!',
     ]);
@@ -85,13 +85,13 @@ test('users can update their review', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'assigned_user_id' => $helper->id,
     ]);
 
     $review = Review::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $user->id,
         'rating' => 3,
         'comment' => 'Average',
@@ -124,13 +124,13 @@ test('only review owner can update review', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user1->id,
         'assigned_user_id' => $helper->id,
     ]);
 
     $review = Review::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $user1->id,
         'rating' => 4,
         'comment' => 'Good',
@@ -159,13 +159,13 @@ test('users can delete their review', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'assigned_user_id' => $helper->id,
     ]);
 
     $review = Review::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $user->id,
         'rating' => 4,
         'comment' => 'Good',
@@ -194,7 +194,7 @@ test('rating must be between 1 and 5', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'assigned_user_id' => $helper->id,
     ]);
@@ -204,7 +204,7 @@ test('rating must be between 1 and 5', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->postJson("/api/bookings/{$booking->id}/review", [
+    ])->postJson("/api/job-posts/{$jobPost->id}/review", [
         'rating' => 6,
         'comment' => 'Invalid rating',
     ]);
@@ -220,13 +220,13 @@ test('users cannot create multiple reviews for same booking', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'assigned_user_id' => $helper->id,
     ]);
 
     $firstReview = Review::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $user->id,
         'rating' => 4,
         'comment' => 'First review',
@@ -240,13 +240,13 @@ test('users cannot create multiple reviews for same booking', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->postJson("/api/bookings/{$booking->id}/review", [
+    ])->postJson("/api/job-posts/{$jobPost->id}/review", [
         'rating' => 5,
         'comment' => 'Second review',
     ]);
 
     // Controller should redirect or return error if review already exists
     // Check that only one review exists
-    expect(Review::where('booking_id', $booking->id)->count())->toBe(1);
+    expect(Review::where('job_post_id', $jobPost->id)->count())->toBe(1);
 });
 

@@ -22,6 +22,7 @@ import BusinessesShow from "./Pages/Businesses/Show";
 import BookingsIndex from "./Pages/Bookings/Index";
 import BookingsShow from "./Pages/Bookings/Show";
 import BookingsCreate from "./Pages/Bookings/Create";
+import BookingsEdit from "./Pages/Bookings/Edit";
 import ServiceListingsIndex from "./Pages/ServiceListings/Index";
 import ServiceListingsShow from "./Pages/ServiceListings/Show";
 import ServiceListingsCreate from "./Pages/ServiceListings/Create";
@@ -139,14 +140,29 @@ function AppRoutes() {
                     <ProfileEdit />
                 </ProtectedRoute>
             } />
+            <Route path="/job-postings" element={
+                <ProtectedRoute>
+                    <BookingsIndex />
+                </ProtectedRoute>
+            } />
             <Route path="/bookings" element={
                 <ProtectedRoute>
                     <BookingsIndex />
                 </ProtectedRoute>
             } />
+            <Route path="/job/create" element={
+                <ProtectedRoute>
+                    <BookingsCreate />
+                </ProtectedRoute>
+            } />
             <Route path="/bookings/create" element={
                 <ProtectedRoute>
                     <BookingsCreate />
+                </ProtectedRoute>
+            } />
+            <Route path="/bookings/:bookingId/edit" element={
+                <ProtectedRoute>
+                    <BookingsEdit />
                 </ProtectedRoute>
             } />
             <Route path="/service-requests/:bookingId" element={<BookingsShow />} />

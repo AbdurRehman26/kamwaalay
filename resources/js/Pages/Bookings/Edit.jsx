@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import axios from "axios";
@@ -6,10 +6,11 @@ import { bookingsService } from "@/services/bookings";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 
-export default function BookingCreate() {
+export default function BookingEdit() {
+    const { bookingId } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
-    const [prefill, setPrefill] = useState({});
+    const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
     
     const [data, setData] = useState({
@@ -24,7 +25,6 @@ export default function BookingCreate() {
         email: user?.email || "",
         address: user?.address || "",
         special_requirements: "",
-        assigned_user_id: null,
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
@@ -35,42 +35,6 @@ export default function BookingCreate() {
     const searchTimeoutRef = useRef(null);
     const suggestionsRef = useRef(null);
 
-    // Fetch prefill data from API
-    useEffect(() => {
-        bookingsService.getBookingCreatePrefill()
-            .then((response) => {
-                if (response.prefill) {
-                    setPrefill(response.prefill);
-                    setData(prev => ({
-                        ...prev,
-                        service_type: response.prefill.service_type || prev.service_type,
-                        work_type: response.prefill.work_type || prev.work_type,
-                        city: response.prefill.city || prev.city,
-                        area: response.prefill.area || prev.area,
-                        name: response.prefill.name || prev.name || user?.name || "",
-                        phone: response.prefill.phone || prev.phone || user?.phone || "",
-                        email: response.prefill.email || prev.email || user?.email || "",
-                        address: response.prefill.address || prev.address || user?.address || "",
-                    }));
-                    setSearchQuery(response.prefill.area || "");
-                }
-                if (response.user) {
-                    setData(prev => ({
-                        ...prev,
-                        name: prev.name || response.user.name || "",
-                        phone: prev.phone || response.user.phone || "",
-                        email: prev.email || response.user.email || "",
-                        address: prev.address || response.user.address || "",
-                    }));
-                }
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error("Error fetching prefill data:", error);
-                setLoading(false);
-            });
-    }, [user]);
-
     const serviceTypes = [
         { value: "maid", label: "Maid" },
         { value: "cook", label: "Cook" },
@@ -79,6 +43,36 @@ export default function BookingCreate() {
         { value: "cleaner", label: "Cleaner" },
         { value: "all_rounder", label: "All Rounder" },
     ];
+
+    // Fetch booking data
+    useEffect(() => {
+        if (bookingId) {
+            bookingsService.getBooking(bookingId)
+                .then((response) => {
+                    const bookingData = response.job_post || response.booking;
+                    setBooking(bookingData);
+                    setData({
+                        service_type: bookingData.service_type || "",
+                        work_type: bookingData.work_type || "",
+                        city: bookingData.city || "Karachi",
+                        area: bookingData.area || "",
+                        start_date: bookingData.start_date || "",
+                        start_time: bookingData.start_time || "",
+                        name: bookingData.name || user?.name || "",
+                        phone: bookingData.phone || user?.phone || "",
+                        email: bookingData.email || user?.email || "",
+                        address: bookingData.address || user?.address || "",
+                        special_requirements: bookingData.special_requirements || "",
+                    });
+                    setSearchQuery(bookingData.area || "");
+                    setLoading(false);
+                })
+                .catch((error) => {
+                    console.error("Error fetching booking:", error);
+                    setLoading(false);
+                });
+        }
+    }, [bookingId, user]);
 
     // Fetch location suggestions for area
     useEffect(() => {
@@ -144,34 +138,54 @@ export default function BookingCreate() {
         };
 
         try {
-            const response = await bookingsService.createBooking(submitData);
-            // Redirect to job postings index or show success message
+            await bookingsService.updateBooking(bookingId, submitData);
             navigate(route("bookings.index"));
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
-                setErrors({ submit: [error.response?.data?.message || "Failed to create job post"] });
+                setErrors({ submit: [error.response?.data?.message || "Failed to update service request"] });
             }
         } finally {
             setProcessing(false);
         }
     };
 
+    if (loading) {
+        return (
+            <DashboardLayout>
+                <div className="text-center py-12">
+                    <p className="text-gray-600">Loading...</p>
+                </div>
+            </DashboardLayout>
+        );
+    }
+
+    if (!booking) {
+        return (
+            <DashboardLayout>
+                <div className="text-center py-12">
+                    <p className="text-red-600">Service request not found</p>
+                    <Link
+                        to={route("bookings.index")}
+                        className="mt-4 inline-block bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
+                    >
+                        Back to Service Requests
+                    </Link>
+                </div>
+            </DashboardLayout>
+        );
+    }
+
     return (
         <DashboardLayout>
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">Post Service Request</h1>
-                    <p className="text-xl text-white/90">Fill in the form below to post your service request</p>
+                    <h1 className="text-4xl font-bold mb-4">Edit Service Request</h1>
+                    <p className="text-xl text-white/90">Update your service request details</p>
                 </div>
             </div>
             <div className="container mx-auto px-4 py-12">
-                {loading ? (
-                    <div className="text-center py-12">
-                        <p className="text-gray-600">Loading...</p>
-                    </div>
-                ) : (
                 <div className="max-w-2xl mx-auto">
                     {/* Notice about Karachi only */}
                     <div className="bg-yellow-50 border-l-4 border-yellow-400 mb-8 rounded-lg p-4">
@@ -354,13 +368,13 @@ export default function BookingCreate() {
                                 disabled={processing}
                                 className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition duration-300 font-semibold"
                             >
-                                {processing ? "Submitting..." : "Submit Booking"}
+                                {processing ? "Updating..." : "Update Service Request"}
                             </button>
                             <Link
-                                to={route("helpers.index")}
+                                to={route("bookings.index")}
                                 className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold text-center"
                             >
-                                Browse Helpers First
+                                Cancel
                             </Link>
                         </div>
                         {errors.submit && (
@@ -370,7 +384,6 @@ export default function BookingCreate() {
                         )}
                     </form>
                 </div>
-                )}
             </div>
         </DashboardLayout>
     );

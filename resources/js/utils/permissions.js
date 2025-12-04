@@ -44,6 +44,15 @@ export const isAdmin = (user) => {
  * @param {Object|null} user - The authenticated user object
  * @returns {boolean}
  */
+export const isHelperOrBusinessOrGuest = (user) => {
+    return !user || isHelper(user) || isBusiness(user);
+};
+
+/**
+ * Check if user is a helper or business (service providers)
+ * @param {Object|null} user - The authenticated user object
+ * @returns {boolean}
+ */
 export const isHelperOrBusiness = (user) => {
     return isHelper(user) || isBusiness(user);
 };

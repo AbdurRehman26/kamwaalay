@@ -19,9 +19,10 @@ export const routes = {
         show: (id) => `/businesses/${id}`,
     },
     bookings: {
-        index: () => "/bookings",
-        create: () => "/bookings/create",
+        index: () => "/job-postings",
+        create: () => "/job/create",
         show: (id) => `/service-requests/${id}`,
+        edit: (id) => `/bookings/${id}/edit`,
     },
     "service-requests": {
         browse: () => "/service-requests",

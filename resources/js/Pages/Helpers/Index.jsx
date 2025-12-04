@@ -301,19 +301,6 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-gray-900">Filter Helpers</h2>
-                        <button
-                            onClick={() => {
-                                if (!user) {
-                                    // Redirect to login if not authenticated
-                                    navigate(route("login"));
-                                    return;
-                                }
-                                setShowBookingForm(!showBookingForm);
-                            }}
-                            className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
-                        >
-                            {showBookingForm ? "Cancel Booking" : "Post Service Request"}
-                        </button>
                     </div>
 
                     <div className="grid md:grid-cols-5 gap-6">
@@ -376,17 +363,6 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                     ))}
                                 </div>
                             )}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Sort By</label>
-                            <select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
-                            >
-                                <option value="rating">Rating</option>
-                                <option value="experience">Experience</option>
-                            </select>
                         </div>
                         <div className="flex items-end">
                             <button
@@ -648,18 +624,18 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                             {helper.service_listings && helper.service_listings.length > 0 && (
                                                 <div className="mb-3">
                                                     <div className="flex flex-wrap gap-2">
-                                                        {helper.service_listings.flatMap(listing => 
+                                                        {helper.service_listings.flatMap(listing =>
                                                             listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
                                                         ).filter(Boolean).slice(0, 3).map((type, idx) => (
                                                             <span key={idx} className="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-md font-medium capitalize">
                                                                 {type}
                                                             </span>
                                                         ))}
-                                                        {helper.service_listings.flatMap(listing => 
+                                                        {helper.service_listings.flatMap(listing =>
                                                             listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
                                                         ).filter(Boolean).length > 3 && (
                                                             <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md font-medium">
-                                                                +{helper.service_listings.flatMap(listing => 
+                                                                +{helper.service_listings.flatMap(listing =>
                                                                     listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
                                                                 ).filter(Boolean).length - 3}
                                                             </span>

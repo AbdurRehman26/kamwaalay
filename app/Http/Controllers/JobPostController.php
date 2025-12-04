@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\BookingResource;
+use App\Http\Resources\JobPostResource;
 use App\Http\Resources\UserResource;
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes as OA;
 
-#[OA\Tag(name: "Bookings", description: "Service request (booking) management endpoints")]
-class BookingController extends Controller
+#[OA\Tag(name: "JobPosts", description: "Job post management endpoints")]
+class JobPostController extends Controller
 {
     #[OA\Get(
-        path: "/api/bookings/create",
-        summary: "Get booking creation form",
-        description: "Get form data for creating a service request with optional prefill data",
-        tags: ["Bookings"],
+        path: "/api/job-posts/create",
+        summary: "Get job post creation form",
+        description: "Get form data for creating a job post with optional prefill data",
+        tags: ["JobPosts"],
         security: [["sanctum" => []]],
         parameters: [
             new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string")),
@@ -51,10 +51,10 @@ class BookingController extends Controller
     }
 
     #[OA\Post(
-        path: "/api/bookings",
-        summary: "Create service request",
-        description: "Create a new service request (booking). Only users and businesses can create requests, not helpers.",
-        tags: ["Bookings"],
+        path: "/api/job-posts",
+        summary: "Create job post",
+        description: "Create a new job post. Only users and businesses can create posts, not helpers.",
+        tags: ["JobPosts"],
         security: [["sanctum" => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -78,24 +78,24 @@ class BookingController extends Controller
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Service request created successfully",
+                description: "Job post created successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "message", type: "string", example: "Booking request submitted successfully!"),
-                        new OA\Property(property: "booking", type: "object"),
+                        new OA\Property(property: "message", type: "string", example: "Job post submitted successfully!"),
+                        new OA\Property(property: "job_post", type: "object"),
                     ]
                 )
             ),
-            new OA\Response(response: 403, description: "Forbidden - Helpers cannot create service requests"),
+            new OA\Response(response: 403, description: "Forbidden - Helpers cannot create job posts"),
             new OA\Response(response: 422, description: "Validation error"),
         ]
     )]
     public function store(Request $request)
     {
-        // Only users and businesses can create service requests, not helpers
+        // Only users and businesses can create job posts, not helpers
         $user = Auth::user();
         if ($user->hasRole('helper')) {
-            abort(403, 'Helpers cannot create service requests.');
+            abort(403, 'Helpers cannot create job posts.');
         }
 
         $validated = $request->validate([
@@ -116,60 +116,60 @@ class BookingController extends Controller
         $validated['city'] = 'Karachi';
         $validated['user_id'] = Auth::id();
 
-        $booking = Booking::create($validated);
+        $jobPost = JobPost::create($validated);
 
         // Send notifications (you can add email/notification logic here)
 
         return response()->json([
-            'message' => 'Booking request submitted successfully!',
-            'booking' => new BookingResource($booking->load(['user', 'assignedUser'])),
+            'message' => 'Job post submitted successfully!',
+            'job_post' => new JobPostResource($jobPost->load(['user', 'assignedUser'])),
         ]);
     }
 
     #[OA\Get(
-        path: "/api/bookings/{booking}",
-        summary: "Get booking details",
-        description: "Get detailed information about a specific service request (public access)",
-        tags: ["Bookings"],
+        path: "/api/job-posts/{jobPost}",
+        summary: "Get job post details",
+        description: "Get detailed information about a specific job post (public access)",
+        tags: ["JobPosts"],
         parameters: [
-            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+            new OA\Parameter(name: "jobPost", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Job Post ID"),
         ],
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Booking details",
+                description: "Job post details",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "booking", type: "object", description: "Booking object with user, assignedUser, review, and jobApplications"),
+                        new OA\Property(property: "job_post", type: "object", description: "Job post object with user, assignedUser, review, and jobApplications"),
                     ]
                 )
             ),
-            new OA\Response(response: 404, description: "Booking not found"),
+            new OA\Response(response: 404, description: "Job post not found"),
         ]
     )]
-    public function show(Booking $booking)
+    public function show(JobPost $jobPost)
     {
-        // Allow public viewing of service requests
-        $booking->load(['user', 'assignedUser', 'review', 'jobApplications']);
+        // Allow public viewing of job posts
+        $jobPost->load(['user', 'assignedUser', 'review', 'jobApplications']);
 
         return response()->json([
-            'booking' => new BookingResource($booking),
+            'job_post' => new JobPostResource($jobPost),
         ]);
     }
 
     #[OA\Get(
-        path: "/api/bookings",
-        summary: "List user's bookings",
-        description: "Get paginated list of service requests created by the authenticated user",
-        tags: ["Bookings"],
+        path: "/api/job-posts",
+        summary: "List user's job posts",
+        description: "Get paginated list of job posts created by the authenticated user",
+        tags: ["JobPosts"],
         security: [["sanctum" => []]],
         responses: [
             new OA\Response(
                 response: 200,
-                description: "List of user's bookings",
+                description: "List of user's job posts",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "bookings", type: "object", description: "Paginated list of bookings"),
+                        new OA\Property(property: "job_posts", type: "object", description: "Paginated list of job posts"),
                     ]
                 )
             ),
@@ -177,21 +177,21 @@ class BookingController extends Controller
     )]
     public function index()
     {
-        $bookings = Booking::with(['user', 'assignedUser'])
+        $jobPosts = JobPost::with(['user', 'assignedUser'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return response()->json([
-            'bookings' => BookingResource::collection($bookings)->response()->getData(true),
+            'job_posts' => JobPostResource::collection($jobPosts)->response()->getData(true),
         ]);
     }
 
     #[OA\Get(
         path: "/api/service-requests",
-        summary: "Browse available service requests",
-        description: "Browse all available pending service requests (for helpers/businesses to apply)",
-        tags: ["Bookings"],
+        summary: "Browse available job posts",
+        description: "Browse all available pending job posts (for helpers/businesses to apply)",
+        tags: ["JobPosts"],
         parameters: [
             new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
             new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer")),
@@ -202,10 +202,10 @@ class BookingController extends Controller
         responses: [
             new OA\Response(
                 response: 200,
-                description: "List of available service requests",
+                description: "List of available job posts",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "bookings", type: "object", description: "Paginated list of pending bookings"),
+                        new OA\Property(property: "job_posts", type: "object", description: "Paginated list of pending job posts"),
                         new OA\Property(property: "filters", type: "object", description: "Applied filters"),
                     ]
                 )
@@ -213,12 +213,12 @@ class BookingController extends Controller
         ]
     )]
     /**
-     * Display all available service requests publicly (for helpers/businesses to browse)
+     * Display all available job posts publicly (for helpers/businesses to browse)
      */
     public function browse(Request $request)
     {
-        // Show only pending requests that haven't been assigned yet
-        $query = Booking::with(['user', 'jobApplications'])
+        // Show only pending posts that haven't been assigned yet
+        $query = JobPost::with(['user', 'jobApplications'])
             ->where('status', 'pending')
             ->whereNull('assigned_user_id');
 
@@ -251,7 +251,7 @@ class BookingController extends Controller
             $query->where('work_type', $request->work_type);
         }
 
-        // If user is logged in and is a helper/business, exclude bookings they already applied to
+        // If user is logged in and is a helper/business, exclude job posts they already applied to
         if (Auth::check()) {
             $user = Auth::user();
             if ($user->hasRole(['helper', 'business'])) {
@@ -261,7 +261,7 @@ class BookingController extends Controller
             }
         }
 
-        $bookings = $query->orderBy('created_at', 'desc')->paginate(12);
+        $jobPosts = $query->orderBy('created_at', 'desc')->paginate(12);
 
         $filters = $request->only(['service_type', 'location_id', 'city_name', 'area', 'work_type']);
         if ($locationDisplay) {
@@ -269,25 +269,34 @@ class BookingController extends Controller
         }
 
         return response()->json([
-            'bookings' => BookingResource::collection($bookings)->response()->getData(true),
+            'job_posts' => JobPostResource::collection($jobPosts)->response()->getData(true),
             'filters' => $filters,
         ]);
     }
 
     #[OA\Patch(
-        path: "/api/bookings/{booking}",
-        summary: "Update booking",
-        description: "Update booking status and notes. Only booking owner can update.",
-        tags: ["Bookings"],
+        path: "/api/job-posts/{jobPost}",
+        summary: "Update job post",
+        description: "Update job post. Only job post owner can update.",
+        tags: ["JobPosts"],
         security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+            new OA\Parameter(name: "jobPost", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Job Post ID"),
         ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["status"],
                 properties: [
+                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                    new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
+                    new OA\Property(property: "area", type: "string", maxLength: 255),
+                    new OA\Property(property: "start_date", type: "string", format: "date", nullable: true),
+                    new OA\Property(property: "start_time", type: "string", format: "time", nullable: true),
+                    new OA\Property(property: "name", type: "string", maxLength: 255),
+                    new OA\Property(property: "phone", type: "string", maxLength: 20),
+                    new OA\Property(property: "email", type: "string", format: "email", maxLength: 255),
+                    new OA\Property(property: "address", type: "string", nullable: true),
+                    new OA\Property(property: "special_requirements", type: "string", nullable: true),
                     new OA\Property(property: "status", type: "string", enum: ["pending", "confirmed", "in_progress", "completed", "cancelled"]),
                     new OA\Property(property: "admin_notes", type: "string", nullable: true),
                 ]
@@ -296,72 +305,89 @@ class BookingController extends Controller
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Booking updated successfully",
+                description: "Job post updated successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "message", type: "string", example: "Booking updated successfully!"),
-                        new OA\Property(property: "booking", type: "object"),
+                        new OA\Property(property: "message", type: "string", example: "Job post updated successfully!"),
+                        new OA\Property(property: "job_post", type: "object"),
                     ]
                 )
             ),
-            new OA\Response(response: 403, description: "Forbidden - Can only update own bookings"),
+            new OA\Response(response: 403, description: "Forbidden - Can only update own job posts"),
             new OA\Response(response: 422, description: "Validation error"),
         ]
     )]
-    public function update(Request $request, Booking $booking)
+    public function update(Request $request, JobPost $jobPost)
     {
-        // Only booking owner can update
-        if (Auth::id() !== $booking->user_id) {
-            abort(403, 'You can only update your own bookings.');
+        // Only job post owner can update
+        if (Auth::id() !== $jobPost->user_id) {
+            abort(403, 'You can only update your own job posts.');
         }
 
+        // Allow updating all job post fields if provided, otherwise just status/admin_notes
         $validated = $request->validate([
-            'status' => 'required|in:pending,confirmed,in_progress,completed,cancelled',
+            'service_type' => 'sometimes|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'work_type' => 'sometimes|in:full_time,part_time',
+            'area' => 'sometimes|string|max:255',
+            'start_date' => 'nullable|date',
+            'start_time' => 'nullable|date_format:H:i',
+            'name' => 'sometimes|string|max:255',
+            'phone' => 'sometimes|string|max:20',
+            'email' => 'sometimes|email|max:255',
+            'address' => 'nullable|string',
+            'special_requirements' => 'nullable|string',
+            'status' => 'sometimes|in:pending,confirmed,in_progress,completed,cancelled',
             'admin_notes' => 'nullable|string',
         ]);
 
-        $booking->update($validated);
+        // Always set city to Karachi if updating location fields
+        if (isset($validated['area'])) {
+            $validated['city'] = 'Karachi';
+        }
+
+        $jobPost->update($validated);
 
         return response()->json([
-            'message' => 'Booking updated successfully!',
-            'booking' => new BookingResource($booking->load(['user', 'assignedUser'])),
+            'message' => 'Job post updated successfully!',
+            'job_post' => new JobPostResource($jobPost->load(['user', 'assignedUser'])),
         ]);
     }
 
     #[OA\Delete(
-        path: "/api/bookings/{booking}",
-        summary: "Delete booking",
-        description: "Delete (cancel) a service request. Only booking owner can delete.",
-        tags: ["Bookings"],
+        path: "/api/job-posts/{jobPost}",
+        summary: "Delete job post",
+        description: "Delete (cancel) a job post. Only job post owner can delete.",
+        tags: ["JobPosts"],
         security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+            new OA\Parameter(name: "jobPost", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Job Post ID"),
         ],
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Booking cancelled successfully",
+                description: "Job post cancelled successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "message", type: "string", example: "Booking cancelled successfully!"),
+                        new OA\Property(property: "message", type: "string", example: "Job post cancelled successfully!"),
                     ]
                 )
             ),
-            new OA\Response(response: 403, description: "Forbidden - Can only delete own bookings"),
-            new OA\Response(response: 404, description: "Booking not found"),
+            new OA\Response(response: 403, description: "Forbidden - Can only delete own job posts"),
+            new OA\Response(response: 404, description: "Job post not found"),
         ]
     )]
-    public function destroy(Booking $booking)
+    public function destroy(JobPost $jobPost)
     {
-        // Only booking owner can delete
-        if (Auth::id() !== $booking->user_id) {
-            abort(403, 'You can only delete your own bookings.');
+        // Only job post owner can delete
+        if (Auth::id() !== $jobPost->user_id) {
+            abort(403, 'You can only delete your own job posts.');
         }
 
-        $booking->delete();
+        $jobPost->delete();
 
         return response()->json([
-            'message' => 'Booking cancelled successfully!',
+            'message' => 'Job post cancelled successfully!',
         ]);
     }
 }
+

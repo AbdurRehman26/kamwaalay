@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\Review;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,21 +34,21 @@ class ReviewController extends Controller
             new OA\Response(response: 403, description: "Forbidden - Can only review own bookings"),
         ]
     )]
-    public function create(Booking $booking)
+    public function create(JobPost $jobPost)
     {
-        if ($booking->user_id !== Auth::id()) {
+        if ($jobPost->user_id !== Auth::id()) {
             abort(403);
         }
 
-        if ($booking->review) {
+        if ($jobPost->review) {
             return response()->json([
                 'message' => 'Review already exists.',
-                'review' => $booking->review->load(['booking.assignedUser', 'user']),
+                'review' => $jobPost->review->load(['jobPost.assignedUser', 'user']),
             ]);
         }
 
         return response()->json([
-            'booking' => $booking->load(['assignedUser', 'user']),
+            'job_post' => $jobPost->load(['assignedUser', 'user']),
         ]);
     }
 
@@ -86,16 +86,16 @@ class ReviewController extends Controller
             new OA\Response(response: 422, description: "Validation error or review already exists"),
         ]
     )]
-    public function store(Request $request, Booking $booking)
+    public function store(Request $request, JobPost $jobPost)
     {
-        if ($booking->user_id !== Auth::id()) {
+        if ($jobPost->user_id !== Auth::id()) {
             abort(403);
         }
 
-        if ($booking->review) {
+        if ($jobPost->review) {
             return response()->json([
                 'message' => 'Review already exists.',
-                'review' => $booking->review->load(['booking.assignedUser', 'user']),
+                'review' => $jobPost->review->load(['jobPost.assignedUser', 'user']),
             ]);
         }
 
@@ -105,16 +105,16 @@ class ReviewController extends Controller
         ]);
 
         $validated['user_id'] = Auth::id();
-        $validated['booking_id'] = $booking->id;
+        $validated['job_post_id'] = $jobPost->id;
 
         Review::create($validated);
 
         return response()->json([
             'message' => 'Review submitted successfully!',
-            'review' => Review::where('booking_id', $booking->id)
+            'review' => Review::where('job_post_id', $jobPost->id)
                 ->where('user_id', Auth::id())
                 ->first()
-                ->load(['booking.assignedUser', 'user']),
+                ->load(['jobPost.assignedUser', 'user']),
         ]);
     }
 
@@ -147,7 +147,7 @@ class ReviewController extends Controller
         }
 
         return response()->json([
-            'review' => $review->load(['booking.assignedUser', 'user']),
+            'review' => $review->load(['jobPost.assignedUser', 'user']),
         ]);
     }
 
@@ -200,7 +200,7 @@ class ReviewController extends Controller
 
         return response()->json([
             'message' => 'Review updated successfully!',
-            'review' => $review->load(['booking.assignedUser', 'user']),
+            'review' => $review->load(['jobPost.assignedUser', 'user']),
         ]);
     }
 
@@ -232,7 +232,7 @@ class ReviewController extends Controller
             abort(403);
         }
 
-        $bookingId = $review->booking_id;
+        $jobPostId = $review->job_post_id;
         $review->delete();
 
         return response()->json([

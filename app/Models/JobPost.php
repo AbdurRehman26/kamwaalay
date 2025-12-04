@@ -8,9 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Booking extends Model
+class JobPost extends Model
 {
     use HasFactory;
+    
+    protected $table = 'job_posts';
+    
+    protected static function newFactory()
+    {
+        return \Database\Factories\JobPostFactory::new();
+    }
+    
     protected $fillable = [
         'user_id',
         'assigned_user_id',
@@ -58,7 +66,7 @@ class Booking extends Model
     }
 
     /**
-     * Get job applications for this service request
+     * Get job applications for this job post
      */
     public function jobApplications(): HasMany
     {
@@ -108,3 +116,4 @@ class Booking extends Model
         return $query->where('status', 'confirmed');
     }
 }
+

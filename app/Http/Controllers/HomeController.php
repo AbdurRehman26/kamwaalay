@@ -44,7 +44,7 @@ class HomeController extends Controller
 
         $stats = [
             'total_helpers' => User::verifiedHelpers()->count(),
-            'total_bookings' => \App\Models\Booking::where('status', 'confirmed')->count(),
+            'total_bookings' => \App\Models\JobPost::where('status', 'confirmed')->count(),
             'total_reviews' => \App\Models\Review::count(),
             'verified_helpers' => User::role('helper')->whereHas('profile', function ($q) {
                 $q->where('verification_status', 'verified');

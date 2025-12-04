@@ -10,7 +10,7 @@ class JobApplication extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'booking_id',
+        'job_post_id',
         'user_id',
         'message',
         'proposed_rate',
@@ -27,11 +27,19 @@ class JobApplication extends Model
     }
 
     /**
-     * Get the booking (service request) this application is for
+     * Get the job post this application is for
+     */
+    public function jobPost(): BelongsTo
+    {
+        return $this->belongsTo(JobPost::class);
+    }
+
+    /**
+     * Alias for backward compatibility
      */
     public function booking(): BelongsTo
     {
-        return $this->belongsTo(Booking::class);
+        return $this->jobPost();
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\JobApplication;
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,7 +20,7 @@ class JobApplicationFactory extends Factory
     public function definition(): array
     {
         return [
-            'booking_id' => Booking::factory(),
+            'job_post_id' => JobPost::factory(),
             'user_id' => User::factory(),
             'message' => fake()->optional()->paragraph(),
             'proposed_rate' => fake()->optional()->numberBetween(10000, 30000),

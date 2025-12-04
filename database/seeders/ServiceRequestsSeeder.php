@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
@@ -86,7 +86,7 @@ class ServiceRequestsSeeder extends Seeder
 
         // Insert service requests
         foreach ($serviceRequests as $request) {
-            Booking::firstOrCreate(
+            JobPost::firstOrCreate(
                 [
                     'user_id' => $request['user_id'],
                     'service_type' => $request['service_type'],

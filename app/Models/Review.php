@@ -10,7 +10,7 @@ class Review extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'booking_id',
+        'job_post_id',
         'user_id',
         'rating',
         'comment',
@@ -23,9 +23,17 @@ class Review extends Model
         ];
     }
 
+    public function jobPost(): BelongsTo
+    {
+        return $this->belongsTo(JobPost::class);
+    }
+
+    /**
+     * Alias for backward compatibility
+     */
     public function booking(): BelongsTo
     {
-        return $this->belongsTo(Booking::class);
+        return $this->jobPost();
     }
 
     public function user(): BelongsTo
@@ -34,24 +42,24 @@ class Review extends Model
     }
 
     /**
-     * Get the helper user from the booking's assigned_user_id
+     * Get the helper user from the job post's assigned_user_id
      * This is a helper method, not a relationship
      */
     public function getHelperAttribute()
     {
-        // Load booking if not already loaded
-        if (!$this->relationLoaded('booking')) {
-            $this->load('booking');
+        // Load job post if not already loaded
+        if (!$this->relationLoaded('jobPost')) {
+            $this->load('jobPost');
         }
-        return $this->booking?->assignedUser;
+        return $this->jobPost?->assignedUser;
     }
 
     protected static function booted(): void
     {
         static::created(function (Review $review) {
-            // Load booking relationship first
-            if (!$review->relationLoaded('booking')) {
-                $review->load('booking');
+            // Load job post relationship first
+            if (!$review->relationLoaded('jobPost')) {
+                $review->load('jobPost');
             }
             $helper = $review->helper;
             if ($helper && $helper->profile) {
@@ -67,9 +75,9 @@ class Review extends Model
         });
 
         static::updated(function (Review $review) {
-            // Load booking relationship first
-            if (!$review->relationLoaded('booking')) {
-                $review->load('booking');
+            // Load job post relationship first
+            if (!$review->relationLoaded('jobPost')) {
+                $review->load('jobPost');
             }
             $helper = $review->helper;
             if ($helper && $helper->profile) {
@@ -83,9 +91,9 @@ class Review extends Model
         });
 
         static::deleted(function (Review $review) {
-            // Load booking relationship first
-            if (!$review->relationLoaded('booking')) {
-                $review->load('booking');
+            // Load job post relationship first
+            if (!$review->relationLoaded('jobPost')) {
+                $review->load('jobPost');
             }
             $helper = $review->helper;
             if ($helper && $helper->profile) {

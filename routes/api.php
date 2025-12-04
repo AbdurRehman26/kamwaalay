@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\BookingController;
+use App\Http\Controllers\JobPostController;
 use App\Http\Controllers\HelperController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AdminController;
@@ -62,11 +62,11 @@ Route::get('/businesses/{business}', [BusinessController::class, 'show']);
 Route::get('/service-listings', [ServiceListingController::class, 'index']);
 Route::get('/service-listings/{serviceListing}', [ServiceListingController::class, 'show'])->where('serviceListing', '[0-9]+');
 
-// Public booking/service requests
-Route::get('/service-requests', [BookingController::class, 'browse']);
-Route::get('/service-requests/{booking}', [BookingController::class, 'show']);
-Route::get('/bookings/browse', [BookingController::class, 'browse']); // Alias for service-requests
-Route::get('/bookings/{booking}', [BookingController::class, 'show']); // Alias for service-requests/{booking}
+// Public job posts/service requests
+Route::get('/service-requests', [JobPostController::class, 'browse']);
+Route::get('/service-requests/{jobPost}', [JobPostController::class, 'show']);
+Route::get('/bookings/browse', [JobPostController::class, 'browse']); // Alias for service-requests
+Route::get('/bookings/{booking}', [JobPostController::class, 'show']); // Alias for service-requests/{jobPost}
 
 // Location search (already API-like)
 Route::get('/karachi-locations/search', [PageController::class, 'searchKarachiLocations']);
@@ -142,12 +142,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/helpers/{helper}/edit', [HelperController::class, 'edit']);
     Route::put('/helpers/{helper}', [HelperController::class, 'update']);
 
-    // Bookings
-    Route::get('/bookings', [BookingController::class, 'index']);
-    Route::get('/bookings/create', [BookingController::class, 'create']);
-    Route::post('/bookings', [BookingController::class, 'store']);
-    Route::patch('/bookings/{booking}', [BookingController::class, 'update']);
-    Route::delete('/bookings/{booking}', [BookingController::class, 'destroy']);
+    // Job Posts
+    Route::get('/job-posts', [JobPostController::class, 'index']);
+    Route::get('/job-posts/create', [JobPostController::class, 'create']);
+    Route::post('/job-posts', [JobPostController::class, 'store']);
+    Route::patch('/job-posts/{jobPost}', [JobPostController::class, 'update']);
+    Route::delete('/job-posts/{jobPost}', [JobPostController::class, 'destroy']);
+    Route::get('/job-posts/{jobPost}', [JobPostController::class, 'show']);
+    
+    // Legacy booking routes for backward compatibility
+    Route::get('/bookings', [JobPostController::class, 'index']);
+    Route::get('/bookings/create', [JobPostController::class, 'create']);
+    Route::post('/bookings', [JobPostController::class, 'store']);
+    Route::patch('/bookings/{booking}', [JobPostController::class, 'update']);
+    Route::delete('/bookings/{booking}', [JobPostController::class, 'destroy']);
 
     // Service Listings
     // IMPORTANT: More specific routes must come before parameterized routes
@@ -160,6 +168,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Job Applications
     Route::get('/job-applications', [JobApplicationController::class, 'index']);
+    Route::get('/job-posts/{jobPost}/apply', [JobApplicationController::class, 'create']);
+    Route::post('/job-posts/{jobPost}/apply', [JobApplicationController::class, 'store']);
+    // Legacy booking routes for backward compatibility
     Route::get('/bookings/{booking}/apply', [JobApplicationController::class, 'create']);
     Route::post('/bookings/{booking}/apply', [JobApplicationController::class, 'store']);
     Route::get('/job-applications/{jobApplication}', [JobApplicationController::class, 'show']);
@@ -171,6 +182,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/job-applications/{jobApplication}', [JobApplicationController::class, 'destroy']);
 
     // Reviews
+    Route::get('/job-posts/{jobPost}/review/create', [ReviewController::class, 'create']);
+    Route::post('/job-posts/{jobPost}/review', [ReviewController::class, 'store']);
+    // Legacy booking routes for backward compatibility
     Route::get('/bookings/{booking}/review/create', [ReviewController::class, 'create']);
     Route::post('/bookings/{booking}/review', [ReviewController::class, 'store']);
     Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit']);

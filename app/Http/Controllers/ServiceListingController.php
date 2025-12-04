@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ServiceListingResource;
 use App\Http\Resources\UserResource;
-use App\Http\Resources\BookingResource;
+use App\Http\Resources\JobPostResource;
 use App\Models\ServiceListing;
-use App\Models\Booking;
+use App\Models\JobPost;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -378,18 +378,18 @@ class ServiceListingController extends Controller
         $matchingBookings = collect([]);
         if ($currentUser && $currentUser->profile && $serviceListing->profile_id === $currentUser->profile->id) {
             // User owns this listing - find matching service requests
-            $bookingQuery = Booking::with(['user', 'jobApplications'])
+            $jobPostQuery = JobPost::with(['user', 'jobApplications'])
                 ->where('status', 'pending')
                 ->whereNull('assigned_user_id');
 
             // Match by service type (if listing has service types)
             if (!empty($serviceListing->service_types)) {
-                $bookingQuery->whereIn('service_type', $serviceListing->service_types);
+                $jobPostQuery->whereIn('service_type', $serviceListing->service_types);
             }
 
             // Match by work type
             if ($serviceListing->work_type) {
-                $bookingQuery->where('work_type', $serviceListing->work_type);
+                $jobPostQuery->where('work_type', $serviceListing->work_type);
             }
 
             // Match by location (if listing has locations)
@@ -397,7 +397,7 @@ class ServiceListingController extends Controller
                 $locationIds = $serviceListing->locations;
                 $locations = \App\Models\Location::whereIn('id', $locationIds)->get();
                 if ($locations->isNotEmpty()) {
-                    $bookingQuery->where(function ($q) use ($locations) {
+                    $jobPostQuery->where(function ($q) use ($locations) {
                         foreach ($locations as $location) {
                             $location->load('city');
                             $q->orWhere(function ($subQ) use ($location) {
@@ -409,19 +409,19 @@ class ServiceListingController extends Controller
                 }
             }
 
-            // Exclude bookings the user already applied to
-            $bookingQuery->whereDoesntHave('jobApplications', function ($q) use ($currentUser) {
+            // Exclude job posts the user already applied to
+            $jobPostQuery->whereDoesntHave('jobApplications', function ($q) use ($currentUser) {
                 $q->where('user_id', $currentUser->id);
             });
 
-            $matchingBookings = $bookingQuery->orderBy('created_at', 'desc')->limit(5)->get();
+            $matchingBookings = $jobPostQuery->orderBy('created_at', 'desc')->limit(5)->get();
         }
 
         return response()->json([
             'listing' => new ServiceListingResource($serviceListing),
             'other_listings' => ServiceListingResource::collection($otherListings),
             'user' => $currentUser ? new UserResource($currentUser) : null,
-            'matching_bookings' => BookingResource::collection($matchingBookings),
+            'matching_bookings' => JobPostResource::collection($matchingBookings),
         ]);
     }
 

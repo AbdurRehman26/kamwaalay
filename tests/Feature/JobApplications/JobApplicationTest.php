@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\JobApplication;
 use App\Models\ServiceListing;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,7 +34,7 @@ test('helpers can view available job applications', function () {
         'profile_id' => $profile->id,
     ]);
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'status' => 'pending',
         'assigned_user_id' => null,
     ]);
@@ -47,7 +47,7 @@ test('helpers can view available job applications', function () {
     ])->getJson('/api/job-applications');
 
     $response->assertStatus(200);
-    $response->assertJsonStructure(['bookings']);
+    $response->assertJsonStructure(['job_posts']);
 });
 
 test('helpers can apply to a service request', function () {
@@ -63,7 +63,7 @@ test('helpers can apply to a service request', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'status' => 'pending',
     ]);
@@ -73,14 +73,14 @@ test('helpers can apply to a service request', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->postJson("/api/bookings/{$booking->id}/apply", [
+    ])->postJson("/api/job-posts/{$jobPost->id}/apply", [
         'message' => 'I am interested in this job',
         'proposed_rate' => 15000,
     ]);
 
     $response->assertStatus(200);
     $this->assertDatabaseHas('job_applications', [
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper->id,
         'status' => 'pending',
     ]);
@@ -99,13 +99,13 @@ test('helpers cannot apply twice to the same service request', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'status' => 'pending',
     ]);
 
     JobApplication::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper->id,
         'status' => 'pending',
     ]);
@@ -115,7 +115,7 @@ test('helpers cannot apply twice to the same service request', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->postJson("/api/bookings/{$booking->id}/apply", [
+    ])->postJson("/api/job-posts/{$jobPost->id}/apply", [
         'message' => 'I am interested',
     ]);
 
@@ -130,13 +130,13 @@ test('users can accept a job application', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'status' => 'pending',
     ]);
 
     $application = JobApplication::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper->id,
         'status' => 'pending',
     ]);
@@ -151,9 +151,9 @@ test('users can accept a job application', function () {
     $response->assertStatus(200);
     $application->refresh();
     expect($application->status)->toBe('accepted');
-    $booking->refresh();
-    expect($booking->status)->toBe('confirmed');
-    expect($booking->assigned_user_id)->toBe($helper->id);
+    $jobPost->refresh();
+    expect($jobPost->status)->toBe('confirmed');
+    expect($jobPost->assigned_user_id)->toBe($helper->id);
 });
 
 test('accepting an application rejects other applications', function () {
@@ -165,19 +165,19 @@ test('accepting an application rejects other applications', function () {
     $helper2 = User::factory()->create();
     $helper2->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'status' => 'pending',
     ]);
 
     $application1 = JobApplication::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper1->id,
         'status' => 'pending',
     ]);
 
     $application2 = JobApplication::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper2->id,
         'status' => 'pending',
     ]);
@@ -200,13 +200,13 @@ test('users can reject a job application', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'status' => 'pending',
     ]);
 
     $application = JobApplication::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper->id,
         'status' => 'pending',
     ]);
@@ -230,13 +230,13 @@ test('helpers can withdraw their application', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
         'status' => 'pending',
     ]);
 
     $application = JobApplication::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper->id,
         'status' => 'pending',
     ]);
@@ -260,12 +260,12 @@ test('helpers can view their applications', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
     ]);
 
     JobApplication::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper->id,
         'status' => 'pending',
     ]);
@@ -288,12 +288,12 @@ test('users can view applications for their service requests', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
     ]);
 
     JobApplication::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper->id,
         'status' => 'pending',
     ]);
@@ -318,12 +318,12 @@ test('only booking owner can accept applications', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user1->id,
     ]);
 
     $application = JobApplication::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper->id,
         'status' => 'pending',
     ]);
@@ -347,12 +347,12 @@ test('only applicant can withdraw application', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
 
-    $booking = Booking::factory()->create([
+    $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
     ]);
 
     $application = JobApplication::create([
-        'booking_id' => $booking->id,
+        'job_post_id' => $jobPost->id,
         'user_id' => $helper1->id,
         'status' => 'pending',
     ]);

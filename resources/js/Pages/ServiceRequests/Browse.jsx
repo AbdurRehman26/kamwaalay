@@ -105,7 +105,7 @@ export default function ServiceRequestsBrowse() {
         bookingsService.browseBookings(params)
             .then((data) => {
                 // Handle pagination response structure
-                const bookingsData = data.bookings || {};
+                const bookingsData = data.job_posts || data.bookings || {};
                 // Ensure links is always an array
                 const bookingsWithArrayLinks = {
                     ...bookingsData,

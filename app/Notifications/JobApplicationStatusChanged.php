@@ -42,8 +42,8 @@ class JobApplicationStatusChanged extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $booking = $this->application->booking;
-        $bookingOwner = $booking->user;
+        $jobPost = $this->application->jobPost;
+        $jobPostOwner = $jobPost->user;
 
         $statusMessages = [
             'accepted' => 'Your application has been accepted',
@@ -52,19 +52,21 @@ class JobApplicationStatusChanged extends Notification
         ];
 
         $message = $statusMessages[$this->newStatus] ?? "Your application status has been changed to {$this->newStatus}";
-        $message .= " for the {$booking->service_type_label} service request.";
+        $message .= " for the {$jobPost->service_type_label} job post.";
 
         return [
             'type' => 'job_application_status_changed',
             'title' => 'Application Status Updated',
             'message' => $message,
             'application_id' => $this->application->id,
-            'booking_id' => $booking->id,
-            'booking_owner_name' => $bookingOwner->name,
+            'job_post_id' => $jobPost->id,
+            'booking_id' => $jobPost->id, // Backward compatibility
+            'job_post_owner_name' => $jobPostOwner->name,
+            'booking_owner_name' => $jobPostOwner->name, // Backward compatibility
             'old_status' => $this->oldStatus,
             'new_status' => $this->newStatus,
-            'service_type' => $booking->service_type,
-            'service_type_label' => $booking->service_type_label,
+            'service_type' => $jobPost->service_type,
+            'service_type_label' => $jobPost->service_type_label,
         ];
     }
 }

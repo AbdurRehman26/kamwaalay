@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\Document;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -103,7 +103,7 @@ test('admins can update helper verification status', function () {
 test('admins can view bookings list', function () {
     $admin = createAdmin();
 
-    Booking::factory()->count(3)->create();
+    JobPost::factory()->count(3)->create();
     
     $token = $admin->createToken('test-token')->plainTextToken;
 
@@ -119,8 +119,8 @@ test('admins can view bookings list', function () {
 test('admins can filter bookings by status', function () {
     $admin = createAdmin();
 
-    Booking::factory()->create(['status' => 'pending']);
-    Booking::factory()->create(['status' => 'confirmed']);
+    JobPost::factory()->create(['status' => 'pending']);
+    JobPost::factory()->create(['status' => 'confirmed']);
     
     $token = $admin->createToken('test-token')->plainTextToken;
 
@@ -201,8 +201,8 @@ test('admin dashboard shows correct statistics', function () {
         'is_active' => true,
     ]);
 
-    Booking::factory()->create(['status' => 'pending']);
-    Booking::factory()->create(['status' => 'confirmed']);
+    JobPost::factory()->create(['status' => 'pending']);
+    JobPost::factory()->create(['status' => 'confirmed']);
     
     $token = $admin->createToken('test-token')->plainTextToken;
 

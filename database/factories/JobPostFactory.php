@@ -2,14 +2,14 @@
 
 namespace Database\Factories;
 
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Booking>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\JobPost>
  */
-class BookingFactory extends Factory
+class JobPostFactory extends Factory
 {
     /**
      * Define the model's default state.

@@ -136,7 +136,7 @@ export default function DashboardOverview() {
                                     className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-300 border border-blue-200"
                                 >
                                     <div className="text-2xl mb-2">📋</div>
-                                    <div className="font-semibold text-blue-700">My Bookings</div>
+                                    <div className="font-semibold text-blue-700">My Job Postings</div>
                                     <div className="text-sm text-gray-600">View your bookings</div>
                                 </Link>
                             </>

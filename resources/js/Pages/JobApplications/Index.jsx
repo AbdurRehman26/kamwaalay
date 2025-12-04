@@ -92,7 +92,7 @@ export default function JobApplicationsIndex() {
         setLoading(true);
         jobApplicationsService.getApplications(params)
             .then((data) => {
-                setBookings(data.bookings || { data: [], links: [], meta: {} });
+                setBookings(data.job_posts || data.bookings || { data: [], links: [], meta: {} });
                 setFilters(data.filters || {});
                 setLoading(false);
             })
@@ -195,41 +195,147 @@ export default function JobApplicationsIndex() {
                     </div>
                 ) : bookings.data && bookings.data.length > 0 ? (
                     <>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {bookings.data.map((booking) => (
-                                <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                                    <div className="p-6">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <span className="bg-primary-100 text-primary-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
-                                                {booking.service_type?.replace("_", " ") || "N/A"}
-                                            </span>
-                                            <span className="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full font-semibold">
-                                                {booking.status || "N/A"}
-                                            </span>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {bookings.data.map((job) => {
+                                if (!job.id) {
+                                    return null;
+                                }
+
+                                const workTypeLabels = {
+                                    "full_time": "Full Time",
+                                    "part_time": "Part Time"
+                                };
+
+                                const statusColors = {
+                                    "pending": "bg-yellow-100 text-yellow-800",
+                                    "confirmed": "bg-green-100 text-green-800",
+                                    "in_progress": "bg-blue-100 text-blue-800",
+                                    "completed": "bg-gray-100 text-gray-800",
+                                    "cancelled": "bg-red-100 text-red-800"
+                                };
+
+                                return (
+                                    <Link
+                                        key={job.id}
+                                        to={route("job-applications.create", job.id)}
+                                        className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 hover:border-primary-300"
+                                    >
+                                        {/* Header with gradient */}
+                                        <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4">
+                                            <div className="flex items-center justify-between">
+                                                <span className="bg-white/20 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize backdrop-blur-sm">
+                                                    {job.service_type?.replace("_", " ") || "Service Request"}
+                                                </span>
+                                                <span className={`text-xs px-3 py-1 rounded-full font-semibold capitalize ${statusColors[job.status] || "bg-gray-100 text-gray-800"}`}>
+                                                    {job.status || "Pending"}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <h3 className="text-xl font-bold mb-2 text-gray-900">{booking.user?.name}</h3>
-                                        <p className="text-gray-600 mb-3 capitalize text-sm">
-                                            {booking.work_type?.replace("_", " ") || "N/A"} • {booking.city || "N/A"}, {booking.area || "N/A"}
-                                        </p>
-                                        {booking.start_date && (
-                                            <p className="text-gray-500 text-sm mb-2">📅 Start: {booking.start_date}</p>
-                                        )}
-                                        {booking.special_requirements && (
-                                            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                                                {booking.special_requirements}
-                                            </p>
-                                        )}
-                                        <div className="mt-4">
-                                            <Link
-                                                to={route("job-applications.create", booking.id)}
-                                                className="block w-full text-center bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold"
-                                            >
-                                                Apply Now
-                                            </Link>
+
+                                        <div className="p-6">
+                                            {/* Customer Info */}
+                                            <div className="flex items-center mb-4">
+                                                <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-3">
+                                                    {job.user?.name?.charAt(0)?.toUpperCase() || job.name?.charAt(0)?.toUpperCase() || "C"}
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-gray-900">{job.user?.name || job.name || "Customer"}</h3>
+                                                    {job.created_at && (
+                                                        <p className="text-xs text-gray-500">
+                                                            Posted {new Date(job.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Work Type */}
+                                            {job.work_type && (
+                                                <div className="mb-4">
+                                                    <span className="inline-flex items-center bg-blue-50 text-blue-700 text-xs px-3 py-1.5 rounded-lg font-medium">
+                                                        <span className="mr-2">💼</span>
+                                                        {workTypeLabels[job.work_type] || job.work_type}
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            {/* Location */}
+                                            {(job.city || job.area) && (
+                                                <div className="flex items-start mb-4">
+                                                    <span className="text-gray-400 mr-2 mt-0.5">📍</span>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">
+                                                            {job.city || "N/A"}
+                                                            {job.area && `, ${job.area}`}
+                                                        </p>
+                                                        {job.address && (
+                                                            <p className="text-xs text-gray-500 mt-1 line-clamp-1">{job.address}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Date & Time */}
+                                            <div className="space-y-2 mb-4">
+                                                {job.start_date && (
+                                                    <div className="flex items-center text-sm text-gray-700">
+                                                        <span className="text-gray-400 mr-2">📅</span>
+                                                        <span className="font-medium">
+                                                            {new Date(job.start_date).toLocaleDateString("en-US", {
+                                                                weekday: "short",
+                                                                year: "numeric",
+                                                                month: "short",
+                                                                day: "numeric"
+                                                            })}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {job.start_time && (
+                                                    <div className="flex items-center text-sm text-gray-700">
+                                                        <span className="text-gray-400 mr-2">🕐</span>
+                                                        <span className="font-medium">
+                                                            {new Date(job.start_time).toLocaleTimeString("en-US", {
+                                                                hour: "numeric",
+                                                                minute: "2-digit",
+                                                                hour12: true
+                                                            })}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Special Requirements */}
+                                            {job.special_requirements && (
+                                                <div className="mb-4 p-3 bg-gray-50 rounded-lg border-l-4 border-primary-500">
+                                                    <p className="text-xs font-semibold text-gray-700 mb-1">Special Requirements:</p>
+                                                    <p className="text-sm text-gray-600 line-clamp-2">{job.special_requirements}</p>
+                                                </div>
+                                            )}
+
+                                            {/* Applications Count */}
+                                            {job.job_applications && (
+                                                <div className="mb-4 flex items-center text-sm text-gray-600">
+                                                    <span className="mr-2">👥</span>
+                                                    <span>
+                                                        {job.job_applications.length || 0} {job.job_applications.length === 1 ? "application" : "applications"}
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            {/* Action Button */}
+                                            <div className="pt-4 border-t border-gray-200">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-primary-600 font-semibold group-hover:text-primary-700 text-sm">
+                                                        Apply Now
+                                                    </span>
+                                                    <span className="text-primary-600 group-hover:translate-x-1 transition-transform">
+                                                        →
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            ))}
+                                    </Link>
+                                );
+                            })}
                         </div>
 
                         {/* Pagination */}

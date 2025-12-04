@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('job_applications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('booking_id')->constrained()->onDelete('cascade'); // Service request from user
+            $table->foreignId('job_post_id')->constrained('job_posts')->onDelete('cascade'); // Job post from user
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Helper applying
             $table->text('message')->nullable(); // Cover letter/application message
             $table->decimal('proposed_rate', 10, 2)->nullable(); // Optional proposed hourly rate
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Prevent duplicate applications
-            $table->unique(['booking_id', 'user_id']);
+            $table->unique(['job_post_id', 'user_id']);
         });
     }
 

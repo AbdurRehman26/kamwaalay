@@ -21,7 +21,7 @@ export default function JobApplicationCreate() {
         if (bookingId) {
             jobApplicationsService.getApplicationCreate(bookingId)
                 .then((response) => {
-                    setBooking(response.booking);
+                    setBooking(response.job_post || response.booking);
                     setLoading(false);
                 })
                 .catch((error) => {

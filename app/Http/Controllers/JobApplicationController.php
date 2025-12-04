@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\JobApplication;
 use App\Notifications\JobApplicationReceived;
 use App\Notifications\JobApplicationStatusChanged;
@@ -61,7 +61,7 @@ class JobApplicationController extends Controller
             ], 422);
         }
 
-        $query = Booking::with(['user', 'jobApplications'])
+        $query = JobPost::with(['user', 'jobApplications'])
             ->where('status', 'pending')
             ->whereNull('assigned_user_id');
 
@@ -89,12 +89,12 @@ class JobApplicationController extends Controller
             $query->where('area', 'like', '%' . $request->area . '%');
         }
 
-        // Exclude bookings where helper already applied
+        // Exclude job posts where helper already applied
         $query->whereDoesntHave('jobApplications', function ($q) {
             $q->where('user_id', Auth::id());
         });
 
-        $bookings = $query->orderBy('created_at', 'desc')->paginate(12);
+        $jobPosts = $query->orderBy('created_at', 'desc')->paginate(12);
 
         $filters = $request->only(['service_type', 'location_id', 'city_name', 'area']);
         if ($locationDisplay) {
@@ -102,7 +102,7 @@ class JobApplicationController extends Controller
         }
         
         return response()->json([
-            'bookings' => $bookings,
+            'job_posts' => $jobPosts,
             'filters' => $filters,
         ]);
     }
@@ -133,7 +133,7 @@ class JobApplicationController extends Controller
     /**
      * Show the form for creating a new application
      */
-    public function create(Booking $booking)
+    public function create(JobPost $jobPost)
     {
         // Only helpers can apply
         $user = Auth::user();
@@ -151,19 +151,19 @@ class JobApplicationController extends Controller
         }
 
         // Check if already applied
-        if (JobApplication::where('booking_id', $booking->id)
+        if (JobApplication::where('job_post_id', $jobPost->id)
             ->where('user_id', Auth::id())
             ->exists()) {
             return response()->json([
-                'message' => 'You have already applied to this service request.',
-                'errors' => ['application' => ['You have already applied to this service request.']]
+                'message' => 'You have already applied to this job post.',
+                'errors' => ['application' => ['You have already applied to this job post.']]
             ], 422);
         }
 
-        $booking->load('user.profile');
+        $jobPost->load('user.profile');
 
         return response()->json([
-            'booking' => $booking,
+            'job_post' => $jobPost,
         ]);
     }
 
@@ -203,7 +203,7 @@ class JobApplicationController extends Controller
     /**
      * Store a newly created application
      */
-    public function store(Request $request, Booking $booking)
+    public function store(Request $request, JobPost $jobPost)
     {
         // Only helpers can apply
         $user = Auth::user();
@@ -221,12 +221,12 @@ class JobApplicationController extends Controller
         }
 
         // Check if already applied
-        if (JobApplication::where('booking_id', $booking->id)
+        if (JobApplication::where('job_post_id', $jobPost->id)
             ->where('user_id', Auth::id())
             ->exists()) {
             return response()->json([
-                'message' => 'You have already applied to this service request.',
-                'errors' => ['application' => ['You have already applied to this service request.']]
+                'message' => 'You have already applied to this job post.',
+                'errors' => ['application' => ['You have already applied to this job post.']]
             ], 422);
         }
 
@@ -235,20 +235,20 @@ class JobApplicationController extends Controller
             'proposed_rate' => 'nullable|numeric|min:0',
         ]);
 
-        $validated['booking_id'] = $booking->id;
+        $validated['job_post_id'] = $jobPost->id;
         $validated['user_id'] = Auth::id();
         $validated['status'] = 'pending';
         $validated['applied_at'] = now();
 
         $application = JobApplication::create($validated);
-        $application->load(['booking.user', 'user']);
+        $application->load(['jobPost.user', 'user']);
         
-        // Refresh booking to ensure it's up to date
-        $booking->refresh();
-        $booking->load('user');
+        // Refresh job post to ensure it's up to date
+        $jobPost->refresh();
+        $jobPost->load('user');
 
-        // Notify booking owner about new application
-        $booking->user->notify(new JobApplicationReceived($application));
+        // Notify job post owner about new application
+        $jobPost->user->notify(new JobApplicationReceived($application));
 
         return response()->json([
             'message' => 'Application submitted successfully!',
@@ -283,15 +283,15 @@ class JobApplicationController extends Controller
      */
     public function show(JobApplication $jobApplication)
     {
-        // Only owner, booking owner, or admin can view
+        // Only owner, job post owner, or admin can view
         $user = Auth::user();
         if (Auth::id() !== $jobApplication->user_id 
-            && Auth::id() !== $jobApplication->booking->user_id 
+            && Auth::id() !== $jobApplication->jobPost->user_id 
             && !$user->hasRole(['admin', 'super_admin'])) {
             abort(403);
         }
 
-        $jobApplication->load(['booking.user', 'user']);
+        $jobApplication->load(['jobPost.user', 'user']);
 
         return response()->json([
             'application' => $jobApplication,
@@ -327,7 +327,7 @@ class JobApplicationController extends Controller
             abort(403);
         }
 
-        $applications = JobApplication::with(['booking.user'])
+        $applications = JobApplication::with(['jobPost.user'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->paginate(12);
@@ -360,8 +360,8 @@ class JobApplicationController extends Controller
      */
     public function myRequestApplications()
     {
-        $applications = JobApplication::with(['user', 'booking'])
-            ->whereHas('booking', function ($query) {
+        $applications = JobApplication::with(['user', 'jobPost'])
+            ->whereHas('jobPost', function ($query) {
                 $query->where('user_id', Auth::id());
             })
             ->orderBy('created_at', 'desc')
@@ -401,8 +401,8 @@ class JobApplicationController extends Controller
      */
     public function accept(JobApplication $jobApplication)
     {
-        // Only booking owner can accept
-        if (Auth::id() !== $jobApplication->booking->user_id) {
+        // Only job post owner can accept
+        if (Auth::id() !== $jobApplication->jobPost->user_id) {
             abort(403);
         }
 
@@ -416,18 +416,18 @@ class JobApplicationController extends Controller
 
         $oldStatus = $jobApplication->status;
         
-        // Reject other applications for the same booking
-        $otherApplications = JobApplication::where('booking_id', $jobApplication->booking_id)
+        // Reject other applications for the same job post
+        $otherApplications = JobApplication::where('job_post_id', $jobApplication->job_post_id)
             ->where('id', '!=', $jobApplication->id)
             ->where('status', '!=', 'rejected')
-            ->with(['booking', 'user'])
+            ->with(['jobPost', 'user'])
             ->get();
         
         foreach ($otherApplications as $otherApp) {
             $otherOldStatus = $otherApp->status;
             $otherApp->update(['status' => 'rejected']);
             $otherApp->refresh();
-            $otherApp->load(['booking', 'user']);
+            $otherApp->load(['jobPost', 'user']);
             // Notify helper about rejection
             $otherApp->user->notify(new JobApplicationStatusChanged($otherApp, $otherOldStatus, 'rejected'));
         }
@@ -435,20 +435,20 @@ class JobApplicationController extends Controller
         // Accept this application
         $jobApplication->update(['status' => 'accepted']);
         $jobApplication->refresh();
-        $jobApplication->load(['booking', 'user']);
+        $jobApplication->load(['jobPost', 'user']);
         
         // Notify helper about acceptance
         $jobApplication->user->notify(new JobApplicationStatusChanged($jobApplication, $oldStatus, 'accepted'));
 
-        // Update booking with assigned helper
-        $jobApplication->booking->update([
+        // Update job post with assigned helper
+        $jobApplication->jobPost->update([
             'assigned_user_id' => $jobApplication->user_id,
             'status' => 'confirmed',
         ]);
 
         return response()->json([
-            'message' => 'Application accepted! The helper has been assigned to your service request.',
-            'application' => $jobApplication->load(['booking.user', 'user']),
+            'message' => 'Application accepted! The helper has been assigned to your job post.',
+            'application' => $jobApplication->load(['jobPost.user', 'user']),
         ]);
     }
 
@@ -480,22 +480,22 @@ class JobApplicationController extends Controller
      */
     public function reject(JobApplication $jobApplication)
     {
-        // Only booking owner can reject
-        if (Auth::id() !== $jobApplication->booking->user_id) {
+        // Only job post owner can reject
+        if (Auth::id() !== $jobApplication->jobPost->user_id) {
             abort(403);
         }
 
         $oldStatus = $jobApplication->status;
         $jobApplication->update(['status' => 'rejected']);
         $jobApplication->refresh();
-        $jobApplication->load(['booking', 'user']);
+        $jobApplication->load(['jobPost', 'user']);
         
         // Notify helper about rejection
         $jobApplication->user->notify(new JobApplicationStatusChanged($jobApplication, $oldStatus, 'rejected'));
 
         return response()->json([
             'message' => 'Application rejected.',
-            'application' => $jobApplication->load(['booking.user', 'user']),
+            'application' => $jobApplication->load(['jobPost.user', 'user']),
         ]);
     }
 
@@ -535,14 +535,14 @@ class JobApplicationController extends Controller
         $oldStatus = $jobApplication->status;
         $jobApplication->update(['status' => 'withdrawn']);
         $jobApplication->refresh();
-        $jobApplication->load(['booking.user', 'user']);
+        $jobApplication->load(['jobPost.user', 'user']);
         
-        // Notify booking owner about withdrawal
-        $jobApplication->booking->user->notify(new JobApplicationStatusChanged($jobApplication, $oldStatus, 'withdrawn'));
+        // Notify job post owner about withdrawal
+        $jobApplication->jobPost->user->notify(new JobApplicationStatusChanged($jobApplication, $oldStatus, 'withdrawn'));
 
         return response()->json([
             'message' => 'Application withdrawn.',
-            'application' => $jobApplication->load(['booking.user', 'user']),
+            'application' => $jobApplication->load(['jobPost.user', 'user']),
         ]);
     }
 
@@ -573,10 +573,10 @@ class JobApplicationController extends Controller
      */
     public function destroy(JobApplication $jobApplication)
     {
-        // Only applicant, booking owner, or admin can delete
+        // Only applicant, job post owner, or admin can delete
         $user = Auth::user();
         if (Auth::id() !== $jobApplication->user_id 
-            && Auth::id() !== $jobApplication->booking->user_id 
+            && Auth::id() !== $jobApplication->jobPost->user_id 
             && !$user->hasRole(['admin', 'super_admin'])) {
             abort(403);
         }

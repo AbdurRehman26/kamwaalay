@@ -16,7 +16,8 @@ class JobApplicationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'booking_id' => $this->booking_id,
+            'job_post_id' => $this->job_post_id,
+            'booking_id' => $this->job_post_id, // Backward compatibility
             'user_id' => $this->user_id,
             'message' => $this->message,
             'proposed_rate' => $this->proposed_rate,
@@ -28,9 +29,12 @@ class JobApplicationResource extends JsonResource
             'user' => $this->whenLoaded('user', function () {
                 return new UserResource($this->user);
             }),
-            'booking' => $this->whenLoaded('booking', function () {
-                return new BookingResource($this->booking);
+            'job_post' => $this->whenLoaded('jobPost', function () {
+                return new JobPostResource($this->jobPost);
             }),
+            'booking' => $this->whenLoaded('jobPost', function () {
+                return new JobPostResource($this->jobPost);
+            }), // Backward compatibility
         ];
     }
 }

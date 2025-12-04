@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\Conversation;
 use App\Models\JobApplication;
 use App\Models\Message;
@@ -22,32 +22,32 @@ class AdditionalDataSeeder extends Seeder
 
     private function seedJobApplications()
     {
-        $bookings = Booking::where('status', 'pending')->get();
+        $jobPosts = JobPost::where('status', 'pending')->get();
         $helpers = User::role('helper')->get();
 
-        if ($bookings->isEmpty() || $helpers->isEmpty()) {
-            $this->command->warn('No pending bookings or helpers found. Skipping job applications seeding.');
+        if ($jobPosts->isEmpty() || $helpers->isEmpty()) {
+            $this->command->warn('No pending job posts or helpers found. Skipping job applications seeding.');
             return;
         }
 
         $this->command->info('Seeding job applications...');
 
-        foreach ($bookings as $booking) {
-            // 50% chance a booking gets applications
+        foreach ($jobPosts as $jobPost) {
+            // 50% chance a job post gets applications
             if (rand(0, 1)) {
                 // 1 to 3 helpers apply
                 $applicants = $helpers->random(min($helpers->count(), rand(1, 3)));
 
                 foreach ($applicants as $helper) {
                     // Check if already applied
-                    if (JobApplication::where('booking_id', $booking->id)->where('user_id', $helper->id)->exists()) {
+                    if (JobApplication::where('job_post_id', $jobPost->id)->where('user_id', $helper->id)->exists()) {
                         continue;
                     }
 
                     JobApplication::create([
-                        'booking_id' => $booking->id,
+                        'job_post_id' => $jobPost->id,
                         'user_id' => $helper->id,
-                        'message' => "I am interested in this job. I have experience in " . $booking->service_type . ".",
+                        'message' => "I am interested in this job. I have experience in " . $jobPost->service_type . ".",
                         'proposed_rate' => rand(1000, 5000),
                         'status' => 'pending',
                         'applied_at' => now()->subHours(rand(1, 48)),

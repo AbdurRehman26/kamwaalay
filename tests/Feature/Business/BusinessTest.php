@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\Country;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;

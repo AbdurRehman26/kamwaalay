@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
+use App\Models\JobPost;
 use App\Models\User;
 use App\Models\Review;
 use App\Models\Document;
@@ -57,14 +57,14 @@ class AdminController extends Controller
             'pending_helpers' => User::role('helper')->whereHas('profile', function ($q) {
                 $q->where('verification_status', 'pending');
             })->count(),
-            'total_bookings' => Booking::count(),
-            'pending_bookings' => Booking::where('status', 'pending')->count(),
-            'confirmed_bookings' => Booking::where('status', 'confirmed')->count(),
+            'total_bookings' => JobPost::count(),
+            'pending_bookings' => JobPost::where('status', 'pending')->count(),
+            'confirmed_bookings' => JobPost::where('status', 'confirmed')->count(),
             'total_reviews' => Review::count(),
             'pending_documents' => Document::where('status', 'pending')->count(),
         ];
 
-        $recentBookings = Booking::with(['user', 'assignedUser'])
+        $recentBookings = JobPost::with(['user', 'assignedUser'])
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
@@ -208,7 +208,7 @@ class AdminController extends Controller
     )]
     public function bookings(Request $request)
     {
-        $query = Booking::with(['user', 'assignedUser']);
+        $query = JobPost::with(['user', 'assignedUser']);
 
         if ($request->has('status')) {
             $query->where('status', $request->status);

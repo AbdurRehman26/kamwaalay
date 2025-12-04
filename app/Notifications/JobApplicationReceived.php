@@ -39,18 +39,19 @@ class JobApplicationReceived extends Notification
     public function toArray(object $notifiable): array
     {
         $applicant = $this->application->user;
-        $booking = $this->application->booking;
+        $jobPost = $this->application->jobPost;
 
         return [
             'type' => 'job_application_received',
             'title' => 'New Job Application Received',
-            'message' => "{$applicant->name} has applied for your {$booking->service_type_label} service request.",
+            'message' => "{$applicant->name} has applied for your {$jobPost->service_type_label} job post.",
             'application_id' => $this->application->id,
-            'booking_id' => $booking->id,
+            'job_post_id' => $jobPost->id,
+            'booking_id' => $jobPost->id, // Backward compatibility
             'applicant_id' => $applicant->id,
             'applicant_name' => $applicant->name,
-            'service_type' => $booking->service_type,
-            'service_type_label' => $booking->service_type_label,
+            'service_type' => $jobPost->service_type,
+            'service_type_label' => $jobPost->service_type_label,
         ];
     }
 }

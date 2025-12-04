@@ -5,15 +5,12 @@ import { route } from "@/utils/routes";
 import NotificationDropdown from "@/Components/NotificationDropdown";
 import LogoutModal from "@/Components/LogoutModal";
 import {
-    isUser,
-    isHelperOrBusiness,
-    isAdmin
+    isHelperOrBusiness, isUser,
 } from "@/utils/permissions";
 
 export default function DashboardLayout({ children }) {
     const { user, logout } = useAuth();
     const location = useLocation();
-    const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -32,7 +29,7 @@ export default function DashboardLayout({ children }) {
             },
             {
                 name: "Applications",
-                path: user?.role === "user" 
+                path: user?.role === "user"
                     ? route("job-applications.my-request-applications")
                     : route("job-applications.my-applications"),
                 icon: "📋",
@@ -56,15 +53,9 @@ export default function DashboardLayout({ children }) {
         if (user?.role === "user") {
             items.push(
                 {
-                    name: "My Bookings",
+                    name: "My Job Postings",
                     path: route("bookings.index"),
                     icon: "📅",
-                    roles: ["user"]
-                },
-                {
-                    name: "Post Request",
-                    path: route("bookings.create"),
-                    icon: "➕",
                     roles: ["user"]
                 }
             );
@@ -127,24 +118,42 @@ export default function DashboardLayout({ children }) {
                             >
                                 Home
                             </Link>
+                            {isHelperOrBusiness(user) && (
+                                <>
+                                    <Link
+                                        to={route("service-listings.create")}
+                                        className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg font-medium"
+                                    >
+                                        Offer New Service
+                                    </Link>
+                                    <Link
+                                        to={route("job-applications.index")}
+                                        className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                                    >
+                                        Search Jobs
+                                    </Link>
+                                </>
+                            )}
+                            {isUser(user) && (
+                                <Link
+                                    to={route("helpers.index")}
+                                    className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                                >
+                                    Browse Helpers
+                                </Link>
+                            )}
                             <Link
                                 to={route("dashboard")}
                                 className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                             >
                                 Dashboard
                             </Link>
-                            <Link
-                                to={route("job-applications.index")}
-                                className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
-                            >
-                                Search Jobs
-                            </Link>
-                            {isHelperOrBusiness(user) && (
+                            {isUser(user) && (
                                 <Link
-                                    to={route("service-listings.create")}
+                                    to={route("bookings.create")}
                                     className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg font-medium"
                                 >
-                                    Offer New Service
+                                    Post a Job
                                 </Link>
                             )}
                             <Link

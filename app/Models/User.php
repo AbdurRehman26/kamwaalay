@@ -79,15 +79,31 @@ class User extends Authenticatable
                     ->select('users.*'); // Explicitly select users table columns
     }
 
-    // Bookings relationships
-    public function bookings()
+    // Job posts relationships
+    public function jobPosts()
     {
-        return $this->hasMany(Booking::class, 'user_id');
+        return $this->hasMany(JobPost::class, 'user_id');
     }
 
+    public function helperJobPosts()
+    {
+        return $this->hasMany(JobPost::class, 'assigned_user_id');
+    }
+
+    /**
+     * Alias for backward compatibility
+     */
+    public function bookings()
+    {
+        return $this->jobPosts();
+    }
+
+    /**
+     * Alias for backward compatibility
+     */
     public function helperBookings()
     {
-        return $this->hasMany(Booking::class, 'assigned_user_id');
+        return $this->helperJobPosts();
     }
 
     public function reviews()
@@ -97,8 +113,8 @@ class User extends Authenticatable
 
     public function helperReviews()
     {
-        // Get reviews where this user is the helper (from booking's assigned_user_id)
-        return $this->hasManyThrough(Review::class, Booking::class, 'assigned_user_id', 'booking_id');
+        // Get reviews where this user is the helper (from job post's assigned_user_id)
+        return $this->hasManyThrough(Review::class, JobPost::class, 'assigned_user_id', 'job_post_id');
     }
 
     // Documents relationship (helpers can have documents)

@@ -8,7 +8,7 @@ import { route } from "@/utils/routes";
 import {
     isUser,
     isUserOrGuest,
-    isHelperOrBusiness
+    isHelperOrBusiness, isHelperOrBusinessOrGuest
 } from "@/utils/permissions";
 
 export default function Home() {
@@ -31,15 +31,17 @@ export default function Home() {
                 setLoading(false);
             });
 
-        // Fetch jobs for all users (including non-logged in)
-        bookingsService.browseBookings({ page: 1, per_page: 6 })
-            .then((data) => {
-                // Get first 6 jobs
-                setJobs((data.bookings?.data || []).slice(0, 6));
-            })
-            .catch((error) => {
-                console.error("Error fetching jobs:", error);
-            });
+        // Fetch jobs only for guests, helpers, and businesses (not regular users)
+        if (!user || isHelperOrBusiness(user)) {
+            bookingsService.browseBookings({ page: 1, per_page: 6 })
+                .then((data) => {
+                    // Get first 6 jobs
+                    setJobs((data.job_posts?.data || data.bookings?.data || []).slice(0, 6));
+                })
+                .catch((error) => {
+                    console.error("Error fetching jobs:", error);
+                });
+        }
     }, [user]);
     const services = [
         { name: "Maid", icon: "🧹", color: "from-primary-500 to-primary-600" },
@@ -117,18 +119,21 @@ export default function Home() {
                                     Browse Helpers
                                 </Link>
                             )}
-                            <Link
-                                to={route("service-requests.browse")}
-                                className="bg-white text-primary-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
-                            >
-                                Search Jobs
-                            </Link>
+
+                            {isHelperOrBusinessOrGuest(user) && (
+                                <Link
+                                    to={route("service-requests.browse")}
+                                    className="bg-white text-primary-600 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-w-[200px] text-center"
+                                >
+                                    Search Jobs
+                                </Link>
+                            )}
                             {isUser(user) && (
                                 <Link
                                     to={route("bookings.create")}
                                     className="bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300 min-w-[200px] text-center"
                                 >
-                                    Post Request
+                                    Post Job
                                 </Link>
                             )}
                             {isHelperOrBusiness(user) && (
@@ -256,8 +261,8 @@ export default function Home() {
                 </section>
             )}
 
-            {/* Jobs Section - Available for all users */}
-            {jobs && jobs.length > 0 && (
+            {/* Jobs Section - Available for guests, helpers, and businesses (not regular users) */}
+            {(!user || isHelperOrBusiness(user)) && jobs && jobs.length > 0 && (
                 <section className="py-24 bg-gradient-to-br from-gray-50 to-white">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
                         <div className="text-center mb-16">
@@ -271,12 +276,12 @@ export default function Home() {
                                 if (!job.id) {
                                     return null;
                                 }
-                                
+
                                 const workTypeLabels = {
                                     "full_time": "Full Time",
                                     "part_time": "Part Time"
                                 };
-                                
+
                                 const statusColors = {
                                     "pending": "bg-yellow-100 text-yellow-800",
                                     "confirmed": "bg-green-100 text-green-800",
@@ -284,7 +289,7 @@ export default function Home() {
                                     "completed": "bg-gray-100 text-gray-800",
                                     "cancelled": "bg-red-100 text-red-800"
                                 };
-                                
+
                                 return (
                                     <Link
                                         key={job.id}
@@ -302,7 +307,7 @@ export default function Home() {
                                                 </span>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="p-6">
                                             {/* Customer Info */}
                                             <div className="flex items-center mb-4">
@@ -318,7 +323,7 @@ export default function Home() {
                                                     )}
                                                 </div>
                                             </div>
-                                            
+
                                             {/* Work Type */}
                                             {job.work_type && (
                                                 <div className="mb-4">
@@ -328,7 +333,7 @@ export default function Home() {
                                                     </span>
                                                 </div>
                                             )}
-                                            
+
                                             {/* Location */}
                                             {(job.city || job.area) && (
                                                 <div className="flex items-start mb-4">
@@ -344,18 +349,18 @@ export default function Home() {
                                                     </div>
                                                 </div>
                                             )}
-                                            
+
                                             {/* Date & Time */}
                                             <div className="space-y-2 mb-4">
                                                 {job.start_date && (
                                                     <div className="flex items-center text-sm text-gray-700">
                                                         <span className="text-gray-400 mr-2">📅</span>
                                                         <span className="font-medium">
-                                                            {new Date(job.start_date).toLocaleDateString("en-US", { 
-                                                                weekday: "short", 
-                                                                year: "numeric", 
-                                                                month: "short", 
-                                                                day: "numeric" 
+                                                            {new Date(job.start_date).toLocaleDateString("en-US", {
+                                                                weekday: "short",
+                                                                year: "numeric",
+                                                                month: "short",
+                                                                day: "numeric"
                                                             })}
                                                         </span>
                                                     </div>
@@ -364,16 +369,16 @@ export default function Home() {
                                                     <div className="flex items-center text-sm text-gray-700">
                                                         <span className="text-gray-400 mr-2">🕐</span>
                                                         <span className="font-medium">
-                                                            {new Date(job.start_time).toLocaleTimeString("en-US", { 
-                                                                hour: "numeric", 
+                                                            {new Date(job.start_time).toLocaleTimeString("en-US", {
+                                                                hour: "numeric",
                                                                 minute: "2-digit",
-                                                                hour12: true 
+                                                                hour12: true
                                                             })}
                                                         </span>
                                                     </div>
                                                 )}
                                             </div>
-                                            
+
                                             {/* Special Requirements */}
                                             {job.special_requirements && (
                                                 <div className="mb-4 p-3 bg-gray-50 rounded-lg border-l-4 border-primary-500">
@@ -381,7 +386,7 @@ export default function Home() {
                                                     <p className="text-sm text-gray-600 line-clamp-2">{job.special_requirements}</p>
                                                 </div>
                                             )}
-                                            
+
                                             {/* Applications Count */}
                                             {job.job_applications && (
                                                 <div className="mb-4 flex items-center text-sm text-gray-600">
@@ -391,7 +396,7 @@ export default function Home() {
                                                     </span>
                                                 </div>
                                             )}
-                                            
+
                                             {/* Action Button */}
                                             <div className="pt-4 border-t border-gray-200">
                                                 <div className="flex items-center justify-between">

@@ -17,12 +17,12 @@ export default function BookingShow() {
         if (bookingId) {
             bookingsService.getBooking(bookingId)
                 .then((data) => {
-                    setBooking(data.booking);
+                    setBooking(data.job_post || data.booking);
                     setLoading(false);
                 })
                 .catch((err) => {
-                    console.error("Error fetching booking:", err);
-                    setError(err.response?.data?.message || "Failed to load booking");
+                    console.error("Error fetching job post:", err);
+                    setError(err.response?.data?.message || "Failed to load job post");
                     setLoading(false);
                 });
         }

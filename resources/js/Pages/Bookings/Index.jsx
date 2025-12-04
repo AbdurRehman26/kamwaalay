@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import PublicLayout from "@/Layouts/PublicLayout";
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import { route } from "@/utils/routes";
 import { useState, useEffect } from "react";
 import { bookingsService } from "@/services/bookings";
@@ -11,11 +11,11 @@ export default function BookingsIndex() {
     useEffect(() => {
         bookingsService.getBookings()
             .then((data) => {
-                setBookings(data.bookings || { data: [], links: [], meta: {} });
+                setBookings(data.job_posts || data.bookings || { data: [], links: [], meta: {} });
                 setLoading(false);
             })
             .catch((error) => {
-                console.error("Error fetching bookings:", error);
+                console.error("Error fetching job posts:", error);
                 setLoading(false);
             });
     }, []);
@@ -37,19 +37,19 @@ export default function BookingsIndex() {
     };
 
     return (
-        <PublicLayout>
+        <DashboardLayout>
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h1 className="text-4xl font-bold mb-4">My Service Requests</h1>
-                            <p className="text-xl text-white/90">View all your service requests and bookings</p>
+                            <h1 className="text-4xl font-bold mb-4">My Job Postings</h1>
+                            <p className="text-xl text-white/90">View all your job postings</p>
                         </div>
                         <Link
                             to={route("bookings.create")}
                             className="bg-white text-primary-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition duration-300 font-semibold"
                         >
-                            + New Request
+                            + Post a Job
                         </Link>
                     </div>
                 </div>
@@ -57,18 +57,20 @@ export default function BookingsIndex() {
             <div className="container mx-auto px-4 py-12">
                 {loading ? (
                     <div className="text-center py-12">
-                        <p className="text-gray-600">Loading bookings...</p>
+                        <p className="text-gray-600">Loading jobs...</p>
                     </div>
                 ) : bookings.data && bookings.data.length > 0 ? (
                     <div className="space-y-6">
                         {bookings.data.map((booking) => (
-                            <Link
+                            <div
                                 key={booking.id}
-                                to={route("bookings.show", booking.id)}
-                                className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300"
+                                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300"
                             >
                                 <div className="flex justify-between items-start mb-4">
-                                    <div className="flex-1">
+                                    <Link
+                                        to={route("bookings.show", booking.id)}
+                                        className="flex-1"
+                                    >
                                         <div className="flex items-center gap-3 mb-2">
                                             <h3 className="text-xl font-bold text-gray-900 capitalize">
                                                 {booking.service_type?.replace("_", " ") || "N/A"}
@@ -93,9 +95,18 @@ export default function BookingsIndex() {
                                                 ⏳ Waiting for helper assignment
                                             </p>
                                         )}
+                                    </Link>
+                                    <div className="ml-4 flex gap-2">
+                                        <Link
+                                            to={route("bookings.edit", booking.id)}
+                                            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition duration-300 font-semibold text-sm"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Edit
+                                        </Link>
                                     </div>
                                 </div>
-                            </Link>
+                            </div>
                         ))}
                         {/* Pagination */}
                         {bookings.links && bookings.links.length > 3 && (
@@ -120,8 +131,8 @@ export default function BookingsIndex() {
                 ) : (
                     <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">📝</div>
-                        <p className="text-gray-600 text-xl mb-6">No service requests yet</p>
-                        <p className="text-gray-500 mb-8">Post your first service request to get started</p>
+                        <p className="text-gray-600 text-xl mb-6">No job postings yet</p>
+                        <p className="text-gray-500 mb-8">Post your first job posting to get started</p>
                         <Link
                             to={route("bookings.create")}
                             className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold inline-block"
@@ -131,7 +142,7 @@ export default function BookingsIndex() {
                     </div>
                 )}
             </div>
-        </PublicLayout>
+        </DashboardLayout>
     );
 }
 

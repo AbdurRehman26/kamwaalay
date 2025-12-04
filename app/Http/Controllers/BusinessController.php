@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Models\Booking;
+use App\Models\JobPost;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -183,7 +183,7 @@ class BusinessController extends Controller
             'verified_workers' => $business->helpers()->whereHas('profile', function ($q) {
                 $q->where('verification_status', 'verified');
             })->count(),
-            'total_bookings' => Booking::whereIn('assigned_user_id', $business->helpers()->pluck('users.id')->toArray())->count(),
+            'total_bookings' => JobPost::whereIn('assigned_user_id', $business->helpers()->pluck('users.id')->toArray())->count(),
         ];
 
         $recentWorkers = $business->helpers()
@@ -192,7 +192,7 @@ class BusinessController extends Controller
             ->get();
 
         $helperIds = $business->helpers()->pluck('users.id')->toArray();
-        $recentBookings = Booking::whereIn('assigned_user_id', $helperIds)
+        $recentBookings = JobPost::whereIn('assigned_user_id', $helperIds)
         ->with(['user', 'assignedUser'])
         ->orderBy('created_at', 'desc')
         ->take(10)
