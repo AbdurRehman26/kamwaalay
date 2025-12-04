@@ -1,3 +1,4 @@
+// Head removed
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { useState, useEffect } from "react";
 import { jobApplicationsService } from "@/services/jobApplications";
@@ -66,7 +67,7 @@ export default function MyRequestApplications() {
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Applications to My Requests</h1>
-                    <p className="text-xl text-white/90">Review and manage applications for your jobs</p>
+                    <p className="text-xl text-white/90">Review and manage applications for your service requests</p>
                 </div>
             </div>
             <div className="container mx-auto px-4 py-12">
@@ -85,7 +86,7 @@ export default function MyRequestApplications() {
                                                 {application.booking.service_type_label}
                                             </h3>
                                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(application.status)}`}>
-                                                {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+                                                {application.status}
                                             </span>
                                         </div>
                                         <p className="text-gray-600 mb-2">
@@ -94,13 +95,16 @@ export default function MyRequestApplications() {
                                         {application.user?.phone && (
                                             <p className="text-gray-500 text-sm mb-2">📞 {application.user.phone}</p>
                                         )}
+                                        {application.user?.email && (
+                                            <p className="text-gray-500 text-sm mb-2">✉️ {application.user.email}</p>
+                                        )}
                                         {application.message && (
                                             <div className="bg-gray-50 rounded-lg p-4 mt-3 mb-3">
                                                 <p className="text-gray-700 text-sm whitespace-pre-wrap">{application.message}</p>
                                             </div>
                                         )}
                                         {application.proposed_rate && (
-                                            <p className="text-green-600 font-bold text-lg">Proposed Rate: PKR {application.proposed_rate}/month</p>
+                                            <p className="text-green-600 font-bold text-lg">Proposed Rate: PKR {application.proposed_rate}/hr</p>
                                         )}
                                     </div>
                                     {application.status === "pending" && (
@@ -156,7 +160,7 @@ export default function MyRequestApplications() {
                     <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">📋</div>
                         <p className="text-gray-600 text-xl mb-6">No applications yet</p>
-                        <p className="text-gray-500 mb-8">Applications to your jobs will appear here</p>
+                        <p className="text-gray-500 mb-8">Applications to your service requests will appear here</p>
                     </div>
                 )}
             </div>

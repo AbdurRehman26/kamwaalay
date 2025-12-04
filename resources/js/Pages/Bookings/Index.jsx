@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import DashboardLayout from "@/Layouts/DashboardLayout";
+import PublicLayout from "@/Layouts/PublicLayout";
 import { route } from "@/utils/routes";
 import { useState, useEffect } from "react";
 import { bookingsService } from "@/services/bookings";
@@ -37,13 +37,13 @@ export default function BookingsIndex() {
     };
 
     return (
-        <DashboardLayout>
+        <PublicLayout>
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h1 className="text-4xl font-bold mb-4">My Jobs</h1>
-                            <p className="text-xl text-white/90">View all your jobs and bookings</p>
+                            <h1 className="text-4xl font-bold mb-4">My Service Requests</h1>
+                            <p className="text-xl text-white/90">View all your service requests and bookings</p>
                         </div>
                         <Link
                             to={route("bookings.create")}
@@ -120,18 +120,18 @@ export default function BookingsIndex() {
                 ) : (
                     <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">📝</div>
-                        <p className="text-gray-600 text-xl mb-6">No jobs yet</p>
-                        <p className="text-gray-500 mb-8">Post your first job to get started</p>
+                        <p className="text-gray-600 text-xl mb-6">No service requests yet</p>
+                        <p className="text-gray-500 mb-8">Post your first service request to get started</p>
                         <Link
                             to={route("bookings.create")}
                             className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold inline-block"
                         >
-                            Post Job
+                            Post Service Request
                         </Link>
                     </div>
                 )}
             </div>
-        </DashboardLayout>
+        </PublicLayout>
     );
 }
 

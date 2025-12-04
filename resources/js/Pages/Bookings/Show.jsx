@@ -81,7 +81,7 @@ export default function BookingShow() {
             
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">Job Details</h1>
+                    <h1 className="text-4xl font-bold mb-4">Service Request Details</h1>
                 </div>
             </div>
             <div className="container mx-auto px-4 py-12">
@@ -147,7 +147,7 @@ export default function BookingShow() {
 
                         {!booking.assigned_user_id && isHelper && booking.status === "pending" && (
                             <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-6">
-                                <p className="text-primary-800 mb-4">This job is open for applications.</p>
+                                <p className="text-primary-800 mb-4">This service request is open for applications.</p>
                                 <Link
                                     to={route("job-applications.create", booking.id)}
                                     className="inline-block bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition duration-300 font-semibold"
@@ -182,7 +182,7 @@ export default function BookingShow() {
                                     to={route("service-requests.browse")}
                                     className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold text-center"
                                 >
-                                    Back to Search Jobs
+                                    Back to Services Required
                                 </Link>
                                 <Link
                                     to={route("login")}

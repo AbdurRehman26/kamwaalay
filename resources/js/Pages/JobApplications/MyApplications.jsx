@@ -1,3 +1,4 @@
+// Head removed
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -59,7 +60,7 @@ export default function MyApplications() {
                                                 {application.booking.service_type_label}
                                             </h3>
                                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(application.status)}`}>
-                                                {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+                                                {application.status}
                                             </span>
                                         </div>
                                         <p className="text-gray-600 mb-2 capitalize">
@@ -72,7 +73,7 @@ export default function MyApplications() {
                                             <p className="text-gray-600 text-sm mt-3 line-clamp-2">{application.message}</p>
                                         )}
                                         {application.proposed_rate && (
-                                            <p className="text-green-600 font-bold mt-2">Proposed Rate: PKR {application.proposed_rate}/month</p>
+                                            <p className="text-green-600 font-bold mt-2">Proposed Rate: PKR {application.proposed_rate}/hr</p>
                                         )}
                                     </div>
                                     <div className="flex gap-2 ml-4">
@@ -130,7 +131,7 @@ export default function MyApplications() {
                     <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">📋</div>
                         <p className="text-gray-600 text-xl mb-6">No applications yet</p>
-                        <p className="text-gray-500 mb-8">Browse jobs and apply to find work</p>
+                        <p className="text-gray-500 mb-8">Browse service requests and apply to find work</p>
                         <Link
                             to={route("job-applications.index")}
                             className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg font-semibold inline-block"

@@ -14,7 +14,6 @@ import Login from "./Pages/Auth/Login";
 import Register from "./Pages/Auth/Register";
 import Verify from "./Pages/Auth/Verify";
 import Dashboard from "./Pages/Dashboard";
-import DashboardOverview from "./Pages/Dashboard/Overview";
 import DashboardDocuments from "./Pages/Dashboard/Documents";
 import ProfileEdit from "./Pages/Profile/Edit";
 import HelpersIndex from "./Pages/Helpers/Index";
@@ -34,6 +33,9 @@ import JobApplicationsCreate from "./Pages/JobApplications/Create";
 import JobApplicationsShow from "./Pages/JobApplications/Show";
 import JobApplicationsMyApplications from "./Pages/JobApplications/MyApplications";
 import JobApplicationsMyRequestApplications from "./Pages/JobApplications/MyRequestApplications";
+import BusinessDashboard from "./Pages/Business/Dashboard";
+import BusinessWorkers from "./Pages/Business/Workers";
+import BusinessWorkersCreate from "./Pages/Business/Workers/Create";
 import OnboardingHelper from "./Pages/Onboarding/Helper";
 import OnboardingBusiness from "./Pages/Onboarding/Business";
 import PageAbout from "./Pages/Pages/About";
@@ -42,9 +44,6 @@ import PageFAQ from "./Pages/Pages/FAQ";
 import PageTerms from "./Pages/Pages/Terms";
 import PagePrivacy from "./Pages/Pages/Privacy";
 import MessagesIndex from "./Pages/Messages/Index";
-import NotificationsIndex from "./Pages/Notifications/Index";
-import Workers from "./Pages/Business/Workers";
-import WorkersCreate from "./Pages/Business/Workers/Create";
 
 // Routes Component (inside providers)
 function AppRoutes() {
@@ -127,7 +126,7 @@ function AppRoutes() {
             {/* Protected Routes */}
             <Route path="/dashboard" element={
                 <ProtectedRoute>
-                    <DashboardOverview />
+                    <Dashboard />
                 </ProtectedRoute>
             } />
             <Route path="/dashboard/documents" element={
@@ -191,34 +190,34 @@ function AppRoutes() {
                     <JobApplicationsMyRequestApplications />
                 </ProtectedRoute>
             } />
+            <Route path="/business/dashboard" element={
+                <ProtectedRoute>
+                    <BusinessDashboard />
+                </ProtectedRoute>
+            } />
+            <Route path="/business/workers" element={
+                <ProtectedRoute>
+                    <BusinessWorkers />
+                </ProtectedRoute>
+            } />
+            <Route path="/business/workers/create" element={
+                <ProtectedRoute>
+                    <BusinessWorkersCreate />
+                </ProtectedRoute>
+            } />
             <Route path="/onboarding/helper" element={
                 <ProtectedRoute>
                     <OnboardingHelper />
                 </ProtectedRoute>
             } />
+            <Route path="/onboarding/business" element={
+                <ProtectedRoute>
+                    <OnboardingBusiness />
+                </ProtectedRoute>
+            } />
             <Route path="/messages" element={
                 <ProtectedRoute>
                     <MessagesIndex />
-                </ProtectedRoute>
-            } />
-            <Route path="/notifications" element={
-                <ProtectedRoute>
-                    <NotificationsIndex />
-                </ProtectedRoute>
-            } />
-            <Route path="/business/workers" element={
-                <ProtectedRoute>
-                    <Workers />
-                </ProtectedRoute>
-            } />
-            <Route path="/business/workers/create" element={
-                <ProtectedRoute>
-                    <WorkersCreate />
-                </ProtectedRoute>
-            } />
-            <Route path="/business/workers/:workerId/edit" element={
-                <ProtectedRoute>
-                    <WorkersCreate />
                 </ProtectedRoute>
             } />
 

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import DashboardLayout from "@/Layouts/DashboardLayout";
+import { useNavigate } from "react-router-dom";
+import PublicLayout from "@/Layouts/PublicLayout";
 import { businessesService } from "@/services/businesses";
 import { route } from "@/utils/routes";
 import api from "@/services/api";
-import { useAuth } from "@/contexts/AuthContext";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
@@ -12,16 +11,11 @@ import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
 
 export default function CreateWorker() {
-    const { workerId } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
-    const isEditMode = !!workerId;
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
     const [selectedServiceTypes, setSelectedServiceTypes] = useState([]);
     const [selectedLocations, setSelectedLocations] = useState([]);
-    const [selectedSkills, setSelectedSkills] = useState([]);
-    const [skillInput, setSkillInput] = useState("");
     const [locationQuery, setLocationQuery] = useState("");
     const [locationSuggestions, setLocationSuggestions] = useState([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
@@ -30,7 +24,10 @@ export default function CreateWorker() {
 
     const [data, setData] = useState({
         name: "",
+        email: "",
         phone: "",
+        password: "",
+        password_confirmation: "",
         experience_years: "",
         availability: "full_time",
         bio: "",
@@ -107,27 +104,6 @@ export default function CreateWorker() {
         setSelectedLocations(selectedLocations.filter(loc => loc.id !== locationId));
     };
 
-    const addSkill = (skill) => {
-        const trimmedSkill = skill.trim();
-        if (trimmedSkill && !selectedSkills.includes(trimmedSkill)) {
-            setSelectedSkills([...selectedSkills, trimmedSkill]);
-            setSkillInput("");
-        }
-    };
-
-    const removeSkill = (skill) => {
-        setSelectedSkills(selectedSkills.filter(s => s !== skill));
-    };
-
-    const handleSkillKeyPress = (e) => {
-        if (e.key === "Enter" || e.key === ",") {
-            e.preventDefault();
-            if (skillInput.trim()) {
-                addSkill(skillInput);
-            }
-        }
-    };
-
     const addServiceType = (serviceType) => {
         if (!selectedServiceTypes.includes(serviceType)) {
             setSelectedServiceTypes([...selectedServiceTypes, serviceType]);
@@ -145,90 +121,6 @@ export default function CreateWorker() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
-
-    // Load worker data if in edit mode
-    useEffect(() => {
-        if (isEditMode && workerId) {
-            // Prevent users from editing themselves
-            if (user && parseInt(workerId) === user.id) {
-                alert("You cannot edit yourself.");
-                navigate(route("business.workers.index"));
-                return;
-            }
-
-            businessesService.getWorkerEdit(workerId)
-                .then((response) => {
-                    console.log("Worker edit response:", response);
-                    // Backend returns 'helper' in the response
-                    const worker = response.helper || response.worker;
-                    
-                    if (!worker) {
-                        throw new Error("Worker data not found in response");
-                    }
-                    
-                    // Double check - prevent editing self
-                    if (user && worker.id === user.id) {
-                        alert("You cannot edit yourself.");
-                        navigate(route("business.workers.index"));
-                        return;
-                    }
-                    setData({
-                        name: worker.name || "",
-                        phone: worker.phone || "",
-                        experience_years: worker.profile?.experience_years || worker.experience_years || "",
-                        availability: worker.profile?.availability || worker.availability || "full_time",
-                        bio: worker.profile?.bio || worker.bio || "",
-                        skills: "", // We'll use selectedSkills array instead
-                        photo: null, // Don't set existing photo as file
-                    });
-
-                    // Parse skills from comma-separated string to array
-                    const skillsString = worker.profile?.skills || worker.skills || "";
-                    if (skillsString) {
-                        const skillsArray = skillsString.split(",").map(s => s.trim()).filter(s => s);
-                        setSelectedSkills(skillsArray);
-                    }
-
-                    // Set service types from worker's service listings
-                    if (worker.service_listings && worker.service_listings.length > 0) {
-                        const serviceTypesFromListings = worker.service_listings
-                            .flatMap(listing => listing.service_types || [])
-                            .map(st => typeof st === "object" ? st.service_type : st)
-                            .filter((value, index, self) => self.indexOf(value) === index); // Remove duplicates
-                        setSelectedServiceTypes(serviceTypesFromListings);
-                    }
-
-                    // Set locations from worker's service listings
-                    if (worker.service_listings && worker.service_listings.length > 0) {
-                        const locationsFromListings = worker.service_listings
-                            .flatMap(listing => {
-                                // Handle both location_details array and locations array
-                                if (listing.location_details && listing.location_details.length > 0) {
-                                    return listing.location_details.map(loc => ({
-                                        id: loc.id || loc.display_text,
-                                        display_text: loc.display_text || `${loc.city_name || loc.city || ""}${loc.area ? ", " + loc.area : ""}`,
-                                        city: loc.city_name || loc.city || "",
-                                        area: loc.area || "",
-                                    }));
-                                }
-                                return [];
-                            })
-                            .filter((loc, index, self) => 
-                                self.findIndex(l => l.id === loc.id) === index
-                            ); // Remove duplicates
-                        setSelectedLocations(locationsFromListings);
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error loading worker:", error);
-                    console.error("Error response:", error.response);
-                    const errorMessage = error.response?.data?.message || error.message || "Failed to load worker data";
-                    alert(errorMessage);
-                    // Navigate back to workers list on error
-                    navigate(route("business.workers.index"));
-                });
-        }
-    }, [isEditMode, workerId, user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -250,12 +142,14 @@ export default function CreateWorker() {
 
         const formData = new FormData();
         formData.append("name", data.name);
+        formData.append("email", data.email);
         formData.append("phone", data.phone);
+        formData.append("password", data.password);
+        formData.append("password_confirmation", data.password_confirmation);
         formData.append("experience_years", data.experience_years);
         formData.append("availability", data.availability);
         formData.append("bio", data.bio);
-        // Convert skills array to comma-separated string
-        formData.append("skills", selectedSkills.join(", "));
+        formData.append("skills", data.skills);
 
         if (data.photo) {
             formData.append("photo", data.photo);
@@ -273,11 +167,7 @@ export default function CreateWorker() {
         });
 
         try {
-            if (isEditMode) {
-                await businessesService.updateWorker(workerId, formData);
-            } else {
-                await businessesService.createWorker(formData);
-            }
+            await businessesService.createWorker(formData);
             navigate(route("business.workers.index"));
         } catch (error) {
             if (error.response && error.response.data.errors) {
@@ -291,11 +181,11 @@ export default function CreateWorker() {
     };
 
     return (
-        <DashboardLayout>
+        <PublicLayout>
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">{isEditMode ? "Edit Worker" : "Add New Worker"}</h1>
-                    <p className="text-xl text-white/90">{isEditMode ? "Update worker information" : "Add a new worker to your agency"}</p>
+                    <h1 className="text-4xl font-bold mb-4">Add New Worker</h1>
+                    <p className="text-xl text-white/90">Add a new worker to your agency</p>
                 </div>
             </div>
 
@@ -318,6 +208,19 @@ export default function CreateWorker() {
                                         required
                                     />
                                     <InputError message={errors.name} className="mt-2" />
+                                </div>
+
+                                <div>
+                                    <InputLabel htmlFor="email" value="Email *" />
+                                    <TextInput
+                                        id="email"
+                                        type="email"
+                                        className="mt-1 block w-full"
+                                        value={data.email}
+                                        onChange={(e) => setData({ ...data, email: e.target.value })}
+                                        required
+                                    />
+                                    <InputError message={errors.email} className="mt-2" />
                                 </div>
 
                                 <div>
@@ -345,6 +248,30 @@ export default function CreateWorker() {
                                     <InputError message={errors.photo} className="mt-2" />
                                 </div>
 
+                                <div>
+                                    <InputLabel htmlFor="password" value="Password *" />
+                                    <TextInput
+                                        id="password"
+                                        type="password"
+                                        className="mt-1 block w-full"
+                                        value={data.password}
+                                        onChange={(e) => setData({ ...data, password: e.target.value })}
+                                        required
+                                    />
+                                    <InputError message={errors.password} className="mt-2" />
+                                </div>
+
+                                <div>
+                                    <InputLabel htmlFor="password_confirmation" value="Confirm Password *" />
+                                    <TextInput
+                                        id="password_confirmation"
+                                        type="password"
+                                        className="mt-1 block w-full"
+                                        value={data.password_confirmation}
+                                        onChange={(e) => setData({ ...data, password_confirmation: e.target.value })}
+                                        required
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -489,7 +416,7 @@ export default function CreateWorker() {
                                     <InputLabel htmlFor="availability" value="Availability *" />
                                     <select
                                         id="availability"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-gray-900 bg-white"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                         value={data.availability}
                                         onChange={(e) => setData({ ...data, availability: e.target.value })}
                                         required
@@ -505,40 +432,13 @@ export default function CreateWorker() {
 
                                 <div className="md:col-span-2">
                                     <InputLabel htmlFor="skills" value="Skills" />
-                                    <p className="text-xs text-gray-500 mb-2">Add skills as tags. Press Enter or comma to add each skill.</p>
-                                    
-                                    {/* Selected Skills as Tags */}
-                                    {selectedSkills.length > 0 && (
-                                        <div className="mb-3">
-                                            <div className="flex flex-wrap gap-2">
-                                                {selectedSkills.map((skill, idx) => (
-                                                    <span
-                                                        key={idx}
-                                                        className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold"
-                                                    >
-                                                        <span>{skill}</span>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeSkill(skill)}
-                                                            className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Skill Input */}
                                     <TextInput
                                         id="skills"
                                         type="text"
                                         className="mt-1 block w-full"
-                                        value={skillInput}
-                                        onChange={(e) => setSkillInput(e.target.value)}
-                                        onKeyPress={handleSkillKeyPress}
-                                        placeholder="Type a skill and press Enter or comma to add"
+                                        value={data.skills}
+                                        onChange={(e) => setData({ ...data, skills: e.target.value })}
+                                        placeholder="e.g., Cooking, Cleaning, Child Care"
                                     />
                                     <InputError message={errors.skills} className="mt-2" />
                                 </div>
@@ -569,16 +469,13 @@ export default function CreateWorker() {
                                     Cancel
                                 </button>
                                 <PrimaryButton disabled={processing}>
-                                    {processing 
-                                        ? (isEditMode ? "Updating Worker..." : "Adding Worker...") 
-                                        : (isEditMode ? "Update Worker" : "Add Worker")
-                                    }
+                                    {processing ? "Adding Worker..." : "Add Worker"}
                                 </PrimaryButton>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
-        </DashboardLayout>
+        </PublicLayout>
     );
 }

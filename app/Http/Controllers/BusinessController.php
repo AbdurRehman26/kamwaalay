@@ -172,29 +172,26 @@ class BusinessController extends Controller
             abort(403);
         }
 
-        // Exclude business owner from all worker-related queries
-        $helpersQuery = $business->helpers()->where('users.id', '!=', $business->id);
-        
         $stats = [
-            'total_workers' => $helpersQuery->count(),
-            'active_workers' => $helpersQuery->whereHas('profile', function ($q) {
+            'total_workers' => $business->helpers()->count(),
+            'active_workers' => $business->helpers()->whereHas('profile', function ($q) {
                 $q->where('is_active', true);
             })->count(),
-            'pending_verification' => $helpersQuery->whereHas('profile', function ($q) {
+            'pending_verification' => $business->helpers()->whereHas('profile', function ($q) {
                 $q->where('verification_status', 'pending');
             })->count(),
-            'verified_workers' => $helpersQuery->whereHas('profile', function ($q) {
+            'verified_workers' => $business->helpers()->whereHas('profile', function ($q) {
                 $q->where('verification_status', 'verified');
             })->count(),
-            'total_bookings' => Booking::whereIn('assigned_user_id', $helpersQuery->pluck('users.id')->toArray())->count(),
+            'total_bookings' => Booking::whereIn('assigned_user_id', $business->helpers()->pluck('users.id')->toArray())->count(),
         ];
 
-        $recentWorkers = $helpersQuery
+        $recentWorkers = $business->helpers()
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
 
-        $helperIds = $helpersQuery->pluck('users.id')->toArray();
+        $helperIds = $business->helpers()->pluck('users.id')->toArray();
         $recentBookings = Booking::whereIn('assigned_user_id', $helperIds)
         ->with(['user', 'assignedUser'])
         ->orderBy('created_at', 'desc')
@@ -235,20 +232,9 @@ class BusinessController extends Controller
             abort(403);
         }
 
-        // Exclude the business owner from workers list
         $workers = $business->helpers()
-            ->where('users.id', '!=', $business->id) // Exclude business owner
-            ->with(['profile', 'serviceListings' => function ($query) {
-                $query->where('service_listings.is_active', true)
-                      ->where('service_listings.status', 'active');
-            }])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
-
-        // Transform workers using UserResource
-        $workers->through(function ($worker) {
-            return new UserResource($worker);
-        });
 
         return response()->json([
             'workers' => $workers,
@@ -296,26 +282,21 @@ class BusinessController extends Controller
             content: new OA\MediaType(
                 mediaType: "multipart/form-data",
                 schema: new OA\Schema(
-                    required: ["name", "phone", "service_types", "experience_years", "locations", "availability"],
+                    required: ["name", "email", "phone", "service_type", "experience_years", "city", "area", "availability", "password"],
                     properties: [
                         new OA\Property(property: "name", type: "string", maxLength: 255),
-                        new OA\Property(property: "email", type: "string", format: "email", maxLength: 255, nullable: true, description: "Optional. If not provided, a unique email will be auto-generated."),
+                        new OA\Property(property: "email", type: "string", format: "email", maxLength: 255),
                         new OA\Property(property: "phone", type: "string", maxLength: 20),
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
-                        new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]), description: "Array of service types"),
-                        new OA\Property(property: "locations", type: "array", items: new OA\Items(
-                            type: "object",
-                            properties: [
-                                new OA\Property(property: "city", type: "string"),
-                                new OA\Property(property: "area", type: "string"),
-                            ]
-                        ), description: "Array of locations"),
+                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
                         new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
+                        new OA\Property(property: "city", type: "string", maxLength: 255),
+                        new OA\Property(property: "area", type: "string", maxLength: 255),
                         new OA\Property(property: "availability", type: "string", enum: ["full_time", "part_time", "available"]),
                         new OA\Property(property: "bio", type: "string", nullable: true),
-                        new OA\Property(property: "password", type: "string", format: "password", minLength: 8, nullable: true, description: "Optional. If not provided, a random password will be auto-generated."),
-                        new OA\Property(property: "password_confirmation", type: "string", format: "password", nullable: true),
+                        new OA\Property(property: "password", type: "string", format: "password", minLength: 8),
+                        new OA\Property(property: "password_confirmation", type: "string", format: "password"),
                     ]
                 )
             )
@@ -345,7 +326,7 @@ class BusinessController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:users,email',
+            'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|max:20',
             'photo' => 'nullable|image|max:2048',
             'service_types' => 'required|array|min:1',
@@ -357,36 +338,15 @@ class BusinessController extends Controller
             'experience_years' => 'required|integer|min:0',
             'availability' => 'required|in:full_time,part_time,available',
             'bio' => 'nullable|string',
-            'password' => 'nullable|min:8|confirmed',
+            'password' => 'required|min:8|confirmed',
         ]);
-
-        // Generate email if not provided (using phone number as base)
-        $email = $validated['email'] ?? null;
-        if (!$email) {
-            // Generate a unique email based on phone and timestamp
-            $baseEmail = 'worker_' . preg_replace('/[^0-9]/', '', $validated['phone']) . '_' . time() . '@kamwaalay.local';
-            $email = $baseEmail;
-            // Ensure uniqueness
-            $counter = 1;
-            while (User::where('email', $email)->exists()) {
-                $email = 'worker_' . preg_replace('/[^0-9]/', '', $validated['phone']) . '_' . time() . '_' . $counter . '@kamwaalay.local';
-                $counter++;
-            }
-        }
-
-        // Generate password if not provided
-        $password = $validated['password'] ?? null;
-        if (!$password) {
-            // Generate a random password
-            $password = \Illuminate\Support\Str::random(12);
-        }
 
         // Create user account for the worker
         $userData = [
             'name' => $validated['name'],
-            'email' => $email,
+            'email' => $validated['email'],
             'phone' => $validated['phone'],
-            'password' => Hash::make($password),
+            'password' => Hash::make($validated['password']),
             'is_active' => true,
         ];
 
@@ -422,12 +382,8 @@ class BusinessController extends Controller
             'service_types' => $validated['service_types'], // JSON array
             'locations' => array_map(function($location) {
                 // Find or create location ID
-                $city = \App\Models\City::firstOrCreate(
-                    ['name' => $location['city']],
-                    ['country_id' => \App\Models\Country::firstOrCreate(['name' => 'Pakistan'], ['code' => 'PK', 'phone_code' => '+92'])->id]
-                );
                 $locationModel = \App\Models\Location::firstOrCreate([
-                    'city_id' => $city->id,
+                    'city_id' => \App\Models\City::firstOrCreate(['name' => $location['city']])->id,
                     'area' => $location['area'],
                 ]);
                 return $locationModel->id;
@@ -481,27 +437,12 @@ class BusinessController extends Controller
             abort(403);
         }
 
-        // Prevent users from editing themselves
-        if ($business->id === $helper->id) {
-            abort(403, 'You cannot edit yourself.');
-        }
-
         if (!$helper->hasRole('helper')) {
             abort(404);
         }
 
-        // Load necessary relationships for editing
-        $helper->load([
-            'roles',
-            'profile',
-            'serviceListings' => function ($query) {
-                $query->where('service_listings.is_active', true)
-                      ->where('service_listings.status', 'active');
-            }
-        ]);
-
         return response()->json([
-            'helper' => new UserResource($helper),
+            'helper' => new UserResource($helper->load('roles')),
         ]);
     }
 
@@ -554,11 +495,6 @@ class BusinessController extends Controller
         
         if (!$business->isBusiness() || !$business->helpers()->where('users.id', $helper->id)->exists()) {
             abort(403);
-        }
-
-        // Prevent users from updating themselves
-        if ($business->id === $helper->id) {
-            abort(403, 'You cannot update yourself.');
         }
 
         if (!$helper->hasRole('helper')) {
@@ -647,11 +583,6 @@ class BusinessController extends Controller
         
         if (!$business->isBusiness() || !$business->helpers()->where('users.id', $helper->id)->exists()) {
             abort(403);
-        }
-
-        // Prevent users from deleting themselves
-        if ($business->id === $helper->id) {
-            abort(403, 'You cannot remove yourself from the agency.');
         }
 
         // Detach from business (don't delete the user, just remove relationship)

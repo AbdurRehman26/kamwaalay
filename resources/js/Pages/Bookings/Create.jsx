@@ -165,8 +165,8 @@ export default function BookingCreate() {
             
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">Post Job</h1>
-                    <p className="text-xl text-white/90">Fill in the form below to post your job</p>
+                    <h1 className="text-4xl font-bold mb-4">Post Service Request</h1>
+                    <p className="text-xl text-white/90">Fill in the form below to post your service request</p>
                 </div>
             </div>
             <div className="container mx-auto px-4 py-12">

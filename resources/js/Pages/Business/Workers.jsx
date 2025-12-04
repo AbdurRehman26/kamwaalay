@@ -1,18 +1,14 @@
+// Head removed
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { businessesService } from "@/services/businesses";
 import { route } from "@/utils/routes";
-import { useAuth } from "@/contexts/AuthContext";
-import RemoveWorkerModal from "@/Components/RemoveWorkerModal";
 
 export default function Workers() {
-    const { user } = useAuth();
     const [workers, setWorkers] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showRemoveModal, setShowRemoveModal] = useState(false);
-    const [workerToRemove, setWorkerToRemove] = useState(null);
 
     useEffect(() => {
         businessesService.getWorkers()
@@ -27,30 +23,23 @@ export default function Workers() {
             });
     }, []);
 
-    const handleDeleteClick = (worker) => {
-        setWorkerToRemove(worker);
-        setShowRemoveModal(true);
-    };
-
-    const handleDeleteConfirm = async (workerId) => {
-        try {
-            await businessesService.deleteWorker(workerId);
-            // Refresh workers list
-            const response = await businessesService.getWorkers();
-            setWorkers(response.workers || { data: [], links: [] });
-            setShowRemoveModal(false);
-            setWorkerToRemove(null);
-        } catch (err) {
-            console.error("Error deleting worker:", err);
-            alert(err.response?.data?.message || "Failed to delete worker");
-            throw err; // Re-throw to let modal handle it
+    const handleDelete = async (workerId) => {
+        if (confirm("Are you sure you want to remove this worker?")) {
+            try {
+                await businessesService.deleteWorker(workerId);
+                // Refresh workers list
+                const response = await businessesService.getWorkers();
+                setWorkers(response.workers || { data: [], links: [] });
+            } catch (err) {
+                console.error("Error deleting worker:", err);
+                alert(err.response?.data?.message || "Failed to delete worker");
+            }
         }
     };
 
     if (loading) {
         return (
             <DashboardLayout>
-                
                 <div className="py-12">
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 text-center">
                         <p className="text-gray-600">Loading workers...</p>
@@ -63,7 +52,6 @@ export default function Workers() {
     if (error) {
         return (
             <DashboardLayout>
-                
                 <div className="py-12">
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 text-center">
                         <p className="text-red-600">{error}</p>
@@ -74,8 +62,6 @@ export default function Workers() {
     }
     return (
         <DashboardLayout>
-            
-
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center mb-8">
@@ -94,95 +80,146 @@ export default function Workers() {
                     {workers.data && workers.data.length > 0 ? (
                         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-                                {workers.data.map((worker) => (
-                                    <div key={worker.id} className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="h-20 w-20 bg-gradient-to-br from-primary-400 to-primary-500 rounded-full flex items-center justify-center overflow-hidden">
-                                                {worker.photo ? (
-                                                    <img src={worker.photo.startsWith("http") ? worker.photo : `/storage/${worker.photo}`} alt={worker.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="text-4xl text-white">👤</div>
+                                {workers.data.map((worker) => {
+                                    // Get all service types
+                                    const serviceTypes = worker.service_listings && worker.service_listings.length > 0
+                                        ? worker.service_listings.flatMap(listing => 
+                                            listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
+                                          ).filter(Boolean)
+                                        : [];
+                                    
+                                    // Format availability
+                                    const availabilityLabels = {
+                                        "full_time": "Full Time",
+                                        "part_time": "Part Time",
+                                        "available": "Available"
+                                    };
+                                    
+                                    // Format date
+                                    const joinedDate = worker.created_at 
+                                        ? new Date(worker.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+                                        : null;
+
+                                    return (
+                                        <div key={worker.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300">
+                                            {/* Header with Photo and Status */}
+                                            <div className="flex items-start justify-between mb-4 pb-4 border-b border-gray-200">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-16 w-16 bg-gradient-to-br from-primary-400 to-primary-500 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                                                        {worker.photo ? (
+                                                            <img src={`/storage/${worker.photo}`} alt={worker.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="text-3xl text-white">👤</div>
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-lg font-bold text-gray-900">{worker.name}</h3>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            {worker.verification_status === "verified" ? (
+                                                                <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full font-semibold">✓ Verified</span>
+                                                            ) : (
+                                                                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-semibold">Pending</span>
+                                                            )}
+                                                            {worker.is_active !== false ? (
+                                                                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full font-semibold">Active</span>
+                                                            ) : (
+                                                                <span className="bg-gray-100 text-gray-800 text-xs px-2 py-0.5 rounded-full font-semibold">Inactive</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Contact Information */}
+                                            <div className="mb-4 space-y-2">
+                                                {worker.email && (
+                                                    <div className="flex items-center text-sm text-gray-600">
+                                                        <span className="mr-2">📧</span>
+                                                        <span className="truncate">{worker.email}</span>
+                                                    </div>
+                                                )}
+                                                {worker.phone && (
+                                                    <div className="flex items-center text-sm text-gray-600">
+                                                        <span className="mr-2">📞</span>
+                                                        <span>{worker.phone}</span>
+                                                    </div>
                                                 )}
                                             </div>
-                                            {worker.verification_status === "verified" && (
-                                                <span className="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-semibold">✓ Verified</span>
+
+                                            {/* Service Types */}
+                                            {serviceTypes.length > 0 && (
+                                                <div className="mb-4">
+                                                    <div className="text-xs font-semibold text-gray-500 mb-2 uppercase">Services</div>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {serviceTypes.map((type, idx) => (
+                                                            <span key={idx} className="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-md font-medium capitalize">
+                                                                {type}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             )}
-                                        </div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">{worker.name || "Worker"}</h3>
-                                        
-                                        {/* Services */}
-                                        {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].service_types && worker.service_listings[0].service_types.length > 0 ? (
-                                            <div className="mb-3">
-                                                <p className="text-xs font-semibold text-gray-700 mb-1">Services:</p>
-                                                <div className="flex flex-wrap gap-1">
-                                                    {worker.service_listings[0].service_types.map((st, idx) => {
-                                                        const serviceType = typeof st === "object" ? st.service_type : st;
-                                                        const serviceLabels = {
-                                                            maid: "🧹 Maid",
-                                                            cook: "👨‍🍳 Cook",
-                                                            babysitter: "👶 Babysitter",
-                                                            caregiver: "👵 Caregiver",
-                                                            cleaner: "✨ Cleaner",
-                                                            all_rounder: "🌟 All Rounder"
-                                                        };
-                                                        return (
-                                                            <span key={idx} className="text-xs bg-primary-100 text-primary-800 px-2 py-1 rounded-full capitalize">
-                                                                {serviceLabels[serviceType] || serviceType?.replace("_", " ")}
-                                                            </span>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        ) : worker.service_type ? (
-                                            <p className="text-gray-600 mb-2 capitalize text-sm">
-                                                {worker.service_type.replace("_", " ")}
-                                            </p>
-                                        ) : null}
 
-                                        {/* Skills */}
-                                        {worker.skills && (
-                                            <div className="mb-3">
-                                                <p className="text-xs font-semibold text-gray-700 mb-1">Skills:</p>
-                                                <div className="flex flex-wrap gap-1">
-                                                    {worker.skills.split(",").map((skill, idx) => {
-                                                        const trimmedSkill = skill.trim();
-                                                        return trimmedSkill ? (
-                                                            <span key={idx} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                                                {trimmedSkill}
-                                                            </span>
-                                                        ) : null;
-                                                    })}
+                                            {/* Location */}
+                                            {(worker.city || worker.area) && (
+                                                <div className="mb-4">
+                                                    <div className="flex items-center text-sm text-gray-600">
+                                                        <span className="mr-2">📍</span>
+                                                        <span>{[worker.city, worker.area].filter(Boolean).join(", ")}</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
+                                            )}
 
-                                        {/* Locations */}
-                                        {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].location_details && worker.service_listings[0].location_details.length > 0 ? (
-                                            <div className="mb-3">
-                                                <p className="text-xs font-semibold text-gray-700 mb-1">Locations:</p>
-                                                <div className="flex flex-wrap gap-1">
-                                                    {worker.service_listings[0].location_details.map((loc, idx) => (
-                                                        <span key={idx} className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                                                            📍 {loc.city_name || loc.city}{loc.area ? `, ${loc.area}` : ""}
-                                                        </span>
-                                                    ))}
+                                            {/* Experience & Availability */}
+                                            <div className="grid grid-cols-2 gap-3 mb-4">
+                                                {worker.experience_years !== null && worker.experience_years !== undefined && (
+                                                    <div className="bg-gray-50 rounded-lg p-2">
+                                                        <div className="text-xs text-gray-500 mb-1">Experience</div>
+                                                        <div className="text-sm font-semibold text-gray-900">{worker.experience_years} {worker.experience_years === 1 ? "year" : "years"}</div>
+                                                    </div>
+                                                )}
+                                                {worker.availability && (
+                                                    <div className="bg-gray-50 rounded-lg p-2">
+                                                        <div className="text-xs text-gray-500 mb-1">Availability</div>
+                                                        <div className="text-sm font-semibold text-gray-900 capitalize">
+                                                            {availabilityLabels[worker.availability] || worker.availability}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Skills */}
+                                            {worker.skills && (
+                                                <div className="mb-4">
+                                                    <div className="text-xs font-semibold text-gray-500 mb-2">Skills</div>
+                                                    <p className="text-sm text-gray-700 line-clamp-2">{worker.skills}</p>
                                                 </div>
-                                            </div>
-                                        ) : (worker.city || worker.area) ? (
-                                            <div className="mb-3">
-                                                <p className="text-xs font-semibold text-gray-700 mb-1">Location:</p>
-                                                <p className="text-sm text-gray-600">
-                                                    {worker.city || ""}{worker.city && worker.area ? ", " : ""}{worker.area || ""}
-                                                </p>
-                                            </div>
-                                        ) : null}
+                                            )}
 
-                                        {user && user.id === worker.id ? (
-                                            <div className="text-center py-2 text-sm text-gray-500 italic">
-                                                This is you
+                                            {/* Bio */}
+                                            {worker.bio && (
+                                                <div className="mb-4">
+                                                    <div className="text-xs font-semibold text-gray-500 mb-2">Bio</div>
+                                                    <p className="text-sm text-gray-700 line-clamp-2">{worker.bio}</p>
+                                                </div>
+                                            )}
+
+                                            {/* Rating */}
+                                            <div className="flex items-center mb-4 pb-4 border-b border-gray-200">
+                                                <span className="text-yellow-500 mr-2 text-lg">⭐</span>
+                                                <span className="font-bold text-gray-900">{worker.rating ? worker.rating.toFixed(1) : "0.0"}</span>
+                                                <span className="text-gray-500 ml-2 text-sm">({worker.total_reviews || 0} {worker.total_reviews === 1 ? "review" : "reviews"})</span>
                                             </div>
-                                        ) : (
-                                            <div className="flex gap-2">
+
+                                            {/* Joined Date */}
+                                            {joinedDate && (
+                                                <div className="mb-4 text-xs text-gray-500">
+                                                    Joined: {joinedDate}
+                                                </div>
+                                            )}
+
+                                            {/* Actions */}
+                                            <div className="flex gap-2 mt-4">
                                                 <Link
                                                     to={route("business.workers.edit", worker.id)}
                                                     className="flex-1 text-center bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
@@ -190,15 +227,15 @@ export default function Workers() {
                                                     Edit
                                                 </Link>
                                                 <button
-                                                    onClick={() => handleDeleteClick(worker)}
+                                                    onClick={() => handleDelete(worker.id)}
                                                     className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
                                                 >
                                                     Remove
                                                 </button>
                                             </div>
-                                        )}
-                                    </div>
-                                ))}
+                                        </div>
+                                    );
+                                })}
                             </div>
 
                             {/* Pagination */}
@@ -236,16 +273,6 @@ export default function Workers() {
                     )}
                 </div>
             </div>
-
-            <RemoveWorkerModal
-                show={showRemoveModal}
-                onClose={() => {
-                    setShowRemoveModal(false);
-                    setWorkerToRemove(null);
-                }}
-                worker={workerToRemove}
-                onConfirm={handleDeleteConfirm}
-            />
         </DashboardLayout>
     );
 }

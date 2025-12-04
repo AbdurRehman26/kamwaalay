@@ -74,7 +74,7 @@ export default function DashboardLayout({ children }) {
                 },
                 {
                     name: "Documents",
-                    path: route("dashboard.documents"),
+                    path: "/dashboard/documents",
                     icon: "📄",
                     roles: ["helper", "business"]
                 },
@@ -122,16 +122,16 @@ export default function DashboardLayout({ children }) {
                                 Home
                             </Link>
                             <Link
-                                to={route("job-applications.index")}
-                                className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
-                            >
-                                Search Jobs
-                            </Link>
-                            <Link
                                 to={route("dashboard")}
                                 className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                             >
                                 Dashboard
+                            </Link>
+                            <Link
+                                to={route("job-applications.index")}
+                                className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                            >
+                                Search Jobs
                             </Link>
                             <NotificationDropdown />
                             <Link
@@ -265,11 +265,7 @@ export default function DashboardLayout({ children }) {
 
                 {/* Main Content */}
                 <main className="flex-1 min-w-0">
-                    <div className="py-6">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            {children}
-                        </div>
-                    </div>
+                    {children}
                 </main>
             </div>
 
@@ -277,4 +273,3 @@ export default function DashboardLayout({ children }) {
         </div>
     );
 }
-
