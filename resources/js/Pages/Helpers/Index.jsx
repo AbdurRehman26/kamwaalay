@@ -644,20 +644,37 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                     <span className="bg-primary-100 text-primary-800 text-xs px-3 py-1 rounded-full font-semibold">🏢 Business</span>
                                                 )}
                                             </div>
-                                            {!isBusiness && helper.service_listings && helper.service_listings.length > 0 && helper.service_listings[0].service_types && helper.service_listings[0].service_types.length > 0 && (
-                                                <p className="text-gray-600 mb-3 capitalize">{helper.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "Service"}</p>
+                                            {/* Services */}
+                                            {helper.service_listings && helper.service_listings.length > 0 && (
+                                                <div className="mb-3">
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {helper.service_listings.flatMap(listing => 
+                                                            listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
+                                                        ).filter(Boolean).slice(0, 3).map((type, idx) => (
+                                                            <span key={idx} className="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-md font-medium capitalize">
+                                                                {type}
+                                                            </span>
+                                                        ))}
+                                                        {helper.service_listings.flatMap(listing => 
+                                                            listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
+                                                        ).filter(Boolean).length > 3 && (
+                                                            <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md font-medium">
+                                                                +{helper.service_listings.flatMap(listing => 
+                                                                    listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
+                                                                ).filter(Boolean).length - 3}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             )}
                                             {isBusiness && helper.bio && (
                                                 <p className="text-gray-600 mb-3 text-sm line-clamp-2">{helper.bio}</p>
                                             )}
-                                            {!isBusiness && (
-                                                <div className="flex items-center mb-3">
-                                                    <span className="text-yellow-500 text-xl mr-2">⭐</span>
-                                                    <span className="font-semibold text-lg">{helper.rating || 0}</span>
-                                                    <span className="text-gray-500 ml-2 text-sm">({helper.total_reviews || 0})</span>
-                                                </div>
-                                            )}
-                                            <p className="text-sm text-gray-500 mb-2">{helper.city || "N/A"}, {helper.area || "N/A"}</p>
+                                            {/* Location */}
+                                            <div className="flex items-center text-sm text-gray-500 mb-2">
+                                                <span className="mr-2">📍</span>
+                                                <span>{helper.city || "N/A"}{helper.area ? `, ${helper.area}` : ""}</span>
+                                            </div>
                                             {!isBusiness && helper.experience_years > 0 && (
                                                 <p className="text-sm text-gray-600 mb-3">{helper.experience_years} years experience</p>
                                             )}

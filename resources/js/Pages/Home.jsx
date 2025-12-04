@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout.jsx";
 import { homeService } from "@/services/home";
-import { jobApplicationsService } from "@/services/jobApplications";
+import { bookingsService } from "@/services/bookings";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import {
@@ -31,17 +31,15 @@ export default function Home() {
                 setLoading(false);
             });
 
-        // Fetch jobs if user is helper or business
-        if (isHelperOrBusiness(user)) {
-            jobApplicationsService.getApplications({})
-                .then((data) => {
-                    // Get first 6 jobs
-                    setJobs((data.bookings?.data || []).slice(0, 6));
-                })
-                .catch((error) => {
-                    console.error("Error fetching jobs:", error);
-                });
-        }
+        // Fetch jobs for all users (including non-logged in)
+        bookingsService.browseBookings({ page: 1, per_page: 6 })
+            .then((data) => {
+                // Get first 6 jobs
+                setJobs((data.bookings?.data || []).slice(0, 6));
+            })
+            .catch((error) => {
+                console.error("Error fetching jobs:", error);
+            });
     }, [user]);
     const services = [
         { name: "Maid", icon: "🧹", color: "from-primary-500 to-primary-600" },
@@ -96,7 +94,6 @@ export default function Home() {
 
     return (
         <PublicLayout>
-
             {/* Hero Section */}
             <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-orange-500 text-white overflow-hidden">
                 <div className="absolute inset-0 opacity-10">
@@ -195,58 +192,6 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* How It Works */}
-            <section className="py-24 bg-white">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">How It Works</h2>
-                        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                            Get started in three simple steps
-                        </p>
-                    </div>
-                    <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
-                        {steps.map((step, index) => (
-                            <div key={index} className="text-center relative">
-                                <div className="bg-gradient-to-br w-24 h-24 flex items-center justify-center mx-auto mb-6 text-white text-5xl transform hover:scale-110 transition-transform">
-                                    {step.icon}
-                                </div>
-                                <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6 font-bold text-2xl shadow-lg">
-                                    {step.number}
-                                </div>
-                                <h3 className="text-2xl font-bold mb-4 text-gray-900">{step.title}</h3>
-                                <p className="text-gray-600 text-lg leading-relaxed">{step.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Trust Indicators */}
-            <section className="py-24 bg-gradient-to-br from-primary-50 via-primary-100 to-orange-50">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Why Choose Us?</h2>
-                    </div>
-                    <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                        <div className="text-center p-10 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-shadow">
-                            <div className="text-6xl mb-6">🔒</div>
-                            <h3 className="font-bold text-xl mb-4 text-gray-900">Police Verified</h3>
-                            <p className="text-gray-600 leading-relaxed">All helpers undergo thorough background verification and police checks</p>
-                        </div>
-                        <div className="text-center p-10 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-shadow">
-                            <div className="text-6xl mb-6">✨</div>
-                            <h3 className="font-bold text-xl mb-4 text-gray-900">Free Replacement</h3>
-                            <p className="text-gray-600 leading-relaxed">Not satisfied? Get a free replacement guarantee within 7 days</p>
-                        </div>
-                        <div className="text-center p-10 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-shadow">
-                            <div className="text-6xl mb-6">⭐</div>
-                            <h3 className="font-bold text-xl mb-4 text-gray-900">1000+ Verified</h3>
-                            <p className="text-gray-600 leading-relaxed">Large pool of trusted and experienced helpers ready to serve</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             {/* Featured Helpers - Only for users/guests */}
             {!loading && !isHelperOrBusiness(user) && featuredHelpers && featuredHelpers.length > 0 && (
                 <section className="py-24 bg-white">
@@ -311,8 +256,8 @@ export default function Home() {
                 </section>
             )}
 
-            {/* Jobs Section - Only for helpers/businesses */}
-            {isHelperOrBusiness(user) && jobs && jobs.length > 0 && (
+            {/* Jobs Section - Available for all users */}
+            {jobs && jobs.length > 0 && (
                 <section className="py-24 bg-gradient-to-br from-gray-50 to-white">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
                         <div className="text-center mb-16">
@@ -475,6 +420,58 @@ export default function Home() {
                 </section>
             )}
 
+            {/* How It Works */}
+            <section className="py-24 bg-white">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">How It Works</h2>
+                        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                            Get started in three simple steps
+                        </p>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+                        {steps.map((step, index) => (
+                            <div key={index} className="text-center relative">
+                                <div className="bg-gradient-to-br w-24 h-24 flex items-center justify-center mx-auto mb-6 text-white text-5xl transform hover:scale-110 transition-transform">
+                                    {step.icon}
+                                </div>
+                                <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6 font-bold text-2xl shadow-lg">
+                                    {step.number}
+                                </div>
+                                <h3 className="text-2xl font-bold mb-4 text-gray-900">{step.title}</h3>
+                                <p className="text-gray-600 text-lg leading-relaxed">{step.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Trust Indicators */}
+            <section className="py-24 bg-gradient-to-br from-primary-50 via-primary-100 to-orange-50">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Why Choose Us?</h2>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                        <div className="text-center p-10 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-shadow">
+                            <div className="text-6xl mb-6">🔒</div>
+                            <h3 className="font-bold text-xl mb-4 text-gray-900">Police Verified</h3>
+                            <p className="text-gray-600 leading-relaxed">All helpers undergo thorough background verification and police checks</p>
+                        </div>
+                        <div className="text-center p-10 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-shadow">
+                            <div className="text-6xl mb-6">✨</div>
+                            <h3 className="font-bold text-xl mb-4 text-gray-900">Free Replacement</h3>
+                            <p className="text-gray-600 leading-relaxed">Not satisfied? Get a free replacement guarantee within 7 days</p>
+                        </div>
+                        <div className="text-center p-10 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-shadow">
+                            <div className="text-6xl mb-6">⭐</div>
+                            <h3 className="font-bold text-xl mb-4 text-gray-900">1000+ Verified</h3>
+                            <p className="text-gray-600 leading-relaxed">Large pool of trusted and experienced helpers ready to serve</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Testimonials */}
             <section className="py-24 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -500,7 +497,7 @@ export default function Home() {
 
             {/* CTA Section */}
             <section className="py-24 bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 text-white">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+                <div className={`max-w-7xl mx-auto px-6 lg:px-8 text-center ${user ? "lg:mr-80" : ""}`}>
                     <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Find Your Perfect Helper?</h2>
                     <p className="text-xl mb-10 text-white/90 max-w-2xl mx-auto">
                         Join thousands of happy customers who found their trusted home help

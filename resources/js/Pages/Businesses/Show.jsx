@@ -354,26 +354,49 @@ export default function BusinessShow() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <div className="flex items-center">
-                                                        <span className="text-yellow-400 text-lg mr-1">⭐</span>
-                                                        <span className="font-semibold">{worker.rating || 0}</span>
-                                                        <span className="text-gray-500 text-sm ml-1">({worker.total_reviews || 0})</span>
-                                                    </div>
-                                                    {worker.verification_status === "verified" && (
+                                                {worker.verification_status === "verified" && (
+                                                    <div className="mb-3">
                                                         <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">
                                                             ✓ Verified
                                                         </span>
-                                                    )}
-                                                </div>
+                                                    </div>
+                                                )}
+                                                {/* Services */}
+                                                {worker.service_listings && worker.service_listings.length > 0 && (
+                                                    <div className="mb-3">
+                                                        <div className="text-xs font-semibold text-gray-500 mb-1">Services</div>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {worker.service_listings.flatMap(listing => 
+                                                                listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
+                                                            ).filter(Boolean).slice(0, 3).map((type, idx) => (
+                                                                <span key={idx} className="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-md font-medium capitalize">
+                                                                    {type}
+                                                                </span>
+                                                            ))}
+                                                            {worker.service_listings.flatMap(listing => 
+                                                                listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
+                                                            ).filter(Boolean).length > 3 && (
+                                                                <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md font-medium">
+                                                                    +{worker.service_listings.flatMap(listing => 
+                                                                        listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
+                                                                    ).filter(Boolean).length - 3}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {/* Location */}
+                                                {(worker.city || worker.area) && (
+                                                    <div className="mb-3">
+                                                        <div className="flex items-center text-sm text-gray-600">
+                                                            <span className="mr-2">📍</span>
+                                                            <span>{[worker.city, worker.area].filter(Boolean).join(", ")}</span>
+                                                        </div>
+                                                    </div>
+                                                )}
                                                 {worker.experience_years && (
                                                     <p className="text-sm text-gray-600 mb-2">
                                                         💼 {worker.experience_years} years experience
-                                                    </p>
-                                                )}
-                                                {worker.service_listings && worker.service_listings.length > 0 && (
-                                                    <p className="text-xs text-gray-500">
-                                                        📋 {worker.service_listings.length} service listing{worker.service_listings.length !== 1 ? "s" : ""}
                                                     </p>
                                                 )}
                                                 <span className="text-primary-600 font-semibold text-sm mt-2 block">View Profile →</span>

@@ -130,22 +130,6 @@ export default function Workers() {
                                                 </div>
                                             </div>
 
-                                            {/* Contact Information */}
-                                            <div className="mb-4 space-y-2">
-                                                {worker.email && (
-                                                    <div className="flex items-center text-sm text-gray-600">
-                                                        <span className="mr-2">📧</span>
-                                                        <span className="truncate">{worker.email}</span>
-                                                    </div>
-                                                )}
-                                                {worker.phone && (
-                                                    <div className="flex items-center text-sm text-gray-600">
-                                                        <span className="mr-2">📞</span>
-                                                        <span>{worker.phone}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-
                                             {/* Service Types */}
                                             {serviceTypes.length > 0 && (
                                                 <div className="mb-4">
@@ -203,13 +187,6 @@ export default function Workers() {
                                                     <p className="text-sm text-gray-700 line-clamp-2">{worker.bio}</p>
                                                 </div>
                                             )}
-
-                                            {/* Rating */}
-                                            <div className="flex items-center mb-4 pb-4 border-b border-gray-200">
-                                                <span className="text-yellow-500 mr-2 text-lg">⭐</span>
-                                                <span className="font-bold text-gray-900">{worker.rating ? worker.rating.toFixed(1) : "0.0"}</span>
-                                                <span className="text-gray-500 ml-2 text-sm">({worker.total_reviews || 0} {worker.total_reviews === 1 ? "review" : "reviews"})</span>
-                                            </div>
 
                                             {/* Joined Date */}
                                             {joinedDate && (

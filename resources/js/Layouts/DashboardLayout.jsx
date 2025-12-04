@@ -43,6 +43,12 @@ export default function DashboardLayout({ children }) {
                 path: route("messages"),
                 icon: "💬",
                 roles: ["user", "helper", "business"]
+            },
+            {
+                name: "Profile",
+                path: route("profile.edit"),
+                icon: "👤",
+                roles: ["user", "helper", "business"]
             }
         ];
 
@@ -133,13 +139,21 @@ export default function DashboardLayout({ children }) {
                             >
                                 Search Jobs
                             </Link>
-                            <NotificationDropdown />
+                            {isHelperOrBusiness(user) && (
+                                <Link
+                                    to={route("service-listings.create")}
+                                    className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg font-medium"
+                                >
+                                    Offer New Service
+                                </Link>
+                            )}
                             <Link
                                 to={route("profile.edit")}
                                 className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg font-medium"
                             >
                                 Profile
                             </Link>
+                            <NotificationDropdown />
                             <button
                                 onClick={() => setShowLogoutModal(true)}
                                 className="text-red-600 hover:text-red-700 font-medium transition-colors"
@@ -227,6 +241,16 @@ export default function DashboardLayout({ children }) {
                                         <span className="mr-3 text-xl">📊</span>
                                         <span>Dashboard</span>
                                     </Link>
+                                    {isHelperOrBusiness(user) && (
+                                        <Link
+                                            to={route("service-listings.create")}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="group flex items-center px-3 py-2 text-base font-medium rounded-lg bg-green-50 text-green-700 hover:bg-green-100"
+                                        >
+                                            <span className="mr-3 text-xl">➕</span>
+                                            <span>Offer New Service</span>
+                                        </Link>
+                                    )}
                                     {navItems.map((item) => (
                                         <Link
                                             key={item.path}
