@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import DashboardLayout from "@/Layouts/DashboardLayout";
+import PublicLayout from "@/Layouts/PublicLayout";
 import api from "@/services/api";
 import { jobApplicationsService } from "@/services/jobApplications";
 import { route } from "@/utils/routes";
@@ -107,7 +107,7 @@ export default function JobApplicationsIndex() {
     };
 
     return (
-        <DashboardLayout>
+        <PublicLayout>
             
             <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 text-white py-16">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -366,7 +366,7 @@ export default function JobApplicationsIndex() {
                     </div>
                 )}
             </div>
-        </DashboardLayout>
+        </PublicLayout>
     );
 }
 
