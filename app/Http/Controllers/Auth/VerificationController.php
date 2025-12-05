@@ -219,7 +219,7 @@ class VerificationController extends Controller
         if ($request->has('email') && $request->email) {
             // Find user by email
             $user = User::where('email', $request->email)->first();
-            
+
             if (!$user) {
                 return response()->json([
                     'message' => 'User not found with this email address.',
@@ -241,9 +241,14 @@ class VerificationController extends Controller
 
         // If phone is provided, use it directly for phone verification
         if ($request->has('phone') && $request->phone) {
-            // Find user by phone
-            $user = User::where('phone', $request->phone)->first();
+            // Format phone number to +92xxxxx format
+            $formattedPhone = $this->formatPhoneNumber($request->phone);
             
+            // Find user by phone (try both formatted and original)
+            $user = User::where('phone', $formattedPhone)
+                ->orWhere('phone', $request->phone)
+                ->first();
+
             if (!$user) {
                 return response()->json([
                     'message' => 'User not found with this phone number.',
@@ -257,7 +262,7 @@ class VerificationController extends Controller
             $verificationData = [
                 'user_id' => $user->id,
                 'method' => 'phone',
-                'identifier' => $request->phone,
+                'identifier' => $formattedPhone,
             ];
 
             return $this->verifyPhoneOtp($request, $user, $isLogin, $verificationData);
@@ -337,7 +342,7 @@ class VerificationController extends Controller
 
         // Demo code check - bypass normal OTP verification for development
         $isDemoCode = $request->otp === '123456';
-        
+
         if (!$isDemoCode) {
             // Find OTP record
             $emailOtp = EmailOtp::where('email', $email)
@@ -457,12 +462,19 @@ class VerificationController extends Controller
             ], 422);
         }
 
+        // Format phone number to +92xxxxx format
+        $phone = $this->formatPhoneNumber($phone);
+
         // Demo code check - bypass normal OTP verification for development
         $isDemoCode = $request->otp === '123456';
-        
+
         if (!$isDemoCode) {
-            // Find OTP record
-            $phoneOtp = PhoneOtp::where('phone', $phone)
+            // Find OTP record (try both formatted phone and original phone formats)
+            $phoneOtp = PhoneOtp::where(function($query) use ($phone) {
+                    $query->where('phone', $phone)
+                          ->orWhere('phone', ltrim($phone, '+'))
+                          ->orWhere('phone', '+' . ltrim($phone, '+'));
+                })
                 ->where('otp', $request->otp)
                 ->where('verified', false)
                 ->latest()
@@ -621,7 +633,7 @@ class VerificationController extends Controller
         // If email is provided, use it directly
         if ($request->has('email') && $request->email) {
             $user = User::where('email', $request->email)->first();
-            
+
             if (!$user) {
                 return response()->json([
                     'message' => 'User not found with this email address.',
@@ -646,7 +658,7 @@ class VerificationController extends Controller
         // If phone is provided, use it directly
         if ($request->has('phone') && $request->phone) {
             $user = User::where('phone', $request->phone)->first();
-            
+
             if (!$user) {
                 return response()->json([
                     'message' => 'User not found with this phone number.',
@@ -910,6 +922,47 @@ class VerificationController extends Controller
     /**
      * Mask phone number for display
      */
+    /**
+     * Format phone number to +92xxxxx format
+     * Handles formats like: 03xxxxxxxxx, 92xxxxxxxxx, +92xxxxxxxxx, 0092xxxxxxxxx
+     */
+    private function formatPhoneNumber(string $phone): string
+    {
+        // Remove all non-numeric characters except +
+        $phone = preg_replace('/[^0-9+]/', '', $phone);
+        
+        // Remove leading + if present (we'll add it back at the end)
+        $phone = ltrim($phone, '+');
+        
+        // Handle different input formats
+        if (strpos($phone, '0092') === 0) {
+            // Format: 0092xxxxxxxxx -> +92xxxxxxxxx
+            $phone = substr($phone, 2); // Remove 00, keep 92
+        } elseif (strpos($phone, '92') === 0 && strlen($phone) >= 12) {
+            // Format: 92xxxxxxxxx -> +92xxxxxxxxx (already has country code)
+            // Keep as is
+        } elseif (strpos($phone, '0') === 0 && strlen($phone) >= 10) {
+            // Format: 03xxxxxxxxx -> +923xxxxxxxxx (local format starting with 0)
+            $phone = '92' . substr($phone, 1); // Remove leading 0, add 92
+        } elseif (strlen($phone) >= 10 && strlen($phone) <= 11) {
+            // Format: 3xxxxxxxxx (10-11 digits without leading 0 or country code)
+            // Assume it's a local number, add 92
+            $phone = '92' . $phone;
+        } elseif (strlen($phone) < 10) {
+            // Too short, might be incomplete - still try to format
+            if (strpos($phone, '92') !== 0) {
+                $phone = '92' . $phone;
+            }
+        }
+        
+        // Ensure it starts with +
+        if (strpos($phone, '+') !== 0) {
+            $phone = '+' . $phone;
+        }
+        
+        return $phone;
+    }
+
     private function maskPhone(string $phone): string
     {
         if (strlen($phone) <= 4) {
@@ -929,15 +982,6 @@ class VerificationController extends Controller
         // Check if onboarding is complete
         $onboardingComplete = $user->hasCompletedOnboarding();
 
-        // Log role for debugging
-        Log::info('Redirecting user after verification', [
-            'user_id' => $user->id,
-            'roles' => $user->roles->pluck('name')->toArray(),
-            'has_helper' => $user->hasRole('helper'),
-            'has_business' => $user->hasRole('business'),
-            'onboarding_complete' => $onboardingComplete,
-        ]);
-
         // If onboarding is not complete, redirect to onboarding/profile
         if (!$onboardingComplete) {
             if ($user->hasRole('helper')) {
@@ -956,7 +1000,7 @@ class VerificationController extends Controller
 
             // Normal user - redirect to profile update
             return [
-                'route' => 'profile.edit',
+                'route' => 'home.index',
                 'message' => 'Welcome! Please update your profile to get started.',
             ];
         }

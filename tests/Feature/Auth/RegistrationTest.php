@@ -51,8 +51,9 @@ test('users can register with phone number', function () {
     $response->assertStatus(200)
         ->assertJsonStructure(['message', 'user_id', 'verification_method', 'identifier']);
     $this->assertGuest(); // User should NOT be logged in until OTP is verified
+    // Phone number is formatted to include country code
     $this->assertDatabaseHas('users', [
-        'phone' => '03001234567',
+        'phone' => '+923001234567',
         'name' => 'Test User',
     ]);
 });

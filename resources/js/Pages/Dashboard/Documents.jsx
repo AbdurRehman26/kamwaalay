@@ -133,9 +133,9 @@ export default function DashboardDocuments() {
                                                             className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-primary-400 transition-colors cursor-pointer"
                                                             onError={(e) => {
                                                                 // Fallback if image fails to load
-                                                                e.target.style.display = 'none';
-                                                                const fallback = e.target.parentElement.querySelector('.image-fallback');
-                                                                if (fallback) fallback.style.display = 'flex';
+                                                                e.target.style.display = "none";
+                                                                const fallback = e.target.parentElement.querySelector(".image-fallback");
+                                                                if (fallback) fallback.style.display = "flex";
                                                             }}
                                                         />
                                                         <div className="w-32 h-32 bg-gray-100 rounded-lg border-2 border-gray-200 flex items-center justify-center image-fallback hidden absolute top-0 left-0">

@@ -94,6 +94,42 @@ export default function Verify() {
         return `${mins}:${secs.toString().padStart(2, "0")}`;
     };
 
+    const formatPhoneNumber = (phone) => {
+        // Remove all non-numeric characters except +
+        let formatted = phone.replace(/[^0-9+]/g, "");
+        
+        // Remove leading + if present (we'll add it back)
+        formatted = formatted.replace(/^\+/, "");
+        
+        // Handle different formats
+        if (formatted.startsWith("0092")) {
+            // Format: 0092xxxxxxxxx -> +92xxxxxxxxx
+            formatted = formatted.substring(2); // Remove 00, keep 92
+        } else if (formatted.startsWith("92") && formatted.length >= 12) {
+            // Format: 92xxxxxxxxx -> +92xxxxxxxxx (already has country code)
+            // Keep as is
+        } else if (formatted.startsWith("0") && formatted.length >= 10) {
+            // Format: 03xxxxxxxxx -> +923xxxxxxxxx (local format starting with 0)
+            formatted = "92" + formatted.substring(1); // Remove leading 0, add 92
+        } else if (formatted.length >= 10 && formatted.length <= 11) {
+            // Format: 3xxxxxxxxx (10-11 digits without leading 0 or country code)
+            // Assume it's a local number, add 92
+            formatted = "92" + formatted;
+        } else if (formatted.length < 10) {
+            // Too short, might be incomplete - still try to format
+            if (!formatted.startsWith("92")) {
+                formatted = "92" + formatted;
+            }
+        }
+        
+        // Ensure it starts with +
+        if (!formatted.startsWith("+")) {
+            formatted = "+" + formatted;
+        }
+        
+        return formatted;
+    };
+
     const handleResend = async (e) => {
         e.preventDefault();
         setProcessing(true);
@@ -134,8 +170,8 @@ export default function Verify() {
                 const storedPhone = localStorage.getItem("verification_phone");
                 const phoneToUse = storedPhone || identifier;
                 if (phoneToUse) {
-                    // Normalize phone number (remove non-numeric characters except +)
-                    otpPayload.phone = phoneToUse.replace(/[^0-9+]/g, "");
+                    // Format phone number to +92xxxxx format
+                    otpPayload.phone = formatPhoneNumber(phoneToUse);
                 }
             }
             

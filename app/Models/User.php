@@ -152,6 +152,7 @@ class User extends Authenticatable
         if ($this->hasRole('helper') || $this->hasRole('business')) {
             // Check if user has a profile with service listings
             $profile = $this->profile;
+
             if (!$profile) {
                 return false;
             }

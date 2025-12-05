@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import axios from "axios";
-import { useDropzone } from "react-dropzone";
 import { onboardingService } from "@/services/onboarding";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
@@ -10,6 +9,9 @@ import { route } from "@/utils/routes";
 export default function OnboardingHelper() {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const [currentStep, setCurrentStep] = useState(1);
+    const totalSteps = 3;
+    
     const [offers, setOffers] = useState([{
         selectedServiceTypes: [],
         selectedLocations: [],
@@ -34,6 +36,7 @@ export default function OnboardingHelper() {
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
+    const [isExplicitSubmit, setIsExplicitSubmit] = useState(false);
     const [fieldErrors, setFieldErrors] = useState({
         serviceTypes: "",
         locations: "",
@@ -196,29 +199,28 @@ export default function OnboardingHelper() {
         };
     }, []);
 
-    const submit = async (e) => {
-        e.preventDefault();
-        setProcessing(true);
-        setErrors({});
-        
-        // Get the first offer (we'll simplify to single offer structure)
-        const offer = offers[0];
-        
-        // Validate
+    const validateStep = (step) => {
         const validationErrors = {};
-        if (!offer.selectedServiceTypes.length) {
-            validationErrors.serviceTypes = "Please select at least one service type.";
+        const offer = offers[0];
+
+        if (step === 1) {
+            // Validate Service Information
+            if (!offer.selectedServiceTypes.length) {
+                validationErrors.serviceTypes = "Please select at least one service type.";
+            }
+            if (!offer.selectedLocations.length) {
+                validationErrors.locations = "Please select at least one location.";
+            }
+            if (!offer.work_type) {
+                validationErrors.workType = "Please select a work type.";
+            }
         }
-        if (!offer.selectedLocations.length) {
-            validationErrors.locations = "Please select at least one location.";
-        }
-        if (!offer.work_type) {
-            validationErrors.workType = "Please select a work type.";
-        }
+        // Step 2 (Profile Verification) is optional - no validation required
+        // Step 3 (Additional Information) has no required fields
 
         if (Object.keys(validationErrors).length > 0) {
             setFieldErrors(prev => ({ ...prev, ...validationErrors }));
-            setProcessing(false);
+            setErrors(validationErrors);
             // Scroll to first error
             setTimeout(() => {
                 const firstErrorElement = document.querySelector("[data-error-field]");
@@ -226,10 +228,9 @@ export default function OnboardingHelper() {
                     firstErrorElement.scrollIntoView({ behavior: "smooth", block: "center" });
                 }
             }, 100);
-            return;
+            return false;
         }
 
-        // Clear validation errors
         setFieldErrors({
             serviceTypes: "",
             locations: "",
@@ -240,29 +241,117 @@ export default function OnboardingHelper() {
             photoFileSize: "",
             locationSelect: "",
         });
+        setErrors({});
+        return true;
+    };
 
-        // Prepare data in the expected format
-        const services = offer.selectedServiceTypes; // Array of strings
-        const locations = offer.selectedLocations.map(loc => loc.id); // Array of location IDs
-        const work_type = offer.work_type;
-        const monthly_rate = offer.monthly_rate ? parseFloat(offer.monthly_rate) : null;
-        const description = offer.description || null;
-
-        // Prepare FormData for file uploads
+    const saveServiceListing = async () => {
+        const offer = offers[0];
+        
+        // Prepare FormData for service listing
         const formData = new FormData();
-        formData.append("services", JSON.stringify(services));
-        formData.append("locations", JSON.stringify(locations));
-        formData.append("work_type", work_type);
-        if (monthly_rate !== null) {
-            formData.append("monthly_rate", monthly_rate);
+        formData.append("services", JSON.stringify(offer.selectedServiceTypes));
+        formData.append("locations", JSON.stringify(offer.selectedLocations.map(loc => loc.id)));
+        formData.append("work_type", offer.work_type);
+        if (offer.monthly_rate) {
+            formData.append("monthly_rate", parseFloat(offer.monthly_rate));
         }
-        if (description) {
-            formData.append("description", description);
+        if (offer.description) {
+            formData.append("description", offer.description);
         }
         formData.append("experience_years", profileData.experience_years || "");
         formData.append("bio", profileData.bio || "");
-        formData.append("nic_number", profileData.nic_number || "");
+
+        try {
+            await onboardingService.completeHelper(formData);
+            return true;
+        } catch (error) {
+            if (error.response?.data?.errors) {
+                setErrors(error.response.data.errors);
+            } else {
+                setErrors({ submit: [error.response?.data?.message || "Failed to save service listing"] });
+            }
+            return false;
+        }
+    };
+
+    const handleNext = async () => {
+        if (currentStep === 1) {
+            // Validate and save service listing on step 1
+            if (!validateStep(1)) {
+                return;
+            }
+            setProcessing(true);
+            const saved = await saveServiceListing();
+            setProcessing(false);
+            if (saved) {
+                setCurrentStep(2);
+            }
+        } else if (validateStep(currentStep)) {
+            if (currentStep < totalSteps) {
+                setCurrentStep(currentStep + 1);
+            }
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentStep > 1) {
+            setCurrentStep(currentStep - 1);
+        }
+    };
+
+    const handleSkip = () => {
+        if (currentStep === 2) {
+            // Skip verification documents and go to step 3
+            setCurrentStep(3);
+        }
+    };
+
+    const submit = async (e) => {
+        e.preventDefault();
         
+        // If on step 1, save service listing
+        if (currentStep === 1) {
+            await handleNext();
+            return;
+        }
+        
+        // If on step 2, just proceed to next step (don't submit)
+        if (currentStep === 2) {
+            handleNext();
+            return;
+        }
+        
+        // Only submit on step 3 if explicitly triggered by button click
+        // Prevent accidental submission from Enter key press
+        if (currentStep === 3 && !isExplicitSubmit) {
+            return;
+        }
+        
+        // Final submission on step 3 - update profile with verification documents if provided
+        setProcessing(true);
+        setErrors({});
+
+        const offer = offers[0];
+
+        // Prepare FormData for final submission (verification documents and profile updates)
+        const formData = new FormData();
+        formData.append("services", JSON.stringify(offer.selectedServiceTypes));
+        formData.append("locations", JSON.stringify(offer.selectedLocations.map(loc => loc.id)));
+        formData.append("work_type", offer.work_type);
+        if (offer.monthly_rate) {
+            formData.append("monthly_rate", parseFloat(offer.monthly_rate));
+        }
+        if (offer.description) {
+            formData.append("description", offer.description);
+        }
+        formData.append("experience_years", profileData.experience_years || "");
+        formData.append("bio", profileData.bio || "");
+        
+        // Add verification documents if provided (optional)
+        if (profileData.nic_number) {
+            formData.append("nic_number", profileData.nic_number);
+        }
         if (profileData.photo) {
             formData.append("photo", profileData.photo);
         }
@@ -272,23 +361,30 @@ export default function OnboardingHelper() {
 
         try {
             await onboardingService.completeHelper(formData);
-            // Redirect to home page on success
-            navigate(route("home"));
+            // Redirect to Search Jobs page on success and refresh
+            window.location.href = route("job-applications.index");
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
                 setErrors({ submit: [error.response?.data?.message || "Failed to complete onboarding"] });
             }
+            setIsExplicitSubmit(false); // Reset flag on error
         } finally {
             setProcessing(false);
         }
     };
+    
+    // Prevent Enter key from submitting form on step 3
+    const handleKeyDown = (e) => {
+        if (currentStep === 3 && e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+            e.preventDefault();
+        }
+    };
 
-    // NIC Dropzone Component
-    const NICDropzone = ({ onFileAccepted, file, error }) => {
-        const fileInputId = `nic-file-input-${Math.random().toString(36).substr(2, 9)}`;
-        const [isDragActive, setIsDragActive] = useState(false);
+    // NIC File Input Component
+    const NICFileInput = ({ onFileAccepted, file, error }) => {
+        const fileInputRef = useRef(null);
 
         const handleFileChange = (e) => {
             const selectedFile = e.target.files?.[0];
@@ -314,96 +410,49 @@ export default function OnboardingHelper() {
             }
         };
 
-        const handleDragOver = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragActive(true);
-        };
-
-        const handleDragLeave = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragActive(false);
-        };
-
-        const handleDrop = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragActive(false);
-            
-            const droppedFile = e.dataTransfer.files?.[0];
-            if (droppedFile) {
-                // Validate file type
-                const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
-                if (!validTypes.includes(droppedFile.type)) {
-                    setFieldErrors(prev => ({ ...prev, nicFileType: "Invalid file type. Please upload JPG, PNG, or PDF." }));
-                    setTimeout(() => setFieldErrors(prev => ({ ...prev, nicFileType: "" })), 5000);
-                    return;
-                }
-                // Validate file size (5MB)
-                if (droppedFile.size > 5 * 1024 * 1024) {
-                    setFieldErrors(prev => ({ ...prev, nicFileSize: "File size exceeds 5MB limit." }));
-                    setTimeout(() => setFieldErrors(prev => ({ ...prev, nicFileSize: "" })), 5000);
-                    return;
-                }
-                // Clear errors on successful file selection
-                setFieldErrors(prev => ({ ...prev, nicFileType: "", nicFileSize: "" }));
-                onFileAccepted(droppedFile);
+        const removeFile = () => {
+            onFileAccepted(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
             }
         };
 
         return (
             <div>
-                <input
-                    id={fileInputId}
-                    type="file"
-                    accept=".jpeg,.jpg,.png,.pdf"
-                    onChange={handleFileChange}
-                    style={{ display: "none" }}
-                />
-                <label
-                    htmlFor={fileInputId}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors block ${
-                        isDragActive
-                            ? "border-primary-500 bg-primary-50"
-                            : error
-                            ? "border-red-300 bg-red-50"
-                            : "border-gray-300 hover:border-primary-400 hover:bg-gray-50"
-                    }`}
-                >
-                    <div className="space-y-2">
-                        <div className="text-4xl mb-2">📄</div>
-                        {file ? (
-                            <div>
-                                <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                    {(file.size / 1024 / 1024).toFixed(2)} MB
-                                </p>
-                            </div>
-                        ) : (
-                            <>
-                                <p className="text-sm font-medium text-gray-700">
-                                    {isDragActive ? "Drop the file here" : "Click or drag to upload NIC"}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                    Supports: JPG, PNG, PDF (Max 5MB)
-                                </p>
-                            </>
-                        )}
+                {file ? (
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">{file.name}</p>
+                            <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={removeFile}
+                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600"
+                        >
+                            Remove
+                        </button>
                     </div>
-                </label>
-                {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
+                ) : (
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={handleFileChange}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                    />
+                )}
+                <p className="mt-1 text-xs text-gray-500">PDF, JPG, or PNG up to 5MB</p>
+                {(error || fieldErrors.nicFileType || fieldErrors.nicFileSize) && (
+                    <div className="text-red-500 text-sm mt-1">{error || fieldErrors.nicFileType || fieldErrors.nicFileSize}</div>
+                )}
             </div>
         );
     };
 
-    // Photo Dropzone Component
-    const PhotoDropzone = ({ onFileAccepted, file, error }) => {
-        const fileInputId = `photo-file-input-${Math.random().toString(36).substr(2, 9)}`;
-        const [isDragActive, setIsDragActive] = useState(false);
+    // Photo File Input Component
+    const PhotoFileInput = ({ onFileAccepted, file, error }) => {
+        const fileInputRef = useRef(null);
 
         const handleFileChange = (e) => {
             const selectedFile = e.target.files?.[0];
@@ -429,105 +478,101 @@ export default function OnboardingHelper() {
             }
         };
 
-        const handleDragOver = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragActive(true);
-        };
-
-        const handleDragLeave = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragActive(false);
-        };
-
-        const handleDrop = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragActive(false);
-            
-            const droppedFile = e.dataTransfer.files?.[0];
-            if (droppedFile) {
-                // Validate file type
-                const validTypes = ["image/jpeg", "image/jpg", "image/png"];
-                if (!validTypes.includes(droppedFile.type)) {
-                    setFieldErrors(prev => ({ ...prev, photoFileType: "Invalid file type. Please upload JPG or PNG." }));
-                    setTimeout(() => setFieldErrors(prev => ({ ...prev, photoFileType: "" })), 5000);
-                    return;
-                }
-                // Validate file size (2MB)
-                if (droppedFile.size > 2 * 1024 * 1024) {
-                    setFieldErrors(prev => ({ ...prev, photoFileSize: "File size exceeds 2MB limit." }));
-                    setTimeout(() => setFieldErrors(prev => ({ ...prev, photoFileSize: "" })), 5000);
-                    return;
-                }
-                // Clear errors on successful file selection
-                setFieldErrors(prev => ({ ...prev, photoFileType: "", photoFileSize: "" }));
-                onFileAccepted(droppedFile);
+        const removeFile = () => {
+            onFileAccepted(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
             }
         };
 
         return (
             <div>
-                <input
-                    id={fileInputId}
-                    type="file"
-                    accept=".jpeg,.jpg,.png"
-                    onChange={handleFileChange}
-                    style={{ display: "none" }}
-                />
-                <label
-                    htmlFor={fileInputId}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors block ${
-                        isDragActive
-                            ? "border-primary-500 bg-primary-50"
-                            : error
-                            ? "border-red-300 bg-red-50"
-                            : "border-gray-300 hover:border-primary-400 hover:bg-gray-50"
-                    }`}
-                >
-                    <div className="space-y-2">
-                        <div className="text-4xl mb-2">📷</div>
-                        {file ? (
-                            <div>
-                                <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                    {(file.size / 1024 / 1024).toFixed(2)} MB
-                                </p>
-                            </div>
-                        ) : (
-                            <>
-                                <p className="text-sm font-medium text-gray-700">
-                                    {isDragActive ? "Drop the photo here" : "Click or drag to upload photo"}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                    Supports: JPG, PNG (Max 2MB)
-                                </p>
-                            </>
-                        )}
+                {file ? (
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">{file.name}</p>
+                            <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={removeFile}
+                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600"
+                        >
+                            Remove
+                        </button>
                     </div>
-                </label>
-                {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
+                ) : (
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".jpg,.jpeg,.png"
+                        onChange={handleFileChange}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                    />
+                )}
+                <p className="mt-1 text-xs text-gray-500">JPG or PNG up to 2MB</p>
+                {(error || fieldErrors.photoFileType || fieldErrors.photoFileSize) && (
+                    <div className="text-red-500 text-sm mt-1">{error || fieldErrors.photoFileType || fieldErrors.photoFileSize}</div>
+                )}
             </div>
         );
     };
 
+    const steps = [
+        { number: 1, title: "Service Information", description: "Tell us about the services you offer" },
+        { number: 2, title: "Profile Verification", description: "Upload your verification documents" },
+        { number: 3, title: "Additional Information", description: "Add more details about yourself" },
+    ];
+
     return (
         <PublicLayout>
-            
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Complete Your Helper Profile</h1>
-                    <p className="text-xl text-white/90">Tell us about the services you offer</p>
+                    <p className="text-xl text-white/90">Step {currentStep} of {totalSteps}: {steps[currentStep - 1].title}</p>
                 </div>
             </div>
+            
+            {/* Stepper Indicator */}
+            <div className="container mx-auto px-4 py-8">
+                <div className="max-w-4xl mx-auto">
+                    <div className="flex items-center justify-between mb-8">
+                        {steps.map((step, index) => (
+                            <div key={step.number} className="flex items-center flex-1">
+                                <div className="flex flex-col items-center flex-1">
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all ${
+                                        currentStep > step.number
+                                            ? "bg-green-500 text-white"
+                                            : currentStep === step.number
+                                            ? "bg-primary-600 text-white ring-4 ring-primary-200"
+                                            : "bg-gray-300 text-gray-600"
+                                    }`}>
+                                        {currentStep > step.number ? "✓" : step.number}
+                                    </div>
+                                    <div className="mt-2 text-center">
+                                        <p className={`text-sm font-semibold ${
+                                            currentStep >= step.number ? "text-gray-900" : "text-gray-500"
+                                        }`}>
+                                            {step.title}
+                                        </p>
+                                    </div>
+                                </div>
+                                {index < steps.length - 1 && (
+                                    <div className={`flex-1 h-1 mx-4 transition-all ${
+                                        currentStep > step.number ? "bg-green-500" : "bg-gray-300"
+                                    }`} />
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
             <div className="container mx-auto px-4 py-12">
                 <div className="max-w-4xl mx-auto">
-                    <form onSubmit={submit} className="space-y-8">
-                        {offers.map((offer, offerIndex) => (
+                    <form onSubmit={submit} onKeyDown={handleKeyDown} className="space-y-8">
+                        {/* Step 1: Service Information */}
+                        {currentStep === 1 && offers.map((offer, offerIndex) => (
                             <div key={offerIndex} className="bg-white rounded-lg shadow-md p-8 border-2 border-primary-200">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-2xl font-bold text-gray-900">Service Offer {offerIndex + 1}</h2>
@@ -551,7 +596,7 @@ export default function OnboardingHelper() {
                                             <p className="text-sm text-red-600">{fieldErrors.serviceTypes}</p>
                                         </div>
                                     )}
-                                    
+
                                     {/* Selected Service Types as Tags */}
                                     {offer.selectedServiceTypes.length > 0 && (
                                         <div className="mb-4">
@@ -614,7 +659,7 @@ export default function OnboardingHelper() {
                                             <p className="text-sm text-red-600">{fieldErrors.locationSelect}</p>
                                         </div>
                                     )}
-                                    
+
                                     {/* Selected Locations as Tags */}
                                     {offer.selectedLocations.length > 0 && (
                                         <div className="mb-4">
@@ -660,7 +705,7 @@ export default function OnboardingHelper() {
                                             placeholder="Search location (e.g., Karachi, Clifton or type area name)..."
                                         />
                                         {showLocationSuggestions[offerIndex] && locationSuggestions[offerIndex]?.length > 0 && (
-                                            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                                            <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
                                                 {locationSuggestions[offerIndex]
                                                     ?.filter(suggestion => suggestion.id && !offer.selectedLocations.some(loc => loc.id === suggestion.id))
                                                     .map((suggestion, idx) => (
@@ -752,34 +797,37 @@ export default function OnboardingHelper() {
                         ))}
 
                         {/* Add Another Offer Button */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
-                            <button
-                                type="button"
-                                onClick={addOffer}
-                                className="w-full border-2 border-dashed border-primary-300 text-primary-600 py-4 rounded-lg hover:bg-primary-50 transition font-semibold"
-                            >
-                                + Add Another Service Offer
-                            </button>
-                        </div>
+                        {currentStep === 1 && (
+                            <div className="bg-white rounded-lg shadow-md p-8">
+                                <button
+                                    type="button"
+                                    onClick={addOffer}
+                                    className="w-full border-2 border-dashed border-primary-300 text-primary-600 py-4 rounded-lg hover:bg-primary-50 transition font-semibold"
+                                >
+                                    + Add Another Service Offer
+                                </button>
+                            </div>
+                        )}
 
-                        {/* Profile Verification Section */}
+                        {/* Step 2: Profile Verification Section */}
+                        {currentStep === 2 && (
                         <div className="bg-white rounded-lg shadow-md p-8 border-2 border-primary-200">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-4">Profile Verification</h2>
-                            <p className="text-sm text-gray-600 mb-6">Please upload your documents for verification</p>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-4">Profile Verification (Optional)</h2>
+                            <p className="text-sm text-gray-600 mb-6">You can upload your documents for verification now or skip this step and do it later</p>
 
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        National Identity Card (NIC) <span className="text-red-500">*</span>
+                                        National Identity Card (NIC) <span className="text-gray-500">(Optional)</span>
                                     </label>
                                     <p className="text-xs text-gray-500 mb-2">Upload a clear photo or scan of your NIC (front and back if needed)</p>
-                                    <NICDropzone
+                                    <NICFileInput
                                         onFileAccepted={(file) => {
                                             setProfileData({ ...profileData, nic: file });
                                             setFieldErrors(prev => ({ ...prev, nicFileType: "", nicFileSize: "" }));
                                         }}
                                         file={profileData.nic}
-                                        error={errors.nic || fieldErrors.nicFileType || fieldErrors.nicFileSize}
+                                        error={errors.nic}
                                     />
                                     {(fieldErrors.nicFileType || fieldErrors.nicFileSize) && (
                                         <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
@@ -790,7 +838,7 @@ export default function OnboardingHelper() {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        NIC Number <span className="text-red-500">*</span>
+                                        NIC Number <span className="text-gray-500">(Optional)</span>
                                     </label>
                                     <input
                                         type="text"
@@ -798,7 +846,6 @@ export default function OnboardingHelper() {
                                         onChange={(e) => setProfileData({ ...profileData, nic_number: e.target.value })}
                                         className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         placeholder="e.g., 42101-1234567-1"
-                                        required
                                     />
                                     {errors.nic_number && <div className="text-red-500 text-sm mt-1">{errors.nic_number}</div>}
                                 </div>
@@ -808,13 +855,13 @@ export default function OnboardingHelper() {
                                         Photo (Optional)
                                     </label>
                                     <p className="text-xs text-gray-500 mb-2">Upload your profile photo (optional)</p>
-                                    <PhotoDropzone
+                                    <PhotoFileInput
                                         onFileAccepted={(file) => {
                                             setProfileData({ ...profileData, photo: file });
                                             setFieldErrors(prev => ({ ...prev, photoFileType: "", photoFileSize: "" }));
                                         }}
                                         file={profileData.photo}
-                                        error={errors.photo || fieldErrors.photoFileType || fieldErrors.photoFileSize}
+                                        error={errors.photo}
                                     />
                                     {(fieldErrors.photoFileType || fieldErrors.photoFileSize) && (
                                         <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
@@ -824,8 +871,10 @@ export default function OnboardingHelper() {
                                 </div>
                             </div>
                         </div>
+                        )}
 
-                        {/* Helper Profile Section */}
+                        {/* Step 3: Helper Profile Section */}
+                        {currentStep === 3 && (
                         <div className="bg-white rounded-lg shadow-md p-8">
                             <h2 className="text-2xl font-bold text-gray-900 mb-4">Your Profile</h2>
                             <p className="text-sm text-gray-600 mb-6">Optional: Add more details about yourself</p>
@@ -858,6 +907,7 @@ export default function OnboardingHelper() {
                                 </div>
                             </div>
                         </div>
+                        )}
 
                         {/* General Error Message */}
                         {errors.submit && (
@@ -877,15 +927,54 @@ export default function OnboardingHelper() {
                             </div>
                         )}
 
-                        {/* Submit Button */}
+                        {/* Navigation Buttons */}
                         <div className="bg-white rounded-lg shadow-md p-8">
-                            <button
-                                type="submit"
-                                disabled={processing}
-                                className="w-full bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition duration-300 font-semibold disabled:opacity-50"
-                            >
-                                {processing ? "Completing Profile..." : "Complete Profile"}
-                            </button>
+                            <div className="flex justify-between gap-4">
+                                {currentStep > 1 && (
+                                    <button
+                                        type="button"
+                                        onClick={handlePrevious}
+                                        disabled={processing}
+                                        className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold disabled:opacity-50"
+                                    >
+                                        Previous
+                                    </button>
+                                )}
+                                <div className="flex gap-4 ml-auto">
+                                    {currentStep === 2 && (
+                                        <button
+                                            type="button"
+                                            onClick={handleSkip}
+                                            disabled={processing}
+                                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold disabled:opacity-50"
+                                        >
+                                            Skip
+                                        </button>
+                                    )}
+                                    {currentStep < totalSteps ? (
+                                        <button
+                                            type="button"
+                                            onClick={handleNext}
+                                            disabled={processing}
+                                            className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition duration-300 font-semibold disabled:opacity-50"
+                                        >
+                                            {processing ? "Saving..." : currentStep === 1 ? "Save & Continue" : "Continue"}
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                setIsExplicitSubmit(true);
+                                                submit(e);
+                                            }}
+                                            disabled={processing}
+                                            className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition duration-300 font-semibold disabled:opacity-50"
+                                        >
+                                            {processing ? "Completing..." : "Complete Profile"}
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>

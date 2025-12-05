@@ -105,7 +105,7 @@ class PageController extends Controller
         // 1. Store the message in a database
         // 2. Send an email notification
         // 3. Send a confirmation email to the user
-        
+
         // For now, we'll just log it and return success
         \Log::info('Contact form submission', $validated);
 
@@ -205,9 +205,9 @@ class PageController extends Controller
     public function searchKarachiLocations(Request $request)
     {
         $query = $request->get('q', '');
-        
+
         $karachi = City::where('name', 'Karachi')->first();
-        
+
         if (!$karachi) {
             return response()->json([]);
         }
@@ -260,7 +260,7 @@ class PageController extends Controller
     public function searchLocations(Request $request)
     {
         $query = $request->get('q', '');
-        
+
         if (strlen($query) < 2) {
             return response()->json([]);
         }
@@ -274,10 +274,8 @@ class PageController extends Controller
             ->limit(15)
             ->get()
             ->map(function ($location) {
-                $displayText = $location->area 
-                    ? $location->city->name . ', ' . $location->area 
-                    : $location->city->name;
-                
+                $displayText = $location->area;
+
                 return [
                     'id' => $location->id,
                     'city_id' => $location->city_id,
@@ -288,7 +286,7 @@ class PageController extends Controller
                     'longitude' => $location->longitude,
                 ];
             });
-        
+
         $results = $results->concat($locations);
 
         // Also search cities by name
@@ -307,7 +305,7 @@ class PageController extends Controller
                     'longitude' => null,
                 ];
             });
-        
+
         $results = $results->concat($cities);
 
         // Deduplicate and limit results
