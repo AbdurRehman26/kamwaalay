@@ -118,12 +118,14 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): JsonResponse
     {
         // Demo phone number check - automatically log in first user with helper or business role
-        $demoPhoneNumber = '9876543210';
+        $demoPhoneNumber = '+929876543210';
         $normalizedPhone = $request->filled('phone') ? $this->formatPhoneNumber($request->input('phone')) : null;
+
 
         if ($normalizedPhone === $demoPhoneNumber || $normalizedPhone === '+' . $demoPhoneNumber) {
             // Find first user with ONLY business role
             $user = User::find(2);
+
 
             if (!$user) {
                 // Fallback: Try to find any business user if strict check fails, or return error
@@ -504,10 +506,10 @@ class AuthenticatedSessionController extends Controller
     {
         // Remove all non-numeric characters except +
         $phone = preg_replace('/[^0-9+]/', '', $phone);
-        
+
         // Remove leading + if present (we'll add it back at the end)
         $phone = ltrim($phone, '+');
-        
+
         // Handle different input formats
         if (strpos($phone, '0092') === 0) {
             // Format: 0092xxxxxxxxx -> +92xxxxxxxxx
@@ -528,12 +530,12 @@ class AuthenticatedSessionController extends Controller
                 $phone = '92' . $phone;
             }
         }
-        
+
         // Ensure it starts with +
         if (strpos($phone, '+') !== 0) {
             $phone = '+' . $phone;
         }
-        
+
         return $phone;
     }
 
