@@ -146,12 +146,24 @@ export default function ServiceListingCreate() {
         });
 
         // Prepare data for API - backend expects service_types and locations arrays
+        // Filter out locations without valid IDs (e.g., cities without location records)
+        const validLocationIds = selectedLocations
+            .map(loc => {
+                // If id is a number or numeric string, use it; otherwise skip
+                const id = typeof loc.id === "number" ? loc.id : parseInt(loc.id);
+                return isNaN(id) ? null : id;
+            })
+            .filter(id => id !== null);
+
+        if (validLocationIds.length === 0) {
+            setErrors({ locations: "Please select valid locations with location IDs." });
+            setProcessing(false);
+            return;
+        }
+
         const apiData = {
             service_types: selectedServiceTypes,
-            locations: selectedLocations.map(loc => ({
-                city: loc.city_name,
-                area: loc.area,
-            })),
+            locations: validLocationIds,
             work_type: commonFields.work_type,
             monthly_rate: commonFields.monthly_rate || null,
             description: commonFields.description || null,

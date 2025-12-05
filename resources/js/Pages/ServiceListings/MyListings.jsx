@@ -32,6 +32,16 @@ export default function MyServiceListings() {
         }
     };
 
+    const toTitleCase = (str) => {
+        if (!str) return "";
+        return str
+            .replace(/_/g, " ")
+            .toLowerCase()
+            .split(" ")
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+    };
+
     return (
         <DashboardLayout>
             <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50">
@@ -87,7 +97,26 @@ export default function MyServiceListings() {
                                                         <span className="text-xl">📋</span>
                                                     </div>
                                                     <div className="flex-1">
-                                                        <h3 className="text-lg font-bold text-gray-900 mb-1">{listing.service_type_label}</h3>
+                                                        {/* Services */}
+                                                        {listing.service_types && listing.service_types.length > 0 ? (
+                                                            <div className="mb-1">
+                                                                <span className="text-lg font-bold text-gray-900">
+                                                                    {listing.service_types.slice(0, 2).map((st, idx) => (
+                                                                        <span key={idx}>
+                                                                            {typeof st === "string" ? toTitleCase(st) : toTitleCase(st?.service_type || "Service")}
+                                                                            {idx < Math.min(listing.service_types.length, 2) - 1 && ", "}
+                                                                        </span>
+                                                                    ))}
+                                                                    {listing.service_types.length > 2 && (
+                                                                        <span className="text-gray-600 font-normal">
+                                                                            {" "}+{listing.service_types.length - 2} more
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                        ) : (
+                                                            <h3 className="text-lg font-bold text-gray-900 mb-1">{toTitleCase(listing.service_type_label) || "Service"}</h3>
+                                                        )}
                                                         <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(listing.status)}`}>
                                                             {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
                                                         </span>
@@ -97,9 +126,40 @@ export default function MyServiceListings() {
                                                     <div className="flex items-center gap-2 text-gray-600 text-sm">
                                                         <span className="text-primary-600 font-bold">📍</span>
                                                         <span className="capitalize">
-                                                            {listing.work_type?.replace("_", " ") || "N/A"} • {listing.city || "N/A"}, {listing.area || "N/A"}
+                                                            {listing.work_type?.replace("_", " ") || "N/A"}
                                                         </span>
                                                     </div>
+                                                    {/* Locations */}
+                                                    {listing.location_details && listing.location_details.length > 0 ? (
+                                                        <div className="flex items-start gap-2 text-gray-600 text-sm">
+                                                            <span className="text-primary-600 font-bold mt-0.5">📍</span>
+                                                            <div className="flex-1">
+                                                                <span>
+                                                                    {listing.location_details.slice(0, 2).map((loc, idx) => (
+                                                                        <span key={idx}>
+                                                                            {loc.city_name}{loc.area ? `, ${loc.area}` : ""}
+                                                                            {idx < Math.min(listing.location_details.length, 2) - 1 && ", "}
+                                                                        </span>
+                                                                    ))}
+                                                                    {listing.location_details.length > 2 && (
+                                                                        <span className="text-gray-500">
+                                                                            {" "}+{listing.location_details.length - 2} more
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ) : listing.city && listing.area ? (
+                                                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                                                            <span className="text-primary-600 font-bold">📍</span>
+                                                            <span>{listing.city}, {listing.area}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-2 text-gray-500 text-sm">
+                                                            <span className="text-primary-600 font-bold">📍</span>
+                                                            <span>Location not specified</span>
+                                                        </div>
+                                                    )}
                                                     {listing.monthly_rate && (
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-primary-600 font-bold">💰</span>

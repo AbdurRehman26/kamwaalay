@@ -103,14 +103,23 @@ export default function ServiceListingShow() {
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Work Type</h3>
                                 <p className="text-gray-900 capitalize">{listing.work_type?.replace("_", " ") || "N/A"}</p>
-                                <h3 className="text-lg font-semibold text-gray-700 mb-2 mt-4">Location</h3>
-                                <p className="text-gray-900">
-                                    {listing.city && listing.area
-                                        ? `${listing.city}, ${listing.area}`
-                                        : listing.locations && listing.locations.length > 0
-                                        ? `Location ID: ${listing.locations[0]}`
-                                        : "Location not specified"}
-                                </p>
+                                <h3 className="text-lg font-semibold text-gray-700 mb-2 mt-4">Location{listing.location_details && listing.location_details.length > 1 ? "s" : ""}</h3>
+                                {listing.location_details && listing.location_details.length > 0 ? (
+                                    <div className="space-y-1">
+                                        {listing.location_details.map((location, idx) => (
+                                            <p key={idx} className="text-gray-900 flex items-center">
+                                                <span className="mr-2">📍</span>
+                                                <span>{location.city_name}{location.area ? `, ${location.area}` : ""}</span>
+                                            </p>
+                                        ))}
+                                    </div>
+                                ) : listing.city && listing.area ? (
+                                    <p className="text-gray-900">
+                                        📍 {listing.city}, {listing.area}
+                                    </p>
+                                ) : (
+                                    <p className="text-gray-900">Location not specified</p>
+                                )}
                             </div>
                         </div>
                         <div className="mb-6">
@@ -354,8 +363,29 @@ export default function ServiceListingShow() {
                                             )}
                                         </div>
                                         <p className="text-sm text-gray-600 mb-2 capitalize">
-                                            {otherListing.work_type?.replace("_", " ") || "Service"} • {otherListing.city && otherListing.area ? `${otherListing.city}, ${otherListing.area}` : otherListing.locations && otherListing.locations.length > 0 ? `Location ID: ${otherListing.locations[0]}` : "Location not specified"}
+                                            {otherListing.work_type?.replace("_", " ") || "Service"}
                                         </p>
+                                        {otherListing.location_details && otherListing.location_details.length > 0 ? (
+                                            <div className="text-sm text-gray-600 mb-2 space-y-1">
+                                                {otherListing.location_details.slice(0, 2).map((location, idx) => (
+                                                    <p key={idx} className="flex items-center">
+                                                        <span className="mr-1">📍</span>
+                                                        <span>{location.city_name}{location.area ? `, ${location.area}` : ""}</span>
+                                                    </p>
+                                                ))}
+                                                {otherListing.location_details.length > 2 && (
+                                                    <p className="text-gray-500 font-medium text-xs">
+                                                        +{otherListing.location_details.length - 2} more location{otherListing.location_details.length - 2 !== 1 ? "s" : ""}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ) : otherListing.city && otherListing.area ? (
+                                            <p className="text-sm text-gray-600 mb-2">
+                                                📍 {otherListing.city}, {otherListing.area}
+                                            </p>
+                                        ) : (
+                                            <p className="text-sm text-gray-600 mb-2">📍 Location not specified</p>
+                                        )}
                                         {otherListing.description && (
                                             <p className="text-gray-600 text-sm line-clamp-2 mb-3">
                                                 {otherListing.description}
