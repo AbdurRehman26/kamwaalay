@@ -114,11 +114,6 @@ export default function HelperShow() {
                                         ✓ Verified
                                     </span>
                                 )}
-                                {helper.police_verified && (
-                                    <span className="bg-primary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                        👮 Police Verified
-                                    </span>
-                                )}
                             </div>
                             {/* Skills Display */}
                             {helper.skills && (

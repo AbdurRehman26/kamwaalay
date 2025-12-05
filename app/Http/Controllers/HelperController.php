@@ -135,7 +135,10 @@ class HelperController extends Controller
             ->select('users.*');
         }
 
-        $helpers = $query->with(['roles', 'profile'])->paginate(12);
+        $helpers = $query->with(['roles', 'profile', 'serviceListings' => function ($query) {
+            $query->where('service_listings.is_active', true)
+                  ->where('service_listings.status', 'active');
+        }])->paginate(12);
 
         $filters = $request->only(['service_type', 'location_id', 'city_name', 'area', 'min_experience', 'sort_by', 'user_type']);
         if ($locationDisplay) {
