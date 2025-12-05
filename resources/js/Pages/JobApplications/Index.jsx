@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
 import api from "@/services/api";
 import { jobApplicationsService } from "@/services/jobApplications";
 import { route } from "@/utils/routes";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function JobApplicationsIndex() {
+    const { user, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
     const [bookings, setBookings] = useState({ data: [], links: [], meta: {} });
     const [filters, setFilters] = useState({});
     const [loading, setLoading] = useState(true);
@@ -214,13 +217,27 @@ export default function JobApplicationsIndex() {
                                     "cancelled": "bg-red-100 text-red-800"
                                 };
 
+                                const handleCardClick = (e) => {
+                                    // If guest, redirect to login
+                                    if (!isAuthenticated) {
+                                        e.preventDefault();
+                                        navigate(route("login"));
+                                        return;
+                                    }
+                                    // If already applied, go to application detail
+                                    if (job.has_applied && job.application_id) {
+                                        navigate(route("job-applications.show", job.application_id));
+                                        return;
+                                    }
+                                    // Otherwise, go to apply page
+                                    navigate(route("job-applications.create", job.id));
+                                };
+
                                 return (
-                                    <Link
+                                    <div
                                         key={job.id}
-                                        to={job.has_applied && job.application_id 
-                                            ? route("job-applications.show", job.application_id)
-                                            : route("job-applications.create", job.id)}
-                                        className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 hover:border-primary-300"
+                                        onClick={handleCardClick}
+                                        className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 hover:border-primary-300 cursor-pointer"
                                     >
                                         {/* Header with gradient */}
                                         <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4">
@@ -235,7 +252,7 @@ export default function JobApplicationsIndex() {
                                         </div>
 
                                         {/* Already Applied Badge */}
-                                        {job.has_applied && (
+                                        {isAuthenticated && job.has_applied && (
                                             <div className="bg-green-50 border-l-4 border-green-500 px-6 py-3">
                                                 <div className="flex items-center">
                                                     <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -338,16 +355,16 @@ export default function JobApplicationsIndex() {
                                             {/* Action Button */}
                                             <div className="pt-4 border-t border-gray-200">
                                                 <div className="flex items-center justify-between">
-                                                    <span className={`font-semibold text-sm ${job.has_applied ? "text-green-600 group-hover:text-green-700" : "text-primary-600 group-hover:text-primary-700"}`}>
-                                                        {job.has_applied ? "View Application" : "Apply Now"}
+                                                    <span className={`font-semibold text-sm ${isAuthenticated && job.has_applied ? "text-green-600 group-hover:text-green-700" : "text-primary-600 group-hover:text-primary-700"}`}>
+                                                        {!isAuthenticated ? "Login to Apply" : (job.has_applied ? "View Application" : "Apply Now")}
                                                     </span>
-                                                    <span className={`group-hover:translate-x-1 transition-transform ${job.has_applied ? "text-green-600" : "text-primary-600"}`}>
+                                                    <span className={`group-hover:translate-x-1 transition-transform ${isAuthenticated && job.has_applied ? "text-green-600" : "text-primary-600"}`}>
                                                         →
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
-                                    </Link>
+                                    </div>
                                 );
                             })}
                         </div>

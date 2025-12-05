@@ -181,11 +181,7 @@ function AppRoutes() {
                     <ServiceListingsMyListings />
                 </ProtectedRoute>
             } />
-            <Route path="/job-applications" element={
-                <ProtectedRoute>
-                    <JobApplicationsIndex />
-                </ProtectedRoute>
-            } />
+            <Route path="/job-applications" element={<JobApplicationsIndex />} />
             <Route path="/bookings/:bookingId/apply" element={
                 <ProtectedRoute>
                     <JobApplicationsCreate />

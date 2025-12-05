@@ -68,6 +68,9 @@ Route::get('/service-requests/{jobPost}', [JobPostController::class, 'show']);
 Route::get('/bookings/browse', [JobPostController::class, 'browse']); // Alias for service-requests
 Route::get('/bookings/{booking}', [JobPostController::class, 'show']); // Alias for service-requests/{jobPost}
 
+// Public job applications (browse/search jobs)
+Route::get('/job-applications', [JobApplicationController::class, 'index']);
+
 // Location search (already API-like)
 Route::get('/karachi-locations/search', [PageController::class, 'searchKarachiLocations']);
 Route::get('/locations/search', [PageController::class, 'searchLocations']);
@@ -166,8 +169,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/service-listings/{serviceListing}', [ServiceListingController::class, 'update'])->where('serviceListing', '[0-9]+');
     Route::delete('/service-listings/{serviceListing}', [ServiceListingController::class, 'destroy'])->where('serviceListing', '[0-9]+');
 
-    // Job Applications
-    Route::get('/job-applications', [JobApplicationController::class, 'index']);
+    // Job Applications (apply and manage - requires authentication)
     Route::get('/job-posts/{jobPost}/apply', [JobApplicationController::class, 'create']);
     Route::post('/job-posts/{jobPost}/apply', [JobApplicationController::class, 'store']);
     // Legacy booking routes for backward compatibility

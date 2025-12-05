@@ -46,20 +46,8 @@ class JobApplicationController extends Controller
      */
     public function index(Request $request)
     {
-        // Only helpers can browse job applications
-        $user = Auth::user();
-        if (!$user->hasRole(['helper', 'business'])) {
-            abort(403);
-        }
-
-        // Check if onboarding is completed
-        if (!$user->hasCompletedOnboarding()) {
-            $redirectRoute = $user->hasRole('helper') ? 'onboarding.helper' : 'onboarding.business';
-            return response()->json([
-                'message' => 'Please complete your onboarding before applying for services.',
-                'redirect' => ['route' => $redirectRoute],
-            ], 422);
-        }
+        // Allow guests and all users to browse job applications
+        // Only authenticated helpers/businesses with completed onboarding can apply
 
         $query = JobPost::with(['user', 'jobApplications'])
             ->where('status', 'pending')
@@ -78,8 +66,8 @@ class JobApplicationController extends Controller
                 $location->load('city');
                 $query->where('city', $location->city->name)
                       ->where('area', $location->area);
-                $locationDisplay = $location->area 
-                    ? $location->city->name . ', ' . $location->area 
+                $locationDisplay = $location->area
+                    ? $location->city->name . ', ' . $location->area
                     : $location->city->name;
             }
         } elseif ($request->has('city_name') && $request->city_name) {
@@ -95,6 +83,7 @@ class JobApplicationController extends Controller
         $jobPosts = $query->orderBy('created_at', 'desc')->paginate(12);
 
         // Get user's applications for the job posts to check if they've applied and get application IDs
+        // Only check if user is authenticated
         $userApplications = [];
         if (Auth::check()) {
             $userApplications = \App\Models\JobApplication::where('user_id', Auth::id())
@@ -105,7 +94,7 @@ class JobApplicationController extends Controller
 
         // Transform the paginated results to include has_applied flag and application_id
         $jobPosts->getCollection()->transform(function ($jobPost) use ($userApplications) {
-            $application = $userApplications->get($jobPost->id);
+            $application = $userApplications ? $userApplications->get($jobPost->id) : [];
             $jobPost->has_applied = $application !== null;
             $jobPost->application_id = $application ? $application->id : null;
             return $jobPost;
@@ -115,7 +104,7 @@ class JobApplicationController extends Controller
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
         }
-        
+
         return response()->json([
             'job_posts' => $jobPosts,
             'filters' => $filters,
@@ -257,7 +246,7 @@ class JobApplicationController extends Controller
 
         $application = JobApplication::create($validated);
         $application->load(['jobPost.user', 'user']);
-        
+
         // Refresh job post to ensure it's up to date
         $jobPost->refresh();
         $jobPost->load('user');
@@ -300,8 +289,8 @@ class JobApplicationController extends Controller
     {
         // Only owner, job post owner, or admin can view
         $user = Auth::user();
-        if (Auth::id() !== $jobApplication->user_id 
-            && Auth::id() !== $jobApplication->jobPost->user_id 
+        if (Auth::id() !== $jobApplication->user_id
+            && Auth::id() !== $jobApplication->jobPost->user_id
             && !$user->hasRole(['admin', 'super_admin'])) {
             abort(403);
         }
@@ -430,14 +419,14 @@ class JobApplicationController extends Controller
         }
 
         $oldStatus = $jobApplication->status;
-        
+
         // Reject other applications for the same job post
         $otherApplications = JobApplication::where('job_post_id', $jobApplication->job_post_id)
             ->where('id', '!=', $jobApplication->id)
             ->where('status', '!=', 'rejected')
             ->with(['jobPost', 'user'])
             ->get();
-        
+
         foreach ($otherApplications as $otherApp) {
             $otherOldStatus = $otherApp->status;
             $otherApp->update(['status' => 'rejected']);
@@ -451,7 +440,7 @@ class JobApplicationController extends Controller
         $jobApplication->update(['status' => 'accepted']);
         $jobApplication->refresh();
         $jobApplication->load(['jobPost', 'user']);
-        
+
         // Notify helper about acceptance
         $jobApplication->user->notify(new JobApplicationStatusChanged($jobApplication, $oldStatus, 'accepted'));
 
@@ -504,7 +493,7 @@ class JobApplicationController extends Controller
         $jobApplication->update(['status' => 'rejected']);
         $jobApplication->refresh();
         $jobApplication->load(['jobPost', 'user']);
-        
+
         // Notify helper about rejection
         $jobApplication->user->notify(new JobApplicationStatusChanged($jobApplication, $oldStatus, 'rejected'));
 
@@ -551,7 +540,7 @@ class JobApplicationController extends Controller
         $jobApplication->update(['status' => 'withdrawn']);
         $jobApplication->refresh();
         $jobApplication->load(['jobPost.user', 'user']);
-        
+
         // Notify job post owner about withdrawal
         $jobApplication->jobPost->user->notify(new JobApplicationStatusChanged($jobApplication, $oldStatus, 'withdrawn'));
 
@@ -590,8 +579,8 @@ class JobApplicationController extends Controller
     {
         // Only applicant, job post owner, or admin can delete
         $user = Auth::user();
-        if (Auth::id() !== $jobApplication->user_id 
-            && Auth::id() !== $jobApplication->jobPost->user_id 
+        if (Auth::id() !== $jobApplication->user_id
+            && Auth::id() !== $jobApplication->jobPost->user_id
             && !$user->hasRole(['admin', 'super_admin'])) {
             abort(403);
         }
