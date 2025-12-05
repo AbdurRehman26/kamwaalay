@@ -48,6 +48,8 @@ class JobPostResource extends JsonResource
                 return JobApplicationResource::collection($this->jobApplications);
             }),
             'job_applications_count' => $this->job_applications_count ?? 0,
+            'has_applied' => $this->has_applied ?? false,
+            'application_id' => $this->application_id ?? null,
         ];
     }
 }

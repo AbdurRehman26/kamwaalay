@@ -89,12 +89,27 @@ class JobApplicationController extends Controller
             $query->where('area', 'like', '%' . $request->area . '%');
         }
 
-        // Exclude job posts where helper already applied
-        $query->whereDoesntHave('jobApplications', function ($q) {
-            $q->where('user_id', Auth::id());
-        });
+        // Show all job posts, even if user has already applied
+        // This allows users to view their applications and see all available opportunities
 
         $jobPosts = $query->orderBy('created_at', 'desc')->paginate(12);
+
+        // Get user's applications for the job posts to check if they've applied and get application IDs
+        $userApplications = [];
+        if (Auth::check()) {
+            $userApplications = \App\Models\JobApplication::where('user_id', Auth::id())
+                ->whereIn('job_post_id', $jobPosts->pluck('id'))
+                ->get()
+                ->keyBy('job_post_id');
+        }
+
+        // Transform the paginated results to include has_applied flag and application_id
+        $jobPosts->getCollection()->transform(function ($jobPost) use ($userApplications) {
+            $application = $userApplications->get($jobPost->id);
+            $jobPost->has_applied = $application !== null;
+            $jobPost->application_id = $application ? $application->id : null;
+            return $jobPost;
+        });
 
         $filters = $request->only(['service_type', 'location_id', 'city_name', 'area']);
         if ($locationDisplay) {
@@ -294,7 +309,7 @@ class JobApplicationController extends Controller
         $jobApplication->load(['jobPost.user', 'user']);
 
         return response()->json([
-            'application' => $jobApplication,
+            'application' => new \App\Http\Resources\JobApplicationResource($jobApplication),
         ]);
     }
 

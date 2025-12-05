@@ -217,7 +217,9 @@ export default function JobApplicationsIndex() {
                                 return (
                                     <Link
                                         key={job.id}
-                                        to={route("job-applications.create", job.id)}
+                                        to={job.has_applied && job.application_id 
+                                            ? route("job-applications.show", job.application_id)
+                                            : route("job-applications.create", job.id)}
                                         className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 hover:border-primary-300"
                                     >
                                         {/* Header with gradient */}
@@ -231,6 +233,18 @@ export default function JobApplicationsIndex() {
                                                 </span>
                                             </div>
                                         </div>
+
+                                        {/* Already Applied Badge */}
+                                        {job.has_applied && (
+                                            <div className="bg-green-50 border-l-4 border-green-500 px-6 py-3">
+                                                <div className="flex items-center">
+                                                    <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                    </svg>
+                                                    <span className="text-sm font-semibold text-green-800">You have already applied for this job</span>
+                                                </div>
+                                            </div>
+                                        )}
 
                                         <div className="p-6">
                                             {/* Customer Info */}
@@ -324,10 +338,10 @@ export default function JobApplicationsIndex() {
                                             {/* Action Button */}
                                             <div className="pt-4 border-t border-gray-200">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-primary-600 font-semibold group-hover:text-primary-700 text-sm">
-                                                        Apply Now
+                                                    <span className={`font-semibold text-sm ${job.has_applied ? "text-green-600 group-hover:text-green-700" : "text-primary-600 group-hover:text-primary-700"}`}>
+                                                        {job.has_applied ? "View Application" : "Apply Now"}
                                                     </span>
-                                                    <span className="text-primary-600 group-hover:translate-x-1 transition-transform">
+                                                    <span className={`group-hover:translate-x-1 transition-transform ${job.has_applied ? "text-green-600" : "text-primary-600"}`}>
                                                         →
                                                     </span>
                                                 </div>
