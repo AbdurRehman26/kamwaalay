@@ -94,7 +94,7 @@ class JobApplicationController extends Controller
 
         // Transform the paginated results to include has_applied flag and application_id
         $jobPosts->getCollection()->transform(function ($jobPost) use ($userApplications) {
-            $application = $userApplications ? $userApplications->get($jobPost->id) : [];
+            $application = !empty($userApplications) ? $userApplications->get($jobPost->id) : null;
             $jobPost->has_applied = $application !== null;
             $jobPost->application_id = $application ? $application->id : null;
             return $jobPost;
