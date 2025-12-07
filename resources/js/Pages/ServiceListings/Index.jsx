@@ -143,7 +143,7 @@ export default function ServiceListingsIndex() {
 
     return (
         <PublicLayout>
-            <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 text-white py-16">
+            <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 dark:from-primary-800 dark:via-primary-900 dark:to-orange-700 text-white py-16">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Browse Services Offered</h1>
                     <p className="text-xl text-white/90">Find services offered by verified helpers and businesses</p>
@@ -151,9 +151,9 @@ export default function ServiceListingsIndex() {
             </div>
 
             {/* Notice */}
-            <div className="bg-yellow-50 border-l-4 border-yellow-400">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
-                    <p className="text-sm text-yellow-700">
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
                         <strong>Note:</strong> We are currently serving Karachi only. We will be going live in different cities soon!
                     </p>
                 </div>
@@ -161,15 +161,15 @@ export default function ServiceListingsIndex() {
 
             <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
                 {/* Filters */}
-                <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                    <h2 className="text-2xl font-bold mb-6 text-gray-900">Filter Services</h2>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-12">
+                    <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Filter Services</h2>
                     <div className="grid md:grid-cols-5 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Service Type</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Service Type</label>
                             <select
                                 value={serviceType}
                                 onChange={(e) => setServiceType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 {serviceTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
@@ -179,11 +179,11 @@ export default function ServiceListingsIndex() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Work Type</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Work Type</label>
                             <select
                                 value={workType}
                                 onChange={(e) => setWorkType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 <option value="">All Types</option>
                                 <option value="full_time">Full Time</option>
@@ -191,7 +191,7 @@ export default function ServiceListingsIndex() {
                             </select>
                         </div>
                         <div className="relative" ref={locationFilterRef}>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Location</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Location</label>
                             <input
                                 type="text"
                                 value={locationFilterQuery || locationDisplay}
@@ -207,16 +207,16 @@ export default function ServiceListingsIndex() {
                                         setShowLocationSuggestions(true);
                                     }
                                 }}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                                 placeholder="Search location..."
                             />
                             {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
-                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
                                     {locationFilterSuggestions.map((suggestion, index) => (
                                         <div
                                             key={index}
                                             onClick={() => handleLocationSelect(suggestion)}
-                                            className="px-4 py-2 hover:bg-primary-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                            className="px-4 py-2 hover:bg-primary-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
                                         >
                                             {suggestion.display_text}
                                         </div>
@@ -225,11 +225,11 @@ export default function ServiceListingsIndex() {
                             )}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Sort By</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Sort By</label>
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 <option value="created_at">Newest</option>
                                 <option value="rate_low">Rate: Low to High</option>
@@ -250,7 +250,7 @@ export default function ServiceListingsIndex() {
                 {/* Listings Grid */}
                 {loading ? (
                     <div className="text-center py-12">
-                        <p className="text-gray-600">Loading service listings...</p>
+                        <p className="text-gray-600 dark:text-gray-400">Loading service listings...</p>
                     </div>
                 ) : listings.data && listings.data.length > 0 ? (
                     <>
@@ -258,7 +258,7 @@ export default function ServiceListingsIndex() {
                             {listings.data.map((listing) => (
                                 <div
                                     key={listing.id}
-                                    className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                                    className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                                 >
                                     <Link
                                         to={route("service-listings.show", listing.id)}
@@ -272,19 +272,19 @@ export default function ServiceListingsIndex() {
                                                         <img 
                                                             src={listing.user.photo.startsWith("http") ? listing.user.photo : `/storage/${listing.user.photo}`} 
                                                             alt={listing.user?.name || "Helper"} 
-                                                            className="w-16 h-16 rounded-full object-cover border-2 border-primary-300 shadow-md" 
+                                                            className="w-16 h-16 rounded-full object-cover border-2 border-primary-300 dark:border-primary-600 shadow-md" 
                                                         />
                                                     ) : (
-                                                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xl shadow-md border-2 border-primary-300">
+                                                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xl shadow-md border-2 border-primary-300 dark:border-primary-600">
                                                             {listing.user?.name ? listing.user.name.charAt(0).toUpperCase() : "👤"}
                                                         </div>
                                                     )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
+                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                                         {listing.user?.name || "Helper"}
                                                     </h3>
-                                                    <p className="text-sm text-gray-500 capitalize">
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
                                                         {listing.work_type?.replace("_", " ") || "Service"}
                                                     </p>
                                                 </div>
@@ -295,24 +295,24 @@ export default function ServiceListingsIndex() {
                                                     {listing.service_types && listing.service_types.length > 0 ? (
                                                         <>
                                                             {listing.service_types.slice(0, 2).map((st, idx) => (
-                                                                <span key={idx} className="bg-primary-100 text-primary-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
+                                                                <span key={idx} className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 text-xs px-3 py-1 rounded-full font-semibold capitalize">
                                                                     {typeof st === "string" ? st.replace("_", " ") : st}
                                                                 </span>
                                                             ))}
                                                             {listing.service_types.length > 2 && (
-                                                                <span className="bg-primary-200 text-primary-900 text-xs px-3 py-1 rounded-full font-semibold">
+                                                                <span className="bg-primary-200 dark:bg-primary-800/50 text-primary-900 dark:text-primary-200 text-xs px-3 py-1 rounded-full font-semibold">
                                                                     +{listing.service_types.length - 2}
                                                                 </span>
                                                             )}
                                                         </>
                                                     ) : (
-                                                        <span className="bg-primary-100 text-primary-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
+                                                        <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 text-xs px-3 py-1 rounded-full font-semibold capitalize">
                                                             Service
                                                         </span>
                                                     )}
                                                 </div>
                                                 {listing.monthly_rate && (
-                                                    <span className="text-lg font-bold text-green-600">
+                                                    <span className="text-lg font-bold text-green-600 dark:text-green-400">
                                                         PKR {listing.monthly_rate}/month
                                                     </span>
                                                 )}
@@ -320,35 +320,35 @@ export default function ServiceListingsIndex() {
                                             
                                             {/* Multiple Locations */}
                                             {listing.location_details && listing.location_details.length > 0 ? (
-                                                <div className="text-sm text-gray-600 mb-3 space-y-1">
+                                                <div className="text-sm text-gray-600 dark:text-gray-300 mb-3 space-y-1">
                                                     {listing.location_details.slice(0, 2).map((location, idx) => (
                                                         <p key={idx} className="capitalize">
                                                             📍 {location.city_name}{location.area ? ", " + location.area : ""}
                                                         </p>
                                                     ))}
                                                     {listing.location_details.length > 2 && (
-                                                        <p className="text-gray-500 font-medium">
+                                                        <p className="text-gray-500 dark:text-gray-400 font-medium">
                                                             +{listing.location_details.length - 2} more location{listing.location_details.length - 2 !== 1 ? "s" : ""}
                                                         </p>
                                                     )}
                                                 </div>
                                             ) : listing.city ? (
-                                                <p className="text-sm text-gray-600 mb-3 capitalize">
+                                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 capitalize">
                                                     📍 {listing.city}{listing.area ? ", " + listing.area : ""}
                                                 </p>
                                             ) : (
-                                                <p className="text-sm text-gray-600 mb-3">
+                                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                                                     📍 Location not specified
                                                 </p>
                                             )}
                                             
                                             {listing.description && (
-                                                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                                                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
                                                     {listing.description}
                                                 </p>
                                             )}
                                             <div className="flex items-center justify-between mb-3">
-                                                <span className="text-primary-600 font-semibold text-sm">View Details →</span>
+                                                <span className="text-primary-600 dark:text-primary-400 font-semibold text-sm">View Details →</span>
                                             </div>
                                         </div>
                                     </Link>
@@ -413,7 +413,7 @@ export default function ServiceListingsIndex() {
                             <div className="mt-12">
                                 {/* Results Info */}
                                 {listings.total !== undefined && (
-                                    <div className="text-center mb-6 text-gray-600">
+                                    <div className="text-center mb-6 text-gray-600 dark:text-gray-400">
                                         <p className="text-sm">
                                             Showing {listings.from || 0} to {listings.to || 0} of {listings.total || 0} results
                                         </p>
@@ -429,7 +429,7 @@ export default function ServiceListingsIndex() {
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
                                                         ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg"
-                                                        : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                                                        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
                                                 } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                             />
                                         ))}
@@ -439,10 +439,10 @@ export default function ServiceListingsIndex() {
                         )}
                     </>
                 ) : (
-                    <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
+                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">🔍</div>
-                        <p className="text-gray-600 text-xl mb-6">No services found</p>
-                        <p className="text-gray-500 mb-8">Try adjusting your filters</p>
+                        <p className="text-gray-600 dark:text-gray-300 text-xl mb-6">No services found</p>
+                        <p className="text-gray-500 dark:text-gray-400 mb-8">Try adjusting your filters</p>
                     </div>
                 )}
             </div>

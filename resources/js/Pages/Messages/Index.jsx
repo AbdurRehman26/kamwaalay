@@ -172,39 +172,39 @@ export default function MessagesIndex() {
 
     return (
         <DashboardLayout>
-            <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 py-8">
+            <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-6">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Messages</h1>
-                        <p className="text-gray-600">Chat with your contacts</p>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Messages</h1>
+                        <p className="text-gray-600 dark:text-gray-400">Chat with your contacts</p>
                     </div>
                     
-                    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
                         <div className="flex h-[calc(100vh-250px)] min-h-[600px]">
                             {/* Conversations List */}
-                            <div className="w-full md:w-1/3 border-r border-gray-200 overflow-y-auto bg-gray-50">
-                                <div className="p-4 border-b border-gray-200 bg-white">
-                                    <h3 className="text-lg font-bold text-gray-900">Conversations</h3>
+                            <div className="w-full md:w-1/3 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+                                <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Conversations</h3>
                                 </div>
                                 {loading ? (
                                     <div className="p-8 text-center">
-                                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mb-3"></div>
-                                        <p className="text-gray-500 text-sm">Loading conversations...</p>
+                                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 dark:border-primary-400 mb-3"></div>
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm">Loading conversations...</p>
                                     </div>
                                 ) : conversations.length === 0 ? (
                                     <div className="p-8 text-center">
                                         <div className="text-4xl mb-3">💬</div>
-                                        <p className="text-gray-500 text-sm">No conversations yet</p>
-                                        <p className="text-gray-400 text-xs mt-1">Start a conversation by contacting someone</p>
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm">No conversations yet</p>
+                                        <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">Start a conversation by contacting someone</p>
                                     </div>
                                 ) : (
-                                    <div className="divide-y divide-gray-200">
+                                    <div className="divide-y divide-gray-200 dark:divide-gray-700">
                                         {conversations.map((conversation) => (
                                             <button
                                                 key={conversation.id}
                                                 onClick={() => handleSelectConversation(conversation)}
-                                                className={`w-full p-4 text-left hover:bg-white transition-all duration-200 ${
-                                                    selectedConversation?.id === conversation.id ? "bg-white border-l-4 border-primary-600" : ""
+                                                className={`w-full p-4 text-left hover:bg-white dark:hover:bg-gray-800 transition-all duration-200 ${
+                                                    selectedConversation?.id === conversation.id ? "bg-white dark:bg-gray-800 border-l-4 border-primary-600 dark:border-primary-400" : ""
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-3">
@@ -213,7 +213,7 @@ export default function MessagesIndex() {
                                                             <img
                                                                 src={`/storage/${conversation.other_user.photo}`}
                                                                 alt={conversation.other_user.name}
-                                                                className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                                                                className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                                                             />
                                                         ) : (
                                                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
@@ -223,7 +223,7 @@ export default function MessagesIndex() {
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center justify-between mb-1">
-                                                            <p className="text-sm font-bold text-gray-900 truncate">
+                                                            <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
                                                                 {conversation.other_user.name}
                                                             </p>
                                                             {conversation.unread_count > 0 && (
@@ -233,12 +233,12 @@ export default function MessagesIndex() {
                                                             )}
                                                         </div>
                                                         {conversation.last_message && (
-                                                            <p className="text-xs text-gray-500 truncate">
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                                                 {conversation.last_message.message}
                                                             </p>
                                                         )}
                                                         {conversation.last_message && (
-                                                            <p className="text-xs text-gray-400 mt-1">
+                                                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                                                                 {new Date(conversation.last_message.created_at).toLocaleDateString() === new Date().toLocaleDateString()
                                                                     ? new Date(conversation.last_message.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                                                                     : new Date(conversation.last_message.created_at).toLocaleDateString([], { month: "short", day: "numeric" })
@@ -258,12 +258,12 @@ export default function MessagesIndex() {
                                 {selectedConversation ? (
                                     <>
                                         {/* Chat Header */}
-                                        <div className="p-4 border-b border-gray-200 bg-white flex items-center gap-3 shadow-sm">
+                                        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center gap-3 shadow-sm">
                                             {selectedConversation.other_user.photo ? (
                                                 <img
                                                     src={`/storage/${selectedConversation.other_user.photo}`}
                                                     alt={selectedConversation.other_user.name}
-                                                    className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                                                    className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                                                 />
                                             ) : (
                                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold shadow-md">
@@ -271,21 +271,21 @@ export default function MessagesIndex() {
                                                 </div>
                                             )}
                                             <div>
-                                                <p className="font-bold text-gray-900">
+                                                <p className="font-bold text-gray-900 dark:text-white">
                                                     {selectedConversation.other_user.name}
                                                 </p>
-                                                <p className="text-xs text-gray-500">Online</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">Online</p>
                                             </div>
                                         </div>
 
                                         {/* Messages */}
-                                        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+                                        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-gray-900">
                                             {messages.length === 0 ? (
                                                 <div className="flex items-center justify-center h-full">
                                                     <div className="text-center">
                                                         <div className="text-5xl mb-3">💬</div>
-                                                        <p className="text-gray-500">No messages yet</p>
-                                                        <p className="text-gray-400 text-sm mt-1">Start the conversation!</p>
+                                                        <p className="text-gray-500 dark:text-gray-400">No messages yet</p>
+                                                        <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Start the conversation!</p>
                                                     </div>
                                                 </div>
                                             ) : (
@@ -306,7 +306,7 @@ export default function MessagesIndex() {
                                                                     className={`px-4 py-3 rounded-2xl shadow-sm ${
                                                                         isOwnMessage
                                                                             ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-br-none"
-                                                                            : "bg-white text-gray-900 rounded-bl-none border border-gray-200"
+                                                                            : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-bl-none border border-gray-200 dark:border-gray-700"
                                                                     }`}
                                                                 >
                                                                     {!isOwnMessage && (
@@ -317,7 +317,7 @@ export default function MessagesIndex() {
                                                                     <p className="text-sm leading-relaxed">{message.message}</p>
                                                                     <p
                                                                         className={`text-xs mt-2 ${
-                                                                            isOwnMessage ? "text-primary-100" : "text-gray-400"
+                                                                            isOwnMessage ? "text-primary-100" : "text-gray-400 dark:text-gray-500"
                                                                         }`}
                                                                     >
                                                                         {new Date(message.created_at).toLocaleTimeString([], {
@@ -340,10 +340,10 @@ export default function MessagesIndex() {
                                         </div>
 
                                         {/* Message Input */}
-                                        <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 bg-white">
+                                        <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                                             {error && (
-                                                <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                                    <p className="text-sm text-red-600">{error}</p>
+                                                <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                                                    <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
                                                 </div>
                                             )}
                                             <div className="flex gap-3">
@@ -355,7 +355,7 @@ export default function MessagesIndex() {
                                                         setError(""); // Clear error when typing
                                                     }}
                                                     placeholder="Type a message..."
-                                                    className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                                                    className="flex-1 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                                                     disabled={sending}
                                                 />
                                                 <button
@@ -369,11 +369,11 @@ export default function MessagesIndex() {
                                         </form>
                                     </>
                                 ) : (
-                                    <div className="flex-1 flex items-center justify-center bg-gray-50">
+                                    <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
                                         <div className="text-center">
                                             <div className="text-6xl mb-4">💬</div>
-                                            <p className="text-gray-600 font-medium text-lg mb-2">Select a conversation</p>
-                                            <p className="text-gray-400 text-sm">Choose a conversation from the list to start messaging</p>
+                                            <p className="text-gray-600 dark:text-gray-300 font-medium text-lg mb-2">Select a conversation</p>
+                                            <p className="text-gray-400 dark:text-gray-500 text-sm">Choose a conversation from the list to start messaging</p>
                                         </div>
                                     </div>
                                 )}

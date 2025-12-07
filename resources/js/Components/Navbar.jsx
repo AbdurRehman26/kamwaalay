@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { route } from "@/utils/routes";
 import NotificationDropdown from "@/Components/NotificationDropdown";
 import LogoutModal from "@/Components/LogoutModal";
@@ -11,9 +12,12 @@ import { useNavigate } from "react-router-dom";
 export default function Navbar() {
     const { user, logout } = useAuth();
     const { locale, t } = useLanguage();
+    const { isDark, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [browseDropdownOpen, setBrowseDropdownOpen] = useState(false);
+    const browseDropdownRef = useRef(null);
 
     const handleLogout = async () => {
         try {
@@ -25,9 +29,22 @@ export default function Navbar() {
         }
     };
 
+    // Handle click outside dropdown
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (browseDropdownRef.current && !browseDropdownRef.current.contains(event.target)) {
+                setBrowseDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
     return (
         <>
-            <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-100">
+            <nav className="bg-white dark:bg-gray-600 shadow-md sticky top-0 z-50 border-b border-gray-100 dark:border-gray-500">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20 w-full">
                         <div className="flex items-center">
@@ -35,39 +52,83 @@ export default function Navbar() {
                                 <img
                                     src="/kamwaalay-logo.png"
                                     alt="kamwaalay"
-                                    className="h-24 w-auto"
+                                    className="h-32 w-auto"
                                 />
                             </Link>
                         </div>
 
                         <div className="hidden lg:flex items-center space-x-8">
+                            {/* Dark Mode Toggle */}
+                            <button
+                                onClick={toggleTheme}
+                                className="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                aria-label="Toggle dark mode"
+                            >
+                                {isDark ? (
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                ) : (
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                    </svg>
+                                )}
+                            </button>
                             <Link
                                 to={route("home")}
-                                className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                                className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors"
                             >
                                 {t ? t("common.home") : "Home"}
                             </Link>
                             {(isHelperOrBusinessOrGuest(user)) && (
                                 <Link
                                     to={route("job-applications.index")}
-                                    className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                                    className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors"
                                 >
                                     Search Jobs
                                 </Link>
                             )}
                             {isUserOrGuest(user) && (
-                                <Link
-                                    to={route("helpers.index")}
-                                    className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
-                                >
-                                    Browse Helpers
-                                </Link>
+                                <div className="relative" ref={browseDropdownRef}>
+                                    <button
+                                        onClick={() => setBrowseDropdownOpen(!browseDropdownOpen)}
+                                        className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors flex items-center gap-1"
+                                    >
+                                        Browse
+                                        <svg 
+                                            className={`w-4 h-4 transition-transform ${browseDropdownOpen ? "rotate-180" : ""}`} 
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                    {browseDropdownOpen && (
+                                        <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                                            <Link
+                                                to={route("helpers.index")}
+                                                onClick={() => setBrowseDropdownOpen(false)}
+                                                className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                            >
+                                                Browse Helpers
+                                            </Link>
+                                            <Link
+                                                to={route("service-listings.index")}
+                                                onClick={() => setBrowseDropdownOpen(false)}
+                                                className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                            >
+                                                Browse Services
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
                             )}
                             {user ? (
                                 <>
                                     <Link
                                         to={route("dashboard")}
-                                        className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                                        className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors"
                                     >
                                         {t ? t("common.dashboard") : "Dashboard"}
                                     </Link>
@@ -96,7 +157,7 @@ export default function Navbar() {
                                     <NotificationDropdown />
                                     <button
                                         onClick={() => setShowLogoutModal(true)}
-                                        className="text-red-600 hover:text-red-700 font-medium transition-colors"
+                                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition-colors"
                                     >
                                         {t ? t("common.logout") : "Logout"}
                                     </button>
@@ -120,23 +181,40 @@ export default function Navbar() {
                         </div>
 
                         {/* Mobile menu button */}
-                        <button
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="lg:hidden text-gray-700 p-2"
-                        >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </button>
+                        <div className="lg:hidden flex items-center space-x-2">
+                            <button
+                                onClick={toggleTheme}
+                                className="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                aria-label="Toggle dark mode"
+                            >
+                                {isDark ? (
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                ) : (
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                    </svg>
+                                )}
+                            </button>
+                            <button
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                className="text-gray-700 dark:text-gray-300 p-2"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     {/* Mobile Menu */}
                     {mobileMenuOpen && (
-                        <div className="lg:hidden py-4 space-y-2 border-t border-gray-100">
+                        <div className="lg:hidden py-4 space-y-2 border-t border-gray-100 dark:border-gray-800">
                             <Link
                                 to={route("home")}
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                                className="block py-3 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
                             >
                                 {t ? t("common.home") : "Home"}
                             </Link>
@@ -144,26 +222,35 @@ export default function Navbar() {
                                 <Link
                                     to={route("job-applications.index")}
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                                    className="block py-3 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
                                 >
                                     Search Jobs
                                 </Link>
                             )}
                             {isUserOrGuest(user) && (
-                                <Link
-                                    to={route("helpers.index")}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                                >
-                                    Browse Helpers
-                                </Link>
+                                <>
+                                    <Link
+                                        to={route("helpers.index")}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="block py-3 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                                    >
+                                        Browse Helpers
+                                    </Link>
+                                    <Link
+                                        to={route("service-listings.index")}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="block py-3 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                                    >
+                                        Browse Services
+                                    </Link>
+                                </>
                             )}
                             {user ? (
                                 <>
                                     <Link
                                         to={route("dashboard")}
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className="block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                                        className="block py-3 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
                                     >
                                         {t ? t("common.dashboard") : "Dashboard"}
                                     </Link>
@@ -202,7 +289,7 @@ export default function Navbar() {
                                             await handleLogout();
                                             setMobileMenuOpen(false);
                                         }}
-                                        className="block py-3 px-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors w-full text-left"
+                                        className="block py-3 px-4 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors w-full text-left"
                                     >
                                         {t ? t("common.logout") : "Logout"}
                                     </button>
@@ -233,6 +320,7 @@ export default function Navbar() {
         </>
     );
 }
+
 
 
 

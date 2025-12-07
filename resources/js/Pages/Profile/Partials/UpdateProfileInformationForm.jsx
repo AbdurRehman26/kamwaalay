@@ -61,11 +61,11 @@ export default function UpdateProfileInformation({
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">
+                <h2 className="text-lg font-medium text-gray-900 dark:text-white">
                     Profile Information
                 </h2>
 
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Update your account's profile information.
                 </p>
             </header>
@@ -93,7 +93,7 @@ export default function UpdateProfileInformation({
                     <TextInput
                         id="phone"
                         type="tel"
-                        className="mt-1 block w-full bg-gray-100 cursor-not-allowed"
+                        className="mt-1 block w-full bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
                         value={data.phone}
                         disabled
                     />
@@ -111,7 +111,7 @@ export default function UpdateProfileInformation({
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                             Saved.
                         </p>
                     </Transition>

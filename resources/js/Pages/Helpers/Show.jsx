@@ -62,7 +62,7 @@ export default function HelperShow() {
             <PublicLayout>
 
                 <div className="min-h-screen flex items-center justify-center">
-                    <p className="text-gray-600">Loading helper profile...</p>
+                    <p className="text-gray-600 dark:text-gray-400">Loading helper profile...</p>
                 </div>
             </PublicLayout>
         );
@@ -73,7 +73,7 @@ export default function HelperShow() {
             <PublicLayout>
 
                 <div className="min-h-screen flex items-center justify-center">
-                    <p className="text-gray-600">Helper not found.</p>
+                    <p className="text-gray-600 dark:text-gray-400">Helper not found.</p>
                 </div>
             </PublicLayout>
         );
@@ -84,7 +84,7 @@ export default function HelperShow() {
 
 
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-16">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 text-white py-16">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row gap-8 items-center">
                         <div className="flex-shrink-0">
@@ -92,10 +92,10 @@ export default function HelperShow() {
                                 <img
                                     src={`/storage/${helper.photo}`}
                                     alt={helper.name}
-                                    className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+                                    className="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-300 shadow-lg"
                                 />
                             ) : (
-                                <div className="w-32 h-32 rounded-full bg-white/20 flex items-center justify-center text-6xl border-4 border-white shadow-lg">
+                                <div className="w-32 h-32 rounded-full bg-white/20 dark:bg-gray-800/30 flex items-center justify-center text-6xl border-4 border-white dark:border-gray-300 shadow-lg">
                                     👤
                                 </div>
                             )}
@@ -158,14 +158,14 @@ export default function HelperShow() {
                     <div className="lg:col-span-2 space-y-8">
                         {/* Service Listings */}
                         {serviceListings && serviceListings.length > 0 && (
-                            <div className="bg-white rounded-lg shadow-md p-8">
-                                <h2 className="text-3xl font-bold text-gray-900 mb-6">Services Offered</h2>
+                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+                                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Services Offered</h2>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     {serviceListings.map((listing) => (
                                         <Link
                                             key={listing.id}
                                             to={route("service-listings.show", listing.id)}
-                                            className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-primary-300"
+                                            className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-primary-300 dark:hover:border-primary-600"
                                         >
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex flex-wrap gap-2">
@@ -189,7 +189,7 @@ export default function HelperShow() {
                                                     )}
                                                 </div>
                                                 {listing.monthly_rate && (
-                                                    <span className="text-lg font-bold text-green-600">
+                                                    <span className="text-lg font-bold text-green-600 dark:text-green-400">
                                                         PKR {listing.monthly_rate}/month
                                                     </span>
                                                 )}
@@ -197,15 +197,15 @@ export default function HelperShow() {
                                             
                                             {/* Work Type */}
                                             <div className="mb-3">
-                                                <span className="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full font-medium capitalize">
+                                                <span className="inline-block bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-3 py-1 rounded-full font-medium capitalize">
                                                     {listing.work_type?.replace("_", " ") || "Service"}
                                                 </span>
                                             </div>
                                             
                                             {/* Locations */}
                                             {listing.location_details && listing.location_details.length > 0 ? (
-                                                <div className="text-sm text-gray-600 mb-3 space-y-1">
-                                                    <p className="text-xs text-gray-500 font-medium mb-1">Locations:</p>
+                                                <div className="text-sm text-gray-600 dark:text-gray-300 mb-3 space-y-1">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Locations:</p>
                                                     {listing.location_details.slice(0, 2).map((location, idx) => (
                                                         <p key={idx} className="flex items-center">
                                                             <span className="mr-2">📍</span>
@@ -213,13 +213,13 @@ export default function HelperShow() {
                                                         </p>
                                                     ))}
                                                     {listing.location_details.length > 2 && (
-                                                        <p className="text-gray-500 font-medium text-xs mt-1">
+                                                        <p className="text-gray-500 dark:text-gray-400 font-medium text-xs mt-1">
                                                             +{listing.location_details.length - 2} more location{listing.location_details.length - 2 !== 1 ? "s" : ""}
                                                         </p>
                                                     )}
                                                 </div>
                                             ) : listing.city ? (
-                                                <div className="text-sm text-gray-600 mb-3">
+                                                <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                                                     <p className="flex items-center">
                                                         <span className="mr-2">📍</span>
                                                         <span>{listing.city}{listing.area ? ", " + listing.area : ""}</span>
@@ -230,8 +230,8 @@ export default function HelperShow() {
                                             {/* Description */}
                                             {listing.description && (
                                                 <div className="mb-3">
-                                                    <p className="text-xs text-gray-500 font-medium mb-1">Description:</p>
-                                                    <p className="text-gray-700 text-sm line-clamp-3">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Description:</p>
+                                                    <p className="text-gray-700 dark:text-gray-300 text-sm line-clamp-3">
                                                         {listing.description}
                                                     </p>
                                                 </div>
@@ -242,8 +242,8 @@ export default function HelperShow() {
                                                 <div className="mb-3">
                                                     <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${
                                                         listing.status === "active" 
-                                                            ? "bg-green-100 text-green-800" 
-                                                            : "bg-gray-100 text-gray-800"
+                                                            ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300" 
+                                                            : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
                                                     }`}>
                                                         {listing.status === "active" ? "✓ Active" : listing.status}
                                                     </span>
@@ -251,13 +251,13 @@ export default function HelperShow() {
                                             )}
                                             
                                             <div className="flex items-center justify-end mt-4">
-                                                <span className="text-primary-600 font-semibold text-sm hover:text-primary-800 transition-colors">View Details →</span>
+                                                <span className="text-primary-600 dark:text-primary-400 font-semibold text-sm hover:text-primary-800 dark:hover:text-primary-300 transition-colors">View Details →</span>
                                             </div>
                                         </Link>
                                     ))}
                                 </div>
                                 {serviceListings.length > 1 && (
-                                    <p className="mt-4 text-sm text-gray-600 text-center">
+                                    <p className="mt-4 text-sm text-gray-600 dark:text-gray-400 text-center">
                                         {helper.name} offers {serviceListings.length} different service{serviceListings.length !== 1 ? "s" : ""} across multiple locations
                                     </p>
                                 )}
@@ -266,31 +266,31 @@ export default function HelperShow() {
 
                         {/* Reviews Section */}
                         {reviews && reviews.length > 0 && (
-                            <div className="bg-white rounded-lg shadow-md p-8">
-                                <h2 className="text-3xl font-bold text-gray-900 mb-6">Reviews & Ratings</h2>
+                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+                                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Reviews & Ratings</h2>
                                 <div className="space-y-6">
                                     {reviews.map((review) => (
-                                        <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
+                                        <div key={review.id} className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0 last:pb-0">
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="flex items-center">
-                                                    <div className="w-10 h-10 rounded-full bg-primary-200 flex items-center justify-center mr-3">
+                                                    <div className="w-10 h-10 rounded-full bg-primary-200 dark:bg-primary-900/30 flex items-center justify-center mr-3 text-primary-800 dark:text-primary-300">
                                                         {review.user?.name?.charAt(0) || "U"}
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-gray-900">{review.user?.name || "Anonymous"}</p>
-                                                        <p className="text-sm text-gray-500">{new Date(review.created_at).toLocaleDateString()}</p>
+                                                        <p className="font-semibold text-gray-900 dark:text-white">{review.user?.name || "Anonymous"}</p>
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(review.created_at).toLocaleDateString()}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex text-yellow-400">
                                                     {[...Array(5)].map((_, i) => (
-                                                        <svg key={i} className={`w-5 h-5 ${i < review.rating ? "fill-current" : "text-gray-300"}`} viewBox="0 0 20 20">
+                                                        <svg key={i} className={`w-5 h-5 ${i < review.rating ? "fill-current" : "text-gray-300 dark:text-gray-600"}`} viewBox="0 0 20 20">
                                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.683-1.539 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.565-1.839-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z" />
                                                         </svg>
                                                     ))}
                                                 </div>
                                             </div>
                                             {review.comment && (
-                                                <p className="text-gray-700">{review.comment}</p>
+                                                <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
                                             )}
                                         </div>
                                     ))}
@@ -302,21 +302,21 @@ export default function HelperShow() {
                     {/* Sidebar */}
                     <div className="space-y-6">
                         {/* Profile Info */}
-                        <div className="bg-white rounded-lg shadow-md p-6">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Profile Information</h3>
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Profile Information</h3>
                             <div className="space-y-4">
                                 {helper.experience_years && (
                                     <div>
-                                        <p className="text-sm text-gray-600">Experience</p>
-                                        <p className="font-semibold text-gray-900">{helper.experience_years} years</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">Experience</p>
+                                        <p className="font-semibold text-gray-900 dark:text-white">{helper.experience_years} years</p>
                                     </div>
                                 )}
                                 {helper.skills && (
                                     <div>
-                                        <p className="text-sm text-gray-600 mb-2">Skills</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Skills</p>
                                         <div className="flex flex-wrap gap-2">
                                             {helper.skills.split(",").map((skill, idx) => (
-                                                <span key={idx} className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-xs font-medium">
+                                                <span key={idx} className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 px-2 py-1 rounded text-xs font-medium">
                                                     {skill.trim()}
                                                 </span>
                                             ))}
@@ -325,26 +325,26 @@ export default function HelperShow() {
                                 )}
                                 {helper.city && (
                                     <div>
-                                        <p className="text-sm text-gray-600">Location</p>
-                                        <p className="font-semibold text-gray-900">{helper.city}, {helper.area || "N/A"}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">Location</p>
+                                        <p className="font-semibold text-gray-900 dark:text-white">{helper.city}, {helper.area || "N/A"}</p>
                                     </div>
                                 )}
                                 {helper.availability && (
                                     <div>
-                                        <p className="text-sm text-gray-600">Availability</p>
-                                        <p className="font-semibold text-gray-900 capitalize">{helper.availability.replace("_", " ")}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">Availability</p>
+                                        <p className="font-semibold text-gray-900 dark:text-white capitalize">{helper.availability.replace("_", " ")}</p>
                                     </div>
                                 )}
                                 {helper.created_at && (
                                     <div>
-                                        <p className="text-sm text-gray-600">Member Since</p>
-                                        <p className="font-semibold text-gray-900">{new Date(helper.created_at).toLocaleDateString()}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">Member Since</p>
+                                        <p className="font-semibold text-gray-900 dark:text-white">{new Date(helper.created_at).toLocaleDateString()}</p>
                                     </div>
                                 )}
                                 {helper.phone && (
                                     <div>
-                                        <p className="text-sm text-gray-600">Phone</p>
-                                        <p className="font-semibold text-gray-900">{helper.phone}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">Phone</p>
+                                        <p className="font-semibold text-gray-900 dark:text-white">{helper.phone}</p>
                                     </div>
                                 )}
                             </div>
@@ -352,8 +352,8 @@ export default function HelperShow() {
 
                         {/* Contact Options */}
                         {helper.phone && (
-                            <div className="bg-white rounded-lg shadow-md p-6">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">Contact Helper</h3>
+                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Contact Helper</h3>
                                 <div className="flex items-center justify-center gap-4">
                                     {/* In-app Message Icon */}
                                     {user ? (
@@ -375,7 +375,7 @@ export default function HelperShow() {
                                                 e.preventDefault();
                                                 navigate(route("login"));
                                             }}
-                                            className="flex items-center justify-center w-14 h-14 bg-gray-400 text-white rounded-full cursor-not-allowed opacity-60 hover:bg-gray-500 transition-all duration-300 shadow-md"
+                                            className="flex items-center justify-center w-14 h-14 bg-gray-400 dark:bg-gray-600 text-white rounded-full cursor-not-allowed opacity-60 hover:bg-gray-500 dark:hover:bg-gray-700 transition-all duration-300 shadow-md"
                                             title="Please login to send message"
                                         >
                                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

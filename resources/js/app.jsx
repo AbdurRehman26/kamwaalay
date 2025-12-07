@@ -8,6 +8,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { authService } from "./services/auth";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 // Pages
 import Home from "./Pages/Home";
 import Login from "./Pages/Auth/Login";
@@ -242,11 +243,13 @@ function AppRoutes() {
 // Main App Component
 function App() {
     return (
-        <AuthProvider>
-            <LanguageProvider>
-                <AppRoutes />
-            </LanguageProvider>
-        </AuthProvider>
+        <ThemeProvider>
+            <AuthProvider>
+                <LanguageProvider>
+                    <AppRoutes />
+                </LanguageProvider>
+            </AuthProvider>
+        </ThemeProvider>
     );
 }
 

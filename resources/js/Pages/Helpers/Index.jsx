@@ -290,7 +290,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
     return (
         <PublicLayout>
 
-            <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 text-white py-16">
+            <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 dark:from-primary-800 dark:via-primary-900 dark:to-orange-700 text-white py-16">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Find Your Perfect Helper</h1>
                     <p className="text-xl text-white/90">Browse through verified domestic helpers</p>
@@ -298,16 +298,16 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
             </div>
 
             {/* Notice about going live in different cities */}
-            <div className="bg-yellow-50 border-l-4 border-yellow-400">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
                     <div className="flex">
                         <div className="flex-shrink-0">
-                            <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                            <svg className="h-5 w-5 text-yellow-400 dark:text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <p className="text-sm text-yellow-700">
+                            <p className="text-sm text-yellow-700 dark:text-yellow-300">
                                 <strong>Note:</strong> We are currently serving Karachi only. We will be going live in different cities soon!
                             </p>
                         </div>
@@ -317,18 +317,18 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
 
             <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
                 {/* Filters */}
-                <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-12">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Filter Helpers</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Filter Helpers</h2>
                     </div>
 
                     <div className="grid md:grid-cols-5 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Type</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Type</label>
                             <select
                                 value={userType}
                                 onChange={(e) => setUserType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 <option value="all">All</option>
                                 <option value="helper">Helpers Only</option>
@@ -336,11 +336,11 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Service Type</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Service Type</label>
                             <select
                                 value={serviceType}
                                 onChange={(e) => setServiceType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 {serviceTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
@@ -350,7 +350,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             </select>
                         </div>
                         <div className="relative" ref={locationFilterRef}>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Location</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Location</label>
                             <input
                                 type="text"
                                 value={locationFilterQuery || locationDisplay}
@@ -366,16 +366,16 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         setShowLocationSuggestions(true);
                                     }
                                 }}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                                 placeholder="Search location..."
                             />
                             {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
-                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
                                     {locationFilterSuggestions.map((suggestion, index) => (
                                         <div
                                             key={index}
                                             onClick={() => handleLocationSelect(suggestion)}
-                                            className="px-4 py-2 hover:bg-primary-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                            className="px-4 py-2 hover:bg-primary-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
                                         >
                                             {suggestion.display_text}
                                         </div>
@@ -396,16 +396,16 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
 
                 {/* Booking Form */}
                 {showBookingForm && user && (
-                    <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                        <h2 className="text-2xl font-bold mb-6 text-gray-900">Create Job Posting</h2>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-12">
+                        <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Create Job Posting</h2>
                         <form onSubmit={handleBookingSubmit}>
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Service Type *</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Service Type *</label>
                                     <select
                                         value={formData.service_type}
                                         onChange={(e) => setFormData(prev => ({ ...prev, service_type: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         required
                                     >
                                         <option value="">Select Service</option>
@@ -419,11 +419,11 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Work Type *</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Work Type *</label>
                                     <select
                                         value={formData.work_type}
                                         onChange={(e) => setFormData(prev => ({ ...prev, work_type: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         required
                                     >
                                         <option value="">Select Type</option>
@@ -434,20 +434,20 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">City *</label>
                                     <input
                                         type="text"
                                         value={formData.city}
                                         disabled
-                                        className="w-full border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+                                        className="w-full border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-300 cursor-not-allowed"
                                         required
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">Currently serving Karachi only</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Currently serving Karachi only</p>
                                     {formErrors.city && <div className="text-red-500 text-sm mt-1">{formErrors.city}</div>}
                                 </div>
 
                                 <div className="relative" ref={suggestionsRef}>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Area *</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Area *</label>
                                     <input
                                         type="text"
                                         value={searchQuery}
@@ -460,17 +460,17 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 setShowSuggestions(true);
                                             }
                                         }}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         placeholder="Type to search area..."
                                         required
                                     />
                                     {showSuggestions && suggestions.length > 0 && (
-                                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
                                             {suggestions.map((suggestion, index) => (
                                                 <div
                                                     key={index}
                                                     onClick={() => handleAreaSelect(suggestion)}
-                                                    className="px-4 py-2 hover:bg-primary-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                    className="px-4 py-2 hover:bg-primary-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
                                                 >
                                                     {suggestion}
                                                 </div>
@@ -481,84 +481,84 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
                                     <input
                                         type="date"
                                         value={formData.start_date}
                                         onChange={(e) => setFormData(prev => ({ ...prev, start_date: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                     />
-                                    {formErrors.start_date && <div className="text-red-500 text-sm mt-1">{formErrors.start_date}</div>}
+                                    {formErrors.start_date && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.start_date}</div>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Time</label>
                                     <input
                                         type="time"
                                         value={formData.start_time}
                                         onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                     />
-                                    {formErrors.start_time && <div className="text-red-500 text-sm mt-1">{formErrors.start_time}</div>}
+                                    {formErrors.start_time && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.start_time}</div>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Your Name *</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Name *</label>
                                     <input
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         required
                                     />
-                                    {formErrors.name && <div className="text-red-500 text-sm mt-1">{formErrors.name}</div>}
+                                    {formErrors.name && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.name}</div>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone *</label>
                                     <input
                                         type="tel"
                                         value={formData.phone}
                                         onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         required
                                     />
-                                    {formErrors.phone && <div className="text-red-500 text-sm mt-1">{formErrors.phone}</div>}
+                                    {formErrors.phone && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.phone}</div>}
                                 </div>
 
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email *</label>
                                     <input
                                         type="email"
                                         value={formData.email}
                                         onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         required
                                     />
-                                    {formErrors.email && <div className="text-red-500 text-sm mt-1">{formErrors.email}</div>}
+                                    {formErrors.email && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.email}</div>}
                                 </div>
 
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
                                     <textarea
                                         value={formData.address}
                                         onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                                         rows={3}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                     />
-                                    {formErrors.address && <div className="text-red-500 text-sm mt-1">{formErrors.address}</div>}
+                                    {formErrors.address && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.address}</div>}
                                 </div>
 
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Special Requirements</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Special Requirements</label>
                                     <textarea
                                         value={formData.special_requirements}
                                         onChange={(e) => setFormData(prev => ({ ...prev, special_requirements: e.target.value }))}
                                         rows={4}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                         placeholder="Any special requirements or preferences..."
                                     />
-                                    {formErrors.special_requirements && <div className="text-red-500 text-sm mt-1">{formErrors.special_requirements}</div>}
+                                    {formErrors.special_requirements && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.special_requirements}</div>}
                                 </div>
                             </div>
 
@@ -591,7 +591,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         setSearchQuery("");
                                         setSelectedArea("");
                                     }}
-                                    className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
+                                    className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold"
                                 >
                                     Cancel
                                 </button>
@@ -603,7 +603,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 {/* Helpers Grid */}
                 {loading ? (
                     <div className="text-center py-12">
-                        <p className="text-gray-600">Loading helpers...</p>
+                        <p className="text-gray-600 dark:text-gray-400">Loading helpers...</p>
                     </div>
                 ) : helpers.data && helpers.data.length > 0 ? (
                     <>
@@ -637,7 +637,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 return (
                                     <div
                                         key={helper.id}
-                                        className={`group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 ${isBusiness ? "border-2 border-primary-200" : ""}`}
+                                        className={`group bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 ${isBusiness ? "border-2 border-primary-200 dark:border-primary-700" : ""}`}
                                     >
                                         {/* Photo/Image Section */}
                                         <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary-400 to-primary-600">
@@ -654,9 +654,9 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                             )}
                                             {/* Rating Badge */}
                                             {helper.rating && parseFloat(helper.rating) > 0 && (
-                                                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
+                                                <div className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
                                                     <span className="text-yellow-500 text-sm">⭐</span>
-                                                    <span className="text-sm font-bold text-gray-900">{parseFloat(helper.rating).toFixed(1)}</span>
+                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">{parseFloat(helper.rating).toFixed(1)}</span>
                                                 </div>
                                             )}
                                             {/* Verification Badge */}
@@ -673,12 +673,12 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                             {/* Name and Type */}
                                             <div className="flex items-start justify-between mb-3">
                                                 <Link to={profileRoute} className="flex-1">
-                                                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
+                                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-1">
                                                         {helper.name}
                                                     </h3>
                                                 </Link>
                                                 {isBusiness && (
-                                                    <span className="bg-primary-100 text-primary-800 text-xs px-2 py-1 rounded-full font-semibold ml-2">Business</span>
+                                                    <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 text-xs px-2 py-1 rounded-full font-semibold ml-2">Business</span>
                                                 )}
                                             </div>
 
@@ -689,13 +689,13 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                         {uniqueServiceTypes.slice(0, 3).map((type, idx) => (
                                                             <span 
                                                                 key={idx} 
-                                                                className="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-md font-medium capitalize"
+                                                                className="bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs px-2 py-1 rounded-md font-medium capitalize"
                                                             >
                                                                 {type}
                                                             </span>
                                                         ))}
                                                         {uniqueServiceTypes.length > 3 && (
-                                                            <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md font-medium">
+                                                            <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-2 py-1 rounded-md font-medium">
                                                                 +{uniqueServiceTypes.length - 3}
                                                             </span>
                                                         )}
@@ -715,14 +715,14 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                             {uniqueLocations.slice(0, 3).map((location, idx) => (
                                                                 <span 
                                                                     key={idx} 
-                                                                    className="text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded-md"
+                                                                    className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
                                                                     title={location.area || location.display_text}
                                                                 >
                                                                     {location.area || location.display_text}
                                                                 </span>
                                                             ))}
                                                             {uniqueLocations.length > 3 && (
-                                                                <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-md">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md">
                                                                     +{uniqueLocations.length - 3} more
                                                                 </span>
                                                             )}
@@ -730,8 +730,8 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center text-sm text-gray-500 mb-2">
-                                                    <svg className="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
+                                                    <svg className="w-4 h-4 mr-1.5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     </svg>
@@ -740,10 +740,10 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                             )}
 
                                             {/* Experience and Reviews */}
-                                            <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                                            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
                                                 {!isBusiness && helper.experience_years > 0 && (
                                                     <div className="flex items-center gap-1">
-                                                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
                                                         <span>{helper.experience_years} {helper.experience_years === 1 ? "year" : "years"}</span>
@@ -759,12 +759,12 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
 
                                             {/* Bio (for businesses) */}
                                             {isBusiness && helper.bio && (
-                                                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{helper.bio}</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">{helper.bio}</p>
                                             )}
 
                                             {/* Contact Options (if logged in) */}
                                             {user && helper.phone && (
-                                                <div className="mt-4 pt-3 border-t border-gray-200">
+                                                <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
                                                     <div className="flex items-center justify-center gap-2">
                                                         {/* Call Button */}
                                                         <a
@@ -814,7 +814,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                             {/* View Profile Link */}
                                             <Link
                                                 to={profileRoute}
-                                                className="block mt-3 text-center text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+                                                className="block mt-3 text-center text-sm font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
                                             >
                                                 View Profile →
                                             </Link>
@@ -829,7 +829,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             <div className="mt-12">
                                 {/* Results Info */}
                                 {helpers.meta && (helpers.meta.total !== undefined || helpers.total !== undefined) && (
-                                    <div className="text-center mb-6 text-gray-600">
+                                    <div className="text-center mb-6 text-gray-600 dark:text-gray-400">
                                         <p className="text-sm">
                                             Showing {helpers.meta?.from || helpers.from || 0} to {helpers.meta?.to || helpers.to || 0} of {helpers.meta?.total || helpers.total || 0} results
                                         </p>
@@ -846,7 +846,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                     link.active
                                                         ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
-                                                        : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                                                        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
                                                 } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                                             />
                                         ))}
@@ -856,10 +856,10 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         )}
                     </>
                 ) : (
-                    <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
+                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">🔍</div>
-                        <p className="text-gray-600 text-xl mb-6">No helpers found</p>
-                        <p className="text-gray-500 mb-8">Try adjusting your filters to find helpers</p>
+                        <p className="text-gray-600 dark:text-gray-300 text-xl mb-6">No helpers found</p>
+                        <p className="text-gray-500 dark:text-gray-400 mb-8">Try adjusting your filters to find helpers</p>
                         <button
                             onClick={() => {
                                 setServiceType("");

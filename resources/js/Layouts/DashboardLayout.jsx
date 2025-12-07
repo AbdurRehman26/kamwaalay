@@ -90,14 +90,14 @@ export default function DashboardLayout({ children }) {
     const navItems = getNavItems();
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             {/* Top Navigation Bar */}
             <Navbar />
 
             <div className="flex">
                 {/* Sidebar */}
                 <aside className="hidden lg:flex lg:flex-shrink-0">
-                    <div className="flex flex-col w-64 bg-white border-r border-gray-200 min-h-screen">
+                    <div className="flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 min-h-screen">
                         <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
                             <nav className="flex-1 px-3 space-y-1">
                                 {navItems.map((item) => (
@@ -106,8 +106,8 @@ export default function DashboardLayout({ children }) {
                                         to={item.path}
                                         className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                                             isActive(item.path)
-                                                ? "bg-primary-50 text-primary-700 border-l-4 border-primary-600"
-                                                : "text-gray-700 hover:bg-gray-50 hover:text-primary-600"
+                                                ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-l-4 border-primary-600 dark:border-primary-500"
+                                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
                                         }`}
                                     >
                                         <span className="mr-3 text-xl">{item.icon}</span>

@@ -95,15 +95,15 @@ export default function NotificationsIndex() {
     const getNotificationColor = (type) => {
         switch (type) {
             case "job_application_received":
-                return "bg-blue-100 text-blue-800";
+                return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
             case "job_application_status_changed":
-                return "bg-green-100 text-green-800";
+                return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
             case "new_message":
-                return "bg-purple-100 text-purple-800";
+                return "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300";
             case "document_verified":
-                return "bg-yellow-100 text-yellow-800";
+                return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
             default:
-                return "bg-gray-100 text-gray-800";
+                return "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300";
         }
     };
 
@@ -111,11 +111,11 @@ export default function NotificationsIndex() {
         <PublicLayout>
             <div className="py-12">
                 <div className="mx-auto max-w-4xl sm:px-6 lg:px-8">
-                    <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 sm:p-8">
                         <div className="flex justify-between items-center mb-6">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-                                <p className="text-sm text-gray-600 mt-1">Stay updated with your activity</p>
+                                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Notifications</h1>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Stay updated with your activity</p>
                             </div>
                             {notifications.data && notifications.data.length > 0 && (
                                 <PrimaryButton
@@ -129,8 +129,8 @@ export default function NotificationsIndex() {
 
                         {loading ? (
                             <div className="text-center py-12">
-                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
-                                <p className="text-gray-600">Loading notifications...</p>
+                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 dark:border-primary-400 mb-4"></div>
+                                <p className="text-gray-600 dark:text-gray-400">Loading notifications...</p>
                             </div>
                         ) : notifications.data && notifications.data.length > 0 ? (
                             <>
@@ -152,8 +152,8 @@ export default function NotificationsIndex() {
                                                 }}
                                                 className={`block p-4 rounded-lg border-2 transition-all ${
                                                     isUnread 
-                                                        ? "border-primary-300 bg-primary-50 hover:bg-primary-100" 
-                                                        : "border-gray-200 bg-gray-50 hover:bg-gray-100 opacity-90"
+                                                        ? "border-primary-300 dark:border-primary-600 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30" 
+                                                        : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 opacity-90"
                                                 }`}
                                             >
                                                 <div className="flex items-start gap-4">
@@ -165,25 +165,25 @@ export default function NotificationsIndex() {
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center justify-between mb-1">
                                                             <h3 className={`text-base font-bold ${
-                                                                isUnread ? "text-gray-900" : "text-gray-600"
+                                                                isUnread ? "text-gray-900 dark:text-white" : "text-gray-600 dark:text-gray-400"
                                                             }`}>
                                                                 {notification.data?.title || "Notification"}
                                                             </h3>
                                                             {isUnread && (
-                                                                <span className="w-2 h-2 bg-primary-600 rounded-full flex-shrink-0"></span>
+                                                                <span className="w-2 h-2 bg-primary-600 dark:bg-primary-400 rounded-full flex-shrink-0"></span>
                                                             )}
                                                         </div>
                                                         <p className={`text-sm mb-2 ${
-                                                            isUnread ? "text-gray-600" : "text-gray-500"
+                                                            isUnread ? "text-gray-600 dark:text-gray-300" : "text-gray-500 dark:text-gray-400"
                                                         }`}>
                                                             {notification.data?.message || ""}
                                                         </p>
                                                         <div className="flex items-center justify-between">
-                                                            <p className="text-xs text-gray-400">
+                                                            <p className="text-xs text-gray-400 dark:text-gray-500">
                                                                 {new Date(notification.created_at).toLocaleString()}
                                                             </p>
                                                             {!isUnread && (
-                                                                <span className="text-xs text-gray-400 italic">Read</span>
+                                                                <span className="text-xs text-gray-400 dark:text-gray-500 italic">Read</span>
                                                             )}
                                                         </div>
                                                     </div>
@@ -201,7 +201,7 @@ export default function NotificationsIndex() {
                                                 return (
                                                     <span
                                                         key={index}
-                                                        className="px-3 py-2 text-gray-400 border border-gray-200 rounded-lg"
+                                                        className="px-3 py-2 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700 rounded-lg"
                                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                                     />
                                                 );
@@ -217,7 +217,7 @@ export default function NotificationsIndex() {
                                                     className={`px-4 py-2 rounded-lg border transition-colors ${
                                                         isActive
                                                             ? "bg-primary-600 text-white border-primary-600"
-                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                            : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                                                     }`}
                                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                                 />
@@ -229,11 +229,11 @@ export default function NotificationsIndex() {
                         ) : (
                             <div className="text-center py-12">
                                 <div className="text-6xl mb-4">🔔</div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">No notifications yet</h3>
-                                <p className="text-gray-600 mb-6">You'll see notifications here when there's activity on your account.</p>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">No notifications yet</h3>
+                                <p className="text-gray-600 dark:text-gray-400 mb-6">You'll see notifications here when there's activity on your account.</p>
                                 <Link
                                     to={route("dashboard")}
-                                    className="inline-block bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition duration-300 font-semibold shadow-md hover:shadow-lg"
+                                    className="inline-block bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-700 dark:to-primary-800 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 dark:hover:from-primary-800 dark:hover:to-primary-900 transition duration-300 font-semibold shadow-md hover:shadow-lg"
                                 >
                                     Go to Dashboard
                                 </Link>

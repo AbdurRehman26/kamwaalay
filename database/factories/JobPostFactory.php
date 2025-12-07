@@ -36,3 +36,5 @@ class JobPostFactory extends Factory
 
 
 
+
+

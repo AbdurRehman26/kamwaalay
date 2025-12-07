@@ -28,7 +28,7 @@ export default function Edit() {
             <DashboardLayout>
                 <div className="py-12">
                     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 text-center">
-                        <p className="text-gray-600">Loading profile...</p>
+                        <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
                     </div>
                 </div>
             </DashboardLayout>
@@ -40,7 +40,7 @@ export default function Edit() {
             <DashboardLayout>
                 <div className="py-12">
                     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 text-center">
-                        <p className="text-red-600">{error || "Failed to load profile"}</p>
+                        <p className="text-red-600 dark:text-red-400">{error || "Failed to load profile"}</p>
                     </div>
                 </div>
             </DashboardLayout>
@@ -50,7 +50,7 @@ export default function Edit() {
         <DashboardLayout>
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                    <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sm:p-8">
                         <UpdateProfileInformationForm
                             mustVerifyEmail={profileData.must_verify_email}
                             status={profileData.status}
@@ -58,11 +58,11 @@ export default function Edit() {
                         />
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sm:p-8">
                         <UpdatePasswordForm className="max-w-xl" />
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sm:p-8">
                         <DeleteUserForm className="max-w-xl" />
                     </div>
                 </div>

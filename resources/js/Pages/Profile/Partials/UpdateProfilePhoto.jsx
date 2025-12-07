@@ -95,11 +95,11 @@ export default function UpdateProfilePhoto({ className = "" }) {
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">
+                <h2 className="text-lg font-medium text-gray-900 dark:text-white">
                     Profile Photo
                 </h2>
 
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Update your profile photo.
                 </p>
             </header>
@@ -113,7 +113,7 @@ export default function UpdateProfilePhoto({ className = "" }) {
                                 <img
                                     src={photoPreview}
                                     alt="Profile preview"
-                                    className="h-20 w-20 rounded-full object-cover border-2 border-gray-300"
+                                    className="h-20 w-20 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
                                 />
                                 {photo && (
                                     <button
@@ -133,9 +133,9 @@ export default function UpdateProfilePhoto({ className = "" }) {
                                 type="file"
                                 accept="image/*"
                                 onChange={handlePhotoChange}
-                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+                                className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-primary-900/30 file:text-primary-700 dark:file:text-primary-300 hover:file:bg-primary-100 dark:hover:file:bg-primary-900/40 cursor-pointer"
                             />
-                            <p className="mt-1 text-xs text-gray-500">PNG, JPG, GIF up to 2MB</p>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 2MB</p>
                         </div>
                     </div>
                     <InputError className="mt-2" message={errors.photo} />
@@ -153,7 +153,7 @@ export default function UpdateProfilePhoto({ className = "" }) {
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                             Photo uploaded successfully.
                         </p>
                     </Transition>
@@ -162,6 +162,8 @@ export default function UpdateProfilePhoto({ className = "" }) {
         </section>
     );
 }
+
+
 
 
 

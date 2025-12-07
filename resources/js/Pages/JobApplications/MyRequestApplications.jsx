@@ -30,15 +30,15 @@ export default function MyRequestApplications() {
     const getStatusColor = (status) => {
         switch (status) {
             case "pending":
-                return "bg-yellow-100 text-yellow-800";
+                return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
             case "accepted":
-                return "bg-green-100 text-green-800";
+                return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
             case "rejected":
-                return "bg-red-100 text-red-800";
+                return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
             case "withdrawn":
-                return "bg-gray-100 text-gray-800";
+                return "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300";
             default:
-                return "bg-gray-100 text-gray-800";
+                return "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300";
         }
     };
 
@@ -127,7 +127,7 @@ export default function MyRequestApplications() {
     return (
         <DashboardLayout>
             
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Applications to My Job Postings</h1>
                     <p className="text-xl text-white/90">Review and manage applications for your job postings</p>
@@ -136,16 +136,16 @@ export default function MyRequestApplications() {
             <div className="container mx-auto px-4 py-12">
                 {loading ? (
                     <div className="text-center py-12">
-                        <p className="text-gray-600">Loading applications...</p>
+                        <p className="text-gray-600 dark:text-gray-400">Loading applications...</p>
                     </div>
                 ) : applications.data && applications.data.length > 0 ? (
                     <div className="space-y-6">
                         {applications.data.map((application) => (
-                            <div key={application.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
+                            <div key={application.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-xl font-bold text-gray-900">
+                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                                                 {(application.job_post || application.booking)?.service_type_label || 
                                                  (application.job_post || application.booking)?.service_type?.replace("_", " ") || 
                                                  "Service Request"}
@@ -159,10 +159,10 @@ export default function MyRequestApplications() {
                                                 <img
                                                     src={`/storage/${application.user.photo}`}
                                                     alt={application.user?.name}
-                                                    className="w-16 h-16 rounded-full object-cover border-2 border-primary-200"
+                                                    className="w-16 h-16 rounded-full object-cover border-2 border-primary-200 dark:border-primary-600"
                                                 />
                                             ) : (
-                                                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-400 to-primary-500 flex items-center justify-center text-white font-bold text-xl border-2 border-primary-200">
+                                                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-400 to-primary-500 flex items-center justify-center text-white font-bold text-xl border-2 border-primary-200 dark:border-primary-600">
                                                     {application.user?.name?.charAt(0)?.toUpperCase() || "U"}
                                                 </div>
                                             )}
@@ -176,22 +176,22 @@ export default function MyRequestApplications() {
                                                     }
                                                     className="block"
                                                 >
-                                                    <p className="text-gray-900 font-semibold text-lg hover:text-primary-600 transition-colors">
+                                                    <p className="text-gray-900 dark:text-white font-semibold text-lg hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                                                         {application.user?.name}
                                                     </p>
                                                 </Link>
-                                                <p className="text-gray-500 text-sm capitalize">
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm capitalize">
                                                     {application.user?.role || "User"}
                                                 </p>
                                             </div>
                                         </div>
                                         {application.user?.phone && (
                                             <div className="mb-3">
-                                                <p className="text-gray-700 text-sm mb-2 font-medium">📞 {application.user.phone}</p>
+                                                <p className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">📞 {application.user.phone}</p>
                                                 <div className="flex gap-2">
                                                     <a
                                                         href={`tel:${formatPhoneForCall(application.user.phone)}`}
-                                                        className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg hover:bg-green-100 transition duration-300 font-medium text-sm"
+                                                        className="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-4 py-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition duration-300 font-medium text-sm"
                                                     >
                                                         <span>📞</span>
                                                         <span>Call</span>
@@ -200,14 +200,14 @@ export default function MyRequestApplications() {
                                                         href={`https://wa.me/${formatPhoneForWhatsApp(application.user.phone)}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg hover:bg-green-100 transition duration-300 font-medium text-sm"
+                                                        className="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-4 py-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition duration-300 font-medium text-sm"
                                                     >
                                                         <span>💬</span>
                                                         <span>WhatsApp</span>
                                                     </a>
                                                     <button
                                                         onClick={() => handleOpenChat(application.user)}
-                                                        className="flex items-center gap-2 bg-primary-50 text-primary-700 px-4 py-2 rounded-lg hover:bg-primary-100 transition duration-300 font-medium text-sm"
+                                                        className="flex items-center gap-2 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 px-4 py-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition duration-300 font-medium text-sm"
                                                     >
                                                         <span>💬</span>
                                                         <span>Message</span>
@@ -216,25 +216,25 @@ export default function MyRequestApplications() {
                                             </div>
                                         )}
                                         {application.message && (
-                                            <div className="bg-gray-50 rounded-lg p-4 mt-3 mb-3">
-                                                <p className="text-gray-700 text-sm whitespace-pre-wrap">{application.message}</p>
+                                            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mt-3 mb-3">
+                                                <p className="text-gray-700 dark:text-gray-300 text-sm whitespace-pre-wrap">{application.message}</p>
                                             </div>
                                         )}
                                         {application.proposed_rate && (
-                                            <p className="text-green-600 font-bold text-lg">Proposed Rate: PKR {application.proposed_rate}/hr</p>
+                                            <p className="text-green-600 dark:text-green-400 font-bold text-lg">Proposed Rate: PKR {application.proposed_rate}/hr</p>
                                         )}
                                     </div>
                                     {application.status === "pending" && (
                                         <div className="flex gap-2 ml-4">
                                             <button
                                                 onClick={() => handleAcceptClick(application)}
-                                                className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition duration-300 font-medium text-sm font-semibold"
+                                                className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-4 py-2 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/40 transition duration-300 font-medium text-sm font-semibold"
                                             >
                                                 Accept
                                             </button>
                                             <button
                                                 onClick={() => handleRejectClick(application)}
-                                                className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition duration-300 font-medium text-sm font-semibold"
+                                                className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-4 py-2 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/40 transition duration-300 font-medium text-sm font-semibold"
                                             >
                                                 Reject
                                             </button>
@@ -244,7 +244,7 @@ export default function MyRequestApplications() {
                                         <div className="ml-4">
                                             <Link
                                                 to={route("bookings.show", (application.job_post || application.booking)?.id)}
-                                                className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition duration-300 font-medium text-sm font-semibold"
+                                                className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-4 py-2 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/40 transition duration-300 font-medium text-sm font-semibold"
                                             >
                                                 View Booking
                                             </Link>
@@ -265,7 +265,7 @@ export default function MyRequestApplications() {
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                 link.active
                                                     ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg"
-                                                    : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
                                             } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                         />
                                     ))}
@@ -274,10 +274,10 @@ export default function MyRequestApplications() {
                         )}
                     </div>
                 ) : (
-                    <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
+                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">📋</div>
-                        <p className="text-gray-600 text-xl mb-6">No applications yet</p>
-                        <p className="text-gray-500 mb-8">Applications to your job postings will appear here</p>
+                        <p className="text-gray-600 dark:text-gray-300 text-xl mb-6">No applications yet</p>
+                        <p className="text-gray-500 dark:text-gray-400 mb-8">Applications to your job postings will appear here</p>
                     </div>
                 )}
             </div>
@@ -308,19 +308,19 @@ export default function MyRequestApplications() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h2 className="ml-4 text-xl font-semibold text-gray-900">
+                        <h2 className="ml-4 text-xl font-semibold text-gray-900 dark:text-white">
                             Accept Application
                         </h2>
                     </div>
 
-                    <p className="mt-2 text-sm text-gray-600 mb-6">
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 mb-6">
                         Are you sure you want to accept this application from <span className="font-semibold">{selectedApplication?.user?.name}</span>? 
                         This will automatically reject all other pending applications for this job posting.
                     </p>
 
                     {selectedApplication?.proposed_rate && (
-                        <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                            <p className="text-sm text-gray-700 mb-1">
+                        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                            <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
                                 <span className="font-semibold">Proposed Rate:</span> PKR {selectedApplication.proposed_rate}/hr
                             </p>
                         </div>
@@ -335,7 +335,7 @@ export default function MyRequestApplications() {
                                 }
                             }}
                             disabled={processing}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
                         >
                             Cancel
                         </button>
@@ -364,12 +364,12 @@ export default function MyRequestApplications() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h2 className="ml-4 text-xl font-semibold text-gray-900">
+                        <h2 className="ml-4 text-xl font-semibold text-gray-900 dark:text-white">
                             Reject Application
                         </h2>
                     </div>
 
-                    <p className="mt-2 text-sm text-gray-600 mb-6">
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 mb-6">
                         Are you sure you want to reject this application from <span className="font-semibold">{selectedApplication?.user?.name}</span>? 
                         This action cannot be undone.
                     </p>
@@ -383,7 +383,7 @@ export default function MyRequestApplications() {
                                 }
                             }}
                             disabled={processing}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
                         >
                             Cancel
                         </button>
