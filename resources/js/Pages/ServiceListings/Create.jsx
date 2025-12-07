@@ -187,26 +187,37 @@ export default function ServiceListingCreate() {
 
     return (
         <DashboardLayout>
-            
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
-                <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">Create Service Listing</h1>
-                    <p className="text-xl text-white/90">Add services and locations you offer</p>
-                    <div className="mt-4 bg-white/20 rounded-lg p-4 max-w-2xl">
-                        <p className="text-sm">
-                            💡 <strong>Tip:</strong> Select multiple service types and locations. One service listing will be created with all selected services and locations.
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Header Section */}
+                <div className="mb-10 relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200 dark:shadow-none">
+                    <div className="relative z-10">
+                        <h1 className="text-3xl md:text-4xl font-bold mb-2">Create Service Listing</h1>
+                        <p className="text-indigo-100 text-lg max-w-2xl mb-6">
+                            Add services and locations you offer to connect with customers.
                         </p>
+                        <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 max-w-2xl border border-white/30">
+                            <p className="text-sm flex items-start gap-2">
+                                <span className="text-xl flex-shrink-0">💡</span>
+                                <span>
+                                    <strong>Tip:</strong> Select multiple service types and locations. One service listing will be created with all selected services and locations.
+                                </span>
+                            </p>
+                        </div>
                     </div>
+                    {/* Decorative blobs */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+                    <div className="absolute bottom-0 right-20 w-48 h-48 bg-purple-500/30 rounded-full blur-3xl transform translate-y-1/2"></div>
                 </div>
-            </div>
-            <div className="container mx-auto px-4 py-12">
                 <div className="max-w-4xl mx-auto">
                     <form onSubmit={submit} className="space-y-8">
                         {/* Service Types Selection */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-4">Select Service Types *</h2>
-                            <p className="text-sm text-gray-600 mb-6">Choose the services you offer. You can select multiple.</p>
-                            
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
+                            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                                <span className="text-2xl">🛠️</span>
+                                Select Service Types *
+                            </h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Choose the services you offer. You can select multiple.</p>
+
                             {/* Selected Service Types as Tags */}
                             {selectedServiceTypes.length > 0 && (
                                 <div className="mb-6">
@@ -216,14 +227,14 @@ export default function ServiceListingCreate() {
                                             return (
                                                 <span
                                                     key={serviceType}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-800 rounded-full text-sm font-semibold"
+                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 rounded-full text-sm font-bold"
                                                 >
                                                     <span>{service?.icon}</span>
                                                     <span>{service?.label}</span>
                                                     <button
                                                         type="button"
                                                         onClick={() => removeServiceType(serviceType)}
-                                                        className="ml-1 text-primary-600 hover:text-primary-800 font-bold"
+                                                        className="ml-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-bold"
                                                     >
                                                         ×
                                                     </button>
@@ -242,27 +253,29 @@ export default function ServiceListingCreate() {
                                         type="button"
                                         onClick={() => addServiceType(service.value)}
                                         disabled={selectedServiceTypes.includes(service.value)}
-                                        className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
-                                            selectedServiceTypes.includes(service.value)
-                                                ? "border-primary-500 bg-primary-50 opacity-50 cursor-not-allowed"
-                                                : "border-gray-200 hover:border-primary-300 hover:bg-primary-50 cursor-pointer"
-                                        }`}
+                                        className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${selectedServiceTypes.includes(service.value)
+                                                ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 dark:border-indigo-600 opacity-50 cursor-not-allowed"
+                                                : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 cursor-pointer hover:shadow-md"
+                                            }`}
                                     >
                                         <div className="text-3xl mb-2">{service.icon}</div>
-                                        <div className="font-semibold text-gray-900">{service.label}</div>
+                                        <div className="font-bold text-gray-900 dark:text-white">{service.label}</div>
                                     </button>
                                 ))}
                             </div>
-                            {errors.service_types && <div className="text-red-500 text-sm mt-2">{errors.service_types}</div>}
+                            {errors.service_types && <div className="text-red-600 dark:text-red-400 text-sm mt-2 font-semibold">{errors.service_types}</div>}
                         </div>
 
                         {/* Locations Selection */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-4">Select Locations *</h2>
-                            <p className="text-sm text-gray-600 mb-6">Add locations where you offer your services. You can add multiple locations.</p>
-                            
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
+                            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                                <span className="text-2xl">📍</span>
+                                Select Locations *
+                            </h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Add locations where you offer your services. You can add multiple locations.</p>
+
                             {/* Notice about Karachi only */}
-                            <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                            <div className="mb-6 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 rounded-lg">
                                 <div className="flex items-start">
                                     <div className="flex-shrink-0">
                                         <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -270,13 +283,13 @@ export default function ServiceListingCreate() {
                                         </svg>
                                     </div>
                                     <div className="ml-3">
-                                        <p className="text-sm text-yellow-700">
+                                        <p className="text-sm text-yellow-700 dark:text-yellow-300">
                                             <strong>Note:</strong> We are currently serving <strong>Karachi</strong> only. We will be going live in different cities soon!
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {/* Selected Locations as Tags */}
                             {selectedLocations.length > 0 && (
                                 <div className="mb-6">
@@ -284,14 +297,14 @@ export default function ServiceListingCreate() {
                                         {selectedLocations.map((location) => (
                                             <span
                                                 key={location.id}
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold"
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 rounded-full text-sm font-bold"
                                             >
                                                 <span>📍</span>
                                                 <span>{location.display_text}</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => removeLocation(location.id)}
-                                                    className="ml-1 text-green-600 hover:text-green-800 font-bold"
+                                                    className="ml-1 text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 font-bold"
                                                 >
                                                     ×
                                                 </button>
@@ -312,86 +325,89 @@ export default function ServiceListingCreate() {
                                             setShowLocationSuggestions(true);
                                         }
                                     }}
-                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 px-4 py-3"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 px-4 py-3 transition-all"
                                     placeholder="Search location (e.g., Karachi, Clifton or type area name)..."
                                 />
                                 {showLocationSuggestions && locationSuggestions.length > 0 && (
-                                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-xl max-h-60 overflow-auto">
                                         {locationSuggestions
                                             .filter(suggestion => !selectedLocations.some(loc => loc.id === (suggestion.id || suggestion.display_text)))
                                             .map((suggestion, index) => (
                                                 <div
                                                     key={index}
                                                     onClick={() => handleLocationSelect(suggestion)}
-                                                    className="px-4 py-2 hover:bg-primary-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                    className="px-4 py-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 text-gray-900 dark:text-white"
                                                 >
                                                     {suggestion.display_text}
                                                 </div>
                                             ))}
                                     </div>
                                 )}
-                                <p className="text-xs text-gray-500 mt-2">
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                     Type to search and select locations. Each location will be added as a tag.
                                 </p>
                             </div>
-                            {errors.locations && <div className="text-red-500 text-sm mt-2">{errors.locations}</div>}
+                            {errors.locations && <div className="text-red-600 dark:text-red-400 text-sm mt-2 font-semibold">{errors.locations}</div>}
                         </div>
 
                         {/* Common Fields */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Common Details</h2>
-                            <p className="text-sm text-gray-600 mb-6">These details will apply to all your service listings.</p>
-                            
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
+                            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                                <span className="text-2xl">📝</span>
+                                Common Details
+                            </h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">These details will apply to all your service listings.</p>
+
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Work Type *</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Work Type *</label>
                                     <select
                                         value={commonFields.work_type}
-                                        onChange={(e) => setCommonFields({...commonFields, work_type: e.target.value})}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        onChange={(e) => setCommonFields({ ...commonFields, work_type: e.target.value })}
+                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
                                         required
                                     >
                                         <option value="">Select Type</option>
                                         <option value="full_time">Full Time</option>
                                         <option value="part_time">Part Time</option>
                                     </select>
-                                    {errors.work_type && <div className="text-red-500 text-sm mt-1">{errors.work_type}</div>}
+                                    {errors.work_type && <div className="text-red-600 dark:text-red-400 text-sm mt-1 font-semibold">{errors.work_type}</div>}
                                 </div>
 
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Monthly Rate (PKR)</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Monthly Rate (PKR)</label>
                                     <input
                                         type="number"
                                         step="0.01"
                                         value={commonFields.monthly_rate}
-                                        onChange={(e) => setCommonFields({...commonFields, monthly_rate: e.target.value})}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        onChange={(e) => setCommonFields({ ...commonFields, monthly_rate: e.target.value })}
+                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
                                         placeholder="e.g., 500"
                                     />
-                                    {errors.monthly_rate && <div className="text-red-500 text-sm mt-1">{errors.monthly_rate}</div>}
+                                    {errors.monthly_rate && <div className="text-red-600 dark:text-red-400 text-sm mt-1 font-semibold">{errors.monthly_rate}</div>}
                                 </div>
 
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Description</label>
                                     <textarea
                                         value={commonFields.description}
-                                        onChange={(e) => setCommonFields({...commonFields, description: e.target.value})}
+                                        onChange={(e) => setCommonFields({ ...commonFields, description: e.target.value })}
                                         rows={6}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
                                         placeholder="Describe the services you offer, your experience, skills, etc..."
                                     />
-                                    {errors.description && <div className="text-red-500 text-sm mt-1">{errors.description}</div>}
+                                    {errors.description && <div className="text-red-600 dark:text-red-400 text-sm mt-1 font-semibold">{errors.description}</div>}
                                 </div>
                             </div>
 
                             {/* Preview */}
                             {selectedServiceTypes.length > 0 && selectedLocations.length > 0 && (
-                                <div className="mt-6 p-4 bg-primary-50 rounded-lg border border-primary-200">
-                                    <p className="text-sm font-semibold text-primary-900 mb-2">
+                                <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-800">
+                                    <p className="text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-2">
                                         Your service listing will include:
                                     </p>
-                                    <div className="text-xs text-primary-700 space-y-2">
+                                    <div className="text-xs text-indigo-700 dark:text-indigo-300 space-y-2">
                                         <div>
                                             <span className="font-semibold">Service Types:</span> {selectedServiceTypes.map((serviceType) => {
                                                 const service = serviceTypes.find(st => st.value === serviceType);
@@ -407,32 +423,32 @@ export default function ServiceListingCreate() {
                         </div>
 
                         {/* Submit Buttons */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
                             <div className="flex gap-4">
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition duration-300 font-semibold disabled:opacity-50"
+                                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-bold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {processing 
-                                        ? "Creating..." 
+                                    {processing
+                                        ? "Creating..."
                                         : "Create Service Listing"
                                     }
                                 </button>
                                 <Link
                                     to={route("service-listings.my-listings")}
-                                    className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold text-center flex items-center justify-center"
+                                    className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 font-bold text-center flex items-center justify-center"
                                 >
                                     View My Listings
                                 </Link>
                             </div>
                             {errors.submit && (
-                                <div className="mt-4 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
-                                    <p className="text-sm text-red-800">{errors.submit[0]}</p>
+                                <div className="mt-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 dark:border-red-600 p-4 rounded-lg">
+                                    <p className="text-sm text-red-800 dark:text-red-300 font-semibold">{errors.submit[0]}</p>
                                 </div>
                             )}
                             <div className="mt-4 text-center">
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
                                     {selectedServiceTypes.length > 0 && selectedLocations.length > 0
                                         ? `One service listing will be created with ${selectedServiceTypes.length} service type(s) and ${selectedLocations.length} location(s).`
                                         : "Select at least one service type and one location to create a listing."

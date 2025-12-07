@@ -21,7 +21,7 @@ test('guests can view service requests', function () {
         'status' => 'pending',
     ]);
 
-    $response = $this->getJson('/api/service-requests');
+    $response = $this->getJson('/api/bookings/browse');
 
     $response->assertStatus(200);
     $response->assertJsonStructure([
@@ -38,7 +38,7 @@ test('guests can view individual service requests', function () {
         'status' => 'pending',
     ]);
 
-    $response = $this->getJson("/api/service-requests/{$jobPost->id}");
+    $response = $this->getJson("/api/bookings/{$jobPost->id}");
 
     $response->assertStatus(200);
     $response->assertJsonStructure([
@@ -145,7 +145,7 @@ test('users can view their own bookings', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->getJson('/api/job-posts');
+    ])->getJson('/api/my-job-posts');
 
     $response->assertStatus(200);
     $response->assertJsonStructure(['job_posts']);

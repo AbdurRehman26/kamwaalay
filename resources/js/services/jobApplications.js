@@ -2,7 +2,7 @@ import api from "./api";
 
 export const jobApplicationsService = {
     async getApplications(params = {}) {
-        const response = await api.get("/job-applications", { params });
+        const response = await api.get("/job-posts", { params });
         return response.data;
     },
 

@@ -66,9 +66,11 @@ export default function ServiceListingShow() {
     if (loading) {
         return (
             <PublicLayout>
-                
-                <div className="container mx-auto px-4 py-12 text-center">
-                    <p className="text-gray-600 dark:text-gray-400">Loading listing details...</p>
+                <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                        <p className="text-gray-600 dark:text-gray-400">Loading listing details...</p>
+                    </div>
                 </div>
             </PublicLayout>
         );
@@ -77,15 +79,19 @@ export default function ServiceListingShow() {
     if (error || !listing) {
         return (
             <PublicLayout>
-                
-                <div className="container mx-auto px-4 py-12 text-center">
-                    <p className="text-red-600 dark:text-red-400">{error || "Listing not found"}</p>
-                    <Link
-                        to={route("service-listings.index")}
-                        className="mt-4 inline-block bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold"
-                    >
-                        Back to Listings
-                    </Link>
+                <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+                    <div className="max-w-2xl mx-auto px-6 lg:px-8">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 text-center border border-gray-100 dark:border-gray-700">
+                            <div className="text-6xl mb-6">❌</div>
+                            <p className="text-red-600 dark:text-red-400 text-xl mb-6 font-semibold">{error || "Listing not found"}</p>
+                            <Link
+                                to={route("service-listings.index")}
+                                className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 font-bold"
+                            >
+                                Back to Listings
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </PublicLayout>
         );
@@ -93,89 +99,112 @@ export default function ServiceListingShow() {
 
     return (
         <PublicLayout>
-            
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 text-white py-12">
-                <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">{listing.service_type_label}</h1>
-                    <p className="text-xl text-white/90">Service offered by {listing.user?.name}</p>
+            {/* Hero Section */}
+            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden py-16 md:py-24">
+                {/* Abstract Background Shapes */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[100px] animate-pulse"></div>
+                    <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-purple-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
+                </div>
+
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">{listing.service_type_label}</h1>
+                    <p className="text-xl text-indigo-100/90 max-w-2xl mx-auto leading-relaxed">
+                        Service offered by {listing.user?.name}
+                    </p>
                     {otherListings && otherListings.length > 0 && (
-                        <p className="text-lg text-white/80 mt-2">
+                        <p className="text-lg text-indigo-100/80 mt-4">
                             This provider offers {otherListings.length} other service{otherListings.length !== 1 ? "s" : ""}
                         </p>
                     )}
                 </div>
             </div>
-            <div className="container mx-auto px-4 py-12">
-                <div className="max-w-4xl mx-auto">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-8">
-                        {isOwner && (
-                            <div className="mb-6 flex justify-end">
-                                <Link
-                                    to={route("service-listings.edit", listing.id)}
-                                    className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-all duration-300 font-semibold inline-flex items-center gap-2"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Edit Listing
-                                </Link>
+
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                    <div className="max-w-4xl mx-auto">
+                        {/* Main Content Card */}
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 dark:border-gray-700 relative z-20 -mt-16">
+                            {isOwner && (
+                                <div className="mb-6 flex justify-end">
+                                    <Link
+                                        to={route("service-listings.edit", listing.id)}
+                                        className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 font-bold inline-flex items-center gap-2"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit Listing
+                                    </Link>
+                                </div>
+                            )}
+                            <div className="grid md:grid-cols-2 gap-6 mb-8">
+                                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-indigo-100 dark:border-indigo-800">
+                                    <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">👤 Service Provider</h3>
+                                    <p className="text-gray-900 dark:text-white font-bold text-2xl mb-2">{listing.user?.name}</p>
+                                    {listing.user?.phone && (
+                                        <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                            <span>📞</span>
+                                            <span>{listing.user.phone}</span>
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-indigo-100 dark:border-indigo-800">
+                                    <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">💼 Work Type</h3>
+                                    <p className="text-gray-900 dark:text-white font-semibold text-lg capitalize mb-4">{listing.work_type?.replace("_", " ") || "N/A"}</p>
+                                    <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">📍 Location{listing.location_details && listing.location_details.length > 1 ? "s" : ""}</h3>
+                                    {listing.location_details && listing.location_details.length > 0 ? (
+                                        <div className="space-y-2">
+                                            {listing.location_details.map((location, idx) => (
+                                                <p key={idx} className="text-gray-900 dark:text-white flex items-center font-medium">
+                                                    <span className="mr-2">📍</span>
+                                                    <span>{location.area || location.city_name}</span>
+                                                </p>
+                                            ))}
+                                        </div>
+                                    ) : listing.area ? (
+                                        <p className="text-gray-900 dark:text-white font-medium">
+                                            📍 {listing.area}
+                                        </p>
+                                    ) : (
+                                        <p className="text-gray-500 dark:text-gray-400">Location not specified</p>
+                                    )}
+                                </div>
                             </div>
-                        )}
-                        <div className="grid md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Service Provider</h3>
-                                <p className="text-gray-900 dark:text-white font-bold text-xl">{listing.user?.name}</p>
-                                {listing.user?.phone && (
-                                    <p className="text-gray-600 dark:text-gray-400">📞 {listing.user.phone}</p>
-                                )}
+                            <div className="mb-8">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <span>🛠️</span>
+                                    Services Offered
+                                </h3>
+                                <div className="flex flex-wrap gap-3">
+                                    {listing.service_types && listing.service_types.length > 0 ? (
+                                        listing.service_types.map((serviceType, idx) => (
+                                            <span key={idx} className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 py-2 rounded-full font-bold capitalize shadow-md">
+                                                {typeof serviceType === "string" ? serviceType.replace("_", " ") : serviceType}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="text-gray-500 dark:text-gray-400">No services specified</span>
+                                    )}
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Work Type</h3>
-                                <p className="text-gray-900 dark:text-white capitalize">{listing.work_type?.replace("_", " ") || "N/A"}</p>
-                                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2 mt-4">Location{listing.location_details && listing.location_details.length > 1 ? "s" : ""}</h3>
-                                {listing.location_details && listing.location_details.length > 0 ? (
-                                    <div className="space-y-1">
-                                        {listing.location_details.map((location, idx) => (
-                                            <p key={idx} className="text-gray-900 dark:text-white flex items-center">
-                                                <span className="mr-2">📍</span>
-                                                <span>{location.city_name}{location.area ? `, ${location.area}` : ""}</span>
-                                            </p>
-                                        ))}
+                            {listing.monthly_rate && (
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-800 rounded-xl p-6 mb-8">
+                                    <p className="text-sm font-bold text-green-600 dark:text-green-400 uppercase tracking-wide mb-2">Monthly Rate</p>
+                                    <p className="text-4xl font-bold text-green-700 dark:text-green-300">PKR {listing.monthly_rate}/month</p>
+                                </div>
+                            )}
+                            {listing.description && (
+                                <div className="mb-8">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                        <span>📝</span>
+                                        Description
+                                    </h3>
+                                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+                                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">{listing.description}</p>
                                     </div>
-                                ) : listing.city && listing.area ? (
-                                    <p className="text-gray-900 dark:text-white">
-                                        📍 {listing.city}, {listing.area}
-                                    </p>
-                                ) : (
-                                    <p className="text-gray-900 dark:text-white">Location not specified</p>
-                                )}
-                            </div>
-                        </div>
-                        <div className="mb-6">
-                            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Services Offered</h3>
-                            <div className="flex flex-wrap gap-2">
-                                {listing.service_types && listing.service_types.length > 0 ? (
-                                    listing.service_types.map((serviceType, idx) => (
-                                        <span key={idx} className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 px-4 py-2 rounded-full font-semibold capitalize">
-                                            {typeof serviceType === "string" ? serviceType.replace("_", " ") : serviceType}
-                                        </span>
-                                    ))
-                                ) : (
-                                    <span className="text-gray-500 dark:text-gray-400">No services specified</span>
-                                )}
-                            </div>
-                        </div>
-                        {listing.monthly_rate && (
-                            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
-                                <p className="text-3xl font-bold text-green-600 dark:text-green-400">PKR {listing.monthly_rate}/month</p>
-                            </div>
-                        )}
-                        {listing.description && (
-                            <div className="mb-6">
-                                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Description</h3>
-                                <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{listing.description}</p>
-                            </div>
-                        )}
+                                </div>
+                            )}
                         {isOwner && (
                             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">Listing Details</h3>
@@ -204,59 +233,65 @@ export default function ServiceListingShow() {
                             </div>
                         )}
                     </div>
-                    {!isOwner && listing.user?.phone && (
-                        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-                            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">Contact Provider</h3>
-                            <div className="flex flex-wrap gap-3">
-                                {/* Call Button */}
-                                <a
-                                    href={`tel:${listing.user.phone}`}
-                                    className="flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-all duration-300 shadow-md hover:shadow-lg font-semibold"
-                                >
-                                    <span className="text-xl">📞</span>
-                                    Call
-                                </a>
-                                
-                                {/* WhatsApp Button */}
-                                <a
-                                    href={`https://wa.me/${formatPhoneForWhatsApp(listing.user.phone)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-lg hover:bg-[#20BA5A] transition-all duration-300 shadow-md hover:shadow-lg font-semibold"
-                                >
-                                    <span className="text-xl">💬</span>
-                                    WhatsApp
-                                </a>
-                                
-                                {/* In-app Message Button */}
-                                {user && (
-                                    <button
-                                        onClick={() => {
-                                            setSelectedRecipient({
-                                                id: listing.user?.id,
-                                                name: listing.user?.name,
-                                                photo: listing.user?.photo,
-                                            });
-                                            setChatOpen(true);
-                                        }}
-                                        className="flex items-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg font-semibold"
-                                    >
-                                        <span className="text-xl">✉️</span>
-                                        In-app Message
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                    {isOwner && matchingBookings && matchingBookings.length > 0 && (
-                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-8">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Matching Service Requests</h2>
+                            {!isOwner && listing.user?.phone && (
+                                <div className="mt-8 pt-8 border-t-2 border-gray-200 dark:border-gray-700">
+                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                                        <span>📞</span>
+                                        Contact Provider
+                                    </h3>
+                                    <div className="flex flex-wrap gap-4">
+                                        {/* Call Button */}
+                                        <a
+                                            href={`tel:${listing.user.phone}`}
+                                            className="flex items-center gap-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-4 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-green-500/30 font-bold text-lg"
+                                        >
+                                            <span className="text-2xl">📞</span>
+                                            Call
+                                        </a>
+                                        
+                                        {/* WhatsApp Button */}
+                                        <a
+                                            href={`https://wa.me/${formatPhoneForWhatsApp(listing.user.phone)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-3 bg-gradient-to-r from-[#25D366] to-[#20BA5A] text-white px-8 py-4 rounded-xl hover:from-[#20BA5A] hover:to-[#1DA851] transition-all duration-300 shadow-lg hover:shadow-[#25D366]/30 font-bold text-lg"
+                                        >
+                                            <span className="text-2xl">💬</span>
+                                            WhatsApp
+                                        </a>
+                                        
+                                        {/* In-app Message Button */}
+                                        {user && (
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedRecipient({
+                                                        id: listing.user?.id,
+                                                        name: listing.user?.name,
+                                                        photo: listing.user?.photo,
+                                                    });
+                                                    setChatOpen(true);
+                                                }}
+                                                className="flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 font-bold text-lg"
+                                            >
+                                                <span className="text-2xl">✉️</span>
+                                                In-app Message
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                            {isOwner && matchingBookings && matchingBookings.length > 0 && (
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 dark:border-gray-700">
+                                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                                        <span>🎯</span>
+                                        Matching Service Requests
+                                    </h2>
                             <p className="text-gray-600 dark:text-gray-300 mb-4">
                                 Here are service requests that match your listing criteria. You can apply to these requests.
                             </p>
-                            <div className="space-y-4">
-                                {matchingBookings.map((booking) => (
-                                    <div key={booking.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-shadow bg-white dark:bg-gray-700">
+                                    <div className="space-y-4">
+                                        {matchingBookings.map((booking) => (
+                                            <div key={booking.id} className="border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600">
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
                                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -284,65 +319,69 @@ export default function ServiceListingShow() {
                                                 <span className="font-semibold">Requirements:</span> {booking.special_requirements}
                                             </p>
                                         )}
-                                        <div className="flex gap-3">
-                                            <Link
-                                                to={`/service-requests/${booking.id}`}
-                                                className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-all duration-300 font-semibold text-sm"
-                                            >
-                                                View Details
-                                            </Link>
-                                            <Link
-                                                to={`/bookings/${booking.id}/apply`}
-                                                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-300 font-semibold text-sm"
-                                            >
-                                                Apply Now
-                                            </Link>
-                                        </div>
+                                                <div className="flex gap-3 mt-4">
+                                                    <Link
+                                                        to={route("bookings.show", booking.id)}
+                                                        className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-indigo-500/30 font-bold"
+                                                    >
+                                                        View Details
+                                                    </Link>
+                                                    <Link
+                                                        to={`/bookings/${booking.id}/apply`}
+                                                        className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-md hover:shadow-green-500/30 font-bold"
+                                                    >
+                                                        Apply Now
+                                                    </Link>
+                                                </div>
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-6 text-center">
-                                <Link
-                                    to={route("job-applications.index")}
-                                    className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold"
-                                >
-                                    View All Service Requests →
-                                </Link>
-                            </div>
-                        </div>
-                    )}
-                    
-                    {/* Other Services from Same Provider */}
-                    {otherListings && otherListings.length > 0 && (
-                        <div className="mt-12">
-                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Other Services by {listing.user?.name}</h2>
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {otherListings.map((otherListing) => (
-                                    <Link
-                                        key={otherListing.id}
-                                        to={route("service-listings.show", otherListing.id)}
-                                        className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-primary-500 dark:hover:border-primary-600"
-                                    >
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex flex-wrap gap-2">
-                                                {otherListing.service_types && otherListing.service_types.length > 0 ? (
-                                                    otherListing.service_types.slice(0, 2).map((st, idx) => (
-                                                        <span key={idx} className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 text-xs px-3 py-1 rounded-full font-semibold capitalize">
-                                                            {typeof st === "string" ? st.replace("_", " ") : (st?.service_type?.replace("_", " ") || "Service")}
+                                    <div className="mt-6 text-center">
+                                        <Link
+                                            to={route("job-applications.index")}
+                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-bold text-lg inline-flex items-center gap-2"
+                                        >
+                                            View All Service Requests
+                                            <span className="text-xl">→</span>
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Other Services from Same Provider */}
+                            {otherListings && otherListings.length > 0 && (
+                                <div className="mt-12">
+                                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-2">
+                                        <span>🌟</span>
+                                        Other Services by {listing.user?.name}
+                                    </h2>
+                                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {otherListings.map((otherListing) => (
+                                            <Link
+                                                key={otherListing.id}
+                                                to={route("service-listings.show", otherListing.id)}
+                                                className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-indigo-300 dark:hover:border-indigo-600"
+                                            >
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {otherListing.service_types && otherListing.service_types.length > 0 ? (
+                                                            otherListing.service_types.slice(0, 2).map((st, idx) => (
+                                                                <span key={idx} className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs px-3 py-1 rounded-full font-bold capitalize shadow-sm">
+                                                                    {typeof st === "string" ? st.replace("_", " ") : (st?.service_type?.replace("_", " ") || "Service")}
+                                                                </span>
+                                                            ))
+                                                        ) : (
+                                                            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs px-3 py-1 rounded-full font-bold capitalize shadow-sm">
+                                                                Service
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    {otherListing.monthly_rate && (
+                                                        <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                                                            PKR {otherListing.monthly_rate}/month
                                                         </span>
-                                                    ))
-                                                ) : (
-                                                    <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 text-xs px-3 py-1 rounded-full font-semibold capitalize">
-                                                        Service
-                                                    </span>
-                                                )}
-                                            </div>
-                                            {otherListing.monthly_rate && (
-                                                <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                                                    PKR {otherListing.monthly_rate}/month
-                                                </span>
-                                            )}
-                                        </div>
+                                                    )}
+                                                </div>
                                         <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 capitalize">
                                             {otherListing.work_type?.replace("_", " ") || "Service"}
                                         </p>
@@ -351,7 +390,7 @@ export default function ServiceListingShow() {
                                                 {otherListing.location_details.slice(0, 2).map((location, idx) => (
                                                     <p key={idx} className="flex items-center">
                                                         <span className="mr-1">📍</span>
-                                                        <span>{location.city_name}{location.area ? `, ${location.area}` : ""}</span>
+                                                        <span>{location.area || location.city_name}</span>
                                                     </p>
                                                 ))}
                                                 {otherListing.location_details.length > 2 && (
@@ -360,9 +399,9 @@ export default function ServiceListingShow() {
                                                     </p>
                                                 )}
                                             </div>
-                                        ) : otherListing.city && otherListing.area ? (
+                                        ) : otherListing.area ? (
                                             <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                                                📍 {otherListing.city}, {otherListing.area}
+                                                📍 {otherListing.area}
                                             </p>
                                         ) : (
                                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">📍 Location not specified</p>
@@ -372,24 +411,29 @@ export default function ServiceListingShow() {
                                                 {otherListing.description}
                                             </p>
                                         )}
-                                        <span className="text-primary-600 dark:text-primary-400 font-semibold text-sm">View Details →</span>
-                                    </Link>
-                                ))}
-                            </div>
-                            <div className="mt-6 text-center">
-                                {listing.user?.role === "helper" && listing.user?.id && (
-                                    <Link
-                                        to={route("helpers.show", listing.user.id)}
-                                        className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold"
-                                    >
-                                        View All Services from {listing.user?.name} →
-                                    </Link>
-                                )}
-                            </div>
+                                                <span className="text-indigo-600 dark:text-indigo-400 font-bold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                                                    View Details
+                                                    <span className="text-lg">→</span>
+                                                </span>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                    <div className="mt-6 text-center">
+                                        {listing.user?.role === "helper" && listing.user?.id && (
+                                            <Link
+                                                to={route("helpers.show", listing.user.id)}
+                                                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-bold text-lg inline-flex items-center gap-2"
+                                            >
+                                                View All Services from {listing.user?.name}
+                                                <span className="text-xl">→</span>
+                                            </Link>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </div>
-            </div>
             
             {/* Chat Popup */}
             {selectedRecipient && (

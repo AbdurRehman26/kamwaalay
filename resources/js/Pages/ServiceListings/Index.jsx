@@ -323,7 +323,7 @@ export default function ServiceListingsIndex() {
                                                 <div className="text-sm text-gray-600 dark:text-gray-300 mb-3 space-y-1">
                                                     {listing.location_details.slice(0, 2).map((location, idx) => (
                                                         <p key={idx} className="capitalize">
-                                                            📍 {location.city_name}{location.area ? ", " + location.area : ""}
+                                                            📍 {location.area || location.city_name}
                                                         </p>
                                                     ))}
                                                     {listing.location_details.length > 2 && (
@@ -332,9 +332,9 @@ export default function ServiceListingsIndex() {
                                                         </p>
                                                     )}
                                                 </div>
-                                            ) : listing.city ? (
+                                            ) : listing.area ? (
                                                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 capitalize">
-                                                    📍 {listing.city}{listing.area ? ", " + listing.area : ""}
+                                                    📍 {listing.area}
                                                 </p>
                                             ) : (
                                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">

@@ -15,7 +15,7 @@ use OpenApi\Attributes as OA;
 class JobApplicationController extends Controller
 {
     #[OA\Get(
-        path: "/api/job-applications",
+        path: "/api/job-posts",
         summary: "Browse available service requests",
         description: "Browse available service requests for helpers/businesses to apply. Requires completed onboarding.",
         tags: ["Job Applications"],

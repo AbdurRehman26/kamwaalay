@@ -2,13 +2,13 @@ import api from "./api";
 
 export const bookingsService = {
     async getBookings(params = {}) {
-        const response = await api.get("/job-posts", { params });
+        const response = await api.get("/my-job-posts", { params });
         return response.data;
     },
 
     async getBooking(id) {
-        // Use service-requests endpoint for public viewing
-        const response = await api.get(`/service-requests/${id}`);
+        // Use bookings endpoint for public viewing
+        const response = await api.get(`/bookings/${id}`);
         return response.data;
     },
 

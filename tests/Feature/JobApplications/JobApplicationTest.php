@@ -44,7 +44,7 @@ test('helpers can view available job applications', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->getJson('/api/job-applications');
+    ])->getJson('/api/job-posts');
 
     $response->assertStatus(200);
     $response->assertJsonStructure(['job_posts']);

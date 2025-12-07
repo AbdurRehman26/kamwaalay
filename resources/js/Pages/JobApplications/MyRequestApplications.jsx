@@ -54,7 +54,7 @@ export default function MyRequestApplications() {
 
     const handleAccept = async () => {
         if (!selectedApplication) return;
-        
+
         setProcessing(true);
         try {
             await jobApplicationsService.acceptApplication(selectedApplication.id);
@@ -73,7 +73,7 @@ export default function MyRequestApplications() {
 
     const handleReject = async () => {
         if (!selectedApplication) return;
-        
+
         setProcessing(true);
         try {
             await jobApplicationsService.rejectApplication(selectedApplication.id);
@@ -126,31 +126,42 @@ export default function MyRequestApplications() {
 
     return (
         <DashboardLayout>
-            
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 text-white py-12">
-                <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">Applications to My Job Postings</h1>
-                    <p className="text-xl text-white/90">Review and manage applications for your job postings</p>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Header Section */}
+                <div className="mb-10 relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200 dark:shadow-none">
+                    <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-bold mb-2">My Job Applications</h1>
+                            <p className="text-indigo-100 text-lg max-w-2xl">
+                                Review and manage applications for your job postings.
+                            </p>
+                        </div>
+                    </div>
+                    {/* Decorative blobs */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+                    <div className="absolute bottom-0 right-20 w-48 h-48 bg-purple-500/30 rounded-full blur-3xl transform translate-y-1/2"></div>
                 </div>
-            </div>
-            <div className="container mx-auto px-4 py-12">
+
                 {loading ? (
-                    <div className="text-center py-12">
-                        <p className="text-gray-600 dark:text-gray-400">Loading applications...</p>
+                    <div className="flex justify-center py-20">
+                        <div className="flex flex-col items-center gap-4">
+                            <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                            <p className="text-gray-500 animate-pulse">Loading applications...</p>
+                        </div>
                     </div>
                 ) : applications.data && applications.data.length > 0 ? (
                     <div className="space-y-6">
                         {applications.data.map((application) => (
-                            <div key={application.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
+                            <div key={application.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-900/50 transition-all duration-300">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
                                             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                                                {(application.job_post || application.booking)?.service_type_label || 
-                                                 (application.job_post || application.booking)?.service_type?.replace("_", " ") || 
-                                                 "Service Request"}
+                                                {(application.job_post || application.booking)?.service_type_label ||
+                                                    (application.job_post || application.booking)?.service_type?.replace("_", " ") ||
+                                                    "Service Request"}
                                             </h3>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(application.status)}`}>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${getStatusColor(application.status)}`}>
                                                 {application.status}
                                             </span>
                                         </div>
@@ -168,11 +179,11 @@ export default function MyRequestApplications() {
                                             )}
                                             <div className="flex-1">
                                                 <Link
-                                                    to={application.user?.role === "helper" 
+                                                    to={application.user?.role === "helper"
                                                         ? route("helpers.show", application.user.id)
                                                         : application.user?.role === "business"
-                                                        ? route("businesses.show", application.user.id)
-                                                        : "#"
+                                                            ? route("businesses.show", application.user.id)
+                                                            : "#"
                                                     }
                                                     className="block"
                                                 >
@@ -187,7 +198,6 @@ export default function MyRequestApplications() {
                                         </div>
                                         {application.user?.phone && (
                                             <div className="mb-3">
-                                                <p className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">📞 {application.user.phone}</p>
                                                 <div className="flex gap-2">
                                                     <a
                                                         href={`tel:${formatPhoneForCall(application.user.phone)}`}
@@ -262,11 +272,10 @@ export default function MyRequestApplications() {
                                             key={index}
                                             to={link.url || "#"}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
-                                            className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                                link.active
-                                                    ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg"
-                                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
-                                            } ${!link.url && "cursor-not-allowed opacity-50"}`}
+                                            className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${link.active
+                                                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+                                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700"
+                                                } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                         />
                                     ))}
                                 </div>
@@ -274,10 +283,10 @@ export default function MyRequestApplications() {
                         )}
                     </div>
                 ) : (
-                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
-                        <div className="text-6xl mb-4">📋</div>
-                        <p className="text-gray-600 dark:text-gray-300 text-xl mb-6">No applications yet</p>
-                        <p className="text-gray-500 dark:text-gray-400 mb-8">Applications to your job postings will appear here</p>
+                    <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700">
+                        <div className="text-7xl mb-6 opacity-80">📋</div>
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No applications yet</h3>
+                        <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-8">Applications to your job postings will appear here.</p>
                     </div>
                 )}
             </div>
@@ -314,7 +323,7 @@ export default function MyRequestApplications() {
                     </div>
 
                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 mb-6">
-                        Are you sure you want to accept this application from <span className="font-semibold">{selectedApplication?.user?.name}</span>? 
+                        Are you sure you want to accept this application from <span className="font-semibold">{selectedApplication?.user?.name}</span>?
                         This will automatically reject all other pending applications for this job posting.
                     </p>
 
@@ -370,7 +379,7 @@ export default function MyRequestApplications() {
                     </div>
 
                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 mb-6">
-                        Are you sure you want to reject this application from <span className="font-semibold">{selectedApplication?.user?.name}</span>? 
+                        Are you sure you want to reject this application from <span className="font-semibold">{selectedApplication?.user?.name}</span>?
                         This action cannot be undone.
                     </p>
 
@@ -400,4 +409,3 @@ export default function MyRequestApplications() {
         </DashboardLayout>
     );
 }
-

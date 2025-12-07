@@ -276,7 +276,7 @@ export default function BusinessShow() {
                                                 <div className="text-sm text-gray-600 mb-3 space-y-1">
                                                     {listing.location_details.slice(0, 2).map((location, idx) => (
                                                         <p key={idx}>
-                                                            📍 {location.city_name}{location.area ? ", " + location.area : ""}
+                                                            📍 {location.area || location.city_name}
                                                         </p>
                                                     ))}
                                                     {listing.location_details.length > 2 && (
@@ -285,9 +285,9 @@ export default function BusinessShow() {
                                                         </p>
                                                     )}
                                                 </div>
-                                            ) : listing.city ? (
+                                            ) : listing.area ? (
                                                 <p className="text-sm text-gray-600 mb-3">
-                                                    📍 {listing.city}{listing.area ? ", " + listing.area : ""}
+                                                    📍 {listing.area}
                                                 </p>
                                             ) : (
                                                 <p className="text-sm text-gray-600 mb-3">

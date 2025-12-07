@@ -218,11 +218,11 @@ export default function HelperShow() {
                                                         </p>
                                                     )}
                                                 </div>
-                                            ) : listing.city ? (
+                                            ) : listing.area ? (
                                                 <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                                                     <p className="flex items-center">
                                                         <span className="mr-2">📍</span>
-                                                        <span>{listing.city}{listing.area ? ", " + listing.area : ""}</span>
+                                                        <span>{listing.area}</span>
                                                     </p>
                                                 </div>
                                             ) : null}

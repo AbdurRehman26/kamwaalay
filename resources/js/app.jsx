@@ -29,7 +29,6 @@ import ServiceListingsShow from "./Pages/ServiceListings/Show";
 import ServiceListingsCreate from "./Pages/ServiceListings/Create";
 import ServiceListingsEdit from "./Pages/ServiceListings/Edit";
 import ServiceListingsMyListings from "./Pages/ServiceListings/MyListings";
-import ServiceRequestsBrowse from "./Pages/ServiceRequests/Browse";
 import JobApplicationsIndex from "./Pages/JobApplications/Index";
 import JobApplicationsCreate from "./Pages/JobApplications/Create";
 import JobApplicationsShow from "./Pages/JobApplications/Show";
@@ -118,7 +117,6 @@ function AppRoutes() {
             <Route path="/businesses/:businessId" element={<BusinessesShow />} />
             <Route path="/service-listings" element={<ServiceListingsIndex />} />
             <Route path="/service-listings/:listingId" element={<ServiceListingsShow />} />
-            <Route path="/service-requests" element={<ServiceRequestsBrowse />} />
             <Route path="/about" element={<PageAbout />} />
             <Route path="/contact" element={<PageContact />} />
             <Route path="/faq" element={<PageFAQ />} />
@@ -166,7 +164,7 @@ function AppRoutes() {
                     <BookingsEdit />
                 </ProtectedRoute>
             } />
-            <Route path="/service-requests/:bookingId" element={<BookingsShow />} />
+            <Route path="/bookings/:bookingId" element={<BookingsShow />} />
             <Route path="/service-listings/create" element={
                 <ProtectedRoute>
                     <ServiceListingsCreate />
@@ -182,7 +180,7 @@ function AppRoutes() {
                     <ServiceListingsMyListings />
                 </ProtectedRoute>
             } />
-            <Route path="/job-applications" element={<JobApplicationsIndex />} />
+            <Route path="/job-posts" element={<JobApplicationsIndex />} />
             <Route path="/bookings/:bookingId/apply" element={
                 <ProtectedRoute>
                     <JobApplicationsCreate />

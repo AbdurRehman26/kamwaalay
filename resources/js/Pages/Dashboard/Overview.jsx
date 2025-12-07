@@ -28,9 +28,10 @@ export default function DashboardOverview() {
     if (loading) {
         return (
             <DashboardLayout>
-                <div className="py-12">
-                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 text-center">
-                        <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+                <div className="flex h-[calc(100vh-64px)] items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                        <p className="text-gray-500 animate-pulse">Loading dashboard...</p>
                     </div>
                 </div>
             </DashboardLayout>
@@ -40,9 +41,17 @@ export default function DashboardOverview() {
     if (error) {
         return (
             <DashboardLayout>
-                <div className="py-12">
-                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 text-center">
-                        <p className="text-red-600 dark:text-red-400">{error}</p>
+                <div className="flex h-[calc(100vh-64px)] items-center justify-center">
+                    <div className="text-center p-8 max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-red-100 dark:border-red-900/30">
+                        <div className="text-4xl mb-4">⚠️</div>
+                        <h3 className="text-lg font-bold text-red-600 dark:text-red-400 mb-2">Something went wrong</h3>
+                        <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="px-6 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium"
+                        >
+                            Try Again
+                        </button>
                     </div>
                 </div>
             </DashboardLayout>
@@ -51,134 +60,152 @@ export default function DashboardOverview() {
 
     return (
         <DashboardLayout>
-            <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Header */}
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Dashboard</h1>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Welcome back, {user?.name}!</p>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Welcome Section */}
+                <div className="mb-10 relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200 dark:shadow-none">
+                    <div className="relative z-10">
+                        <h1 className="text-3xl md:text-4xl font-bold mb-3">Welcome back, {user?.name?.split(" ")[0]}! 👋</h1>
+                        <p className="text-indigo-100 text-lg max-w-xl">
+                            Here's what's happening with your account today. You have a few items pending your attention.
+                        </p>
                     </div>
+                    {/* Decorative blobs */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+                    <div className="absolute bottom-0 right-20 w-48 h-48 bg-purple-500/30 rounded-full blur-3xl transform translate-y-1/2"></div>
+                </div>
 
-                {/* Quick Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Profile Status</h3>
-                            <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-500 rounded-xl flex items-center justify-center shadow-md">
-                                <span className="text-xl text-white">👤</span>
+                {/* Quick Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    {/* Profile Status Card */}
+                    <div className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:border-indigo-100 dark:hover:border-gray-600 transition-all duration-300">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-2xl text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300">
+                                👤
                             </div>
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${user?.onboarding_complete
+                                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                                    : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300"
+                                }`}>
+                                {user?.onboarding_complete ? "Complete" : "Action Needed"}
+                            </span>
                         </div>
-                        {user?.onboarding_complete ? (
-                            <div>
-                                <p className="text-lg font-bold text-green-600 dark:text-green-400 mb-1">Complete</p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Your profile is set up</p>
-                            </div>
-                        ) : (
-                            <div>
-                                <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400 mb-1">In Progress</p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Complete your profile</p>
-                            </div>
-                        )}
+                        <h3 className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Profile Status</h3>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                            {user?.onboarding_complete ? "All Set" : "Incomplete"}
+                        </p>
                     </div>
 
+                    {/* Verification Card (Only for Helper/Business) */}
                     {isHelperOrBusiness(user) && (
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Verification</h3>
-                                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-500 rounded-xl flex items-center justify-center shadow-md">
-                                    <span className="text-xl text-white">✓</span>
+                        <div className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:border-green-100 dark:hover:border-gray-600 transition-all duration-300">
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center text-2xl text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform duration-300">
+                                    🛡️
                                 </div>
+                                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${user?.verification_status === "verified"
+                                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                                        : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
+                                    }`}>
+                                    {user?.verification_status === "verified" ? "Verified" : "Pending"}
+                                </span>
                             </div>
-                            {user?.verification_status === "verified" ? (
-                                <div>
-                                    <p className="text-lg font-bold text-green-600 dark:text-green-400 mb-1">Verified</p>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">Your documents are verified</p>
-                                </div>
-                            ) : (
-                                <div>
-                                    <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400 mb-1">Pending</p>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">Awaiting verification</p>
-                                </div>
-                            )}
+                            <h3 className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Account Verification</h3>
+                            <p className="text-2xl font-bold text-gray-900 dark:text-white capitalize">
+                                {user?.verification_status || "Pending"}
+                            </p>
                         </div>
                     )}
 
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Account Type</h3>
-                            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl flex items-center justify-center shadow-md">
-                                <span className="text-xl text-white">🔑</span>
+                    {/* Account Type Card */}
+                    <div className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:border-purple-100 dark:hover:border-gray-600 transition-all duration-300">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-xl flex items-center justify-center text-2xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform duration-300">
+                                🔑
                             </div>
+                            <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full text-xs font-bold uppercase tracking-wide">
+                                Role
+                            </span>
                         </div>
-                        <div>
-                            <p className="text-lg font-bold text-primary-600 dark:text-primary-400 mb-1 capitalize">{user?.role || "User"}</p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Your account role</p>
-                        </div>
+                        <h3 className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Account Type</h3>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white capitalize">
+                            {user?.role || "User"}
+                        </p>
                     </div>
                 </div>
 
-                {/* Quick Actions */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {isUser(user) && (
-                            <>
-                                <Link
-                                    to={route("bookings.create")}
-                                    className="p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors duration-300 border border-primary-200 dark:border-primary-800"
-                                >
-                                    <div className="text-2xl mb-2">📅</div>
-                                    <div className="font-semibold text-primary-700 dark:text-primary-300">Post a Job</div>
-                                    <div className="text-sm text-gray-600 dark:text-gray-400">Create a job posting</div>
-                                </Link>
-                                <Link
-                                    to={route("bookings.index")}
-                                    className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors duration-300 border border-blue-200 dark:border-blue-800"
-                                >
-                                    <div className="text-2xl mb-2">📋</div>
-                                    <div className="font-semibold text-blue-700 dark:text-blue-300">My Job Postings</div>
-                                    <div className="text-sm text-gray-600 dark:text-gray-400">View your bookings</div>
-                                </Link>
-                            </>
-                        )}
-                        {isHelperOrBusiness(user) && (
-                            <>
-                                <Link
-                                    to={route("service-listings.create")}
-                                    className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-300 border border-green-200 dark:border-green-800"
-                                >
-                                    <div className="text-2xl mb-2">➕</div>
-                                    <div className="font-semibold text-green-700 dark:text-green-300">Create Service</div>
-                                    <div className="text-sm text-gray-600 dark:text-gray-400">Offer your service</div>
-                                </Link>
-                                <Link
-                                    to="/dashboard/documents"
-                                    className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors duration-300 border border-yellow-200 dark:border-yellow-800"
-                                >
-                                    <div className="text-2xl mb-2">📄</div>
-                                    <div className="font-semibold text-yellow-700 dark:text-yellow-300">Documents</div>
-                                    <div className="text-sm text-gray-600 dark:text-gray-400">Manage documents</div>
-                                </Link>
-                            </>
-                        )}
-                        <Link
-                            to={route("profile.edit")}
-                            className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-300 border border-purple-200 dark:border-purple-800"
-                        >
-                            <div className="text-2xl mb-2">⚙️</div>
-                            <div className="font-semibold text-purple-700 dark:text-purple-300">Edit Profile</div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">Update your information</div>
-                        </Link>
-                        <Link
-                            to={route("messages")}
-                            className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-300 border border-indigo-200 dark:border-indigo-800"
-                        >
-                            <div className="text-2xl mb-2">💬</div>
-                            <div className="font-semibold text-indigo-700 dark:text-indigo-300">Messages</div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">View your messages</div>
-                        </Link>
-                    </div>
-                </div>
+                {/* Service Cards / Quick Actions */}
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                    ⚡ Quick Actions
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {isUser(user) && (
+                        <>
+                            <Link
+                                to={route("bookings.create")}
+                                className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                            >
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-bl-full group-hover:bg-indigo-500/10 transition-colors"></div>
+                                <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">📅</div>
+                                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Post a Job</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Create a new service request</p>
+                            </Link>
+
+                            <Link
+                                to={route("bookings.index")}
+                                className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                            >
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-bl-full group-hover:bg-blue-500/10 transition-colors"></div>
+                                <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">📋</div>
+                                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">My Postings</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">View and manage jobs</p>
+                            </Link>
+                        </>
+                    )}
+
+                    {isHelperOrBusiness(user) && (
+                        <>
+                            <Link
+                                to={route("service-listings.create")}
+                                className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                            >
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full group-hover:bg-emerald-500/10 transition-colors"></div>
+                                <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">📝</div>
+                                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Create Service</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Offer a new service</p>
+                            </Link>
+
+                            <Link
+                                to="/dashboard/documents"
+                                className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                            >
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-bl-full group-hover:bg-amber-500/10 transition-colors"></div>
+                                <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">📄</div>
+                                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">Documents</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Manage your files</p>
+                            </Link>
+                        </>
+                    )}
+
+                    <Link
+                        to={route("profile.edit")}
+                        className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                    >
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-bl-full group-hover:bg-purple-500/10 transition-colors"></div>
+                        <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">⚙️</div>
+                        <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Edit Profile</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Update account info</p>
+                    </Link>
+
+                    <Link
+                        to={route("messages")}
+                        className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                    >
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/5 rounded-bl-full group-hover:bg-pink-500/10 transition-colors"></div>
+                        <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">💬</div>
+                        <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">Messages</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Check your inbox</p>
+                    </Link>
                 </div>
             </div>
         </DashboardLayout>

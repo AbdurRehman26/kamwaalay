@@ -21,12 +21,9 @@ export const routes = {
     bookings: {
         index: () => "/job-postings",
         create: () => "/job/create",
-        show: (id) => `/service-requests/${id}`,
+        show: (id) => `/bookings/${id}`,
         edit: (id) => `/bookings/${id}/edit`,
-    },
-    "service-requests": {
-        browse: () => "/service-requests",
-        show: (id) => `/service-requests/${id}`,
+        browse: () => "/bookings/browse",
     },
     "service-listings": {
         index: () => "/service-listings",
@@ -36,7 +33,7 @@ export const routes = {
         "my-listings": () => "/my-service-listings",
     },
     "job-applications": {
-        index: () => "/job-applications",
+        index: () => "/job-posts",
         create: (bookingId) => `/bookings/${bookingId}/apply`,
         show: (id) => `/job-applications/${id}`,
         "my-applications": () => "/my-applications",

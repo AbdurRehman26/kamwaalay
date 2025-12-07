@@ -63,13 +63,11 @@ Route::get('/service-listings', [ServiceListingController::class, 'index']);
 Route::get('/service-listings/{serviceListing}', [ServiceListingController::class, 'show'])->where('serviceListing', '[0-9]+');
 
 // Public job posts/service requests
-Route::get('/service-requests', [JobPostController::class, 'browse']);
-Route::get('/service-requests/{jobPost}', [JobPostController::class, 'show']);
-Route::get('/bookings/browse', [JobPostController::class, 'browse']); // Alias for service-requests
-Route::get('/bookings/{booking}', [JobPostController::class, 'show']); // Alias for service-requests/{jobPost}
+Route::get('/bookings/browse', [JobPostController::class, 'browse']);
+Route::get('/bookings/{booking}', [JobPostController::class, 'show']);
 
-// Public job applications (browse/search jobs)
-Route::get('/job-applications', [JobApplicationController::class, 'index']);
+// Public job posts (browse/search jobs)
+Route::get('/job-posts', [JobApplicationController::class, 'index']);
 
 // Location search (already API-like)
 Route::get('/karachi-locations/search', [PageController::class, 'searchKarachiLocations']);
@@ -145,8 +143,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/helpers/{helper}/edit', [HelperController::class, 'edit']);
     Route::put('/helpers/{helper}', [HelperController::class, 'update']);
 
-    // Job Posts
-    Route::get('/job-posts', [JobPostController::class, 'index']);
+    // Job Posts (user's own posts)
+    Route::get('/my-job-posts', [JobPostController::class, 'index']);
     Route::get('/job-posts/create', [JobPostController::class, 'create']);
     Route::post('/job-posts', [JobPostController::class, 'store']);
     Route::patch('/job-posts/{jobPost}', [JobPostController::class, 'update']);
