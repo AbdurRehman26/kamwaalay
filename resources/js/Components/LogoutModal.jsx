@@ -25,11 +25,11 @@ export default function LogoutModal({ show, onClose }) {
     return (
         <Modal show={show} onClose={onClose}>
             <div className="p-6">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">
+                <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                     Confirm Logout
                 </h2>
 
-                <p className="mt-1 text-sm text-gray-600 mb-6">
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 mb-6">
                     Are you sure you want to logout? You will need to login again to access your account.
                 </p>
 
@@ -37,7 +37,7 @@ export default function LogoutModal({ show, onClose }) {
                     <button
                         onClick={onClose}
                         disabled={processing}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
                     >
                         Cancel
                     </button>
