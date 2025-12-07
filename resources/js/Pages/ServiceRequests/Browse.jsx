@@ -149,34 +149,34 @@ export default function ServiceRequestsBrowse() {
     const getStatusColor = (status) => {
         switch (status) {
             case "pending":
-                return "bg-yellow-100 text-yellow-800";
+                return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
             case "confirmed":
-                return "bg-green-100 text-green-800";
+                return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
             default:
-                return "bg-gray-100 text-gray-800";
+                return "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300";
         }
     };
 
     return (
         <PublicLayout>
 
-            <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 text-white py-16">
+            <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-orange-500 dark:from-primary-800 dark:via-primary-900 dark:to-orange-700 text-white py-16">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Search Jobs</h1>
                     <p className="text-xl text-white/90">Browse job opportunities posted by customers looking to hire helpers or businesses</p>
                 </div>
             </div>
 
-            <div className="bg-yellow-50 border-l-4 border-yellow-400">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
                     <div className="flex">
                         <div className="flex-shrink-0">
-                            <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                            <svg className="h-5 w-5 text-yellow-400 dark:text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <p className="text-sm text-yellow-700">
+                            <p className="text-sm text-yellow-700 dark:text-yellow-300">
                                 <strong>Note:</strong> We are currently serving Karachi only. We will be going live in different cities soon!
                             </p>
                         </div>
@@ -186,15 +186,15 @@ export default function ServiceRequestsBrowse() {
 
             <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
                 {/* Filters */}
-                <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                    <h2 className="text-2xl font-bold mb-6 text-gray-900">Filter Requests</h2>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-12">
+                    <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Filter Requests</h2>
                     <div className="grid md:grid-cols-5 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Service Type</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Service Type</label>
                             <select
                                 value={serviceType}
                                 onChange={(e) => setServiceType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 {serviceTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
@@ -204,11 +204,11 @@ export default function ServiceRequestsBrowse() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Work Type</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Work Type</label>
                             <select
                                 value={workType}
                                 onChange={(e) => setWorkType(e.target.value)}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 {workTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
@@ -218,7 +218,7 @@ export default function ServiceRequestsBrowse() {
                             </select>
                         </div>
                         <div className="relative" ref={locationFilterRef}>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Location</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Location</label>
                             <input
                                 type="text"
                                 value={locationFilterQuery || locationDisplay}
@@ -234,16 +234,16 @@ export default function ServiceRequestsBrowse() {
                                         setShowLocationSuggestions(true);
                                     }
                                 }}
-                                className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                                 placeholder="Search location..."
                             />
                             {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
-                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
                                     {locationFilterSuggestions.map((suggestion, index) => (
                                         <div
                                             key={index}
                                             onClick={() => handleLocationSelect(suggestion)}
-                                            className="px-4 py-2 hover:bg-primary-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                            className="px-4 py-2 hover:bg-primary-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-white"
                                         >
                                             {suggestion.display_text}
                                         </div>
@@ -271,7 +271,7 @@ export default function ServiceRequestsBrowse() {
                                         setCurrentPage(1);
                                         handleFilter();
                                     }}
-                                    className="w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-300 font-semibold"
+                                    className="w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 font-semibold"
                                 >
                                     Clear
                                 </button>
@@ -283,7 +283,7 @@ export default function ServiceRequestsBrowse() {
                 {/* Search Jobs Grid */}
                 {loading ? (
                     <div className="text-center py-12">
-                        <p className="text-gray-600">Loading service requests...</p>
+                        <p className="text-gray-600 dark:text-gray-400">Loading service requests...</p>
                     </div>
                 ) : bookings.data && bookings.data.length > 0 ? (
                     <>
@@ -294,37 +294,37 @@ export default function ServiceRequestsBrowse() {
                                 const isHelper = user && (user.role === "helper" || user.role === "business");
 
                                 return (
-                                    <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col">
+                                    <div key={booking.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col">
                                         <div className="p-6 flex flex-col flex-grow">
                                             <div className="flex items-center justify-between mb-4">
-                                                <span className="bg-primary-100 text-primary-800 text-xs px-3 py-1 rounded-full font-semibold capitalize">
+                                                <span className="bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300 text-xs px-3 py-1 rounded-full font-semibold capitalize">
                                                     {booking.service_type?.replace("_", " ") || "N/A"}
                                                 </span>
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)} dark:bg-opacity-80`}>
                                                     {booking.status?.replace("_", " ") || "N/A"}
                                                 </span>
                                             </div>
-                                            <h3 className="text-xl font-bold mb-2 text-gray-900">
+                                            <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
                                                 {booking.service_type_label || booking.service_type?.replace("_", " ") || "Service"} Service
                                             </h3>
-                                            <p className="text-gray-600 mb-3 capitalize text-sm">
+                                            <p className="text-gray-600 dark:text-gray-300 mb-3 capitalize text-sm">
                                                 {booking.work_type?.replace("_", " ") || "N/A"} • {booking.city || "N/A"}, {booking.area || "N/A"}
                                             </p>
                                             {booking.start_date && (
-                                                <p className="text-gray-500 text-sm mb-2">
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
                                                     📅 Start Date: {new Date(booking.start_date).toLocaleDateString()}
                                                 </p>
                                             )}
                                             {booking.special_requirements && (
-                                                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                                                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
                                                     💬 {booking.special_requirements}
                                                 </p>
                                             )}
-                                            <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
+                                            <div className="flex items-center gap-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
                                                 <span>👤 Posted by: {booking.user?.name || "Customer"}</span>
                                             </div>
                                             {booking.job_applications && booking.job_applications.length > 0 && (
-                                                <p className="text-sm text-primary-600 mb-3">
+                                                <p className="text-sm text-primary-600 dark:text-primary-400 mb-3">
                                                     📋 {booking.job_applications.length} application{booking.job_applications.length !== 1 ? "s" : ""} received
                                                 </p>
                                             )}
@@ -333,7 +333,7 @@ export default function ServiceRequestsBrowse() {
                                                     hasApplied ? (
                                                         <Link
                                                             to={route("job-applications.my-applications")}
-                                                            className="block w-full text-center bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold cursor-not-allowed"
+                                                            className="block w-full text-center bg-gray-400 dark:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold cursor-not-allowed"
                                                         >
                                                             Already Applied
                                                         </Link>
@@ -365,7 +365,7 @@ export default function ServiceRequestsBrowse() {
                             <div className="mt-12">
                                 {/* Results Info */}
                                 {bookings.meta && (bookings.meta.total !== undefined || bookings.total !== undefined) && (
-                                    <div className="text-center mb-6 text-gray-600">
+                                    <div className="text-center mb-6 text-gray-600 dark:text-gray-400">
                                         <p className="text-sm">
                                             Showing {bookings.meta?.from || bookings.from || 0} to {bookings.meta?.to || bookings.to || 0} of {bookings.meta?.total || bookings.total || 0} results
                                         </p>
@@ -381,7 +381,7 @@ export default function ServiceRequestsBrowse() {
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${link.active
                                                         ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
-                                                        : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                                                        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md dark:border dark:border-gray-700"
                                                     } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                                             />
                                         ))}
@@ -391,10 +391,10 @@ export default function ServiceRequestsBrowse() {
                         )}
                     </>
                 ) : (
-                    <div className="text-center py-16 bg-white rounded-2xl shadow-xl">
+                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
                         <div className="text-6xl mb-4">🔍</div>
-                        <p className="text-gray-600 text-xl mb-6">No jobs found</p>
-                        <p className="text-gray-500 mb-8">Try adjusting your filters or check back later</p>
+                        <p className="text-gray-600 dark:text-gray-300 text-xl mb-6">No jobs found</p>
+                        <p className="text-gray-500 dark:text-gray-400 mb-8">Try adjusting your filters or check back later</p>
                         {user && (user.role === "user") && (
                             <Link
                                 to={route("bookings.create")}

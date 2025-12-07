@@ -70,7 +70,7 @@ export default function JobApplicationCreate() {
     return (
         <PublicLayout>
 
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:via-primary-900 dark:to-orange-700 text-white py-12">
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-4">Apply for Service Request</h1>
                     <p className="text-xl text-white/90">Submit your application to this service request</p>
@@ -79,24 +79,24 @@ export default function JobApplicationCreate() {
             <div className="container mx-auto px-4 py-12">
                 {loading ? (
                     <div className="text-center py-12">
-                        <p className="text-gray-600">Loading booking details...</p>
+                        <p className="text-gray-600 dark:text-gray-400">Loading booking details...</p>
                     </div>
                 ) : errorMessage ? (
                     <div className="text-center py-12">
-                        <div className="text-red-600 text-xl mb-4">⚠️ {errorMessage}</div>
+                        <div className="text-red-600 dark:text-red-400 text-xl mb-4">⚠️ {errorMessage}</div>
                         <button
                             onClick={() => navigate(route("service-requests.index"))}
-                            className="mt-4 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
+                            className="mt-4 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold"
                         >
                             Back to Service Requests
                         </button>
                     </div>
                 ) : !booking ? (
                     <div className="text-center py-12">
-                        <p className="text-red-600">Booking not found</p>
+                        <p className="text-red-600 dark:text-red-400">Booking not found</p>
                         <button
                             onClick={() => navigate(route("service-requests.index"))}
-                            className="mt-4 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
+                            className="mt-4 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold"
                         >
                             Back to Service Requests
                         </button>
@@ -104,67 +104,67 @@ export default function JobApplicationCreate() {
                 ) : (
                     <div className="max-w-4xl mx-auto">
                         {/* Booking Details */}
-                        <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-                            <h2 className="text-2xl font-bold mb-6 text-gray-900">Job Detail</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-8">
+                            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Job Detail</h2>
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Service Type</h3>
-                                    <p className="text-gray-900 capitalize">{booking.service_type?.replace("_", " ") || "N/A"}</p>
+                                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Service Type</h3>
+                                    <p className="text-gray-900 dark:text-gray-200 capitalize">{booking.service_type?.replace("_", " ") || "N/A"}</p>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Work Type</h3>
-                                    <p className="text-gray-900 capitalize">{booking.work_type?.replace("_", " ") || "N/A"}</p>
+                                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Work Type</h3>
+                                    <p className="text-gray-900 dark:text-gray-200 capitalize">{booking.work_type?.replace("_", " ") || "N/A"}</p>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Location</h3>
-                                    <p className="text-gray-900">{booking.city}, {booking.area}</p>
+                                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Location</h3>
+                                    <p className="text-gray-900 dark:text-gray-200">{booking.city}, {booking.area}</p>
                                 </div>
                                 {booking.start_date && (
                                     <div>
-                                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Start Date</h3>
-                                        <p className="text-gray-900">{booking.start_date}</p>
+                                        <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Start Date</h3>
+                                        <p className="text-gray-900 dark:text-gray-200">{booking.start_date}</p>
                                     </div>
                                 )}
                                 {booking.special_requirements && (
                                     <div className="md:col-span-2">
-                                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Special Requirements</h3>
-                                        <p className="text-gray-900">{booking.special_requirements}</p>
+                                        <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Special Requirements</h3>
+                                        <p className="text-gray-900 dark:text-gray-200">{booking.special_requirements}</p>
                                     </div>
                                 )}
                             </div>
                         </div>
 
                         {/* Application Form */}
-                        <form onSubmit={submit} className="bg-white rounded-lg shadow-md p-8">
-                            <h2 className="text-2xl font-bold mb-6 text-gray-900">Your Application</h2>
+                        <form onSubmit={submit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+                            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Your Application</h2>
 
                             <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Application Message
                                 </label>
                                 <textarea
                                     value={data.message}
                                     onChange={(e) => setData(prev => ({ ...prev, message: e.target.value }))}
                                     rows={6}
-                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                     placeholder="Tell the client why you're perfect for this job. Mention your experience, skills, and availability..."
                                 />
-                                {errors.message && <div className="text-red-500 text-sm mt-1">{errors.message}</div>}
+                                {errors.message && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.message}</div>}
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Proposed Monthly Rate (PKR) <span className="text-gray-500">(Optional)</span>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Proposed Monthly Rate (PKR) <span className="text-gray-500 dark:text-gray-400">(Optional)</span>
                                 </label>
                                 <input
                                     type="number"
                                     step="0.01"
                                     value={data.proposed_rate}
                                     onChange={(e) => setData(prev => ({ ...prev, proposed_rate: e.target.value }))}
-                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
                                     placeholder="e.g., 500"
                                 />
-                                {errors.proposed_rate && <div className="text-red-500 text-sm mt-1">{errors.proposed_rate}</div>}
+                                {errors.proposed_rate && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.proposed_rate}</div>}
                             </div>
 
                             <div className="flex gap-4">
@@ -178,14 +178,14 @@ export default function JobApplicationCreate() {
                                 <button
                                     type="button"
                                     onClick={() => navigate(route("service-requests.index"))}
-                                    className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
+                                    className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold"
                                 >
                                     Cancel
                                 </button>
                             </div>
                             {errors.submit && (
-                                <div className="mt-4 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
-                                    <p className="text-sm text-red-800">{errors.submit[0]}</p>
+                                <div className="mt-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 dark:border-red-500 p-4 rounded-lg">
+                                    <p className="text-sm text-red-800 dark:text-red-300">{errors.submit[0]}</p>
                                 </div>
                             )}
                         </form>
