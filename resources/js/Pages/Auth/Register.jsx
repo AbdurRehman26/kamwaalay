@@ -92,17 +92,30 @@ export default function Register() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-primary-100 to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-2xl w-full space-y-8">
-                    <div>
-                        <h2 className="mt-6 text-center text-4xl font-extrabold text-gray-900">
-                            Create Your Account
-                        </h2>
-                        <p className="mt-2 text-center text-sm text-gray-600">
+            {/* Hero Section */}
+            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden py-16 md:py-24">
+                {/* Abstract Background Shapes */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[100px] animate-pulse"></div>
+                    <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-purple-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
+                </div>
+
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Create Your Account</h1>
+                    <p className="text-xl text-indigo-100/90 max-w-2xl mx-auto leading-relaxed">
+                        Join us and start your journey today
+                    </p>
+                </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 pb-20">
+                <div className="max-w-2xl w-full mx-auto">
+                    <div className="text-center mb-8">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                             Already have an account?{" "}
                             <Link
                                 to={route("login")}
-                                className="font-medium text-primary-600 hover:text-primary-500"
+                                className="font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
                             >
                                 Sign in
                             </Link>
@@ -111,63 +124,63 @@ export default function Register() {
 
                     {/* General Error Message (shown before form) */}
                     {errors.error && (
-                        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+                        <div className="mb-8 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 rounded-xl">
                             <div className="flex items-start">
                                 <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <svg className="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                                     </svg>
                                 </div>
                                 <div className="ml-3">
-                                    <p className="text-sm font-medium text-red-800">{errors.error}</p>
+                                    <p className="text-sm font-medium text-red-800 dark:text-red-300">{errors.error}</p>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    <form className="mt-8 space-y-6 bg-white rounded-2xl shadow-xl p-8" onSubmit={submit}>
+                    <form className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 relative z-20 -mt-16 space-y-6" onSubmit={submit}>
                         {/* Role Selection */}
                         <div>
-                            <InputLabel value="I want to" className="text-gray-700 font-medium mb-4" />
+                            <InputLabel value="I want to" className="text-gray-700 dark:text-gray-300 font-bold mb-4 uppercase tracking-wide" />
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <button
                                     type="button"
                                     onClick={() => handleRoleChange("user")}
                                     className={`p-6 rounded-xl border-2 transition-all duration-300 ${
                                         selectedRole === "user"
-                                            ? "border-primary-500 bg-primary-50 shadow-lg"
-                                            : "border-gray-200 hover:border-primary-300 bg-white"
+                                            ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
+                                            : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
                                     }`}
                                 >
                                     <div className="text-4xl mb-3">👤</div>
-                                    <h3 className="font-bold text-lg text-gray-900 mb-2">Find Help</h3>
-                                    <p className="text-sm text-gray-600">Book helpers for your home</p>
+                                    <h3 className={`font-bold text-lg mb-2 ${selectedRole === "user" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Find Help</h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">Book helpers for your home</p>
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => handleRoleChange("helper")}
                                     className={`p-6 rounded-xl border-2 transition-all duration-300 ${
                                         selectedRole === "helper"
-                                            ? "border-primary-500 bg-primary-50 shadow-lg"
-                                            : "border-gray-200 hover:border-primary-300 bg-white"
+                                            ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
+                                            : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
                                     }`}
                                 >
                                     <div className="text-4xl mb-3">💼</div>
-                                    <h3 className="font-bold text-lg text-gray-900 mb-2">Work as Helper</h3>
-                                    <p className="text-sm text-gray-600">Offer your services</p>
+                                    <h3 className={`font-bold text-lg mb-2 ${selectedRole === "helper" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Work as Helper</h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">Offer your services</p>
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => handleRoleChange("business")}
                                     className={`p-6 rounded-xl border-2 transition-all duration-300 ${
                                         selectedRole === "business"
-                                            ? "border-primary-500 bg-primary-50 shadow-lg"
-                                            : "border-gray-200 hover:border-primary-300 bg-white"
+                                            ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
+                                            : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
                                     }`}
                                 >
                                     <div className="text-4xl mb-3">🏢</div>
-                                    <h3 className="font-bold text-lg text-gray-900 mb-2">Agency/Business</h3>
-                                    <p className="text-sm text-gray-600">Manage multiple workers</p>
+                                    <h3 className={`font-bold text-lg mb-2 ${selectedRole === "business" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Agency/Business</h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">Manage multiple workers</p>
                                 </button>
                             </div>
                             <InputError message={errors.role} className="mt-2" />
@@ -175,12 +188,12 @@ export default function Register() {
 
                         <div className="space-y-6">
                             <div>
-                                <InputLabel htmlFor="name" value="Full Name" className="text-gray-700 font-medium" />
+                                <InputLabel htmlFor="name" value="Full Name" className="text-gray-700 dark:text-gray-300 font-bold uppercase tracking-wide" />
                                 <TextInput
                                     id="name"
                                     name="name"
                                     value={formData.name}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    className="mt-2 block w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                     autoComplete="name"
                                     isFocused={true}
                                     onChange={(e) => handleInputChange("name", e.target.value)}
@@ -190,12 +203,12 @@ export default function Register() {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="phone" value="Phone Number" className="text-gray-700 font-medium" />
+                                <InputLabel htmlFor="phone" value="Phone Number" className="text-gray-700 dark:text-gray-300 font-bold uppercase tracking-wide" />
                                 <div className="mt-2 flex items-center gap-2">
-                                    <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-l-lg">
+                                    <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-l-xl">
                                         <span className="text-2xl">🇵🇰</span>
-                                        <span className="text-sm font-medium text-gray-700">+92</span>
-                                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">+92</span>
+                                        <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </div>
@@ -204,7 +217,7 @@ export default function Register() {
                                         type="tel"
                                         name="phone"
                                         value={formData.phone}
-                                        className="flex-1 rounded-r-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                        className="flex-1 rounded-r-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                         autoComplete="tel"
                                         onChange={(e) => handleInputChange("phone", e.target.value)}
                                         placeholder="Enter your phone number"
@@ -215,13 +228,13 @@ export default function Register() {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="address" value="Address" className="text-gray-700 font-medium" />
+                                <InputLabel htmlFor="address" value="Address" className="text-gray-700 dark:text-gray-300 font-bold uppercase tracking-wide" />
                                 <TextInput
                                     id="address"
                                     type="text"
                                     name="address"
                                     value={formData.address}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    className="mt-2 block w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                     autoComplete="street-address"
                                     onChange={(e) => handleInputChange("address", e.target.value)}
                                     placeholder="Your address (optional)"
@@ -230,13 +243,13 @@ export default function Register() {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="password" value="Password" className="text-gray-700 font-medium" />
+                                <InputLabel htmlFor="password" value="Password" className="text-gray-700 dark:text-gray-300 font-bold uppercase tracking-wide" />
                                 <TextInput
                                     id="password"
                                     type="password"
                                     name="password"
                                     value={formData.password}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    className="mt-2 block w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                     autoComplete="new-password"
                                     onChange={(e) => handleInputChange("password", e.target.value)}
                                     required
@@ -248,14 +261,14 @@ export default function Register() {
                                 <InputLabel
                                     htmlFor="password_confirmation"
                                     value="Confirm Password"
-                                    className="text-gray-700 font-medium"
+                                    className="text-gray-700 dark:text-gray-300 font-bold uppercase tracking-wide"
                                 />
                                 <TextInput
                                     id="password_confirmation"
                                     type="password"
                                     name="password_confirmation"
                                     value={formData.password_confirmation}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    className="mt-2 block w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                     autoComplete="new-password"
                                     onChange={(e) => handleInputChange("password_confirmation", e.target.value)}
                                     required
@@ -267,17 +280,14 @@ export default function Register() {
                             </div>
                         </div>
 
-                        <div>
+                        <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
                             <PrimaryButton
-                                className="w-full flex justify-center bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white py-3 px-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex justify-center bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={processing}
                             >
                                 {processing ? (
-                                    <span className="flex items-center">
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
+                                    <span className="flex items-center gap-2">
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                                         Creating Account...
                                     </span>
                                 ) : (
@@ -288,19 +298,29 @@ export default function Register() {
                             {/* Show processing state */}
                             {processing && (
                                 <div className="mt-4 text-center">
-                                    <p className="text-sm text-gray-600 animate-pulse">Please wait while we create your account...</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 animate-pulse font-medium">Please wait while we create your account...</p>
                                 </div>
                             )}
+
+                            <div className="mt-4 text-center">
+                                <Link
+                                    to={route("login")}
+                                    className="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                                >
+                                    <span>←</span>
+                                    Back to Login
+                                </Link>
+                            </div>
                         </div>
 
-                        <div className="text-center">
-                            <p className="text-sm text-gray-600">
+                        <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                 By registering, you agree to our{" "}
-                                <Link to={route("terms")} className="text-primary-600 hover:text-primary-500">
+                                <Link to={route("terms")} className="font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
                                     Terms
                                 </Link>{" "}
                                 and{" "}
-                                <Link to={route("privacy")} className="text-primary-600 hover:text-primary-500">
+                                <Link to={route("privacy")} className="font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
                                     Privacy Policy
                                 </Link>
                             </p>

@@ -25,10 +25,10 @@ export default function PublicLayout({ children }) {
             <Navbar />
 
             {/* Main Content */}
-            <main className="min-h-screen">{children}</main>
+            <main>{children}</main>
 
             {/* Footer */}
-            <footer className="bg-gray-900 dark:bg-gray-950 text-white dark:text-gray-200 mt-20">
+            <footer className="bg-gray-900 dark:bg-gray-950 text-white dark:text-gray-200 mt-8">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
                         <div className="col-span-1 md:col-span-2">
