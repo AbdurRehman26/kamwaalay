@@ -107,9 +107,7 @@ test('businesses can update their worker', function () {
         'name' => 'Old Name',
     ]);
     $helper->assignRole('helper');
-    $helper->profile()->create([
-        'service_type' => 'maid',
-    ]);
+    $profile = $helper->profile()->create([]);
     $business->helpers()->attach($helper->id);
     
     $token = $business->createToken('test-token')->plainTextToken;
@@ -119,13 +117,16 @@ test('businesses can update their worker', function () {
         'Accept' => 'application/json',
     ])->putJson("/api/business/workers/{$helper->id}", [
         'name' => 'New Name',
-        'email' => $helper->email,
         'phone' => $helper->phone ?? '03001234567',
-        'service_type' => 'cook',
+        'service_types' => ['cook'],
+        'locations' => [
+            [
+                'city' => 'Karachi',
+                'area' => 'PECHS',
+            ],
+        ],
         'skills' => 'Cooking',
         'experience_years' => 8,
-        'city' => 'Karachi',
-        'area' => 'PECHS',
         'availability' => 'part_time',
         'bio' => 'Updated bio',
         'is_active' => true,
@@ -133,9 +134,11 @@ test('businesses can update their worker', function () {
 
     $response->assertStatus(200);
     $helper->refresh();
-    $helper->load('profile');
+    $helper->load(['profile', 'serviceListings']);
     expect($helper->name)->toBe('New Name');
-    expect($helper->profile->service_type)->toBe('cook');
+    // Check that service listing was created with the correct service types
+    expect($helper->serviceListings)->not->toBeEmpty();
+    expect($helper->serviceListings->first()->service_types)->toContain('cook');
 });
 
 test('businesses can remove a worker', function () {
@@ -174,13 +177,16 @@ test('only business owner can manage their workers', function () {
         'Accept' => 'application/json',
     ])->putJson("/api/business/workers/{$helper->id}", [
         'name' => 'Hacked Name',
-        'email' => $helper->email,
         'phone' => $helper->phone ?? '03001234567',
-        'service_type' => 'maid',
+        'service_types' => ['maid'],
+        'locations' => [
+            [
+                'city' => 'Karachi',
+                'area' => 'Saddar',
+            ],
+        ],
         'skills' => 'Cleaning',
         'experience_years' => 5,
-        'city' => 'Karachi',
-        'area' => 'Saddar',
         'availability' => 'full_time',
         'is_active' => true,
     ]);

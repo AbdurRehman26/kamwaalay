@@ -27,6 +27,12 @@ export const businessesService = {
     },
 
     async updateWorker(id, data) {
+        // Use POST with _method=PUT for FormData compatibility
+        if (data instanceof FormData) {
+            data.append("_method", "PUT");
+            const response = await api.post(`/business/workers/${id}`, data);
+            return response.data;
+        }
         const response = await api.put(`/business/workers/${id}`, data);
         return response.data;
     },

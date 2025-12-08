@@ -139,12 +139,6 @@ export default function JobApplicationCreate() {
                                         <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-2">📍 Location</h3>
                                         <p className="text-lg font-semibold text-gray-900 dark:text-white">{booking.city}, {booking.area}</p>
                                     </div>
-                                    {booking.start_date && (
-                                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-5 border border-indigo-100 dark:border-indigo-800">
-                                            <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-2">📅 Start Date</h3>
-                                            <p className="text-lg font-semibold text-gray-900 dark:text-white">{booking.start_date}</p>
-                                        </div>
-                                    )}
                                     {booking.special_requirements && (
                                         <div className="md:col-span-2 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-5 border border-indigo-100 dark:border-indigo-800">
                                             <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-2">💬 Special Requirements</h3>

@@ -130,24 +130,24 @@ export default function NotificationDropdown() {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg"
+                className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 rounded-lg transition-colors"
             >
                 <span className="text-2xl">🔔</span>
                 {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    <span className="absolute top-0 right-0 bg-red-500 dark:bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                         {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                 )}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden flex flex-col">
-                    <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                        <h3 className="font-bold text-gray-900">Notifications</h3>
+                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-hidden flex flex-col">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <h3 className="font-bold text-gray-900 dark:text-white">Notifications</h3>
                         {unreadCount > 0 && (
                             <button
                                 onClick={handleMarkAllAsRead}
-                                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                                className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors"
                             >
                                 Mark all read
                             </button>
@@ -157,11 +157,11 @@ export default function NotificationDropdown() {
                     <div className="overflow-y-auto flex-1">
                         {loading ? (
                             <div className="p-8 text-center">
-                                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
-                                <p className="text-gray-600 mt-3 text-sm">Loading notifications...</p>
+                                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 dark:border-primary-400"></div>
+                                <p className="text-gray-600 dark:text-gray-400 mt-3 text-sm">Loading notifications...</p>
                             </div>
                         ) : notifications.data && notifications.data.length > 0 ? (
-                            <div className="divide-y divide-gray-100">
+                            <div className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {notifications.data.map((notification) => {
                                     const isUnread = !notification.read_at;
                                     const link = getNotificationLink(notification);
@@ -177,27 +177,27 @@ export default function NotificationDropdown() {
                                                 }
                                                 setIsOpen(false);
                                             }}
-                                            className={`block p-4 hover:bg-gray-50 transition-colors ${
-                                                isUnread ? "bg-primary-50" : ""
+                                            className={`block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
+                                                isUnread ? "bg-primary-50 dark:bg-primary-900/20" : ""
                                             }`}
                                         >
                                             <div className="flex items-start gap-3">
                                                 <span className="text-2xl">{icon}</span>
                                                 <div className="flex-1 min-w-0">
                                                     <p className={`text-sm font-semibold ${
-                                                        isUnread ? "text-gray-900" : "text-gray-700"
+                                                        isUnread ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"
                                                     }`}>
                                                         {notification.data?.title || "Notification"}
                                                     </p>
-                                                    <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                                                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
                                                         {notification.data?.message || ""}
                                                     </p>
-                                                    <p className="text-xs text-gray-400 mt-2">
+                                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                                                         {new Date(notification.created_at).toLocaleString()}
                                                     </p>
                                                 </div>
                                                 {isUnread && (
-                                                    <span className="w-2 h-2 bg-primary-600 rounded-full mt-2 flex-shrink-0"></span>
+                                                    <span className="w-2 h-2 bg-primary-600 dark:bg-primary-400 rounded-full mt-2 flex-shrink-0"></span>
                                                 )}
                                             </div>
                                         </Link>
@@ -207,17 +207,17 @@ export default function NotificationDropdown() {
                         ) : (
                             <div className="p-8 text-center">
                                 <div className="text-4xl mb-3">🔔</div>
-                                <p className="text-gray-600 text-sm">No notifications yet</p>
+                                <p className="text-gray-600 dark:text-gray-400 text-sm">No notifications yet</p>
                             </div>
                         )}
                     </div>
 
                     {notifications.data && notifications.data.length > 0 && (
-                        <div className="p-3 border-t border-gray-200 text-center">
+                        <div className="p-3 border-t border-gray-200 dark:border-gray-700 text-center">
                             <Link
                                 to={route("notifications")}
                                 onClick={() => setIsOpen(false)}
-                                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                                className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors"
                             >
                                 View all notifications
                             </Link>

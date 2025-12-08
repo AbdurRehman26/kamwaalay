@@ -37,6 +37,7 @@ import JobApplicationsMyRequestApplications from "./Pages/JobApplications/MyRequ
 import BusinessDashboard from "./Pages/Business/Dashboard";
 import BusinessWorkers from "./Pages/Business/Workers";
 import BusinessWorkersCreate from "./Pages/Business/Workers/Create";
+import BusinessWorkersEdit from "./Pages/Business/Workers/Edit";
 import OnboardingHelper from "./Pages/Onboarding/Helper";
 import OnboardingBusiness from "./Pages/Onboarding/Business";
 import PageAbout from "./Pages/Pages/About";
@@ -214,6 +215,11 @@ function AppRoutes() {
             <Route path="/business/workers/create" element={
                 <ProtectedRoute>
                     <BusinessWorkersCreate />
+                </ProtectedRoute>
+            } />
+            <Route path="/business/workers/:id/edit" element={
+                <ProtectedRoute>
+                    <BusinessWorkersEdit />
                 </ProtectedRoute>
             } />
             <Route path="/onboarding/helper" element={

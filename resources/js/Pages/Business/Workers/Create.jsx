@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import PublicLayout from "@/Layouts/PublicLayout";
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import { businessesService } from "@/services/businesses";
 import { route } from "@/utils/routes";
 import api from "@/services/api";
@@ -24,10 +24,7 @@ export default function CreateWorker() {
 
     const [data, setData] = useState({
         name: "",
-        email: "",
         phone: "",
-        password: "",
-        password_confirmation: "",
         experience_years: "",
         availability: "full_time",
         bio: "",
@@ -142,10 +139,9 @@ export default function CreateWorker() {
 
         const formData = new FormData();
         formData.append("name", data.name);
-        formData.append("email", data.email);
-        formData.append("phone", data.phone);
-        formData.append("password", data.password);
-        formData.append("password_confirmation", data.password_confirmation);
+        if (data.phone) {
+            formData.append("phone", data.phone);
+        }
         formData.append("experience_years", data.experience_years);
         formData.append("availability", data.availability);
         formData.append("bio", data.bio);
@@ -181,22 +177,51 @@ export default function CreateWorker() {
     };
 
     return (
-        <PublicLayout>
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
-                <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">Add New Worker</h1>
-                    <p className="text-xl text-white/90">Add a new worker to your agency</p>
+        <DashboardLayout>
+            {/* Header Section */}
+            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden rounded-2xl shadow-xl mb-8">
+                {/* Abstract Background Shapes */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[100px] animate-pulse"></div>
+                    <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-purple-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
+                </div>
+
+                <div className="relative z-10 p-8">
+                    <h2 className="text-indigo-300 dark:text-indigo-400 font-bold tracking-wide uppercase text-sm mb-3">Add Worker</h2>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-2">Add New Worker</h1>
+                    <p className="text-xl text-indigo-100/90 dark:text-indigo-200/90">Add a new worker to your agency</p>
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-12">
-                <div className="max-w-4xl mx-auto">
-                    <form onSubmit={handleSubmit} className="space-y-8">
-                        {/* Basic Information */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Basic Information</h2>
+            <div className="max-w-4xl">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Submit Error Banner */}
+                        {errors.submit && (
+                            <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-red-600 dark:text-red-400 font-bold">⚠️</span>
+                                    <div>
+                                        {Array.isArray(errors.submit) ? (
+                                            errors.submit.map((error, idx) => (
+                                                <p key={idx} className="text-red-600 dark:text-red-400 text-sm font-medium">
+                                                    {error}
+                                                </p>
+                                            ))
+                                        ) : (
+                                            <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                                                {errors.submit}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Basic Information */}
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Basic Information</h2>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                                 <div>
                                     <InputLabel htmlFor="name" value="Full Name *" />
                                     <TextInput
@@ -207,33 +232,19 @@ export default function CreateWorker() {
                                         onChange={(e) => setData({ ...data, name: e.target.value })}
                                         required
                                     />
-                                    <InputError message={errors.name} className="mt-2" />
+                                    <InputError message={errors.name} className="mt-1.5" />
                                 </div>
 
                                 <div>
-                                    <InputLabel htmlFor="email" value="Email *" />
-                                    <TextInput
-                                        id="email"
-                                        type="email"
-                                        className="mt-1 block w-full"
-                                        value={data.email}
-                                        onChange={(e) => setData({ ...data, email: e.target.value })}
-                                        required
-                                    />
-                                    <InputError message={errors.email} className="mt-2" />
-                                </div>
-
-                                <div>
-                                    <InputLabel htmlFor="phone" value="Phone *" />
+                                    <InputLabel htmlFor="phone" value="Phone" />
                                     <TextInput
                                         id="phone"
                                         type="tel"
                                         className="mt-1 block w-full"
                                         value={data.phone}
                                         onChange={(e) => setData({ ...data, phone: e.target.value })}
-                                        required
                                     />
-                                    <InputError message={errors.phone} className="mt-2" />
+                                    <InputError message={errors.phone} className="mt-1.5" />
                                 </div>
 
                                 <div>
@@ -241,44 +252,19 @@ export default function CreateWorker() {
                                     <input
                                         id="photo"
                                         type="file"
-                                        className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                                        className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-900/30 file:text-indigo-700 dark:file:text-indigo-300 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50 transition-all"
                                         onChange={(e) => setData({ ...data, photo: e.target.files[0] })}
                                         accept="image/*"
                                     />
-                                    <InputError message={errors.photo} className="mt-2" />
-                                </div>
-
-                                <div>
-                                    <InputLabel htmlFor="password" value="Password *" />
-                                    <TextInput
-                                        id="password"
-                                        type="password"
-                                        className="mt-1 block w-full"
-                                        value={data.password}
-                                        onChange={(e) => setData({ ...data, password: e.target.value })}
-                                        required
-                                    />
-                                    <InputError message={errors.password} className="mt-2" />
-                                </div>
-
-                                <div>
-                                    <InputLabel htmlFor="password_confirmation" value="Confirm Password *" />
-                                    <TextInput
-                                        id="password_confirmation"
-                                        type="password"
-                                        className="mt-1 block w-full"
-                                        value={data.password_confirmation}
-                                        onChange={(e) => setData({ ...data, password_confirmation: e.target.value })}
-                                        required
-                                    />
+                                    <InputError message={errors.photo} className="mt-1.5" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Service Types Selection */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-4">Select Service Types *</h2>
-                            <p className="text-sm text-gray-600 mb-6">Choose the services this worker can provide. You can select multiple.</p>
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Service Types *</h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Choose the services this worker can provide. You can select multiple.</p>
 
                             {/* Selected Service Types as Tags */}
                             {selectedServiceTypes.length > 0 && (
@@ -289,7 +275,7 @@ export default function CreateWorker() {
                                             return (
                                                 <span
                                                     key={serviceType}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-800 rounded-full text-sm font-semibold"
+                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold border-2 border-indigo-200 dark:border-indigo-700"
                                                 >
                                                     <span>{service?.icon}</span>
                                                     <span>{service?.label}</span>
@@ -315,23 +301,24 @@ export default function CreateWorker() {
                                         type="button"
                                         onClick={() => addServiceType(service.value)}
                                         disabled={selectedServiceTypes.includes(service.value)}
-                                        className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${selectedServiceTypes.includes(service.value)
-                                                ? "border-primary-500 bg-primary-50 opacity-50 cursor-not-allowed"
-                                                : "border-gray-200 hover:border-primary-300 hover:bg-primary-50 cursor-pointer"
-                                            }`}
+                                        className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
+                                            selectedServiceTypes.includes(service.value)
+                                                ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
+                                                : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
+                                        }`}
                                     >
                                         <div className="text-3xl mb-2">{service.icon}</div>
-                                        <div className="font-semibold text-gray-900">{service.label}</div>
+                                        <div className="font-semibold text-gray-900 dark:text-white">{service.label}</div>
                                     </button>
                                 ))}
                             </div>
-                            <InputError message={errors.service_types} className="mt-2" />
+                            <InputError message={errors.service_types} className="mt-1.5" />
                         </div>
 
                         {/* Locations Selection */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-4">Select Locations *</h2>
-                            <p className="text-sm text-gray-600 mb-6">Add locations where this worker can provide services. You can add multiple locations.</p>
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Locations *</h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Add locations where this worker can provide services. You can add multiple locations.</p>
 
                             {/* Selected Locations as Tags */}
                             {selectedLocations.length > 0 && (
@@ -340,7 +327,7 @@ export default function CreateWorker() {
                                         {selectedLocations.map((location) => (
                                             <span
                                                 key={location.id}
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold"
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-semibold border-2 border-green-200 dark:border-green-700"
                                             >
                                                 <span>📍</span>
                                                 <span>{location.display_text}</span>
@@ -368,36 +355,36 @@ export default function CreateWorker() {
                                             setShowLocationSuggestions(true);
                                         }
                                     }}
-                                    className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 px-4 py-3"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3 shadow-sm"
                                     placeholder="Search location (e.g., Karachi, Clifton or type area name)..."
                                 />
                                 {showLocationSuggestions && locationSuggestions.length > 0 && (
-                                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-auto">
                                         {locationSuggestions
                                             .filter(suggestion => !selectedLocations.some(loc => loc.id === (suggestion.id || suggestion.display_text)))
                                             .map((suggestion, index) => (
                                                 <div
                                                     key={index}
                                                     onClick={() => handleLocationSelect(suggestion)}
-                                                    className="px-4 py-2 hover:bg-primary-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                    className="px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
                                                 >
-                                                    {suggestion.display_text}
+                                                    {suggestion.area || suggestion.display_text}
                                                 </div>
                                             ))}
                                     </div>
                                 )}
-                                <p className="text-xs text-gray-500 mt-2">
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                     Type to search and select locations. Each location will be added as a tag.
                                 </p>
                             </div>
-                            <InputError message={errors.locations} className="mt-2" />
+                            <InputError message={errors.locations} className="mt-1.5" />
                         </div>
 
                         {/* Professional Details */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Professional Details</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Professional Details</h2>
 
-                            <div className="grid md:grid-cols-2 gap-6">
+                            <div className="grid md:grid-cols-2 gap-6 mt-6">
                                 <div>
                                     <InputLabel htmlFor="experience_years" value="Experience (Years) *" />
                                     <TextInput
@@ -409,14 +396,14 @@ export default function CreateWorker() {
                                         required
                                         min="0"
                                     />
-                                    <InputError message={errors.experience_years} className="mt-2" />
+                                    <InputError message={errors.experience_years} className="mt-1.5" />
                                 </div>
 
                                 <div>
                                     <InputLabel htmlFor="availability" value="Availability *" />
                                     <select
                                         id="availability"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                        className="mt-1 block w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4"
                                         value={data.availability}
                                         onChange={(e) => setData({ ...data, availability: e.target.value })}
                                         required
@@ -427,7 +414,7 @@ export default function CreateWorker() {
                                             </option>
                                         ))}
                                     </select>
-                                    <InputError message={errors.availability} className="mt-2" />
+                                    <InputError message={errors.availability} className="mt-1.5" />
                                 </div>
 
                                 <div className="md:col-span-2">
@@ -440,7 +427,7 @@ export default function CreateWorker() {
                                         onChange={(e) => setData({ ...data, skills: e.target.value })}
                                         placeholder="e.g., Cooking, Cleaning, Child Care"
                                     />
-                                    <InputError message={errors.skills} className="mt-2" />
+                                    <InputError message={errors.skills} className="mt-1.5" />
                                 </div>
 
                                 <div className="md:col-span-2">
@@ -453,29 +440,39 @@ export default function CreateWorker() {
                                         rows="4"
                                         placeholder="Describe the worker's experience, skills, and qualifications..."
                                     />
-                                    <InputError message={errors.bio} className="mt-2" />
+                                    <InputError message={errors.bio} className="mt-1.5" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Submit Button */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-end gap-4">
                                 <button
                                     type="button"
                                     onClick={() => navigate(route("business.workers.index"))}
-                                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
+                                    className="px-6 py-3.5 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 font-bold shadow-md hover:shadow-lg"
                                 >
                                     Cancel
                                 </button>
-                                <PrimaryButton disabled={processing}>
-                                    {processing ? "Adding Worker..." : "Add Worker"}
-                                </PrimaryButton>
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {processing ? (
+                                        <span className="flex items-center justify-center gap-2">
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                            Adding Worker...
+                                        </span>
+                                    ) : (
+                                        "Add Worker"
+                                    )}
+                                </button>
                             </div>
                         </div>
                     </form>
-                </div>
             </div>
-        </PublicLayout>
+        </DashboardLayout>
     );
 }

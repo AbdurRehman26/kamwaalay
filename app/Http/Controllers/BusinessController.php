@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Business", description: "Business management endpoints")]
@@ -62,8 +64,8 @@ class BusinessController extends Controller
                     $q->where('city', $location->city->name)
                       ->where('area', $location->area);
                 });
-                $locationDisplay = $location->area 
-                    ? $location->city->name . ', ' . $location->area 
+                $locationDisplay = $location->area
+                    ? $location->city->name . ', ' . $location->area
                     : $location->city->name;
             }
         } elseif ($request->has('city_name') && $request->city_name) {
@@ -167,7 +169,7 @@ class BusinessController extends Controller
     public function dashboard()
     {
         $business = Auth::user();
-        
+
         if (!$business->isBusiness()) {
             abort(403);
         }
@@ -227,17 +229,26 @@ class BusinessController extends Controller
     public function workers(Request $request)
     {
         $business = Auth::user();
-        
+
         if (!$business->isBusiness()) {
             abort(403);
         }
 
         $workers = $business->helpers()
+            ->with(['serviceListings' => function ($query) {
+                $query->where('service_listings.is_active', true)
+                      ->where('service_listings.status', 'active');
+            }])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
+        // Transform workers using UserResource to get proper service_listings format
+        $transformedWorkers = $workers->through(function ($worker) {
+            return new UserResource($worker);
+        });
+
         return response()->json([
-            'workers' => $workers,
+            'workers' => $transformedWorkers,
         ]);
     }
 
@@ -263,7 +274,7 @@ class BusinessController extends Controller
     public function createWorker()
     {
         $business = Auth::user();
-        
+
         if (!$business->isBusiness()) {
             abort(403);
         }
@@ -282,21 +293,23 @@ class BusinessController extends Controller
             content: new OA\MediaType(
                 mediaType: "multipart/form-data",
                 schema: new OA\Schema(
-                    required: ["name", "email", "phone", "service_type", "experience_years", "city", "area", "availability", "password"],
+                    required: ["name", "service_types", "locations", "experience_years", "availability"],
                     properties: [
                         new OA\Property(property: "name", type: "string", maxLength: 255),
-                        new OA\Property(property: "email", type: "string", format: "email", maxLength: 255),
-                        new OA\Property(property: "phone", type: "string", maxLength: 20),
+                        new OA\Property(property: "phone", type: "string", maxLength: 20, nullable: true),
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
-                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                        new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
+                        new OA\Property(property: "locations", type: "array", items: new OA\Items(
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "city", type: "string"),
+                                new OA\Property(property: "area", type: "string"),
+                            ]
+                        )),
                         new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
-                        new OA\Property(property: "city", type: "string", maxLength: 255),
-                        new OA\Property(property: "area", type: "string", maxLength: 255),
                         new OA\Property(property: "availability", type: "string", enum: ["full_time", "part_time", "available"]),
                         new OA\Property(property: "bio", type: "string", nullable: true),
-                        new OA\Property(property: "password", type: "string", format: "password", minLength: 8),
-                        new OA\Property(property: "password_confirmation", type: "string", format: "password"),
                     ]
                 )
             )
@@ -319,15 +332,14 @@ class BusinessController extends Controller
     public function storeWorker(Request $request)
     {
         $business = Auth::user();
-        
+
         if (!$business->isBusiness()) {
             abort(403);
         }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string|max:20',
+            'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|max:2048',
             'service_types' => 'required|array|min:1',
             'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
@@ -338,15 +350,36 @@ class BusinessController extends Controller
             'experience_years' => 'required|integer|min:0',
             'availability' => 'required|in:full_time,part_time,available',
             'bio' => 'nullable|string',
-            'password' => 'required|min:8|confirmed',
         ]);
 
         // Create user account for the worker
+        // Generate a unique email if not provided (using phone or timestamp)
+        $email = $request->input('email');
+        if (!$email) {
+            // Generate a unique email based on phone or timestamp
+            $phone = $validated['phone'] ?? '';
+            $baseEmail = $phone ? str_replace([' ', '-', '(', ')'], '', $phone) : 'worker_' . time();
+            $email = $baseEmail . '@worker.kamwaalay.local';
+
+            // Ensure uniqueness
+            $counter = 1;
+            while (User::where('email', $email)->exists()) {
+                $email = $baseEmail . '_' . $counter . '@worker.kamwaalay.local';
+                $counter++;
+            }
+        }
+
+        // Generate a random password if not provided
+        $password = $request->input('password');
+        if (!$password) {
+            $password = \Str::random(16);
+        }
+
         $userData = [
             'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
-            'password' => Hash::make($validated['password']),
+            'email' => $email,
+            'phone' => $validated['phone'] ?? null,
+            'password' => Hash::make($password),
             'is_active' => true,
         ];
 
@@ -432,7 +465,7 @@ class BusinessController extends Controller
     public function editWorker(User $helper)
     {
         $business = Auth::user();
-        
+
         if (!$business->isBusiness() || !$business->helpers()->where('users.id', $helper->id)->exists()) {
             abort(403);
         }
@@ -442,7 +475,7 @@ class BusinessController extends Controller
         }
 
         return response()->json([
-            'helper' => new UserResource($helper->load('roles')),
+            'helper' => new UserResource($helper->load(['roles', 'serviceListings'])),
         ]);
     }
 
@@ -492,7 +525,7 @@ class BusinessController extends Controller
     public function updateWorker(Request $request, User $helper)
     {
         $business = Auth::user();
-        
+
         if (!$business->isBusiness() || !$business->helpers()->where('users.id', $helper->id)->exists()) {
             abort(403);
         }
@@ -501,36 +534,88 @@ class BusinessController extends Controller
             abort(404);
         }
 
-        $validated = $request->validate([
+        // Handle FormData arrays - Laravel might not parse nested arrays correctly with PUT requests
+        // Manually reconstruct arrays from request input
+        $allInput = $request->all();
+
+        // Reconstruct service_types array
+        $parsedServiceTypes = [];
+        if (isset($allInput['service_types']) && is_array($allInput['service_types'])) {
+            $parsedServiceTypes = array_values($allInput['service_types']);
+        } else {
+            // Try to get from raw input if not parsed correctly
+            $rawInput = $request->input();
+            foreach ($rawInput as $key => $value) {
+                if (preg_match('/^service_types\[(\d+)\]$/', $key, $matches)) {
+                    $parsedServiceTypes[(int)$matches[1]] = $value;
+                }
+            }
+            ksort($parsedServiceTypes);
+            $parsedServiceTypes = array_values($parsedServiceTypes);
+        }
+
+        // Reconstruct locations array
+        $parsedLocations = [];
+        if (isset($allInput['locations']) && is_array($allInput['locations'])) {
+            $parsedLocations = array_values($allInput['locations']);
+        } else {
+            // Try to get from raw input if not parsed correctly
+            $rawInput = $request->input();
+            $locationIndexes = [];
+            foreach ($rawInput as $key => $value) {
+                if (preg_match('/^locations\[(\d+)\]\[(city|area)\]$/', $key, $matches)) {
+                    $index = (int)$matches[1];
+                    $field = $matches[2];
+                    if (!isset($locationIndexes[$index])) {
+                        $locationIndexes[$index] = [];
+                    }
+                    $locationIndexes[$index][$field] = $value;
+                }
+            }
+            ksort($locationIndexes);
+            $parsedLocations = array_values($locationIndexes);
+        }
+
+        // Merge parsed data with request data for validation
+        $dataToValidate = $allInput;
+        $dataToValidate['service_types'] = $parsedServiceTypes;
+        $dataToValidate['locations'] = $parsedLocations;
+
+        $validated = \Validator::make($dataToValidate, [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $helper->id,
-            'phone' => 'required|string|max:20',
+            'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|max:2048',
-            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'service_types' => 'required|array|min:1',
+            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'locations' => 'required|array|min:1',
+            'locations.*.city' => 'required|string|max:255',
+            'locations.*.area' => 'required|string|max:255',
             'skills' => 'nullable|string',
             'experience_years' => 'required|integer|min:0',
-            'city' => 'required|string|max:255',
-            'area' => 'required|string|max:255',
             'availability' => 'required|in:full_time,part_time,available',
             'bio' => 'nullable|string',
             'is_active' => 'boolean',
-        ]);
+        ])->validate();
 
         // Update user basic data
         $userData = [
             'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
         ];
+        if (isset($validated['phone'])) {
+            $userData['phone'] = $validated['phone'];
+        }
         $helper->update($userData);
 
-        // Update or create profile
+        // Get or create profile
+        $profile = $helper->profile;
+        if (!$profile) {
+            $profile = $helper->profile()->create([]);
+        }
+
+        // Update profile data
         $profileData = [
-            'service_type' => $validated['service_type'],
             'skills' => $validated['skills'] ?? null,
             'experience_years' => $validated['experience_years'],
-            'city' => $validated['city'],
-            'area' => $validated['area'],
             'availability' => $validated['availability'],
             'bio' => $validated['bio'] ?? null,
             'is_active' => $validated['is_active'] ?? true,
@@ -538,16 +623,36 @@ class BusinessController extends Controller
 
         if ($request->hasFile('photo')) {
             // Delete old photo
-            if ($helper->profile && $helper->profile->photo) {
-                Storage::disk('public')->delete($helper->profile->photo);
+            if ($profile->photo) {
+                Storage::disk('public')->delete($profile->photo);
             }
             $profileData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
         }
 
-        $helper->profile()->updateOrCreate(
-            ['profileable_id' => $helper->id, 'profileable_type' => 'App\Models\User'],
-            $profileData
-        );
+        $profile->update($profileData);
+
+        // Update service listings - delete old ones and create new ones
+        $profile->serviceListings()->delete();
+
+        // Create service listing with all service types and locations
+        $serviceListingData = [
+            'profile_id' => $profile->id,
+            'work_type' => $validated['availability'], // Map availability to work_type
+            'service_types' => $validated['service_types'], // JSON array
+            'locations' => array_map(function($location) {
+                // Find or create location ID
+                $locationModel = \App\Models\Location::firstOrCreate([
+                    'city_id' => \App\Models\City::firstOrCreate(['name' => $location['city']])->id,
+                    'area' => $location['area'],
+                ]);
+                return $locationModel->id;
+            }, $validated['locations']), // JSON array of location IDs
+            'description' => $validated['bio'],
+            'is_active' => true,
+            'status' => 'active',
+        ];
+
+        \App\Models\ServiceListing::create($serviceListingData);
 
         return response()->json([
             'message' => 'Worker updated successfully!',
@@ -580,7 +685,7 @@ class BusinessController extends Controller
     public function destroyWorker(User $helper)
     {
         $business = Auth::user();
-        
+
         if (!$business->isBusiness() || !$business->helpers()->where('users.id', $helper->id)->exists()) {
             abort(403);
         }

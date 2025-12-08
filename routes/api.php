@@ -198,7 +198,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/workers/create', [BusinessController::class, 'createWorker']);
         Route::post('/workers', [BusinessController::class, 'storeWorker']);
         Route::get('/workers/{helper}/edit', [BusinessController::class, 'editWorker']);
-        Route::put('/workers/{helper}', [BusinessController::class, 'updateWorker']);
+        Route::match(['put', 'post'], '/workers/{helper}', [BusinessController::class, 'updateWorker']);
         Route::delete('/workers/{helper}', [BusinessController::class, 'destroyWorker']);
     });
 
