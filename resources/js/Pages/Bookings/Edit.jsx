@@ -179,16 +179,25 @@ export default function BookingEdit() {
 
     return (
         <DashboardLayout>
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 text-white py-12">
-                <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">Edit Service Request</h1>
-                    <p className="text-xl text-white/90">Update your job posting details</p>
+            {/* Hero Section */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="mb-10 relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200 dark:shadow-none">
+                    <div className="relative z-10">
+                        <h1 className="text-3xl md:text-4xl font-bold mb-3">Edit Job Posting</h1>
+                        <p className="text-indigo-100 text-lg max-w-xl">
+                            Update your job posting details and find the perfect helper for your needs.
+                        </p>
+                    </div>
+                    {/* Decorative blobs */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+                    <div className="absolute bottom-0 right-20 w-48 h-48 bg-purple-500/30 rounded-full blur-3xl transform translate-y-1/2"></div>
                 </div>
             </div>
-            <div className="container mx-auto px-4 py-12">
-                <div className="max-w-2xl mx-auto">
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="max-w-3xl mx-auto">
                     {/* Notice about Karachi only */}
-                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 mb-8 rounded-lg p-4">
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 mb-6 rounded-xl p-4">
                         <div className="flex">
                             <div className="flex-shrink-0">
                                 <svg className="h-5 w-5 text-yellow-400 dark:text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
@@ -202,14 +211,14 @@ export default function BookingEdit() {
                             </div>
                         </div>
                     </div>
-                    <form onSubmit={submit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+                    <form onSubmit={submit} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 relative z-20 -mt-10 space-y-6">
                         <div className="grid md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Service Type *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Service Type *</label>
                                 <select
                                     value={data.service_type}
                                     onChange={(e) => setData(prev => ({ ...prev, service_type: e.target.value }))}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                     required
                                 >
                                     <option value="">Select Service</option>
@@ -219,26 +228,26 @@ export default function BookingEdit() {
                                         </option>
                                     ))}
                                 </select>
-                                {errors.service_type && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.service_type}</div>}
+                                {errors.service_type && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.service_type}</div>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Work Type *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Work Type *</label>
                                 <select
                                     value={data.work_type}
                                     onChange={(e) => setData(prev => ({ ...prev, work_type: e.target.value }))}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                     required
                                 >
                                     <option value="">Select Type</option>
                                     <option value="full_time">Full Time</option>
                                     <option value="part_time">Part Time</option>
                                 </select>
-                                {errors.work_type && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.work_type}</div>}
+                                {errors.work_type && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.work_type}</div>}
                             </div>
 
                             <div className="relative" ref={suggestionsRef}>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Area *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Area *</label>
                                 <input
                                     type="text"
                                     value={searchQuery}
@@ -251,135 +260,142 @@ export default function BookingEdit() {
                                             setShowSuggestions(true);
                                         }
                                     }}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                     placeholder="Type to search area..."
                                     required
                                 />
                                 {showSuggestions && suggestions.length > 0 && (
-                                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
+                                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-auto">
                                         {suggestions.map((suggestion, index) => (
                                             <div
                                                 key={index}
                                                 onClick={() => handleAreaSelect(suggestion)}
-                                                className="px-4 py-2 hover:bg-primary-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
+                                                className="px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
                                             >
                                                 {suggestion}
                                             </div>
                                         ))}
                                     </div>
                                 )}
-                                {errors.area && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.area}</div>}
+                                {errors.area && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.area}</div>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Start Date</label>
                                 <input
                                     type="date"
                                     value={data.start_date}
                                     onChange={(e) => setData(prev => ({ ...prev, start_date: e.target.value }))}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                 />
-                                {errors.start_date && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.start_date}</div>}
+                                {errors.start_date && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.start_date}</div>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Time</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Start Time</label>
                                 <input
                                     type="time"
                                     value={data.start_time}
                                     onChange={(e) => setData(prev => ({ ...prev, start_time: e.target.value }))}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                 />
-                                {errors.start_time && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.start_time}</div>}
+                                {errors.start_time && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.start_time}</div>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Name *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Your Name *</label>
                                 <input
                                     type="text"
                                     value={data.name}
                                     onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}
                                     disabled={!!user}
-                                    className={`w-full border-gray-300 dark:border-gray-600 rounded-lg focus:border-primary-500 focus:ring-primary-500 ${
-                                        user ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed dark:text-gray-300" : "dark:bg-gray-700 dark:text-white"
+                                    className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${
+                                        user ? "border-gray-200 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed dark:text-gray-300" : "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                                     }`}
                                     required
                                 />
-                                {errors.name && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.name}</div>}
+                                {errors.name && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.name}</div>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Phone *</label>
                                 <input
                                     type="tel"
                                     value={data.phone}
                                     onChange={(e) => setData(prev => ({ ...prev, phone: e.target.value }))}
                                     disabled={!!user}
-                                    className={`w-full border-gray-300 dark:border-gray-600 rounded-lg focus:border-primary-500 focus:ring-primary-500 ${
-                                        user ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed dark:text-gray-300" : "dark:bg-gray-700 dark:text-white"
+                                    className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${
+                                        user ? "border-gray-200 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed dark:text-gray-300" : "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                                     }`}
                                     required
                                 />
-                                {errors.phone && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.phone}</div>}
+                                {errors.phone && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.phone}</div>}
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Email *</label>
                                 <input
                                     type="email"
                                     value={data.email}
                                     onChange={(e) => setData(prev => ({ ...prev, email: e.target.value }))}
                                     disabled={!!user}
-                                    className={`w-full border-gray-300 dark:border-gray-600 rounded-lg focus:border-primary-500 focus:ring-primary-500 ${
-                                        user ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed dark:text-gray-300" : "dark:bg-gray-700 dark:text-white"
+                                    className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${
+                                        user ? "border-gray-200 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed dark:text-gray-300" : "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                                     }`}
                                     required
                                 />
-                                {errors.email && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.email}</div>}
+                                {errors.email && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.email}</div>}
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Address</label>
                                 <textarea
                                     value={data.address}
                                     onChange={(e) => setData(prev => ({ ...prev, address: e.target.value }))}
                                     rows={3}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                 />
-                                {errors.address && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.address}</div>}
+                                {errors.address && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.address}</div>}
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Special Requirements</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Special Requirements</label>
                                 <textarea
                                     value={data.special_requirements}
                                     onChange={(e) => setData(prev => ({ ...prev, special_requirements: e.target.value }))}
                                     rows={4}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                     placeholder="Any special requirements or preferences..."
                                 />
-                                {errors.special_requirements && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.special_requirements}</div>}
+                                {errors.special_requirements && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.special_requirements}</div>}
                             </div>
                         </div>
 
-                        <div className="mt-8 flex gap-4">
+                        <div className="pt-6 border-t border-gray-200 dark:border-gray-700 flex gap-4">
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition duration-300 font-semibold"
+                                className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {processing ? "Updating..." : "Update Service Request"}
+                                {processing ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                        Updating...
+                                    </span>
+                                ) : (
+                                    "Update Job Post"
+                                )}
                             </button>
                             <Link
                                 to={route("bookings.index")}
-                                className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold text-center"
+                                className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3.5 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 text-center shadow-md hover:shadow-lg"
                             >
                                 Cancel
                             </Link>
                         </div>
                         {errors.submit && (
-                            <div className="mt-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 dark:border-red-600 p-4 rounded-lg">
-                                <p className="text-sm text-red-800 dark:text-red-300">{errors.submit[0]}</p>
+                            <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 dark:border-red-600 p-4 rounded-xl">
+                                <p className="text-sm font-medium text-red-800 dark:text-red-300">{errors.submit[0]}</p>
                             </div>
                         )}
                     </form>

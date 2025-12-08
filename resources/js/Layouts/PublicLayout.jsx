@@ -91,7 +91,7 @@ export default function PublicLayout({ children }) {
                                         to={route("bookings.create")} 
                                         className="text-indigo-100 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block"
                                     >
-                                        Post Service Request
+                                        Post Job
                                     </Link>
                                 </li>
                                 <li>

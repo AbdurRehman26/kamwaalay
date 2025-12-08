@@ -36,7 +36,10 @@ class HomeController extends Controller
                 $join->on('users.id', '=', 'profiles.profileable_id')
                      ->where('profiles.profileable_type', '=', 'App\Models\User');
             })
-            ->with(['roles', 'profile'])
+            ->with(['roles', 'profile', 'serviceListings' => function ($query) {
+                $query->where('service_listings.is_active', true)
+                      ->where('service_listings.status', 'active');
+            }])
             ->orderBy('profiles.rating', 'desc')
             ->select('users.*')
             ->take(6)
