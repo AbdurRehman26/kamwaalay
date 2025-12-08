@@ -180,7 +180,7 @@ export default function Login() {
                         </div>
                     )}
 
-                    <form className="bg-white dark:bg-gray-800 mb-10 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 relative z-20 mt-16 space-y-2" onSubmit={submit}>
+                    <form className="bg-white dark:bg-gray-800 mb-24 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 relative z-20 mt-5 space-y-2" onSubmit={submit}>
                         {/* Authenticate Method Selection */}
                         <div>
                             <InputLabel value="Authenticate with" className="text-gray-700 dark:text-gray-300 font-bold mb-2 text-sm uppercase tracking-wide" />
