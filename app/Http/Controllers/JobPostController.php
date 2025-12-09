@@ -53,7 +53,7 @@ class JobPostController extends Controller
     #[OA\Post(
         path: "/api/job-posts",
         summary: "Create job post",
-        description: "Create a new job post. Only users and businesses can create posts, not helpers.",
+        description: "Create a new job post. Only users and businesses can create posts, not helpers. The city field is automatically set to 'Karachi'.",
         tags: ["JobPosts"],
         security: [["sanctum" => []]],
         requestBody: new OA\RequestBody(
@@ -82,7 +82,22 @@ class JobPostController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "message", type: "string", example: "Job post submitted successfully!"),
-                        new OA\Property(property: "job_post", type: "object"),
+                        new OA\Property(
+                            property: "job_post",
+                            type: "object",
+                            description: "JobPostResource with user and assignedUser relations loaded",
+                            properties: [
+                                new OA\Property(property: "id", type: "integer"),
+                                new OA\Property(property: "user_id", type: "integer"),
+                                new OA\Property(property: "service_type", type: "string"),
+                                new OA\Property(property: "work_type", type: "string"),
+                                new OA\Property(property: "city", type: "string", example: "Karachi"),
+                                new OA\Property(property: "area", type: "string"),
+                                new OA\Property(property: "status", type: "string", example: "pending"),
+                                new OA\Property(property: "user", type: "object", nullable: true),
+                                new OA\Property(property: "assigned_user", type: "object", nullable: true),
+                            ]
+                        ),
                     ]
                 )
             ),
@@ -140,7 +155,24 @@ class JobPostController extends Controller
                 description: "Job post details",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "job_post", type: "object", description: "Job post object with user, assignedUser, review, and jobApplications"),
+                        new OA\Property(
+                            property: "job_post",
+                            type: "object",
+                            description: "JobPostResource with user, assignedUser, review, and jobApplications relations loaded",
+                            properties: [
+                                new OA\Property(property: "id", type: "integer"),
+                                new OA\Property(property: "user_id", type: "integer"),
+                                new OA\Property(property: "service_type", type: "string"),
+                                new OA\Property(property: "work_type", type: "string"),
+                                new OA\Property(property: "city", type: "string"),
+                                new OA\Property(property: "area", type: "string"),
+                                new OA\Property(property: "status", type: "string"),
+                                new OA\Property(property: "user", type: "object", nullable: true),
+                                new OA\Property(property: "assigned_user", type: "object", nullable: true),
+                                new OA\Property(property: "review", type: "object", nullable: true),
+                                new OA\Property(property: "job_applications", type: "array", items: new OA\Items(type: "object"), nullable: true),
+                            ]
+                        ),
                     ]
                 )
             ),
@@ -158,7 +190,7 @@ class JobPostController extends Controller
     }
 
     #[OA\Get(
-        path: "/api/job-posts",
+        path: "/api/my-job-posts",
         summary: "List user's job posts",
         description: "Get paginated list of job posts created by the authenticated user",
         tags: ["JobPosts"],
@@ -169,7 +201,18 @@ class JobPostController extends Controller
                 description: "List of user's job posts",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "job_posts", type: "object", description: "Paginated list of job posts"),
+                        new OA\Property(
+                            property: "job_posts",
+                            type: "object",
+                            description: "Paginated list of job posts",
+                            properties: [
+                                new OA\Property(property: "data", type: "array", items: new OA\Items(type: "object")),
+                                new OA\Property(property: "current_page", type: "integer"),
+                                new OA\Property(property: "per_page", type: "integer"),
+                                new OA\Property(property: "total", type: "integer"),
+                                new OA\Property(property: "last_page", type: "integer"),
+                            ]
+                        ),
                     ]
                 )
             ),
@@ -189,15 +232,15 @@ class JobPostController extends Controller
     }
 
     #[OA\Get(
-        path: "/api/service-requests",
+        path: "/api/bookings/browse",
         summary: "Browse available job posts",
-        description: "Browse all available pending job posts (for helpers/businesses to apply)",
+        description: "Browse all available pending job posts (public access). Shows only pending posts that haven't been assigned yet. If user is authenticated and is a helper/business, excludes job posts they already applied to.",
         tags: ["JobPosts"],
         parameters: [
             new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
-            new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer")),
-            new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string")),
-            new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer"), description: "Location ID to filter by city and area"),
+            new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "City name to filter by"),
+            new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Area name to filter by (partial match)"),
             new OA\Parameter(name: "work_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["full_time", "part_time"])),
         ],
         responses: [
@@ -206,8 +249,31 @@ class JobPostController extends Controller
                 description: "List of available job posts",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "job_posts", type: "object", description: "Paginated list of pending job posts"),
-                        new OA\Property(property: "filters", type: "object", description: "Applied filters"),
+                        new OA\Property(
+                            property: "job_posts",
+                            type: "object",
+                            description: "Paginated list of pending job posts",
+                            properties: [
+                                new OA\Property(property: "data", type: "array", items: new OA\Items(type: "object")),
+                                new OA\Property(property: "current_page", type: "integer"),
+                                new OA\Property(property: "per_page", type: "integer"),
+                                new OA\Property(property: "total", type: "integer"),
+                                new OA\Property(property: "last_page", type: "integer"),
+                            ]
+                        ),
+                        new OA\Property(
+                            property: "filters",
+                            type: "object",
+                            description: "Applied filters",
+                            properties: [
+                                new OA\Property(property: "service_type", type: "string", nullable: true),
+                                new OA\Property(property: "location_id", type: "integer", nullable: true),
+                                new OA\Property(property: "city_name", type: "string", nullable: true),
+                                new OA\Property(property: "area", type: "string", nullable: true),
+                                new OA\Property(property: "work_type", type: "string", nullable: true),
+                                new OA\Property(property: "location_display", type: "string", nullable: true),
+                            ]
+                        ),
                     ]
                 )
             ),
@@ -278,7 +344,7 @@ class JobPostController extends Controller
     #[OA\Patch(
         path: "/api/job-posts/{jobPost}",
         summary: "Update job post",
-        description: "Update job post. Only job post owner can update.",
+        description: "Update job post. Only job post owner can update. All fields are optional (use 'sometimes' validation). If area is updated, city is automatically set to 'Karachi'.",
         tags: ["JobPosts"],
         security: [["sanctum" => []]],
         parameters: [
@@ -310,7 +376,22 @@ class JobPostController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "message", type: "string", example: "Job post updated successfully!"),
-                        new OA\Property(property: "job_post", type: "object"),
+                        new OA\Property(
+                            property: "job_post",
+                            type: "object",
+                            description: "JobPostResource with user and assignedUser relations loaded",
+                            properties: [
+                                new OA\Property(property: "id", type: "integer"),
+                                new OA\Property(property: "user_id", type: "integer"),
+                                new OA\Property(property: "service_type", type: "string"),
+                                new OA\Property(property: "work_type", type: "string"),
+                                new OA\Property(property: "city", type: "string"),
+                                new OA\Property(property: "area", type: "string"),
+                                new OA\Property(property: "status", type: "string"),
+                                new OA\Property(property: "user", type: "object", nullable: true),
+                                new OA\Property(property: "assigned_user", type: "object", nullable: true),
+                            ]
+                        ),
                     ]
                 )
             ),

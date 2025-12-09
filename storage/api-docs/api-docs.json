@@ -1327,483 +1327,6 @@
                 }
             }
         },
-        "/api/bookings/create": {
-            "get": {
-                "tags": [
-                    "Bookings"
-                ],
-                "summary": "Get booking creation form",
-                "description": "Get form data for creating a service request with optional prefill data",
-                "operationId": "bb08aefa71964d802cfc473a0f21c0ba",
-                "parameters": [
-                    {
-                        "name": "service_type",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "work_type",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "city",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "area",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Form data with prefill",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "prefill": {
-                                            "type": "object"
-                                        },
-                                        "user": {
-                                            "type": "object",
-                                            "nullable": true
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/bookings": {
-            "get": {
-                "tags": [
-                    "Bookings"
-                ],
-                "summary": "List user's bookings",
-                "description": "Get paginated list of service requests created by the authenticated user",
-                "operationId": "eb7c332e8ba161904a1c0071040f61a5",
-                "responses": {
-                    "200": {
-                        "description": "List of user's bookings",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "bookings": {
-                                            "description": "Paginated list of bookings",
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Bookings"
-                ],
-                "summary": "Create service request",
-                "description": "Create a new service request (booking). Only users and businesses can create requests, not helpers.",
-                "operationId": "e33fa5a6507581f9b1e0d710a9a130d1",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "service_type",
-                                    "work_type",
-                                    "area",
-                                    "name",
-                                    "phone",
-                                    "email"
-                                ],
-                                "properties": {
-                                    "service_type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "maid",
-                                            "cook",
-                                            "babysitter",
-                                            "caregiver",
-                                            "cleaner",
-                                            "all_rounder"
-                                        ]
-                                    },
-                                    "work_type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "full_time",
-                                            "part_time"
-                                        ]
-                                    },
-                                    "area": {
-                                        "type": "string",
-                                        "maxLength": 255
-                                    },
-                                    "start_date": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "nullable": true
-                                    },
-                                    "start_time": {
-                                        "type": "string",
-                                        "format": "time",
-                                        "example": "09:00",
-                                        "nullable": true
-                                    },
-                                    "name": {
-                                        "type": "string",
-                                        "maxLength": 255
-                                    },
-                                    "phone": {
-                                        "type": "string",
-                                        "maxLength": 20
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "maxLength": 255
-                                    },
-                                    "address": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "special_requirements": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "assigned_user_id": {
-                                        "type": "integer",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Service request created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Booking request submitted successfully!"
-                                        },
-                                        "booking": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden - Helpers cannot create service requests"
-                    },
-                    "422": {
-                        "description": "Validation error"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/bookings/{booking}": {
-            "get": {
-                "tags": [
-                    "Bookings"
-                ],
-                "summary": "Get booking details",
-                "description": "Get detailed information about a specific service request (public access)",
-                "operationId": "5b1a917e6c62a1029dd759b1587c276b",
-                "parameters": [
-                    {
-                        "name": "booking",
-                        "in": "path",
-                        "description": "Booking ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Booking details",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "booking": {
-                                            "description": "Booking object with user, assignedUser, review, and jobApplications",
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Booking not found"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Bookings"
-                ],
-                "summary": "Delete booking",
-                "description": "Delete (cancel) a service request. Only booking owner can delete.",
-                "operationId": "69e442ca715abf5036d9e4c2b22af630",
-                "parameters": [
-                    {
-                        "name": "booking",
-                        "in": "path",
-                        "description": "Booking ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Booking cancelled successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Booking cancelled successfully!"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden - Can only delete own bookings"
-                    },
-                    "404": {
-                        "description": "Booking not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "Bookings"
-                ],
-                "summary": "Update booking",
-                "description": "Update booking status and notes. Only booking owner can update.",
-                "operationId": "2fca498be1d97f0a811c75402c77a8a7",
-                "parameters": [
-                    {
-                        "name": "booking",
-                        "in": "path",
-                        "description": "Booking ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "status"
-                                ],
-                                "properties": {
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "pending",
-                                            "confirmed",
-                                            "in_progress",
-                                            "completed",
-                                            "cancelled"
-                                        ]
-                                    },
-                                    "admin_notes": {
-                                        "type": "string",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Booking updated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Booking updated successfully!"
-                                        },
-                                        "booking": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden - Can only update own bookings"
-                    },
-                    "422": {
-                        "description": "Validation error"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/service-requests": {
-            "get": {
-                "tags": [
-                    "Bookings"
-                ],
-                "summary": "Browse available service requests",
-                "description": "Browse all available pending service requests (for helpers/businesses to apply)",
-                "operationId": "9119960daacddcee5d083de59450edd9",
-                "parameters": [
-                    {
-                        "name": "service_type",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "maid",
-                                "cook",
-                                "babysitter",
-                                "caregiver",
-                                "cleaner",
-                                "all_rounder"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "location_id",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "city_name",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "area",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "work_type",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "full_time",
-                                "part_time"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of available service requests",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "bookings": {
-                                            "description": "Paginated list of pending bookings",
-                                            "type": "object"
-                                        },
-                                        "filters": {
-                                            "description": "Applied filters",
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/businesses": {
             "get": {
                 "tags": [
@@ -2001,10 +1524,9 @@
                             "schema": {
                                 "required": [
                                     "name",
-                                    "phone",
                                     "service_types",
-                                    "experience_years",
                                     "locations",
+                                    "experience_years",
                                     "availability"
                                 ],
                                 "properties": {
@@ -2012,16 +1534,10 @@
                                         "type": "string",
                                         "maxLength": 255
                                     },
-                                    "email": {
-                                        "description": "Optional. If not provided, a unique email will be auto-generated.",
-                                        "type": "string",
-                                        "format": "email",
-                                        "maxLength": 255,
-                                        "nullable": true
-                                    },
                                     "phone": {
                                         "type": "string",
-                                        "maxLength": 20
+                                        "maxLength": 20,
+                                        "nullable": true
                                     },
                                     "photo": {
                                         "type": "string",
@@ -2029,7 +1545,6 @@
                                         "nullable": true
                                     },
                                     "service_types": {
-                                        "description": "Array of service types",
                                         "type": "array",
                                         "items": {
                                             "type": "string",
@@ -2044,7 +1559,6 @@
                                         }
                                     },
                                     "locations": {
-                                        "description": "Array of locations",
                                         "type": "array",
                                         "items": {
                                             "properties": {
@@ -2076,18 +1590,6 @@
                                     },
                                     "bio": {
                                         "type": "string",
-                                        "nullable": true
-                                    },
-                                    "password": {
-                                        "description": "Optional. If not provided, a random password will be auto-generated.",
-                                        "type": "string",
-                                        "format": "password",
-                                        "minLength": 8,
-                                        "nullable": true
-                                    },
-                                    "password_confirmation": {
-                                        "type": "string",
-                                        "format": "password",
                                         "nullable": true
                                     }
                                 },
@@ -2866,14 +2368,14 @@
                 }
             }
         },
-        "/api/job-applications": {
+        "/api/job-posts": {
             "get": {
                 "tags": [
                     "Job Applications"
                 ],
                 "summary": "Browse available service requests",
                 "description": "Browse available service requests for helpers/businesses to apply. Requires completed onboarding.",
-                "operationId": "e44e3d0e9819bc18b9f735f62e86685e",
+                "operationId": "e294577b13f1f0968b3c0ad7227b462d",
                 "parameters": [
                     {
                         "name": "service_type",
@@ -2942,6 +2444,158 @@
                     },
                     "422": {
                         "description": "Onboarding not completed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "JobPosts"
+                ],
+                "summary": "Create job post",
+                "description": "Create a new job post. Only users and businesses can create posts, not helpers. The city field is automatically set to 'Karachi'.",
+                "operationId": "749c7cfdd38a63749cd1dee61502f709",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "service_type",
+                                    "work_type",
+                                    "area",
+                                    "name",
+                                    "phone",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "service_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "maid",
+                                            "cook",
+                                            "babysitter",
+                                            "caregiver",
+                                            "cleaner",
+                                            "all_rounder"
+                                        ]
+                                    },
+                                    "work_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "full_time",
+                                            "part_time"
+                                        ]
+                                    },
+                                    "area": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "09:00",
+                                        "nullable": true
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "maxLength": 20
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "special_requirements": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "assigned_user_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Job post created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job post submitted successfully!"
+                                        },
+                                        "job_post": {
+                                            "description": "JobPostResource with user and assignedUser relations loaded",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "user_id": {
+                                                    "type": "integer"
+                                                },
+                                                "service_type": {
+                                                    "type": "string"
+                                                },
+                                                "work_type": {
+                                                    "type": "string"
+                                                },
+                                                "city": {
+                                                    "type": "string",
+                                                    "example": "Karachi"
+                                                },
+                                                "area": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                },
+                                                "user": {
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "assigned_user": {
+                                                    "type": "object",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Helpers cannot create job posts"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [
@@ -3386,6 +3040,558 @@
                         "sanctum": []
                     }
                 ]
+            }
+        },
+        "/api/job-posts/create": {
+            "get": {
+                "tags": [
+                    "JobPosts"
+                ],
+                "summary": "Get job post creation form",
+                "description": "Get form data for creating a job post with optional prefill data",
+                "operationId": "2f562a068245939026085adf03282f1f",
+                "parameters": [
+                    {
+                        "name": "service_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "work_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "area",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Form data with prefill",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "prefill": {
+                                            "type": "object"
+                                        },
+                                        "user": {
+                                            "type": "object",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/job-posts/{jobPost}": {
+            "get": {
+                "tags": [
+                    "JobPosts"
+                ],
+                "summary": "Get job post details",
+                "description": "Get detailed information about a specific job post (public access)",
+                "operationId": "5330be1227186caf4b001bb2f221915f",
+                "parameters": [
+                    {
+                        "name": "jobPost",
+                        "in": "path",
+                        "description": "Job Post ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job post details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "job_post": {
+                                            "description": "JobPostResource with user, assignedUser, review, and jobApplications relations loaded",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "user_id": {
+                                                    "type": "integer"
+                                                },
+                                                "service_type": {
+                                                    "type": "string"
+                                                },
+                                                "work_type": {
+                                                    "type": "string"
+                                                },
+                                                "city": {
+                                                    "type": "string"
+                                                },
+                                                "area": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "user": {
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "assigned_user": {
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "review": {
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "job_applications": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    },
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Job post not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "JobPosts"
+                ],
+                "summary": "Delete job post",
+                "description": "Delete (cancel) a job post. Only job post owner can delete.",
+                "operationId": "e4c392c2fd183e8bc01302b995391e06",
+                "parameters": [
+                    {
+                        "name": "jobPost",
+                        "in": "path",
+                        "description": "Job Post ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job post cancelled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job post cancelled successfully!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Can only delete own job posts"
+                    },
+                    "404": {
+                        "description": "Job post not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "JobPosts"
+                ],
+                "summary": "Update job post",
+                "description": "Update job post. Only job post owner can update. All fields are optional (use 'sometimes' validation). If area is updated, city is automatically set to 'Karachi'.",
+                "operationId": "6e60a8f60872cdda7484b90f9bd00747",
+                "parameters": [
+                    {
+                        "name": "jobPost",
+                        "in": "path",
+                        "description": "Job Post ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "service_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "maid",
+                                            "cook",
+                                            "babysitter",
+                                            "caregiver",
+                                            "cleaner",
+                                            "all_rounder"
+                                        ]
+                                    },
+                                    "work_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "full_time",
+                                            "part_time"
+                                        ]
+                                    },
+                                    "area": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "nullable": true
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "maxLength": 20
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "special_requirements": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "confirmed",
+                                            "in_progress",
+                                            "completed",
+                                            "cancelled"
+                                        ]
+                                    },
+                                    "admin_notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Job post updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job post updated successfully!"
+                                        },
+                                        "job_post": {
+                                            "description": "JobPostResource with user and assignedUser relations loaded",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "user_id": {
+                                                    "type": "integer"
+                                                },
+                                                "service_type": {
+                                                    "type": "string"
+                                                },
+                                                "work_type": {
+                                                    "type": "string"
+                                                },
+                                                "city": {
+                                                    "type": "string"
+                                                },
+                                                "area": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "user": {
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "assigned_user": {
+                                                    "type": "object",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Can only update own job posts"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/my-job-posts": {
+            "get": {
+                "tags": [
+                    "JobPosts"
+                ],
+                "summary": "List user's job posts",
+                "description": "Get paginated list of job posts created by the authenticated user",
+                "operationId": "fa846bc04df582a73ebd00bf75b2dbd4",
+                "responses": {
+                    "200": {
+                        "description": "List of user's job posts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "job_posts": {
+                                            "description": "Paginated list of job posts",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/bookings/browse": {
+            "get": {
+                "tags": [
+                    "JobPosts"
+                ],
+                "summary": "Browse available job posts",
+                "description": "Browse all available pending job posts (public access). Shows only pending posts that haven't been assigned yet. If user is authenticated and is a helper/business, excludes job posts they already applied to.",
+                "operationId": "ba5c4f4528269686e482bf236a91d5d4",
+                "parameters": [
+                    {
+                        "name": "service_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "maid",
+                                "cook",
+                                "babysitter",
+                                "caregiver",
+                                "cleaner",
+                                "all_rounder"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "location_id",
+                        "in": "query",
+                        "description": "Location ID to filter by city and area",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "city_name",
+                        "in": "query",
+                        "description": "City name to filter by",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "area",
+                        "in": "query",
+                        "description": "Area name to filter by (partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "work_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "full_time",
+                                "part_time"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of available job posts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "job_posts": {
+                                            "description": "Paginated list of pending job posts",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "filters": {
+                                            "description": "Applied filters",
+                                            "properties": {
+                                                "service_type": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "location_id": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "city_name": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "area": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "work_type": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "location_display": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/locale/{locale}": {
@@ -6472,10 +6678,6 @@
             "description": "OTP verification endpoints for registration and login"
         },
         {
-            "name": "Bookings",
-            "description": "Service request (booking) management endpoints"
-        },
-        {
             "name": "Business",
             "description": "Business management endpoints"
         },
@@ -6490,6 +6692,10 @@
         {
             "name": "Job Applications",
             "description": "Job application management endpoints"
+        },
+        {
+            "name": "JobPosts",
+            "description": "Job post management endpoints"
         },
         {
             "name": "Language",
