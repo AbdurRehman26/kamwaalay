@@ -64,7 +64,7 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         $this->ensureProfileLoaded();
-        
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -83,9 +83,9 @@ class UserResource extends JsonResource
             'service_type' => $this->when($this->profile, $this->service_type),
             'skills' => $this->when($this->profile, $this->skills),
             'experience_years' => $this->when($this->profile, $this->experience_years),
-            'age' => $this->when($this->profile, $this->age),
-            'gender' => $this->when($this->profile, $this->gender),
-            'religion' => $this->when($this->profile, $this->religion),
+            'age' => $this->when($this->profile, $this->profile?->age),
+            'gender' => $this->when($this->profile, $this->profile?->gender),
+            'religion' => $this->when($this->profile, $this->profile?->religion),
             'city' => $this->when($this->profile, $this->city),
             'area' => $this->when($this->profile, $this->area),
             'availability' => $this->when($this->profile, $this->availability),

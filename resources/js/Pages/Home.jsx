@@ -379,7 +379,7 @@ export default function Home() {
                                         to={route("helpers.show", helper.id)}
                                         className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
                                     >
-                                        <div className="h-64 relative bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                                        <div className="h-48 relative bg-gray-100 dark:bg-gray-700 overflow-hidden">
                                             {helper.photo ? (
                                                 <img
                                                     src={`/storage/${helper.photo}`}
@@ -448,6 +448,86 @@ export default function Home() {
                                                     <span>📍</span> Location not specified
                                                 </p>
                                             )}
+
+                                            {/* Helper Details Grid */}
+                                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                                {/* Left Column: Personal Info */}
+                                                <div className="space-y-2">
+                                                    {/* Age */}
+                                                    {helper.age && (
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            <span className="text-gray-500 dark:text-gray-400 w-5 text-center">🎂</span>
+                                                            <span className="text-gray-700 dark:text-gray-300 text-xs">{helper.age} years</span>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Gender */}
+                                                    {helper.gender && (
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            <span className="text-gray-500 dark:text-gray-400 w-5 text-center">👤</span>
+                                                            <span className="text-gray-700 dark:text-gray-300 capitalize text-xs">{helper.gender}</span>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Religion */}
+                                                    {helper.religion && (
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            <span className="text-gray-500 dark:text-gray-400 w-5 text-center">🕌</span>
+                                                            <span className="text-gray-700 dark:text-gray-300 capitalize text-xs">
+                                                                {helper.religion.replace(/_/g, " ")}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Right Column: Capabilities */}
+                                                <div className="space-y-3">
+                                                    {/* Languages */}
+                                                    {helper.languages && helper.languages.length > 0 && (
+                                                        <div>
+                                                            <div className="flex items-center gap-1 mb-1.5">
+                                                                <span className="text-gray-500 dark:text-gray-400 text-xs">💬 Languages</span>
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {helper.languages.slice(0, 2).map((lang, idx) => (
+                                                                    <span
+                                                                        key={idx}
+                                                                        className="text-[10px] text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-1.5 py-0.5 rounded border border-gray-100 dark:border-gray-600"
+                                                                    >
+                                                                        {lang.name || lang}
+                                                                    </span>
+                                                                ))}
+                                                                {helper.languages.length > 2 && (
+                                                                    <span className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">+{helper.languages.length - 2}</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Skills */}
+                                                    {helper.skills && (
+                                                        <div>
+                                                            <div className="flex items-center gap-1 mb-1.5">
+                                                                <span className="text-gray-500 dark:text-gray-400 text-xs">⚡ Skills</span>
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {helper.skills.split(",").slice(0, 2).map((skill, idx) => (
+                                                                    <span
+                                                                        key={idx}
+                                                                        className="text-[10px] text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded border border-indigo-100 dark:border-indigo-800"
+                                                                    >
+                                                                        {skill.trim()}
+                                                                    </span>
+                                                                ))}
+                                                                {helper.skills.split(",").length > 2 && (
+                                                                    <span className="text-[10px] text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">+{helper.skills.split(",").length - 2}</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
                                             {helper.phone && (
                                                 <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
                                                     <div className="flex items-center justify-center gap-2">

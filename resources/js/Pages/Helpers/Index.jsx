@@ -653,7 +653,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         to={profileRoute}
                                         className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
                                     >
-                                        <div className="h-64 relative bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                                        <div className="h-48 relative bg-gray-100 dark:bg-gray-700 overflow-hidden">
                                             {isBusiness ? (
                                                 <div className="w-full h-full flex items-center justify-center bg-indigo-50 dark:bg-indigo-900/20">
                                                     <span className="text-6xl text-indigo-300 dark:text-indigo-600">🏢</span>
@@ -742,42 +742,83 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 </p>
                                             )}
 
-                                            {/* Gender, Religion, Languages */}
-                                            <div className="space-y-3 mb-6">
-                                                {/* Gender */}
-                                                {helper.gender && (
-                                                    <div className="flex items-center gap-2 text-sm">
-                                                        <span className="text-gray-500 dark:text-gray-400">👤</span>
-                                                        <span className="text-gray-700 dark:text-gray-300 capitalize">{helper.gender}</span>
-                                                    </div>
-                                                )}
-
-                                                {/* Religion */}
-                                                {helper.religion && (
-                                                    <div className="flex items-center gap-2 text-sm">
-                                                        <span className="text-gray-500 dark:text-gray-400">🕌</span>
-                                                        <span className="text-gray-700 dark:text-gray-300 capitalize">
-                                                            {helper.religion.replace(/_/g, " ")}
-                                                        </span>
-                                                    </div>
-                                                )}
-
-                                                {/* Languages */}
-                                                {helper.languages && helper.languages.length > 0 && (
-                                                    <div className="flex items-start gap-2 text-sm">
-                                                        <span className="text-gray-500 dark:text-gray-400 mt-0.5">💬</span>
-                                                        <div className="flex flex-wrap gap-1.5 flex-1">
-                                                            {helper.languages.map((lang, idx) => (
-                                                                <span
-                                                                    key={idx}
-                                                                    className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
-                                                                >
-                                                                    {lang.name || lang}
-                                                                </span>
-                                                            ))}
+                                            {/* Helper Details Grid */}
+                                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                                {/* Left Column: Personal Info */}
+                                                <div className="space-y-2">
+                                                    {/* Age */}
+                                                    {helper.age && (
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            <span className="text-gray-500 dark:text-gray-400 w-5 text-center">🎂</span>
+                                                            <span className="text-gray-700 dark:text-gray-300 text-xs">{helper.age} years</span>
                                                         </div>
-                                                    </div>
-                                                )}
+                                                    )}
+
+                                                    {/* Gender */}
+                                                    {helper.gender && (
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            <span className="text-gray-500 dark:text-gray-400 w-5 text-center">👤</span>
+                                                            <span className="text-gray-700 dark:text-gray-300 capitalize text-xs">{helper.gender}</span>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Religion */}
+                                                    {helper.religion && (
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            <span className="text-gray-500 dark:text-gray-400 w-5 text-center">🕌</span>
+                                                            <span className="text-gray-700 dark:text-gray-300 capitalize text-xs">
+                                                                {helper.religion.replace(/_/g, " ")}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Right Column: Capabilities */}
+                                                <div className="space-y-3">
+                                                    {/* Languages */}
+                                                    {helper.languages && helper.languages.length > 0 && (
+                                                        <div>
+                                                            <div className="flex items-center gap-1 mb-1.5">
+                                                                <span className="text-gray-500 dark:text-gray-400 text-xs">💬 Languages</span>
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {helper.languages.slice(0, 2).map((lang, idx) => (
+                                                                    <span
+                                                                        key={idx}
+                                                                        className="text-[10px] text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-1.5 py-0.5 rounded border border-gray-100 dark:border-gray-600"
+                                                                    >
+                                                                        {lang.name || lang}
+                                                                    </span>
+                                                                ))}
+                                                                {helper.languages.length > 2 && (
+                                                                    <span className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">+{helper.languages.length - 2}</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Skills */}
+                                                    {helper.skills && (
+                                                        <div>
+                                                            <div className="flex items-center gap-1 mb-1.5">
+                                                                <span className="text-gray-500 dark:text-gray-400 text-xs">⚡ Skills</span>
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {helper.skills.split(",").slice(0, 2).map((skill, idx) => (
+                                                                    <span
+                                                                        key={idx}
+                                                                        className="text-[10px] text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded border border-indigo-100 dark:border-indigo-800"
+                                                                    >
+                                                                        {skill.trim()}
+                                                                    </span>
+                                                                ))}
+                                                                {helper.skills.split(",").length > 2 && (
+                                                                    <span className="text-[10px] text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">+{helper.skills.split(",").length - 2}</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             {/* Contact Options */}
@@ -869,8 +910,8 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 disabled={!link.url || link.active}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${link.active
-                                                        ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
-                                                        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
+                                                    ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
+                                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
                                                     } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                                             />
                                         ))}

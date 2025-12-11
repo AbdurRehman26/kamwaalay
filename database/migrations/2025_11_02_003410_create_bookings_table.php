@@ -23,7 +23,7 @@ return new class extends Migration
             $table->time('start_time')->nullable();
             $table->string('name');
             $table->string('phone');
-            $table->string('email');
+            $table->string('email')->nullable();
             $table->text('address')->nullable();
             $table->text('special_requirements')->nullable();
             $table->enum('status', ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'])->default('pending');
