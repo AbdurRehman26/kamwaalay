@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
@@ -18,6 +19,9 @@ class Profile extends Model
         'service_type',
         'skills',
         'experience_years',
+        'age',
+        'gender',
+        'religion',
         'city',
         'area',
         'availability',
@@ -33,6 +37,7 @@ class Profile extends Model
     {
         return [
             'experience_years' => 'integer',
+            'age' => 'integer',
             'police_verified' => 'boolean',
             'is_active' => 'boolean',
             'rating' => 'decimal:2',
@@ -57,6 +62,14 @@ class Profile extends Model
     }
 
     /**
+     * Get languages for this profile
+     */
+    public function languages(): BelongsToMany
+    {
+        return $this->belongsToMany(Language::class, 'profile_language');
+    }
+
+    /**
      * Get service type label
      */
     public function getServiceTypeLabelAttribute(): string
@@ -71,8 +84,10 @@ class Profile extends Model
             'babysitter' => 'Babysitter',
             'caregiver' => 'Caregiver',
             'cleaner' => 'Cleaner',
-            'all_rounder' => 'All Rounder',
-            default => ucfirst($this->service_type),
+            'domestic_helper' => 'Domestic Helper',
+            'driver' => 'Driver',
+            'security_guard' => 'Security Guard',
+            default => ucfirst(str_replace('_', ' ', $this->service_type)),
         };
     }
 }

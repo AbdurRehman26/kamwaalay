@@ -5,6 +5,8 @@ import axios from "axios";
 import { onboardingService } from "@/services/onboarding";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
+import { useLanguages } from "@/hooks/useLanguages";
 
 export default function OnboardingHelper() {
     const navigate = useNavigate();
@@ -33,6 +35,10 @@ export default function OnboardingHelper() {
         nic_number: "",
         experience_years: user?.experience_years || "",
         bio: user?.bio || "",
+        age: user?.age || "",
+        gender: user?.gender || "",
+        religion: user?.religion || "",
+        selectedLanguages: [],
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
@@ -48,6 +54,12 @@ export default function OnboardingHelper() {
         locationSelect: "",
     });
 
+    // Fetch service types from API
+    const { serviceTypes, loading: serviceTypesLoading } = useServiceTypes();
+    
+    // Fetch languages from API
+    const { languages } = useLanguages();
+
     // Update profile data when user loads
     useEffect(() => {
         if (user) {
@@ -55,18 +67,12 @@ export default function OnboardingHelper() {
                 ...prev,
                 experience_years: user?.experience_years || prev.experience_years,
                 bio: user?.bio || prev.bio,
+                age: user?.age || prev.age,
+                gender: user?.gender || prev.gender,
+                religion: user?.religion || prev.religion,
             }));
         }
     }, [user]);
-
-    const serviceTypes = [
-        { value: "maid", label: "Maid", icon: "🧹" },
-        { value: "cook", label: "Cook", icon: "👨‍🍳" },
-        { value: "babysitter", label: "Babysitter", icon: "👶" },
-        { value: "caregiver", label: "Caregiver", icon: "👵" },
-        { value: "cleaner", label: "Cleaner", icon: "✨" },
-        { value: "all_rounder", label: "All Rounder", icon: "🌟" },
-    ];
 
     // Fetch location suggestions for each offer
     useEffect(() => {
@@ -261,6 +267,18 @@ export default function OnboardingHelper() {
         }
         formData.append("experience_years", profileData.experience_years || "");
         formData.append("bio", profileData.bio || "");
+        if (profileData.age) {
+            formData.append("age", profileData.age);
+        }
+        if (profileData.gender) {
+            formData.append("gender", profileData.gender);
+        }
+        if (profileData.religion) {
+            formData.append("religion", profileData.religion);
+        }
+        if (profileData.selectedLanguages && profileData.selectedLanguages.length > 0) {
+            formData.append("languages", JSON.stringify(profileData.selectedLanguages));
+        }
 
         try {
             await onboardingService.completeHelper(formData);
@@ -347,6 +365,18 @@ export default function OnboardingHelper() {
         }
         formData.append("experience_years", profileData.experience_years || "");
         formData.append("bio", profileData.bio || "");
+        if (profileData.age) {
+            formData.append("age", profileData.age);
+        }
+        if (profileData.gender) {
+            formData.append("gender", profileData.gender);
+        }
+        if (profileData.religion) {
+            formData.append("religion", profileData.religion);
+        }
+        if (profileData.selectedLanguages && profileData.selectedLanguages.length > 0) {
+            formData.append("languages", JSON.stringify(profileData.selectedLanguages));
+        }
         
         // Add verification documents if provided (optional)
         if (profileData.nic_number) {
@@ -385,6 +415,7 @@ export default function OnboardingHelper() {
     // NIC File Input Component
     const NICFileInput = ({ onFileAccepted, file, error }) => {
         const fileInputRef = useRef(null);
+        const fileInputIdRef = useRef(`nic-file-${Date.now()}-${Math.random()}`);
 
         const handleFileChange = (e) => {
             const selectedFile = e.target.files?.[0];
@@ -420,31 +451,38 @@ export default function OnboardingHelper() {
         return (
             <div>
                 {file ? (
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border-2 border-gray-200 dark:border-gray-600">
                         <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                            <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                         <button
                             type="button"
                             onClick={removeFile}
-                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600"
+                            className="px-3 py-1 text-sm bg-red-500 dark:bg-red-600 text-white rounded-xl hover:bg-red-600 dark:hover:bg-red-700 transition-all duration-300"
                         >
                             Remove
                         </button>
                     </div>
                 ) : (
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={handleFileChange}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-                    />
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300">
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={handleFileChange}
+                            className="hidden"
+                            id={fileInputIdRef.current}
+                        />
+                        <label htmlFor={fileInputIdRef.current} className="cursor-pointer">
+                            <div className="text-4xl mb-2">📄</div>
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Click to upload NIC</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF, JPG, or PNG up to 5MB</p>
+                        </label>
+                    </div>
                 )}
-                <p className="mt-1 text-xs text-gray-500">PDF, JPG, or PNG up to 5MB</p>
                 {(error || fieldErrors.nicFileType || fieldErrors.nicFileSize) && (
-                    <div className="text-red-500 text-sm mt-1">{error || fieldErrors.nicFileType || fieldErrors.nicFileSize}</div>
+                    <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{error || fieldErrors.nicFileType || fieldErrors.nicFileSize}</div>
                 )}
             </div>
         );
@@ -453,6 +491,7 @@ export default function OnboardingHelper() {
     // Photo File Input Component
     const PhotoFileInput = ({ onFileAccepted, file, error }) => {
         const fileInputRef = useRef(null);
+        const fileInputIdRef = useRef(`photo-file-${Date.now()}-${Math.random()}`);
 
         const handleFileChange = (e) => {
             const selectedFile = e.target.files?.[0];
@@ -488,31 +527,38 @@ export default function OnboardingHelper() {
         return (
             <div>
                 {file ? (
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border-2 border-gray-200 dark:border-gray-600">
                         <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                            <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                         <button
                             type="button"
                             onClick={removeFile}
-                            className="px-3 py-1 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600"
+                            className="px-3 py-1 text-sm bg-red-500 dark:bg-red-600 text-white rounded-xl hover:bg-red-600 dark:hover:bg-red-700 transition-all duration-300"
                         >
                             Remove
                         </button>
                     </div>
                 ) : (
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".jpg,.jpeg,.png"
-                        onChange={handleFileChange}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-                    />
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300">
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={handleFileChange}
+                            className="hidden"
+                            id={fileInputIdRef.current}
+                        />
+                        <label htmlFor={fileInputIdRef.current} className="cursor-pointer">
+                            <div className="text-4xl mb-2">📷</div>
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Click to upload photo</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">JPG or PNG up to 2MB</p>
+                        </label>
+                    </div>
                 )}
-                <p className="mt-1 text-xs text-gray-500">JPG or PNG up to 2MB</p>
                 {(error || fieldErrors.photoFileType || fieldErrors.photoFileSize) && (
-                    <div className="text-red-500 text-sm mt-1">{error || fieldErrors.photoFileType || fieldErrors.photoFileSize}</div>
+                    <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{error || fieldErrors.photoFileType || fieldErrors.photoFileSize}</div>
                 )}
             </div>
         );
@@ -526,15 +572,28 @@ export default function OnboardingHelper() {
 
     return (
         <PublicLayout>
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
-                <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold mb-4">Complete Your Helper Profile</h1>
-                    <p className="text-xl text-white/90">Step {currentStep} of {totalSteps}: {steps[currentStep - 1].title}</p>
+            {/* Hero Section */}
+            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden">
+                {/* Abstract Background Shapes */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[100px] animate-pulse"></div>
+                    <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-purple-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
+                    <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[60%] bg-blue-500/10 rounded-full blur-[100px] animate-pulse delay-2000"></div>
+                </div>
+
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 relative z-10">
+                    <div className="max-w-3xl">
+                        <h2 className="text-indigo-300 dark:text-indigo-400 font-bold tracking-wide uppercase text-sm mb-3">Helper Onboarding</h2>
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">Complete Your Helper Profile</h1>
+                        <p className="text-xl text-indigo-100/90 dark:text-indigo-200/90 leading-relaxed">
+                            Step {currentStep} of {totalSteps}: {steps[currentStep - 1].title}
+                        </p>
+                    </div>
                 </div>
             </div>
-            
+
             {/* Stepper Indicator */}
-            <div className="container mx-auto px-4 py-8">
+            <div className="bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex items-center justify-between mb-8">
                         {steps.map((step, index) => (
@@ -544,14 +603,14 @@ export default function OnboardingHelper() {
                                         currentStep > step.number
                                             ? "bg-green-500 text-white"
                                             : currentStep === step.number
-                                            ? "bg-primary-600 text-white ring-4 ring-primary-200"
-                                            : "bg-gray-300 text-gray-600"
+                                            ? "bg-indigo-600 text-white ring-4 ring-indigo-200 dark:ring-indigo-800"
+                                            : "bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300"
                                     }`}>
                                         {currentStep > step.number ? "✓" : step.number}
                                     </div>
                                     <div className="mt-2 text-center">
                                         <p className={`text-sm font-semibold ${
-                                            currentStep >= step.number ? "text-gray-900" : "text-gray-500"
+                                            currentStep >= step.number ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400"
                                         }`}>
                                             {step.title}
                                         </p>
@@ -559,7 +618,7 @@ export default function OnboardingHelper() {
                                 </div>
                                 {index < steps.length - 1 && (
                                     <div className={`flex-1 h-1 mx-4 transition-all ${
-                                        currentStep > step.number ? "bg-green-500" : "bg-gray-300"
+                                        currentStep > step.number ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
                                     }`} />
                                 )}
                             </div>
@@ -568,19 +627,41 @@ export default function OnboardingHelper() {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-12">
+            <div className="bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto">
-                    <form onSubmit={submit} onKeyDown={handleKeyDown} className="space-y-8">
+                    <form onSubmit={submit} onKeyDown={handleKeyDown} className="space-y-6">
+                        {/* Submit Error Banner */}
+                        {errors.submit && (
+                            <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-red-600 dark:text-red-400 font-bold">⚠️</span>
+                                    <div>
+                                        {Array.isArray(errors.submit) ? (
+                                            errors.submit.map((error, idx) => (
+                                                <p key={idx} className="text-red-600 dark:text-red-400 text-sm font-medium">
+                                                    {error}
+                                                </p>
+                                            ))
+                                        ) : (
+                                            <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                                                {errors.submit}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Step 1: Service Information */}
                         {currentStep === 1 && offers.map((offer, offerIndex) => (
-                            <div key={offerIndex} className="bg-white rounded-lg shadow-md p-8 border-2 border-primary-200">
+                            <div key={offerIndex} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-2xl font-bold text-gray-900">Service Offer {offerIndex + 1}</h2>
+                                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Service Offer {offerIndex + 1}</h2>
                                     {offers.length > 1 && (
                                         <button
                                             type="button"
                                             onClick={() => removeOffer(offerIndex)}
-                                            className="text-red-600 hover:text-red-800 font-bold px-4 py-2 border border-red-300 rounded-lg hover:bg-red-50"
+                                            className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-bold px-4 py-2 border-2 border-red-300 dark:border-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
                                         >
                                             Remove Offer
                                         </button>
@@ -589,11 +670,11 @@ export default function OnboardingHelper() {
 
                                 {/* Service Types Selection */}
                                 <div className="mb-8" data-error-field={fieldErrors.serviceTypes ? "true" : undefined}>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-4">Select Service Types *</h3>
-                                    <p className="text-sm text-gray-600 mb-4">Choose the services for this offer. You can select multiple.</p>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Service Types *</h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Choose the services for this offer. You can select multiple.</p>
                                     {fieldErrors.serviceTypes && (
-                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                            <p className="text-sm text-red-600">{fieldErrors.serviceTypes}</p>
+                                        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
+                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.serviceTypes}</p>
                                         </div>
                                     )}
 
@@ -606,14 +687,14 @@ export default function OnboardingHelper() {
                                                     return (
                                                         <span
                                                             key={serviceType}
-                                                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-800 rounded-full text-sm font-semibold"
+                                                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold border-2 border-indigo-200 dark:border-indigo-700"
                                                         >
                                                             <span>{service?.icon}</span>
                                                             <span>{service?.label}</span>
                                                             <button
                                                                 type="button"
                                                                 onClick={() => removeServiceTypeFromOffer(offerIndex, serviceType)}
-                                                                className="ml-1 text-primary-600 hover:text-primary-800 font-bold"
+                                                                className="ml-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-bold"
                                                             >
                                                                 ×
                                                             </button>
@@ -632,14 +713,14 @@ export default function OnboardingHelper() {
                                                 type="button"
                                                 onClick={() => addServiceTypeToOffer(offerIndex, service.value)}
                                                 disabled={offer.selectedServiceTypes.includes(service.value)}
-                                                className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
+                                                className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
                                                     offer.selectedServiceTypes.includes(service.value)
-                                                        ? "border-primary-500 bg-primary-50 opacity-50 cursor-not-allowed"
-                                                        : "border-gray-200 hover:border-primary-300 hover:bg-primary-50 cursor-pointer"
+                                                        ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
+                                                        : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
                                                 }`}
                                             >
                                                 <div className="text-3xl mb-2">{service.icon}</div>
-                                                <div className="font-semibold text-gray-900">{service.label}</div>
+                                                <div className="font-semibold text-gray-900 dark:text-white">{service.label}</div>
                                             </button>
                                         ))}
                                     </div>
@@ -647,16 +728,16 @@ export default function OnboardingHelper() {
 
                                 {/* Locations Selection */}
                                 <div className="mb-8" data-error-field={fieldErrors.locations || fieldErrors.locationSelect ? "true" : undefined}>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-4">Select Locations *</h3>
-                                    <p className="text-sm text-gray-600 mb-4">Add locations for this offer. You can add multiple locations.</p>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Locations *</h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Add locations for this offer. You can add multiple locations.</p>
                                     {fieldErrors.locations && (
-                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                            <p className="text-sm text-red-600">{fieldErrors.locations}</p>
+                                        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
+                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.locations}</p>
                                         </div>
                                     )}
                                     {fieldErrors.locationSelect && (
-                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                            <p className="text-sm text-red-600">{fieldErrors.locationSelect}</p>
+                                        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
+                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.locationSelect}</p>
                                         </div>
                                     )}
 
@@ -667,14 +748,14 @@ export default function OnboardingHelper() {
                                                 {offer.selectedLocations.map((location) => (
                                                     <span
                                                         key={location.id}
-                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-semibold border-2 border-green-200 dark:border-green-700"
                                                     >
                                                         <span>📍</span>
                                                         <span>{location.display_text}</span>
                                                         <button
                                                             type="button"
                                                             onClick={() => removeLocationFromOffer(offerIndex, location.id)}
-                                                            className="ml-1 text-green-600 hover:text-green-800 font-bold"
+                                                            className="ml-1 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 font-bold"
                                                         >
                                                             ×
                                                         </button>
@@ -701,18 +782,18 @@ export default function OnboardingHelper() {
                                                     setShowLocationSuggestions(newShow);
                                                 }
                                             }}
-                                            className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 px-4 py-3"
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3 shadow-sm"
                                             placeholder="Search location (e.g., Karachi, Clifton or type area name)..."
                                         />
                                         {showLocationSuggestions[offerIndex] && locationSuggestions[offerIndex]?.length > 0 && (
-                                            <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                                            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-auto">
                                                 {locationSuggestions[offerIndex]
                                                     ?.filter(suggestion => suggestion.id && !offer.selectedLocations.some(loc => loc.id === suggestion.id))
                                                     .map((suggestion, idx) => (
                                                         <div
                                                             key={idx}
                                                             onClick={() => handleLocationSelect(suggestion, offerIndex)}
-                                                            className="px-4 py-2 hover:bg-primary-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                            className="px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
                                                         >
                                                             {suggestion.display_text}
                                                         </div>
@@ -725,7 +806,7 @@ export default function OnboardingHelper() {
                                 {/* Offer Details */}
                                 <div className="grid md:grid-cols-2 gap-6 mb-6">
                                     <div data-error-field={fieldErrors.workType ? "true" : undefined}>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Work Type *</label>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Work Type *</label>
                                         <select
                                             value={offer.work_type}
                                             onChange={(e) => {
@@ -734,9 +815,11 @@ export default function OnboardingHelper() {
                                                     setFieldErrors(prev => ({ ...prev, workType: "" }));
                                                 }
                                             }}
-                                            className={`w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500 ${
-                                                fieldErrors.workType ? "border-red-300" : ""
-                                            }`}
+                                            className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${
+                                                fieldErrors.workType 
+                                                    ? "border-red-300 dark:border-red-600" 
+                                                    : "border-gray-300 dark:border-gray-600"
+                                            } dark:bg-gray-700 dark:text-white`}
                                             required
                                         >
                                             <option value="">Select Type</option>
@@ -744,31 +827,31 @@ export default function OnboardingHelper() {
                                             <option value="part_time">Part Time</option>
                                         </select>
                                         {fieldErrors.workType && (
-                                            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
-                                                <p className="text-sm text-red-600">{fieldErrors.workType}</p>
+                                            <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
+                                                <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.workType}</p>
                                             </div>
                                         )}
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Monthly Rate (PKR)</label>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Monthly Rate (PKR)</label>
                                         <input
                                             type="number"
                                             step="0.01"
                                             value={offer.monthly_rate}
                                             onChange={(e) => updateOffer(offerIndex, "monthly_rate", e.target.value)}
-                                            className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                             placeholder="e.g., 15000"
                                         />
                                     </div>
 
                                     <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Description</label>
                                         <textarea
                                             value={offer.description}
                                             onChange={(e) => updateOffer(offerIndex, "description", e.target.value)}
                                             rows={4}
-                                            className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                             placeholder="Describe this service offer..."
                                         />
                                     </div>
@@ -776,11 +859,11 @@ export default function OnboardingHelper() {
 
                                 {/* Preview for this offer */}
                                 {offer.selectedServiceTypes.length > 0 && offer.selectedLocations.length > 0 && offer.work_type && (
-                                    <div className="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200">
-                                        <p className="text-sm font-semibold text-primary-900 mb-2">
+                                    <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-700">
+                                        <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-300 mb-2">
                                             This offer will create 1 service listing with:
                                         </p>
-                                        <div className="text-xs text-primary-700 space-y-1">
+                                        <div className="text-xs text-indigo-700 dark:text-indigo-400 space-y-1">
                                             <div>
                                                 <span className="font-semibold">{offer.selectedServiceTypes.length}</span> service type(s): {offer.selectedServiceTypes.map((st) => {
                                                     const service = serviceTypes.find(s => s.value === st);
@@ -798,11 +881,11 @@ export default function OnboardingHelper() {
 
                         {/* Add Another Offer Button */}
                         {currentStep === 1 && (
-                            <div className="bg-white rounded-lg shadow-md p-8">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
                                 <button
                                     type="button"
                                     onClick={addOffer}
-                                    className="w-full border-2 border-dashed border-primary-300 text-primary-600 py-4 rounded-lg hover:bg-primary-50 transition font-semibold"
+                                    className="w-full border-2 border-dashed border-indigo-300 dark:border-indigo-600 text-indigo-600 dark:text-indigo-400 py-4 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-300 font-bold"
                                 >
                                     + Add Another Service Offer
                                 </button>
@@ -811,16 +894,16 @@ export default function OnboardingHelper() {
 
                         {/* Step 2: Profile Verification Section */}
                         {currentStep === 2 && (
-                        <div className="bg-white rounded-lg shadow-md p-8 border-2 border-primary-200">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-4">Profile Verification (Optional)</h2>
-                            <p className="text-sm text-gray-600 mb-6">You can upload your documents for verification now or skip this step and do it later</p>
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Profile Verification</h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Optional: Upload your documents for verification. You can skip this step and complete it later.</p>
 
                             <div className="space-y-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        National Identity Card (NIC) <span className="text-gray-500">(Optional)</span>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
+                                        National Identity Card (NIC) <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
                                     </label>
-                                    <p className="text-xs text-gray-500 mb-2">Upload a clear photo or scan of your NIC (front and back if needed)</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload a clear photo or scan of your NIC (front and back if needed)</p>
                                     <NICFileInput
                                         onFileAccepted={(file) => {
                                             setProfileData({ ...profileData, nic: file });
@@ -830,31 +913,31 @@ export default function OnboardingHelper() {
                                         error={errors.nic}
                                     />
                                     {(fieldErrors.nicFileType || fieldErrors.nicFileSize) && (
-                                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
-                                            <p className="text-sm text-red-600">{fieldErrors.nicFileType || fieldErrors.nicFileSize}</p>
+                                        <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
+                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.nicFileType || fieldErrors.nicFileSize}</p>
                                         </div>
                                     )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        NIC Number <span className="text-gray-500">(Optional)</span>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
+                                        NIC Number <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
                                     </label>
                                     <input
                                         type="text"
                                         value={profileData.nic_number}
                                         onChange={(e) => setProfileData({ ...profileData, nic_number: e.target.value })}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                         placeholder="e.g., 42101-1234567-1"
                                     />
-                                    {errors.nic_number && <div className="text-red-500 text-sm mt-1">{errors.nic_number}</div>}
+                                    {errors.nic_number && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.nic_number}</div>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Photo (Optional)
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
+                                        Photo <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
                                     </label>
-                                    <p className="text-xs text-gray-500 mb-2">Upload your profile photo (optional)</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload your profile photo (optional)</p>
                                     <PhotoFileInput
                                         onFileAccepted={(file) => {
                                             setProfileData({ ...profileData, photo: file });
@@ -864,8 +947,8 @@ export default function OnboardingHelper() {
                                         error={errors.photo}
                                     />
                                     {(fieldErrors.photoFileType || fieldErrors.photoFileSize) && (
-                                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
-                                            <p className="text-sm text-red-600">{fieldErrors.photoFileType || fieldErrors.photoFileSize}</p>
+                                        <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
+                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.photoFileType || fieldErrors.photoFileSize}</p>
                                         </div>
                                     )}
                                 </div>
@@ -875,92 +958,204 @@ export default function OnboardingHelper() {
 
                         {/* Step 3: Helper Profile Section */}
                         {currentStep === 3 && (
-                        <div className="bg-white rounded-lg shadow-md p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-4">Your Profile</h2>
-                            <p className="text-sm text-gray-600 mb-6">Optional: Add more details about yourself</p>
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Your Profile</h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Optional: Add more details about yourself</p>
 
                             <div className="space-y-6">
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Age</label>
+                                        <input
+                                            type="number"
+                                            min="18"
+                                            max="100"
+                                            value={profileData.age}
+                                            onChange={(e) => setProfileData({ ...profileData, age: e.target.value })}
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                            placeholder="e.g., 25"
+                                        />
+                                        {errors.age && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.age}</div>}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Gender</label>
+                                        <select
+                                            value={profileData.gender}
+                                            onChange={(e) => setProfileData({ ...profileData, gender: e.target.value })}
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                        >
+                                            <option value="">Select Gender</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                        {errors.gender && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.gender}</div>}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Religion</label>
+                                        <select
+                                            value={profileData.religion}
+                                            onChange={(e) => setProfileData({ ...profileData, religion: e.target.value })}
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                        >
+                                            <option value="">Select Religion</option>
+                                            <option value="sunni_nazar_niyaz">Sunni (Nazar Niyaz)</option>
+                                            <option value="sunni_no_nazar_niyaz">Sunni (No Nazar Niyaz)</option>
+                                            <option value="shia">Shia</option>
+                                            <option value="christian">Christian</option>
+                                        </select>
+                                        {errors.religion && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.religion}</div>}
+                                    </div>
+                                </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Years of Experience</label>
                                     <input
                                         type="number"
                                         min="0"
                                         value={profileData.experience_years}
                                         onChange={(e) => setProfileData({ ...profileData, experience_years: e.target.value })}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                         placeholder="e.g., 5"
                                     />
-                                    {errors.experience_years && <div className="text-red-500 text-sm mt-1">{errors.experience_years}</div>}
+                                    {errors.experience_years && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.experience_years}</div>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Languages</label>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Select the languages you speak</p>
+                                    
+                                    {/* Selected Languages as Tags */}
+                                    {profileData.selectedLanguages.length > 0 && (
+                                        <div className="mb-4">
+                                            <div className="flex flex-wrap gap-2">
+                                                {profileData.selectedLanguages.map((languageId) => {
+                                                    const language = languages.find(l => l.id === languageId);
+                                                    return (
+                                                        <span
+                                                            key={languageId}
+                                                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold border-2 border-blue-200 dark:border-blue-700"
+                                                        >
+                                                            <span>{language?.name}</span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setProfileData({
+                                                                        ...profileData,
+                                                                        selectedLanguages: profileData.selectedLanguages.filter(id => id !== languageId)
+                                                                    });
+                                                                }}
+                                                                className="ml-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-bold"
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        </span>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Language Options */}
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                        {languages.map((language) => (
+                                            <button
+                                                key={language.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    if (!profileData.selectedLanguages.includes(language.id)) {
+                                                        setProfileData({
+                                                            ...profileData,
+                                                            selectedLanguages: [...profileData.selectedLanguages, language.id]
+                                                        });
+                                                    }
+                                                }}
+                                                disabled={profileData.selectedLanguages.includes(language.id)}
+                                                className={`p-3 rounded-xl border-2 transition-all duration-300 text-left ${
+                                                    profileData.selectedLanguages.includes(language.id)
+                                                        ? "border-blue-500 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 opacity-50 cursor-not-allowed"
+                                                        : "border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer bg-white dark:bg-gray-700"
+                                                }`}
+                                            >
+                                                <div className="font-semibold text-gray-900 dark:text-white">{language.name}</div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {errors.languages && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.languages}</div>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Bio</label>
                                     <textarea
                                         value={profileData.bio}
                                         onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                                         rows={4}
-                                        className="w-full border-gray-300 rounded-lg focus:border-primary-500 focus:ring-primary-500"
+                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                         placeholder="Tell us about yourself..."
                                     />
-                                    {errors.bio && <div className="text-red-500 text-sm mt-1">{errors.bio}</div>}
+                                    {errors.bio && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.bio}</div>}
                                 </div>
                             </div>
                         </div>
                         )}
 
-                        {/* General Error Message */}
-                        {errors.submit && (
-                            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
-                                <div className="flex items-start">
-                                    <div className="flex-shrink-0">
-                                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div className="ml-3">
-                                        <p className="text-sm font-medium text-red-800">
-                                            {Array.isArray(errors.submit) ? errors.submit[0] : errors.submit}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
                         {/* Navigation Buttons */}
-                        <div className="bg-white rounded-lg shadow-md p-8">
-                            <div className="flex justify-between gap-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                            <div className="flex gap-4">
                                 {currentStep > 1 && (
                                     <button
                                         type="button"
                                         onClick={handlePrevious}
                                         disabled={processing}
-                                        className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold disabled:opacity-50"
+                                        className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
                                     >
-                                        Previous
+                                        ← Previous
                                     </button>
                                 )}
-                                <div className="flex gap-4 ml-auto">
-                                    {currentStep === 2 && (
+                                {currentStep === 1 ? (
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {processing ? (
+                                            <span className="flex items-center justify-center gap-2">
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                Saving...
+                                            </span>
+                                        ) : (
+                                            "Save & Continue →"
+                                        )}
+                                    </button>
+                                ) : currentStep === 2 ? (
+                                    <>
                                         <button
                                             type="button"
                                             onClick={handleSkip}
                                             disabled={processing}
-                                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold disabled:opacity-50"
+                                            className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
                                         >
                                             Skip
                                         </button>
-                                    )}
-                                    {currentStep < totalSteps ? (
+                                        <button
+                                            type="submit"
+                                            className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300"
+                                        >
+                                            Continue →
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
                                         <button
                                             type="button"
-                                            onClick={handleNext}
+                                            onClick={handleSkip}
                                             disabled={processing}
-                                            className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition duration-300 font-semibold disabled:opacity-50"
+                                            className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
                                         >
-                                            {processing ? "Saving..." : currentStep === 1 ? "Save & Continue" : "Continue"}
+                                            Skip & Complete
                                         </button>
-                                    ) : (
                                         <button
                                             type="button"
                                             onClick={(e) => {
@@ -968,12 +1163,19 @@ export default function OnboardingHelper() {
                                                 submit(e);
                                             }}
                                             disabled={processing}
-                                            className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition duration-300 font-semibold disabled:opacity-50"
+                                            className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            {processing ? "Completing..." : "Complete Profile"}
+                                            {processing ? (
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                    Completing Profile...
+                                                </span>
+                                            ) : (
+                                                "Complete Profile"
+                                            )}
                                         </button>
-                                    )}
-                                </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </form>

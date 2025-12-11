@@ -21,7 +21,7 @@ class JobApplicationController extends Controller
         tags: ["Job Applications"],
         security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
+            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
             new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer")),
             new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string")),
             new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string")),
@@ -114,7 +114,7 @@ class JobApplicationController extends Controller
     #[OA\Get(
         path: "/api/bookings/{booking}/apply",
         summary: "Get job application form",
-        description: "Get booking data for creating a job application. Requires helper/business role and completed onboarding.",
+        description: "Get booking data for creating a job application. Requires helper/business role and completed onboarding. Returns job details even if user has already applied.",
         tags: ["Job Applications"],
         security: [["sanctum" => []]],
         parameters: [
@@ -126,12 +126,13 @@ class JobApplicationController extends Controller
                 description: "Booking data for application",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "booking", type: "object"),
+                        new OA\Property(property: "job_post", type: "object", description: "Job post details"),
+                        new OA\Property(property: "has_applied", type: "boolean", description: "Whether the user has already applied to this job"),
                     ]
                 )
             ),
             new OA\Response(response: 403, description: "Forbidden - Only helpers and businesses can apply"),
-            new OA\Response(response: 422, description: "Onboarding not completed or already applied"),
+            new OA\Response(response: 422, description: "Onboarding not completed"),
         ]
     )]
     /**
@@ -155,19 +156,15 @@ class JobApplicationController extends Controller
         }
 
         // Check if already applied
-        if (JobApplication::where('job_post_id', $jobPost->id)
+        $hasApplied = JobApplication::where('job_post_id', $jobPost->id)
             ->where('user_id', Auth::id())
-            ->exists()) {
-            return response()->json([
-                'message' => 'You have already applied to this job post.',
-                'errors' => ['application' => ['You have already applied to this job post.']]
-            ], 422);
-        }
+            ->exists();
 
         $jobPost->load('user.profile');
 
         return response()->json([
             'job_post' => $jobPost,
+            'has_applied' => $hasApplied,
         ]);
     }
 

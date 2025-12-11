@@ -8,6 +8,7 @@ export default function JobApplicationCreate() {
     const { bookingId } = useParams();
     const navigate = useNavigate();
     const [booking, setBooking] = useState(null);
+    const [hasApplied, setHasApplied] = useState(false);
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState({
         message: "",
@@ -22,6 +23,7 @@ export default function JobApplicationCreate() {
             jobApplicationsService.getApplicationCreate(bookingId)
                 .then((response) => {
                     setBooking(response.job_post || response.booking);
+                    setHasApplied(response.has_applied || false);
                     setLoading(false);
                 })
                 .catch((error) => {
@@ -32,9 +34,17 @@ export default function JobApplicationCreate() {
                         } else if (error.response.status === 403) {
                             setErrorMessage("You are not authorized to apply for this service request. Only helpers and businesses can apply.");
                         } else if (error.response.status === 422) {
-                            setErrorMessage(error.response.data.message || "Please complete your onboarding first.");
-                            if (error.response.data.redirect) {
-                                // Optional: Auto redirect or show button
+                            // Check if it's an onboarding issue or already applied
+                            const message = error.response.data.message || "Please complete your onboarding first.";
+                            if (message.includes("already applied")) {
+                                // If it's the old API response, try to fetch job details differently
+                                // But for now, just show the error
+                                setErrorMessage(message);
+                            } else {
+                                setErrorMessage(message);
+                                if (error.response.data.redirect) {
+                                    // Optional: Auto redirect or show button
+                                }
                             }
                         } else {
                             setErrorMessage("Failed to load job details.");
@@ -121,6 +131,19 @@ export default function JobApplicationCreate() {
                         <div className="max-w-4xl mx-auto">
                             {/* Job Details Card */}
                             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 dark:border-gray-700 relative z-20 -mt-16">
+                                {hasApplied && (
+                                    <div className="mb-6 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 dark:border-green-400 px-6 py-4 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                            <svg className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                            </svg>
+                                            <div>
+                                                <p className="text-sm font-semibold text-green-800 dark:text-green-300">You have already applied to this job</p>
+                                                <p className="text-xs text-green-700 dark:text-green-400 mt-1">You can view the job details below, but you cannot submit another application.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="flex items-center gap-3 mb-6">
                                     <span className="text-2xl">📋</span>
                                     <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Job Details</h2>
@@ -149,6 +172,7 @@ export default function JobApplicationCreate() {
                             </div>
 
                             {/* Application Form */}
+                            {!hasApplied ? (
                             <form onSubmit={submit} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
                                 <div className="flex items-center gap-3 mb-8">
                                     <span className="text-2xl">✍️</span>
@@ -223,6 +247,24 @@ export default function JobApplicationCreate() {
                                     </div>
                                 )}
                             </form>
+                            ) : (
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                                    <div className="text-center py-12">
+                                        <div className="text-6xl mb-6">✅</div>
+                                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Application Already Submitted</h2>
+                                        <p className="text-gray-600 dark:text-gray-400 mb-8">
+                                            You have already applied for this job. You can view your application status from your applications page.
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate(route("job-applications.index"))}
+                                            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 font-bold"
+                                        >
+                                            View My Applications
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

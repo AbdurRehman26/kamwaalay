@@ -68,7 +68,7 @@ class OnboardingController extends Controller
                                 type: "object",
                                 required: ["service_type", "work_type", "location_id"],
                                 properties: [
-                                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
                                     new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
                                     new OA\Property(property: "location_id", type: "integer"),
                                     new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
@@ -81,6 +81,10 @@ class OnboardingController extends Controller
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", nullable: true, minimum: 0),
                         new OA\Property(property: "bio", type: "string", nullable: true),
+                        new OA\Property(property: "age", type: "integer", nullable: true, minimum: 18, maximum: 100, description: "Age of the helper"),
+                        new OA\Property(property: "gender", type: "string", nullable: true, enum: ["male", "female", "other"], description: "Gender of the helper"),
+                        new OA\Property(property: "religion", type: "string", nullable: true, enum: ["sunni_nazar_niyaz", "sunni_no_nazar_niyaz", "shia", "christian"], description: "Religion of the helper"),
+                        new OA\Property(property: "languages", type: "array", nullable: true, description: "Array of language IDs (can be sent as JSON string in FormData)", items: new OA\Items(type: "integer")),
                     ]
                 )
             )
@@ -144,11 +148,22 @@ class OnboardingController extends Controller
         $dataToValidate = $request->all();
         $dataToValidate['services'] = $decodedServices;
         $dataToValidate['locations'] = $decodedLocations;
+        
+        // Handle languages if sent as JSON string (from FormData)
+        $languagesData = $request->input('languages');
+        $decodedLanguages = $languagesData;
+        if (is_string($languagesData)) {
+            $decoded = json_decode($languagesData, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $decodedLanguages = $decoded;
+            }
+        }
+        $dataToValidate['languages'] = $decodedLanguages;
 
         // Validate the decoded data
         $validator = Validator::make($dataToValidate, [
             'services' => 'required|array|min:1',
-            'services.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'services.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'locations' => 'required|array|min:1',
             'locations.*' => 'required|integer|exists:locations,id',
             'work_type' => 'required|in:full_time,part_time',
@@ -161,6 +176,11 @@ class OnboardingController extends Controller
             'photo' => 'nullable|image|max:2048',
             'experience_years' => 'nullable|integer|min:0',
             'bio' => 'nullable|string',
+            'age' => 'nullable|integer|min:18|max:100',
+            'gender' => 'nullable|in:male,female,other',
+            'religion' => 'nullable|in:sunni_nazar_niyaz,sunni_no_nazar_niyaz,shia,christian',
+            'languages' => 'nullable|array',
+            'languages.*' => 'required|integer|exists:languages,id',
         ]);
 
         if ($validator->fails()) {
@@ -183,11 +203,30 @@ class OnboardingController extends Controller
         if ($request->has('bio')) {
             $profileData['bio'] = $validated['bio'];
         }
+        if ($request->has('age')) {
+            $profileData['age'] = $validated['age'];
+        }
+        if ($request->has('gender')) {
+            $profileData['gender'] = $validated['gender'];
+        }
+        if ($request->has('religion')) {
+            $profileData['religion'] = $validated['religion'];
+        }
         if (!empty($profileData)) {
-            $user->profile()->updateOrCreate(
+            $profile = $user->profile()->updateOrCreate(
                 ['profileable_id' => $user->id, 'profileable_type' => 'App\Models\User'],
                 $profileData
             );
+        } else {
+            $profile = $user->profile;
+            if (!$profile) {
+                $profile = $user->profile()->create([]);
+            }
+        }
+
+        // Sync languages if provided
+        if ($request->has('languages') && is_array($validated['languages'])) {
+            $profile->languages()->sync($validated['languages']);
         }
 
         // Store NIC document (if provided)
@@ -264,17 +303,32 @@ class OnboardingController extends Controller
     #[OA\Post(
         path: "/api/onboarding/business",
         summary: "Complete business onboarding",
-        description: "Complete business onboarding by submitting business information. Requires business role.",
+        description: "Complete business onboarding by submitting services, locations, and profile information. Requires business role.",
         tags: ["Onboarding"],
         security: [["sanctum" => []]],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: "business_name", type: "string", nullable: true, maxLength: 255),
-                    new OA\Property(property: "business_address", type: "string", nullable: true, maxLength: 500),
-                    new OA\Property(property: "business_description", type: "string", nullable: true, maxLength: 2000),
-                ]
+            content: new OA\MediaType(
+                mediaType: "multipart/form-data",
+                schema: new OA\Schema(
+                    required: ["services", "locations", "work_type"],
+                    properties: [
+                        new OA\Property(property: "services", type: "array", description: "Array of service type slugs (can be sent as JSON string in FormData)", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
+                        new OA\Property(property: "locations", type: "array", description: "Array of location IDs (can be sent as JSON string in FormData)", items: new OA\Items(type: "integer")),
+                        new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
+                        new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
+                        new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
+                        new OA\Property(property: "nic", type: "string", format: "binary", nullable: true, description: "NIC document file (jpeg, jpg, png, pdf, max 5MB) - optional"),
+                        new OA\Property(property: "nic_number", type: "string", nullable: true, maxLength: 255),
+                        new OA\Property(property: "bio", type: "string", nullable: true),
+                        new OA\Property(property: "city", type: "string", nullable: true, maxLength: 255),
+                        new OA\Property(property: "area", type: "string", nullable: true, maxLength: 255),
+                        new OA\Property(property: "age", type: "integer", nullable: true, minimum: 18, maximum: 100, description: "Age"),
+                        new OA\Property(property: "gender", type: "string", nullable: true, enum: ["male", "female", "other"], description: "Gender"),
+                        new OA\Property(property: "religion", type: "string", nullable: true, enum: ["sunni_nazar_niyaz", "sunni_no_nazar_niyaz", "shia", "christian"], description: "Religion"),
+                        new OA\Property(property: "languages", type: "array", nullable: true, description: "Array of language IDs (can be sent as JSON string in FormData)", items: new OA\Items(type: "integer")),
+                    ]
+                )
             )
         ),
         responses: [
@@ -333,10 +387,21 @@ class OnboardingController extends Controller
         $dataToValidate = $request->all();
         $dataToValidate['services'] = $decodedServices;
         $dataToValidate['locations'] = $decodedLocations;
+        
+        // Handle languages if sent as JSON string (from FormData)
+        $languagesData = $request->input('languages');
+        $decodedLanguages = $languagesData;
+        if (is_string($languagesData)) {
+            $decoded = json_decode($languagesData, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $decodedLanguages = $decoded;
+            }
+        }
+        $dataToValidate['languages'] = $decodedLanguages;
 
         $validator = Validator::make($dataToValidate, [
             'services' => 'required|array|min:1',
-            'services.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'services.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'locations' => 'required|array|min:1',
             'locations.*' => 'required|integer|exists:locations,id',
             'work_type' => 'required|in:full_time,part_time',
@@ -347,6 +412,11 @@ class OnboardingController extends Controller
             'bio' => 'nullable|string',
             'city' => 'nullable|string|max:255',
             'area' => 'nullable|string|max:255',
+            'age' => 'nullable|integer|min:18|max:100',
+            'gender' => 'nullable|in:male,female,other',
+            'religion' => 'nullable|in:sunni_nazar_niyaz,sunni_no_nazar_niyaz,shia,christian',
+            'languages' => 'nullable|array',
+            'languages.*' => 'required|integer|exists:languages,id',
         ]);
 
         if ($validator->fails()) {
@@ -368,11 +438,30 @@ class OnboardingController extends Controller
         if ($request->has('area')) {
             $profileData['area'] = $validated['area'];
         }
+        if ($request->has('age')) {
+            $profileData['age'] = $validated['age'];
+        }
+        if ($request->has('gender')) {
+            $profileData['gender'] = $validated['gender'];
+        }
+        if ($request->has('religion')) {
+            $profileData['religion'] = $validated['religion'];
+        }
         if (!empty($profileData)) {
-            $user->profile()->updateOrCreate(
+            $profile = $user->profile()->updateOrCreate(
                 ['profileable_id' => $user->id, 'profileable_type' => 'App\Models\User'],
                 $profileData
             );
+        } else {
+            $profile = $user->profile;
+            if (!$profile) {
+                $profile = $user->profile()->create([]);
+            }
+        }
+
+        // Sync languages if provided
+        if ($request->has('languages') && is_array($validated['languages'])) {
+            $profile->languages()->sync($validated['languages']);
         }
 
         // Store NIC document (if provided)

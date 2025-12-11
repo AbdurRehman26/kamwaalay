@@ -4,6 +4,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import api from "@/services/api";
 import { serviceListingsService } from "@/services/serviceListings";
 import { route } from "@/utils/routes";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 
 export default function ServiceListingCreate() {
     const navigate = useNavigate();
@@ -24,14 +25,8 @@ export default function ServiceListingCreate() {
         description: "",
     });
 
-    const serviceTypes = [
-        { value: "maid", label: "Maid", icon: "🧹" },
-        { value: "cook", label: "Cook", icon: "👨‍🍳" },
-        { value: "babysitter", label: "Babysitter", icon: "👶" },
-        { value: "caregiver", label: "Caregiver", icon: "👵" },
-        { value: "cleaner", label: "Cleaner", icon: "✨" },
-        { value: "all_rounder", label: "All Rounder", icon: "🌟" },
-    ];
+    // Fetch service types from API
+    const { serviceTypes } = useServiceTypes();
 
     // Fetch location suggestions
     useEffect(() => {

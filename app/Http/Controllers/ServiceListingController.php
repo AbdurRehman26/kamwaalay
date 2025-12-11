@@ -22,7 +22,7 @@ class ServiceListingController extends Controller
         description: "Get a paginated list of active service listings. Only visible to helpers and guests.",
         tags: ["Service Listings"],
         parameters: [
-            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
+            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
             new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer")),
             new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string")),
             new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string")),
@@ -200,7 +200,7 @@ class ServiceListingController extends Controller
                             type: "object",
                             required: ["service_type", "work_type", "city", "area"],
                             properties: [
-                                new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                                new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
                                 new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
                                 new OA\Property(property: "city", type: "string", maxLength: 255),
                                 new OA\Property(property: "area", type: "string", maxLength: 255),
@@ -209,7 +209,7 @@ class ServiceListingController extends Controller
                             ]
                         )
                     ),
-                    new OA\Property(property: "service_type", type: "string", nullable: true, enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"], description: "Single listing format (backward compatibility)"),
+                    new OA\Property(property: "service_type", type: "string", nullable: true, enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"], description: "Single listing format (backward compatibility)"),
                     new OA\Property(property: "work_type", type: "string", nullable: true, enum: ["full_time", "part_time"]),
                     new OA\Property(property: "city", type: "string", nullable: true, maxLength: 255),
                     new OA\Property(property: "area", type: "string", nullable: true, maxLength: 255),
@@ -285,7 +285,7 @@ class ServiceListingController extends Controller
 
         $validator = Validator::make($dataToValidate, [
             'service_types' => 'required|array|min:1',
-            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'locations' => 'required|array|min:1',
             'locations.*' => 'required|integer|exists:locations,id',
             'work_type' => 'required|in:full_time,part_time',
@@ -480,7 +480,7 @@ class ServiceListingController extends Controller
             content: new OA\JsonContent(
                 required: ["service_types", "locations", "work_type", "status"],
                 properties: [
-                    new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
+                    new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
                     new OA\Property(property: "locations", type: "array", items: new OA\Items(
                         type: "object",
                         required: ["city", "area"],
@@ -526,7 +526,7 @@ class ServiceListingController extends Controller
 
         $validated = $request->validate([
             'service_types' => 'required|array|min:1',
-            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'locations' => 'required|array|min:1',
             'locations.*' => 'required|integer|exists:locations,id',
             'work_type' => 'required|in:full_time,part_time',

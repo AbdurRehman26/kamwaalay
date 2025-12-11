@@ -6,6 +6,7 @@ import axios from "axios";
 import { serviceListingsService } from "@/services/serviceListings";
 import { useAuth } from "@/contexts/AuthContext";
 import ChatPopup from "@/Components/ChatPopup";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 
 export default function ServiceListingsIndex() {
     const { user } = useAuth();
@@ -28,17 +29,17 @@ export default function ServiceListingsIndex() {
     // Format phone number for WhatsApp (add +92 if needed)
     const formatPhoneForWhatsApp = (phone) => {
         if (!phone) return "";
-        
+
         // Check if it starts with +92 (with or without spaces)
         const trimmed = phone.trim();
         if (trimmed.startsWith("+92") || trimmed.startsWith("+ 92")) {
             // Remove all non-digit characters, which will keep 92 at the start
             return trimmed.replace(/\D/g, "");
         }
-        
+
         // Remove all non-digit characters
         let cleaned = phone.replace(/\D/g, "");
-        
+
         // If starts with 0, replace with 92
         if (cleaned.startsWith("0")) {
             cleaned = "92" + cleaned.substring(1);
@@ -47,18 +48,15 @@ export default function ServiceListingsIndex() {
         else if (!cleaned.startsWith("92")) {
             cleaned = "92" + cleaned;
         }
-        
+
         return cleaned;
     };
 
+    // Fetch service types from API
+    const { serviceTypes: fetchedServiceTypes } = useServiceTypes();
     const serviceTypes = [
         { value: "", label: "All Services" },
-        { value: "maid", label: "Maid" },
-        { value: "cook", label: "Cook" },
-        { value: "babysitter", label: "Babysitter" },
-        { value: "caregiver", label: "Caregiver" },
-        { value: "cleaner", label: "Cleaner" },
-        { value: "all_rounder", label: "All Rounder" },
+        ...fetchedServiceTypes,
     ];
 
     // Fetch location suggestions for filter
@@ -120,10 +118,10 @@ export default function ServiceListingsIndex() {
             location_id: locationId || undefined,
             sort_by: sortBy,
         };
-        
+
         // Remove undefined values
         Object.keys(params).forEach(key => params[key] === undefined && delete params[key]);
-        
+
         setLoading(true);
         serviceListingsService.getListings(params)
             .then((data) => {
@@ -269,10 +267,10 @@ export default function ServiceListingsIndex() {
                                             <div className="flex items-center gap-4 mb-4">
                                                 <div className="flex-shrink-0">
                                                     {listing.user?.photo ? (
-                                                        <img 
-                                                            src={listing.user.photo.startsWith("http") ? listing.user.photo : `/storage/${listing.user.photo}`} 
-                                                            alt={listing.user?.name || "Helper"} 
-                                                            className="w-16 h-16 rounded-full object-cover border-2 border-primary-300 dark:border-primary-600 shadow-md" 
+                                                        <img
+                                                            src={listing.user.photo.startsWith("http") ? listing.user.photo : `/storage/${listing.user.photo}`}
+                                                            alt={listing.user?.name || "Helper"}
+                                                            className="w-16 h-16 rounded-full object-cover border-2 border-primary-300 dark:border-primary-600 shadow-md"
                                                         />
                                                     ) : (
                                                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xl shadow-md border-2 border-primary-300 dark:border-primary-600">
@@ -289,7 +287,7 @@ export default function ServiceListingsIndex() {
                                                     </p>
                                                 </div>
                                             </div>
-                                            
+
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex flex-wrap gap-2">
                                                     {listing.service_types && listing.service_types.length > 0 ? (
@@ -317,7 +315,7 @@ export default function ServiceListingsIndex() {
                                                     </span>
                                                 )}
                                             </div>
-                                            
+
                                             {/* Multiple Locations */}
                                             {listing.location_details && listing.location_details.length > 0 ? (
                                                 <div className="text-sm text-gray-600 dark:text-gray-300 mb-3 space-y-1">
@@ -341,12 +339,51 @@ export default function ServiceListingsIndex() {
                                                     📍 Location not specified
                                                 </p>
                                             )}
-                                            
+
                                             {listing.description && (
                                                 <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
                                                     {listing.description}
                                                 </p>
                                             )}
+
+                                            {/* Gender, Religion, Languages */}
+                                            <div className="space-y-2 mb-4">
+                                                {/* Gender */}
+                                                {listing.user?.gender && (
+                                                    <div className="flex items-center gap-2 text-sm">
+                                                        <span className="text-gray-500 dark:text-gray-400">👤</span>
+                                                        <span className="text-gray-700 dark:text-gray-300 capitalize">{listing.user.gender}</span>
+                                                    </div>
+                                                )}
+
+                                                {/* Religion */}
+                                                {listing.user?.religion && (
+                                                    <div className="flex items-center gap-2 text-sm">
+                                                        <span className="text-gray-500 dark:text-gray-400">🕌</span>
+                                                        <span className="text-gray-700 dark:text-gray-300 capitalize">
+                                                            {listing.user.religion.replace(/_/g, " ")}
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                {/* Languages */}
+                                                {listing.user?.languages && listing.user.languages.length > 0 && (
+                                                    <div className="flex items-start gap-2 text-sm">
+                                                        <span className="text-gray-500 dark:text-gray-400 mt-0.5">💬</span>
+                                                        <div className="flex flex-wrap gap-1.5 flex-1">
+                                                            {listing.user.languages.map((lang, idx) => (
+                                                                <span
+                                                                    key={idx}
+                                                                    className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
+                                                                >
+                                                                    {lang.name || lang}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
                                             <div className="flex items-center justify-between mb-3">
                                                 <span className="text-primary-600 dark:text-primary-400 font-semibold text-sm">View Details →</span>
                                             </div>
@@ -375,7 +412,7 @@ export default function ServiceListingsIndex() {
                                                         </svg>
                                                     </button>
                                                 )}
-                                                
+
                                                 {/* Call Icon */}
                                                 <a
                                                     href={`tel:${listing.user.phone}`}
@@ -387,7 +424,7 @@ export default function ServiceListingsIndex() {
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                                     </svg>
                                                 </a>
-                                                
+
                                                 {/* WhatsApp Icon */}
                                                 <a
                                                     href={`https://wa.me/${formatPhoneForWhatsApp(listing.user.phone)}`}
@@ -398,7 +435,7 @@ export default function ServiceListingsIndex() {
                                                     title="WhatsApp"
                                                 >
                                                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                                                     </svg>
                                                 </a>
                                             </div>
@@ -426,11 +463,10 @@ export default function ServiceListingsIndex() {
                                                 key={index}
                                                 to={link.url || "#"}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
-                                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                                    link.active
+                                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${link.active
                                                         ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg"
                                                         : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
-                                                } ${!link.url && "cursor-not-allowed opacity-50"}`}
+                                                    } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                             />
                                         ))}
                                     </div>
@@ -446,7 +482,7 @@ export default function ServiceListingsIndex() {
                     </div>
                 )}
             </div>
-            
+
             {/* Chat Popup */}
             {selectedRecipient && (
                 <ChatPopup

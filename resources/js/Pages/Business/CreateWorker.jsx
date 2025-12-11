@@ -1,9 +1,12 @@
-// Head removed
+import { useForm } from "@inertiajs/react";
+import { Link } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import PrimaryButton from "@/Components/PrimaryButton";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
+import { route } from "@/utils/routes";
 
 export default function CreateWorker() {
     const { data, setData, post, processing, errors } = useForm({
@@ -23,14 +26,8 @@ export default function CreateWorker() {
         password_confirmation: "",
     });
 
-    const serviceTypes = [
-        { value: "maid", label: "Maid" },
-        { value: "cook", label: "Cook" },
-        { value: "babysitter", label: "Babysitter" },
-        { value: "caregiver", label: "Caregiver" },
-        { value: "cleaner", label: "Cleaner" },
-        { value: "all_rounder", label: "All Rounder" },
-    ];
+    // Fetch service types from API
+    const { serviceTypes } = useServiceTypes();
 
     const submit = (e) => {
         e.preventDefault();

@@ -61,7 +61,7 @@ class JobPostController extends Controller
             content: new OA\JsonContent(
                 required: ["service_type", "work_type", "area", "name", "phone", "email"],
                 properties: [
-                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
                     new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
                     new OA\Property(property: "area", type: "string", maxLength: 255),
                     new OA\Property(property: "start_date", type: "string", format: "date", nullable: true),
@@ -114,7 +114,7 @@ class JobPostController extends Controller
         }
 
         $validated = $request->validate([
-            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'work_type' => 'required|in:full_time,part_time',
             'area' => 'required|string|max:255',
             'start_date' => 'nullable|date',
@@ -237,7 +237,7 @@ class JobPostController extends Controller
         description: "Browse all available pending job posts (public access). Shows only pending posts that haven't been assigned yet. If user is authenticated and is a helper/business, excludes job posts they already applied to.",
         tags: ["JobPosts"],
         parameters: [
-            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
+            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
             new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer"), description: "Location ID to filter by city and area"),
             new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "City name to filter by"),
             new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Area name to filter by (partial match)"),
@@ -354,7 +354,7 @@ class JobPostController extends Controller
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
                     new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
                     new OA\Property(property: "area", type: "string", maxLength: 255),
                     new OA\Property(property: "start_date", type: "string", format: "date", nullable: true),
@@ -408,7 +408,7 @@ class JobPostController extends Controller
 
         // Allow updating all job post fields if provided, otherwise just status/admin_notes
         $validated = $request->validate([
-            'service_type' => 'sometimes|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'service_type' => 'sometimes|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'work_type' => 'sometimes|in:full_time,part_time',
             'area' => 'sometimes|string|max:255',
             'start_date' => 'nullable|date',

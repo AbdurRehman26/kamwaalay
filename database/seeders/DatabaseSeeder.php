@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             KarachiLocationsSeeder::class,
             RolePermissionSeeder::class,
             UserSeeder::class,
+            LanguageSeeder::class,
+            ServiceTypeSeeder::class,
             DummyUsersSeeder::class,
             ServiceRequestsSeeder::class,
             AdditionalDataSeeder::class,

@@ -5,6 +5,7 @@ import api from "@/services/api";
 import { jobApplicationsService } from "@/services/jobApplications";
 import { route } from "@/utils/routes";
 import { useAuth } from "@/contexts/AuthContext";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 
 export default function JobApplicationsIndex() {
     const { user, isAuthenticated } = useAuth();
@@ -21,14 +22,11 @@ export default function JobApplicationsIndex() {
     const locationFilterRef = useRef(null);
     const searchTimeoutRef = useRef(null);
 
+    // Fetch service types from API
+    const { serviceTypes: fetchedServiceTypes } = useServiceTypes();
     const serviceTypes = [
         { value: "", label: "All Services" },
-        { value: "maid", label: "Maid" },
-        { value: "cook", label: "Cook" },
-        { value: "babysitter", label: "Babysitter" },
-        { value: "caregiver", label: "Caregiver" },
-        { value: "cleaner", label: "Cleaner" },
-        { value: "all_rounder", label: "All Rounder" },
+        ...fetchedServiceTypes,
     ];
 
     // Fetch location suggestions for filter
@@ -231,19 +229,8 @@ export default function JobApplicationsIndex() {
                                     };
 
                                     const handleCardClick = (e) => {
-                                        // If guest, redirect to login
-                                        if (!isAuthenticated) {
-                                            e.preventDefault();
-                                            navigate(route("login"));
-                                            return;
-                                        }
-                                        // If already applied, go to application detail
-                                        if (job.has_applied && job.application_id) {
-                                            navigate(route("job-applications.show", job.application_id));
-                                            return;
-                                        }
-                                        // Otherwise, go to apply page
-                                        navigate(route("job-applications.create", job.id));
+                                        // Navigate to job detail page
+                                        navigate(route("bookings.show", job.id));
                                     };
 
                                     return (
@@ -368,8 +355,8 @@ export default function JobApplicationsIndex() {
                                                 to={link.url || "#"}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center min-w-[40px] ${link.active
-                                                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
-                                                        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-700"
+                                                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
+                                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-700"
                                                     } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                             />
                                         ))}

@@ -33,8 +33,10 @@ class ServiceListingServiceType extends Model
             'babysitter' => 'Babysitter',
             'caregiver' => 'Caregiver',
             'cleaner' => 'Cleaner',
-            'all_rounder' => 'All Rounder',
-            default => ucfirst($this->service_type),
+            'domestic_helper' => 'Domestic Helper',
+            'driver' => 'Driver',
+            'security_guard' => 'Security Guard',
+            default => ucfirst(str_replace('_', ' ', $this->service_type)),
         };
     }
 }

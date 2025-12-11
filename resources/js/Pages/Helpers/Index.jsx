@@ -7,6 +7,7 @@ import { bookingsService } from "@/services/bookings";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import ChatPopup from "@/Components/ChatPopup";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 
 export default function HelpersIndex({ helperId: initialHelperId, filters: initialFilters }) {
     const { user } = useAuth();
@@ -67,14 +68,11 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         return cleaned;
     };
 
+    // Fetch service types from API
+    const { serviceTypes: fetchedServiceTypes } = useServiceTypes();
     const serviceTypes = [
         { value: "", label: "All Services" },
-        { value: "maid", label: "Maid" },
-        { value: "cook", label: "Cook" },
-        { value: "babysitter", label: "Babysitter" },
-        { value: "caregiver", label: "Caregiver" },
-        { value: "cleaner", label: "Cleaner" },
-        { value: "all_rounder", label: "All Rounder" },
+        ...fetchedServiceTypes,
     ];
 
     // Fetch location suggestions for booking form
@@ -628,9 +626,9 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                     return null;
                                 }
                                 const profileRoute = isBusiness ? route("businesses.show", helper.id) : route("helpers.show", helper.id);
-                                
+
                                 // Get all unique service types from service listings
-                                const allServiceTypes = helper.service_listings?.flatMap(listing => 
+                                const allServiceTypes = helper.service_listings?.flatMap(listing =>
                                     listing.service_types?.map(st => {
                                         const serviceType = typeof st === "string" ? st : st?.service_type;
                                         return serviceType?.replace(/_/g, " ") || null;
@@ -640,7 +638,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 const primaryServiceType = uniqueServiceTypes[0] || "Helper";
 
                                 // Get all unique locations from service listings
-                                const allLocations = helper.service_listings?.flatMap(listing => 
+                                const allLocations = helper.service_listings?.flatMap(listing =>
                                     listing.location_details || []
                                 ).filter(Boolean) || [];
                                 // Create unique locations based on display_text
@@ -700,8 +698,8 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 <div className="mb-4">
                                                     <div className="flex flex-wrap gap-2">
                                                         {uniqueServiceTypes.slice(0, 2).map((type, idx) => (
-                                                            <span 
-                                                                key={idx} 
+                                                            <span
+                                                                key={idx}
                                                                 className="inline-block px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-semibold uppercase tracking-wide"
                                                             >
                                                                 {type}
@@ -722,8 +720,8 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                         <span className="text-gray-500 dark:text-gray-400 mt-0.5">📍</span>
                                                         <div className="flex flex-wrap gap-1.5 flex-1">
                                                             {uniqueLocations.slice(0, 2).map((location, idx) => (
-                                                                <span 
-                                                                    key={idx} 
+                                                                <span
+                                                                    key={idx}
                                                                     className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
                                                                     title={location.area || location.display_text}
                                                                 >
@@ -743,6 +741,45 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                     <span>📍</span> Location not specified
                                                 </p>
                                             )}
+
+                                            {/* Gender, Religion, Languages */}
+                                            <div className="space-y-3 mb-6">
+                                                {/* Gender */}
+                                                {helper.gender && (
+                                                    <div className="flex items-center gap-2 text-sm">
+                                                        <span className="text-gray-500 dark:text-gray-400">👤</span>
+                                                        <span className="text-gray-700 dark:text-gray-300 capitalize">{helper.gender}</span>
+                                                    </div>
+                                                )}
+
+                                                {/* Religion */}
+                                                {helper.religion && (
+                                                    <div className="flex items-center gap-2 text-sm">
+                                                        <span className="text-gray-500 dark:text-gray-400">🕌</span>
+                                                        <span className="text-gray-700 dark:text-gray-300 capitalize">
+                                                            {helper.religion.replace(/_/g, " ")}
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                {/* Languages */}
+                                                {helper.languages && helper.languages.length > 0 && (
+                                                    <div className="flex items-start gap-2 text-sm">
+                                                        <span className="text-gray-500 dark:text-gray-400 mt-0.5">💬</span>
+                                                        <div className="flex flex-wrap gap-1.5 flex-1">
+                                                            {helper.languages.map((lang, idx) => (
+                                                                <span
+                                                                    key={idx}
+                                                                    className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
+                                                                >
+                                                                    {lang.name || lang}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
                                             {/* Contact Options */}
                                             <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
                                                 {user ? (
@@ -770,7 +807,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                                 title="WhatsApp"
                                                             >
                                                                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                                                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                                                                 </svg>
                                                             </a>
 
@@ -831,11 +868,10 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 onClick={() => handlePageChange(link.url)}
                                                 disabled={!link.url || link.active}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
-                                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                                    link.active
+                                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${link.active
                                                         ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
                                                         : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
-                                                } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                                                    } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                                             />
                                         ))}
                                     </div>

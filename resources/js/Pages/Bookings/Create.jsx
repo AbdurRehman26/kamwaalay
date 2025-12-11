@@ -5,6 +5,7 @@ import axios from "axios";
 import { bookingsService } from "@/services/bookings";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 
 export default function BookingCreate() {
     const navigate = useNavigate();
@@ -71,14 +72,8 @@ export default function BookingCreate() {
             });
     }, [user]);
 
-    const serviceTypes = [
-        { value: "maid", label: "Maid" },
-        { value: "cook", label: "Cook" },
-        { value: "babysitter", label: "Babysitter" },
-        { value: "caregiver", label: "Caregiver" },
-        { value: "cleaner", label: "Cleaner" },
-        { value: "all_rounder", label: "All Rounder" },
-    ];
+    // Fetch service types from API
+    const { serviceTypes } = useServiceTypes();
 
     // Fetch location suggestions for area
     useEffect(() => {

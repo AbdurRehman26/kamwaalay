@@ -73,6 +73,12 @@ Route::get('/job-posts', [JobApplicationController::class, 'index']);
 Route::get('/karachi-locations/search', [PageController::class, 'searchKarachiLocations']);
 Route::get('/locations/search', [PageController::class, 'searchLocations']);
 
+// Service types
+Route::get('/service-types', [PageController::class, 'serviceTypes']);
+
+// Languages
+Route::get('/languages', [PageController::class, 'languages']);
+
 // Authentication routes (public)
 Route::middleware('guest')->group(function () {
     // Registration

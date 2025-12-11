@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\City;
 use App\Models\Location;
+use App\Models\ServiceType;
+use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
@@ -312,5 +314,85 @@ class PageController extends Controller
         $results = $results->unique('display_text')->take(20)->values();
 
         return response()->json($results);
+    }
+
+    #[OA\Get(
+        path: "/api/service-types",
+        summary: "Get service types",
+        description: "Get a list of all active service types",
+        tags: ["Pages"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of service types",
+                content: new OA\JsonContent(
+                    type: "array",
+                    items: new OA\Items(
+                        type: "object",
+                        properties: [
+                            new OA\Property(property: "id", type: "integer"),
+                            new OA\Property(property: "slug", type: "string"),
+                            new OA\Property(property: "name", type: "string"),
+                            new OA\Property(property: "icon", type: "string", nullable: true),
+                            new OA\Property(property: "sort_order", type: "integer"),
+                        ]
+                    )
+                )
+            ),
+        ]
+    )]
+    /**
+     * Get all active service types
+     */
+    public function serviceTypes(): JsonResponse
+    {
+        $serviceTypes = ServiceType::active()->get([
+            'id',
+            'slug',
+            'name',
+            'icon',
+            'sort_order',
+        ]);
+
+        return response()->json($serviceTypes);
+    }
+
+    #[OA\Get(
+        path: "/api/languages",
+        summary: "Get languages",
+        description: "Get a list of all active languages",
+        tags: ["Pages"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of languages",
+                content: new OA\JsonContent(
+                    type: "array",
+                    items: new OA\Items(
+                        type: "object",
+                        properties: [
+                            new OA\Property(property: "id", type: "integer"),
+                            new OA\Property(property: "name", type: "string"),
+                            new OA\Property(property: "code", type: "string"),
+                            new OA\Property(property: "sort_order", type: "integer"),
+                        ]
+                    )
+                )
+            ),
+        ]
+    )]
+    /**
+     * Get all active languages
+     */
+    public function languages(): JsonResponse
+    {
+        $languages = Language::active()->get([
+            'id',
+            'name',
+            'code',
+            'sort_order',
+        ]);
+
+        return response()->json($languages);
     }
 }

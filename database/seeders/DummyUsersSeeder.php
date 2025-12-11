@@ -104,6 +104,9 @@ class DummyUsersSeeder extends Seeder
                     'profile' => [
                         'city' => 'Karachi',
                         'area' => 'Saddar',
+                        'age' => 32,
+                        'gender' => 'female',
+                        'religion' => 'sunni_nazar_niyaz',
                         'skills' => 'Cleaning, Laundry, Cooking basics',
                         'experience_years' => 5,
                         'bio' => 'Experienced and reliable maid with 5 years of experience. Good with cleaning and household chores.',
@@ -113,6 +116,7 @@ class DummyUsersSeeder extends Seeder
                         'rating' => 4.8,
                         'total_reviews' => 12,
                     ],
+                    'languages' => [1, 2], // English, Urdu
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'maid', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'Saddar', 'monthly_rate' => 15000, 'description' => 'Professional maid service'],
@@ -130,6 +134,9 @@ class DummyUsersSeeder extends Seeder
                     'profile' => [
                         'city' => 'Karachi',
                         'area' => 'PECHS',
+                        'age' => 45,
+                        'gender' => 'male',
+                        'religion' => 'sunni_no_nazar_niyaz',
                         'skills' => 'Pakistani cuisine, BBQ, Baking',
                         'experience_years' => 8,
                         'bio' => 'Professional cook specializing in Pakistani and continental dishes. Available for part-time cooking.',
@@ -139,6 +146,7 @@ class DummyUsersSeeder extends Seeder
                         'rating' => 4.9,
                         'total_reviews' => 25,
                     ],
+                    'languages' => [1, 2, 3], // English, Urdu, Punjabi
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'cook', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'PECHS', 'monthly_rate' => 21000, 'description' => 'Pakistani and continental cuisine'],
@@ -156,6 +164,9 @@ class DummyUsersSeeder extends Seeder
                     'profile' => [
                         'city' => 'Karachi',
                         'area' => 'DHA',
+                        'age' => 28,
+                        'gender' => 'female',
+                        'religion' => 'sunni_nazar_niyaz',
                         'skills' => 'Childcare, Homework help, First aid',
                         'experience_years' => 3,
                         'bio' => 'Caring and patient babysitter with experience in childcare. Good with kids of all ages.',
@@ -165,6 +176,7 @@ class DummyUsersSeeder extends Seeder
                         'rating' => 4.7,
                         'total_reviews' => 8,
                     ],
+                    'languages' => [1, 2], // English, Urdu
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'babysitter', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'DHA', 'monthly_rate' => 18000, 'description' => 'Full-time babysitting'],
@@ -182,6 +194,9 @@ class DummyUsersSeeder extends Seeder
                     'profile' => [
                         'city' => 'Karachi',
                         'area' => 'North Karachi',
+                        'age' => 52,
+                        'gender' => 'female',
+                        'religion' => 'shia',
                         'skills' => 'Elderly care, Medication management, Physical therapy',
                         'experience_years' => 10,
                         'bio' => 'Experienced caregiver specializing in elderly care. Trained in basic medical assistance.',
@@ -191,6 +206,7 @@ class DummyUsersSeeder extends Seeder
                         'rating' => 5.0,
                         'total_reviews' => 15,
                     ],
+                    'languages' => [1, 2, 4], // English, Urdu, Sindhi
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'North Karachi', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
@@ -208,6 +224,9 @@ class DummyUsersSeeder extends Seeder
                     'profile' => [
                         'city' => 'Karachi',
                         'area' => 'Korangi',
+                        'age' => 38,
+                        'gender' => 'male',
+                        'religion' => 'sunni_no_nazar_niyaz',
                         'skills' => 'Deep cleaning, Window cleaning, Carpet cleaning',
                         'experience_years' => 4,
                         'bio' => 'Professional cleaner with expertise in deep cleaning and maintenance.',
@@ -217,6 +236,7 @@ class DummyUsersSeeder extends Seeder
                         'rating' => 4.6,
                         'total_reviews' => 10,
                     ],
+                    'languages' => [2, 4], // Urdu, Sindhi
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'Korangi', 'monthly_rate' => 13500, 'description' => 'Deep cleaning services'],
@@ -234,6 +254,9 @@ class DummyUsersSeeder extends Seeder
                     'profile' => [
                         'city' => 'Karachi',
                         'area' => 'Bahadurabad',
+                        'age' => 35,
+                        'gender' => 'female',
+                        'religion' => 'christian',
                         'skills' => 'Cooking, Cleaning, Childcare, Errands',
                         'experience_years' => 6,
                         'bio' => 'Versatile all-rounder helper capable of handling multiple household tasks efficiently.',
@@ -243,6 +266,7 @@ class DummyUsersSeeder extends Seeder
                         'rating' => 4.8,
                         'total_reviews' => 18,
                     ],
+                    'languages' => [1, 2, 3], // English, Urdu, Punjabi
                     // Multiple service listings
                     'services' => [
                         ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'Bahadurabad', 'monthly_rate' => 19500, 'description' => 'Complete household management'],
@@ -259,6 +283,10 @@ class DummyUsersSeeder extends Seeder
 
                 $profileData = $helperData['profile'] ?? [];
                 unset($helperData['profile']);
+
+                // Extract languages
+                $languageIds = $helperData['languages'] ?? [];
+                unset($helperData['languages']);
 
                 // Remove 'role' from data array
                 $role = $helperData['role'];
@@ -277,6 +305,11 @@ class DummyUsersSeeder extends Seeder
                     ['profileable_id' => $helper->id, 'profileable_type' => User::class],
                     $profileData
                 );
+
+                // Attach languages to profile (not user)
+                if (!empty($languageIds) && $helper->profile) {
+                    $helper->profile->languages()->sync($languageIds);
+                }
 
                 // Create service listings if provided
                 if (!empty($services)) {

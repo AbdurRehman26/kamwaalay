@@ -8,6 +8,8 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
+import { useLanguages } from "@/hooks/useLanguages";
 
 export default function EditWorker() {
     const navigate = useNavigate();
@@ -26,6 +28,9 @@ export default function EditWorker() {
     const [data, setData] = useState({
         name: "",
         phone: "",
+        age: "",
+        gender: "",
+        religion: "",
         experience_years: "",
         availability: "full_time",
         bio: "",
@@ -33,15 +38,11 @@ export default function EditWorker() {
         photo: null,
         existingPhoto: null,
     });
+    const [selectedLanguages, setSelectedLanguages] = useState([]);
 
-    const serviceTypes = [
-        { value: "maid", label: "Maid", icon: "🧹" },
-        { value: "cook", label: "Cook", icon: "👨‍🍳" },
-        { value: "babysitter", label: "Babysitter", icon: "👶" },
-        { value: "caregiver", label: "Caregiver", icon: "👵" },
-        { value: "cleaner", label: "Cleaner", icon: "✨" },
-        { value: "all_rounder", label: "All Rounder", icon: "🌟" },
-    ];
+    // Fetch service types and languages from API
+    const { serviceTypes } = useServiceTypes();
+    const { languages } = useLanguages();
 
     const availabilityOptions = [
         { value: "full_time", label: "Full Time" },
@@ -59,6 +60,9 @@ export default function EditWorker() {
                         setData({
                             name: worker.name || "",
                             phone: worker.phone || "",
+                            age: worker.age || "",
+                            gender: worker.gender || "",
+                            religion: worker.religion || "",
                             experience_years: worker.experience_years || "",
                             availability: worker.availability || "full_time",
                             bio: worker.bio || "",
@@ -66,6 +70,11 @@ export default function EditWorker() {
                             photo: null,
                             existingPhoto: worker.photo || null,
                         });
+
+                        // Load languages
+                        if (worker.languages && Array.isArray(worker.languages)) {
+                            setSelectedLanguages(worker.languages.map(l => l.id));
+                        }
 
                         // Load service types from service listings
                         if (worker.service_listings && worker.service_listings.length > 0) {
@@ -251,6 +260,20 @@ export default function EditWorker() {
             formData.append(`locations[${index}][area]`, area);
         });
 
+        // Add optional worker details
+        if (data.age) {
+            formData.append("age", data.age);
+        }
+        if (data.gender) {
+            formData.append("gender", data.gender);
+        }
+        if (data.religion) {
+            formData.append("religion", data.religion);
+        }
+        if (selectedLanguages.length > 0) {
+            formData.append("languages", JSON.stringify(selectedLanguages));
+        }
+
         try {
             await businessesService.updateWorker(id, formData);
             navigate(route("business.workers.index"));
@@ -352,9 +375,9 @@ export default function EditWorker() {
                                 <InputLabel htmlFor="photo" value="Photo" />
                                 {data.existingPhoto && !data.photo && (
                                     <div className="mb-2">
-                                        <img 
-                                            src={`/storage/${data.existingPhoto}`} 
-                                            alt="Current photo" 
+                                        <img
+                                            src={`/storage/${data.existingPhoto}`}
+                                            alt="Current photo"
                                             className="w-20 h-20 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
                                         />
                                     </div>
@@ -368,7 +391,111 @@ export default function EditWorker() {
                                 />
                                 <InputError message={errors.photo} className="mt-1.5" />
                             </div>
+
+                            <div>
+                                <InputLabel htmlFor="age" value="Age" />
+                                <TextInput
+                                    id="age"
+                                    type="number"
+                                    min="18"
+                                    max="100"
+                                    className="mt-1 block w-full"
+                                    value={data.age}
+                                    onChange={(e) => setData({ ...data, age: e.target.value })}
+                                />
+                                <InputError message={errors.age} className="mt-1.5" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="gender" value="Gender" />
+                                <select
+                                    id="gender"
+                                    className="mt-1 block w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4"
+                                    value={data.gender}
+                                    onChange={(e) => setData({ ...data, gender: e.target.value })}
+                                >
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <InputError message={errors.gender} className="mt-1.5" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="religion" value="Religion" />
+                                <select
+                                    id="religion"
+                                    className="mt-1 block w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4"
+                                    value={data.religion}
+                                    onChange={(e) => setData({ ...data, religion: e.target.value })}
+                                >
+                                    <option value="">Select Religion</option>
+                                    <option value="sunni_nazar_niyaz">Sunni (Nazar Niyaz)</option>
+                                    <option value="sunni_no_nazar_niyaz">Sunni (No Nazar Niyaz)</option>
+                                    <option value="shia">Shia</option>
+                                    <option value="christian">Christian</option>
+                                </select>
+                                <InputError message={errors.religion} className="mt-1.5" />
+                            </div>
                         </div>
+                    </div>
+
+                    {/* Languages Selection */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Languages</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Select the languages this worker speaks</p>
+
+                        {/* Selected Languages as Tags */}
+                        {selectedLanguages.length > 0 && (
+                            <div className="mb-6">
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedLanguages.map((languageId) => {
+                                        const language = languages.find(l => l.id === languageId);
+                                        return (
+                                            <span
+                                                key={languageId}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold border-2 border-blue-200 dark:border-blue-700"
+                                            >
+                                                <span>{language?.name}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedLanguages(selectedLanguages.filter(id => id !== languageId));
+                                                    }}
+                                                    className="ml-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-bold"
+                                                >
+                                                    ×
+                                                </button>
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Language Options */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {languages.map((language) => (
+                                <button
+                                    key={language.id}
+                                    type="button"
+                                    onClick={() => {
+                                        if (!selectedLanguages.includes(language.id)) {
+                                            setSelectedLanguages([...selectedLanguages, language.id]);
+                                        }
+                                    }}
+                                    disabled={selectedLanguages.includes(language.id)}
+                                    className={`p-3 rounded-xl border-2 transition-all duration-300 text-left ${selectedLanguages.includes(language.id)
+                                            ? "border-blue-500 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 opacity-50 cursor-not-allowed"
+                                            : "border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer bg-white dark:bg-gray-700"
+                                        }`}
+                                >
+                                    <div className="font-semibold text-gray-900 dark:text-white">{language.name}</div>
+                                </button>
+                            ))}
+                        </div>
+                        <InputError message={errors.languages} className="mt-1.5" />
                     </div>
 
                     {/* Service Types Selection */}
@@ -411,11 +538,10 @@ export default function EditWorker() {
                                     type="button"
                                     onClick={() => addServiceType(service.value)}
                                     disabled={selectedServiceTypes.includes(service.value)}
-                                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                                        selectedServiceTypes.includes(service.value)
+                                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${selectedServiceTypes.includes(service.value)
                                             ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
                                             : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
-                                    }`}
+                                        }`}
                                 >
                                     <div className="text-3xl mb-2">{service.icon}</div>
                                     <div className="font-semibold text-gray-900 dark:text-white">{service.label}</div>

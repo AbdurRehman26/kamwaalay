@@ -298,7 +298,7 @@ class BusinessController extends Controller
                         new OA\Property(property: "name", type: "string", maxLength: 255),
                         new OA\Property(property: "phone", type: "string", maxLength: 20, nullable: true),
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
-                        new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"])),
+                        new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
                         new OA\Property(property: "locations", type: "array", items: new OA\Items(
                             type: "object",
                             properties: [
@@ -342,7 +342,7 @@ class BusinessController extends Controller
             'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|max:2048',
             'service_types' => 'required|array|min:1',
-            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'locations' => 'required|array|min:1',
             'locations.*.city' => 'required|string|max:255',
             'locations.*.area' => 'required|string|max:255',
@@ -496,7 +496,7 @@ class BusinessController extends Controller
                     required: ["service_type", "experience_years", "city", "area", "availability"],
                     properties: [
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
-                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
                         new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
                         new OA\Property(property: "city", type: "string", maxLength: 255),
@@ -586,7 +586,7 @@ class BusinessController extends Controller
             'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|max:2048',
             'service_types' => 'required|array|min:1',
-            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'locations' => 'required|array|min:1',
             'locations.*.city' => 'required|string|max:255',
             'locations.*.area' => 'required|string|max:255',

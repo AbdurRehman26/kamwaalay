@@ -11,6 +11,7 @@ import {
     isHelperOrBusiness, isHelperOrBusinessOrGuest
 } from "@/utils/permissions";
 import ChatPopup from "@/Components/ChatPopup";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 
 export default function Home() {
     const { user } = useAuth();
@@ -83,14 +84,8 @@ export default function Home() {
         };
     }, []);
 
-    const services = [
-        { name: "Maid", icon: "🧹", color: "from-indigo-500 to-purple-600" },
-        { name: "Cook", icon: "👨‍🍳", color: "from-orange-400 to-red-500" },
-        { name: "Babysitter", icon: "👶", color: "from-blue-400 to-cyan-500" },
-        { name: "Caregiver", icon: "👵", color: "from-emerald-400 to-green-500" },
-        { name: "Cleaner", icon: "✨", color: "from-teal-400 to-emerald-500" },
-        { name: "All Rounder", icon: "🌟", color: "from-amber-400 to-orange-500" },
-    ];
+    // Fetch service types from database
+    const { serviceTypes } = useServiceTypes();
 
     const steps = [
         {
@@ -303,20 +298,35 @@ export default function Home() {
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                        {services.map((service) => (
+                        {serviceTypes.slice(0, 6).map((service) => (
                             <Link
-                                key={service.name}
-                                to={route("helpers.index") + `?service_type=${service.name.toLowerCase().replace(" ", "_")}`}
+                                key={service.value}
+                                to={route("helpers.index") + `?service_type=${service.value}`}
                                 className="group relative bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center border border-gray-100 dark:border-gray-700/50 overflow-hidden"
                             >
-                                <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${service.color}`}></div>
+                                <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${service.color || "from-indigo-500 to-purple-600"}`}></div>
                                 <div className="text-6xl mb-6 transform group-hover:scale-110 transition-transform duration-300 filter drop-shadow-sm">{service.icon}</div>
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                    {service.name}
+                                    {service.label}
                                 </h3>
                             </Link>
                         ))}
                     </div>
+
+                    {/* View More Button */}
+                    {serviceTypes.length > 6 && (
+                        <div className="mt-12 text-center">
+                            <Link
+                                to={route("helpers.index")}
+                                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                            >
+                                View All Services
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -344,9 +354,9 @@ export default function Home() {
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {featuredHelpers.map((helper) => {
                                 if (!helper.id) return null;
-                                
+
                                 // Get all unique service types from service listings
-                                const allServiceTypes = helper.service_listings?.flatMap(listing => 
+                                const allServiceTypes = helper.service_listings?.flatMap(listing =>
                                     listing.service_types?.map(st => {
                                         const serviceType = typeof st === "string" ? st : st?.service_type;
                                         return serviceType?.replace(/_/g, " ") || null;
@@ -355,7 +365,7 @@ export default function Home() {
                                 const uniqueServiceTypes = [...new Set(allServiceTypes)];
 
                                 // Get all unique locations from service listings
-                                const allLocations = helper.service_listings?.flatMap(listing => 
+                                const allLocations = helper.service_listings?.flatMap(listing =>
                                     listing.location_details || []
                                 ).filter(Boolean) || [];
                                 // Create unique locations based on display_text
@@ -392,8 +402,8 @@ export default function Home() {
                                                 <div className="mb-4">
                                                     <div className="flex flex-wrap gap-2">
                                                         {uniqueServiceTypes.slice(0, 2).map((type, idx) => (
-                                                            <span 
-                                                                key={idx} 
+                                                            <span
+                                                                key={idx}
                                                                 className="inline-block px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-semibold uppercase tracking-wide"
                                                             >
                                                                 {type}
@@ -417,8 +427,8 @@ export default function Home() {
                                                         <span className="text-gray-500 dark:text-gray-400 mt-0.5">📍</span>
                                                         <div className="flex flex-wrap gap-1.5 flex-1">
                                                             {uniqueLocations.slice(0, 2).map((location, idx) => (
-                                                                <span 
-                                                                    key={idx} 
+                                                                <span
+                                                                    key={idx}
                                                                     className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
                                                                     title={location.area || location.display_text}
                                                                 >
@@ -463,7 +473,7 @@ export default function Home() {
                                                             title="WhatsApp"
                                                         >
                                                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                                                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                                                             </svg>
                                                         </a>
 

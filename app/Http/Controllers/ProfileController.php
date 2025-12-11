@@ -37,6 +37,17 @@ class ProfileController extends Controller
                                 new OA\Property(property: "email", type: "string", nullable: true, example: "user@example.com"),
                                 new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
                                 new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
+                                new OA\Property(property: "age", type: "integer", nullable: true, example: 25, description: "Age from profile"),
+                                new OA\Property(property: "gender", type: "string", nullable: true, enum: ["male", "female", "other"], example: "male", description: "Gender from profile"),
+                                new OA\Property(property: "religion", type: "string", nullable: true, enum: ["sunni_nazar_niyaz", "sunni_no_nazar_niyaz", "shia", "christian"], example: "sunni_nazar_niyaz", description: "Religion from profile"),
+                                new OA\Property(property: "languages", type: "array", nullable: true, description: "Languages from profile", items: new OA\Items(
+                                    type: "object",
+                                    properties: [
+                                        new OA\Property(property: "id", type: "integer"),
+                                        new OA\Property(property: "name", type: "string"),
+                                        new OA\Property(property: "code", type: "string"),
+                                    ]
+                                )),
                             ]
                         ),
                         new OA\Property(property: "must_verify_email", type: "boolean"),
@@ -74,7 +85,7 @@ class ProfileController extends Controller
     public function user(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => new UserResource($request->user()->load(['roles', 'profile']))
+            'user' => new UserResource($request->user()->load(['roles', 'profile.languages']))
         ]);
     }
 
@@ -84,7 +95,7 @@ class ProfileController extends Controller
     public function edit(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => new UserResource($request->user()->load(['roles', 'profile'])),
+            'user' => new UserResource($request->user()->load(['roles', 'profile.languages'])),
             'must_verify_email' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
         ]);
@@ -99,8 +110,13 @@ class ProfileController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
+                required: ["name"],
                 properties: [
                     new OA\Property(property: "name", type: "string", maxLength: 255),
+                    new OA\Property(property: "age", type: "integer", nullable: true, minimum: 18, maximum: 100, description: "Age"),
+                    new OA\Property(property: "gender", type: "string", nullable: true, enum: ["male", "female", "other"], description: "Gender"),
+                    new OA\Property(property: "religion", type: "string", nullable: true, enum: ["sunni_nazar_niyaz", "sunni_no_nazar_niyaz", "shia", "christian"], description: "Religion"),
+                    new OA\Property(property: "languages", type: "array", nullable: true, description: "Array of language IDs", items: new OA\Items(type: "integer")),
                 ]
             )
         ),
@@ -119,6 +135,17 @@ class ProfileController extends Controller
                                 new OA\Property(property: "name", type: "string", example: "John Doe"),
                                 new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
                                 new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
+                                new OA\Property(property: "age", type: "integer", nullable: true, example: 25, description: "Age from profile"),
+                                new OA\Property(property: "gender", type: "string", nullable: true, enum: ["male", "female", "other"], example: "male", description: "Gender from profile"),
+                                new OA\Property(property: "religion", type: "string", nullable: true, enum: ["sunni_nazar_niyaz", "sunni_no_nazar_niyaz", "shia", "christian"], example: "sunni_nazar_niyaz", description: "Religion from profile"),
+                                new OA\Property(property: "languages", type: "array", nullable: true, description: "Languages from profile", items: new OA\Items(
+                                    type: "object",
+                                    properties: [
+                                        new OA\Property(property: "id", type: "integer"),
+                                        new OA\Property(property: "name", type: "string"),
+                                        new OA\Property(property: "code", type: "string"),
+                                    ]
+                                )),
                             ]
                         ),
                     ]
@@ -133,7 +160,10 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): JsonResponse
     {
         $user = $request->user();
-        $user->fill($request->validated());
+        $validated = $request->validated();
+        
+        // Update user name
+        $user->fill(['name' => $validated['name']]);
 
         // Mark profile as updated for normal users (not helper/business) on first update
         if (!$user->hasRole(['helper', 'business']) && $user->profile_updated_at === null) {
@@ -142,9 +172,41 @@ class ProfileController extends Controller
 
         $user->save();
 
+        // Update or create profile with age, gender, religion
+        $profileData = [];
+        if (isset($validated['age'])) {
+            $profileData['age'] = $validated['age'];
+        }
+        if (isset($validated['gender'])) {
+            $profileData['gender'] = $validated['gender'];
+        }
+        if (isset($validated['religion'])) {
+            $profileData['religion'] = $validated['religion'];
+        }
+
+        $profile = $user->profile;
+        if (!empty($profileData)) {
+            $profile = $user->profile()->updateOrCreate(
+                ['profileable_id' => $user->id, 'profileable_type' => 'App\Models\User'],
+                $profileData
+            );
+        } else {
+            if (!$profile) {
+                $profile = $user->profile()->create([]);
+            }
+        }
+
+        // Sync languages if provided
+        if (isset($validated['languages']) && is_array($validated['languages'])) {
+            $profile->languages()->sync($validated['languages']);
+        }
+
+        // Reload user with profile and languages
+        $user->load(['roles', 'profile.languages']);
+
         return response()->json([
             'message' => 'Profile updated successfully.',
-            'user' => new UserResource($user->load('roles')),
+            'user' => new UserResource($user),
         ]);
     }
 

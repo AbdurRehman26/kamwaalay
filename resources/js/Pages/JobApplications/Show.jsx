@@ -38,15 +38,15 @@ export default function JobApplicationShow() {
     const getStatusColor = (status) => {
         switch (status) {
             case "pending":
-                return "bg-yellow-100 text-yellow-800";
+                return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
             case "accepted":
-                return "bg-green-100 text-green-800";
+                return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
             case "rejected":
-                return "bg-red-100 text-red-800";
+                return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
             case "withdrawn":
-                return "bg-gray-100 text-gray-800";
+                return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
             default:
-                return "bg-gray-100 text-gray-800";
+                return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
         }
     };
 
@@ -121,7 +121,7 @@ export default function JobApplicationShow() {
         return (
             <DashboardLayout>
                 <div className="container mx-auto px-4 py-12 text-center">
-                    <p className="text-gray-600">Loading application details...</p>
+                    <p className="text-gray-600 dark:text-gray-400">Loading application details...</p>
                 </div>
             </DashboardLayout>
         );
@@ -131,10 +131,10 @@ export default function JobApplicationShow() {
         return (
             <DashboardLayout>
                 <div className="container mx-auto px-4 py-12 text-center">
-                    <p className="text-red-600">{error || "Application not found"}</p>
+                    <p className="text-red-600 dark:text-red-400">{error || "Application not found"}</p>
                     <Link
                         to={route("job-applications.index")}
-                        className="mt-4 inline-block bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition duration-300 font-semibold"
+                        className="mt-4 inline-block bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold"
                     >
                         Back to Applications
                     </Link>
@@ -177,13 +177,13 @@ export default function JobApplicationShow() {
             <div className="container mx-auto px-4 py-12">
                 <div className="max-w-5xl mx-auto">
                     {/* Status Badge */}
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(application.status)}`}>
                                     {application.status.toUpperCase()}
                                 </span>
-                                <span className="text-gray-500 text-sm">
+                                <span className="text-gray-500 dark:text-gray-400 text-sm">
                                     Applied on {new Date(application.applied_at).toLocaleDateString("en-US", {
                                         year: "numeric",
                                         month: "long",
@@ -195,7 +195,7 @@ export default function JobApplicationShow() {
                                 <button
                                     onClick={handleWithdraw}
                                     disabled={processing}
-                                    className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition duration-300 font-semibold disabled:opacity-50"
+                                    className="bg-gray-600 dark:bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition duration-300 font-semibold disabled:opacity-50"
                                 >
                                     Withdraw Application
                                 </button>
@@ -205,11 +205,11 @@ export default function JobApplicationShow() {
 
                     <div className="grid md:grid-cols-2 gap-6 mb-6">
                         {/* Applicant/Job Owner Info */}
-                        <div className="bg-white rounded-lg shadow-md p-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                                 {isBookingOwner ? "Applicant Information" : "Job Owner Information"}
                             </h2>
-                            
+
                             <div className="flex items-center gap-4 mb-4">
                                 {displayUser?.photo ? (
                                     <img
@@ -224,19 +224,19 @@ export default function JobApplicationShow() {
                                 )}
                                 <div className="flex-1">
                                     <Link
-                                        to={displayUser?.role === "helper" 
+                                        to={displayUser?.role === "helper"
                                             ? route("helpers.show", displayUser.id)
                                             : displayUser?.role === "business"
-                                            ? route("businesses.show", displayUser.id)
-                                            : "#"
+                                                ? route("businesses.show", displayUser.id)
+                                                : "#"
                                         }
                                         className="block"
                                     >
-                                        <h3 className="text-xl font-bold text-gray-900 hover:text-primary-600 transition-colors">
+                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                                             {displayUser?.name || "N/A"}
                                         </h3>
                                     </Link>
-                                    <p className="text-gray-500 text-sm capitalize">
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm capitalize">
                                         {displayUser?.role || "User"}
                                     </p>
                                 </div>
@@ -244,13 +244,13 @@ export default function JobApplicationShow() {
 
                             {canSeeContactInfo && displayUser?.phone ? (
                                 <div className="mt-4">
-                                    <p className="text-gray-700 text-sm mb-3 font-medium">📞 {displayUser.phone}</p>
+                                    <p className="text-gray-700 dark:text-gray-300 text-sm mb-3 font-medium">📞 {displayUser.phone}</p>
                                     <div className="flex gap-2 flex-wrap">
                                         {canInitiateContact ? (
                                             <>
                                                 <a
                                                     href={`tel:${formatPhoneForCall(displayUser.phone)}`}
-                                                    className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg hover:bg-green-100 transition duration-300 font-medium text-sm"
+                                                    className="flex items-center gap-2 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-4 py-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/50 transition duration-300 font-medium text-sm"
                                                 >
                                                     <span>📞</span>
                                                     <span>Call</span>
@@ -259,7 +259,7 @@ export default function JobApplicationShow() {
                                                     href={`https://wa.me/${formatPhoneForWhatsApp(displayUser.phone)}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg hover:bg-green-100 transition duration-300 font-medium text-sm"
+                                                    className="flex items-center gap-2 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-4 py-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/50 transition duration-300 font-medium text-sm"
                                                 >
                                                     <span>💬</span>
                                                     <span>WhatsApp</span>
@@ -270,7 +270,7 @@ export default function JobApplicationShow() {
                                         {(isBookingOwner || (isApplicant && application.status === "accepted")) ? (
                                             <button
                                                 onClick={() => handleOpenChat(displayUser)}
-                                                className="flex items-center gap-2 bg-primary-50 text-primary-700 px-4 py-2 rounded-lg hover:bg-primary-100 transition duration-300 font-medium text-sm"
+                                                className="flex items-center gap-2 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 px-4 py-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/50 transition duration-300 font-medium text-sm"
                                             >
                                                 <span>💬</span>
                                                 <span>Message</span>
@@ -279,8 +279,8 @@ export default function JobApplicationShow() {
                                     </div>
                                 </div>
                             ) : isApplicant && application.status !== "accepted" ? (
-                                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                    <p className="text-yellow-800 text-sm">
+                                <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                                    <p className="text-yellow-800 dark:text-yellow-300 text-sm">
                                         <span className="font-semibold">Contact information will be available</span> once your application is accepted.
                                     </p>
                                 </div>
@@ -288,38 +288,38 @@ export default function JobApplicationShow() {
                         </div>
 
                         {/* Job Post Information */}
-                        <div className="bg-white rounded-lg shadow-md p-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">Job Posting Details</h2>
-                            
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Job Posting Details</h2>
+
                             <div className="space-y-3">
                                 <div>
-                                    <p className="text-sm text-gray-500 mb-1">Service Type</p>
-                                    <p className="text-gray-900 font-semibold capitalize">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Service Type</p>
+                                    <p className="text-gray-900 dark:text-white font-semibold capitalize">
                                         {jobPost?.service_type?.replace("_", " ") || "N/A"}
                                     </p>
                                 </div>
-                                
+
                                 <div>
-                                    <p className="text-sm text-gray-500 mb-1">Work Type</p>
-                                    <p className="text-gray-900 font-semibold capitalize">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Work Type</p>
+                                    <p className="text-gray-900 dark:text-white font-semibold capitalize">
                                         {jobPost?.work_type?.replace("_", " ") || "N/A"}
                                     </p>
                                 </div>
-                                
+
                                 <div>
-                                    <p className="text-sm text-gray-500 mb-1">Location</p>
-                                    <p className="text-gray-900 font-semibold">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Location</p>
+                                    <p className="text-gray-900 dark:text-white font-semibold">
                                         {jobPost?.city || "N/A"}{jobPost?.area ? `, ${jobPost.area}` : ""}
                                     </p>
                                     {jobPost?.address && (
-                                        <p className="text-gray-600 text-sm mt-1">{jobPost.address}</p>
+                                        <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">{jobPost.address}</p>
                                     )}
                                 </div>
 
                                 {jobPost?.start_date && (
                                     <div>
-                                        <p className="text-sm text-gray-500 mb-1">Start Date</p>
-                                        <p className="text-gray-900 font-semibold">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Start Date</p>
+                                        <p className="text-gray-900 dark:text-white font-semibold">
                                             {new Date(jobPost.start_date).toLocaleDateString("en-US", {
                                                 year: "numeric",
                                                 month: "long",
@@ -331,8 +331,8 @@ export default function JobApplicationShow() {
 
                                 {jobPost?.start_time && (
                                     <div>
-                                        <p className="text-sm text-gray-500 mb-1">Start Time</p>
-                                        <p className="text-gray-900 font-semibold">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Start Time</p>
+                                        <p className="text-gray-900 dark:text-white font-semibold">
                                             {new Date(jobPost.start_time).toLocaleTimeString("en-US", {
                                                 hour: "numeric",
                                                 minute: "2-digit",
@@ -343,10 +343,10 @@ export default function JobApplicationShow() {
                                 )}
 
                                 {jobPost && (
-                                    <div className="pt-3 border-t border-gray-200">
+                                    <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
                                         <Link
                                             to={route("bookings.show", jobPost.id)}
-                                            className="text-primary-600 hover:text-primary-700 font-semibold text-sm"
+                                            className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold text-sm"
                                         >
                                             View Full Job Details →
                                         </Link>
@@ -358,25 +358,25 @@ export default function JobApplicationShow() {
 
                     {/* Application Message */}
                     {application.message && (
-                        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">Application Message</h2>
-                            <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-primary-500">
-                                <p className="text-gray-700 whitespace-pre-wrap">{application.message}</p>
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Application Message</h2>
+                            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border-l-4 border-primary-500 dark:border-primary-400">
+                                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{application.message}</p>
                             </div>
                         </div>
                     )}
 
                     {/* Proposed Rate */}
                     {application.proposed_rate && (
-                        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">Proposed Rate</h2>
-                            <p className="text-3xl font-bold text-green-600">PKR {application.proposed_rate}/hr</p>
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Proposed Rate</h2>
+                            <p className="text-3xl font-bold text-green-600 dark:text-green-400">PKR {application.proposed_rate}/hr</p>
                         </div>
                     )}
 
                     {/* Actions */}
                     {isBookingOwner && application.status === "pending" && (
-                        <div className="bg-white rounded-lg shadow-md p-6">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                             <div className="flex gap-4">
                                 <button
                                     onClick={() => setShowAcceptModal(true)}
@@ -395,13 +395,13 @@ export default function JobApplicationShow() {
                     )}
 
                     {application.status === "accepted" && jobPost && (
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 text-center">
                             <div className="flex items-center justify-center mb-4">
                                 <svg className="w-12 h-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <p className="text-green-800 font-semibold text-xl mb-4">Application Accepted!</p>
+                            <p className="text-green-800 dark:text-green-300 font-semibold text-xl mb-4">Application Accepted!</p>
                             <Link
                                 to={route("bookings.show", jobPost.id)}
                                 className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300 font-semibold"
@@ -435,30 +435,30 @@ export default function JobApplicationShow() {
             }}>
                 <div className="p-6">
                     <div className="flex items-center mb-4">
-                        <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                            <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30">
+                            <svg className="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h2 className="ml-4 text-xl font-semibold text-gray-900">
+                        <h2 className="ml-4 text-xl font-semibold text-gray-900 dark:text-white">
                             Accept Application
                         </h2>
                     </div>
 
-                    <p className="mt-2 text-sm text-gray-600 mb-4">
-                        Are you sure you want to accept this application from <span className="font-semibold">{application?.user?.name}</span>? 
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Are you sure you want to accept this application from <span className="font-semibold">{application?.user?.name}</span>?
                         This will automatically reject all other pending applications for this job posting.
                     </p>
 
-                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                         <div className="flex items-start">
-                            <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                             </svg>
                             <div>
-                                <p className="text-sm font-semibold text-blue-900 mb-1">Information Sharing Notice</p>
-                                <p className="text-sm text-blue-800">
-                                    By accepting this application, your contact information (phone number) will be shared with <span className="font-semibold">{application?.user?.name}</span>. 
+                                <p className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-1">Information Sharing Notice</p>
+                                <p className="text-sm text-blue-800 dark:text-blue-300">
+                                    By accepting this application, your contact information (phone number) will be shared with <span className="font-semibold">{application?.user?.name}</span>.
                                     They will be able to contact you via phone, WhatsApp, or in-app messaging.
                                 </p>
                             </div>
@@ -466,8 +466,8 @@ export default function JobApplicationShow() {
                     </div>
 
                     {application?.proposed_rate && (
-                        <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                            <p className="text-sm text-gray-700 mb-1">
+                        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                            <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
                                 <span className="font-semibold">Proposed Rate:</span> PKR {application.proposed_rate}/hr
                             </p>
                         </div>
@@ -481,7 +481,7 @@ export default function JobApplicationShow() {
                                 }
                             }}
                             disabled={processing}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
                         >
                             Cancel
                         </button>
@@ -504,18 +504,18 @@ export default function JobApplicationShow() {
             }}>
                 <div className="p-6">
                     <div className="flex items-center mb-4">
-                        <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                            <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30">
+                            <svg className="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </div>
-                        <h2 className="ml-4 text-xl font-semibold text-gray-900">
+                        <h2 className="ml-4 text-xl font-semibold text-gray-900 dark:text-white">
                             Reject Application
                         </h2>
                     </div>
 
-                    <p className="mt-2 text-sm text-gray-600 mb-6">
-                        Are you sure you want to reject this application from <span className="font-semibold">{application?.user?.name}</span>? 
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
+                        Are you sure you want to reject this application from <span className="font-semibold">{application?.user?.name}</span>?
                         This action cannot be undone.
                     </p>
 
@@ -527,7 +527,7 @@ export default function JobApplicationShow() {
                                 }
                             }}
                             disabled={processing}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
                         >
                             Cancel
                         </button>

@@ -21,7 +21,7 @@ class HelperController extends Controller
         tags: ["Helpers"],
         parameters: [
             new OA\Parameter(name: "user_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["all", "helper", "business"]), description: "Filter by user type"),
-            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]), description: "Filter by service type"),
+            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]), description: "Filter by service type"),
             new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer"), description: "Filter by location ID"),
             new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Filter by city name"),
             new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Filter by area"),
@@ -225,7 +225,7 @@ class HelperController extends Controller
                     required: ["service_type", "experience_years", "city", "area", "availability"],
                     properties: [
                         new OA\Property(property: "photo", type: "string", format: "binary", description: "Helper profile photo"),
-                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
                         new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
                         new OA\Property(property: "city", type: "string", maxLength: 255),
@@ -255,7 +255,7 @@ class HelperController extends Controller
     {
         $validated = $request->validate([
             'photo' => 'nullable|image|max:2048',
-            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'skills' => 'nullable|string',
             'experience_years' => 'required|integer|min:0',
             'city' => 'required|string|max:255',
@@ -342,7 +342,7 @@ class HelperController extends Controller
                     required: ["service_type", "experience_years", "city", "area", "availability"],
                     properties: [
                         new OA\Property(property: "photo", type: "string", format: "binary", description: "Helper profile photo"),
-                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "all_rounder"]),
+                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
                         new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
                         new OA\Property(property: "city", type: "string", maxLength: 255),
@@ -382,7 +382,7 @@ class HelperController extends Controller
 
         $validated = $request->validate([
             'photo' => 'nullable|image|max:2048',
-            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,all_rounder',
+            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'skills' => 'nullable|string',
             'experience_years' => 'required|integer|min:0',
             'city' => 'required|string|max:255',

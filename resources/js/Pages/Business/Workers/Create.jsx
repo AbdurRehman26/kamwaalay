@@ -9,6 +9,8 @@ import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
+import { useLanguages } from "@/hooks/useLanguages";
 
 export default function CreateWorker() {
     const navigate = useNavigate();
@@ -25,21 +27,20 @@ export default function CreateWorker() {
     const [data, setData] = useState({
         name: "",
         phone: "",
+        age: "",
+        gender: "",
+        religion: "",
         experience_years: "",
         availability: "full_time",
         bio: "",
         skills: "",
         photo: null,
     });
+    const [selectedLanguages, setSelectedLanguages] = useState([]);
 
-    const serviceTypes = [
-        { value: "maid", label: "Maid", icon: "🧹" },
-        { value: "cook", label: "Cook", icon: "👨‍🍳" },
-        { value: "babysitter", label: "Babysitter", icon: "👶" },
-        { value: "caregiver", label: "Caregiver", icon: "👵" },
-        { value: "cleaner", label: "Cleaner", icon: "✨" },
-        { value: "all_rounder", label: "All Rounder", icon: "🌟" },
-    ];
+    // Fetch service types and languages from API
+    const { serviceTypes } = useServiceTypes();
+    const { languages } = useLanguages();
 
     const availabilityOptions = [
         { value: "full_time", label: "Full Time" },
@@ -162,6 +163,20 @@ export default function CreateWorker() {
             formData.append(`locations[${index}][area]`, location.area);
         });
 
+        // Add optional worker details
+        if (data.age) {
+            formData.append("age", data.age);
+        }
+        if (data.gender) {
+            formData.append("gender", data.gender);
+        }
+        if (data.religion) {
+            formData.append("religion", data.religion);
+        }
+        if (selectedLanguages.length > 0) {
+            formData.append("languages", JSON.stringify(selectedLanguages));
+        }
+
         try {
             await businessesService.createWorker(formData);
             navigate(route("business.workers.index"));
@@ -195,283 +210,386 @@ export default function CreateWorker() {
 
             <div className="max-w-4xl">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Submit Error Banner */}
-                        {errors.submit && (
-                            <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-red-600 dark:text-red-400 font-bold">⚠️</span>
-                                    <div>
-                                        {Array.isArray(errors.submit) ? (
-                                            errors.submit.map((error, idx) => (
-                                                <p key={idx} className="text-red-600 dark:text-red-400 text-sm font-medium">
-                                                    {error}
-                                                </p>
-                                            ))
-                                        ) : (
-                                            <p className="text-red-600 dark:text-red-400 text-sm font-medium">
-                                                {errors.submit}
+                    {/* Submit Error Banner */}
+                    {errors.submit && (
+                        <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
+                            <div className="flex items-center gap-2">
+                                <span className="text-red-600 dark:text-red-400 font-bold">⚠️</span>
+                                <div>
+                                    {Array.isArray(errors.submit) ? (
+                                        errors.submit.map((error, idx) => (
+                                            <p key={idx} className="text-red-600 dark:text-red-400 text-sm font-medium">
+                                                {error}
                                             </p>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Basic Information */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Basic Information</h2>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                                <div>
-                                    <InputLabel htmlFor="name" value="Full Name *" />
-                                    <TextInput
-                                        id="name"
-                                        type="text"
-                                        className="mt-1 block w-full"
-                                        value={data.name}
-                                        onChange={(e) => setData({ ...data, name: e.target.value })}
-                                        required
-                                    />
-                                    <InputError message={errors.name} className="mt-1.5" />
-                                </div>
-
-                                <div>
-                                    <InputLabel htmlFor="phone" value="Phone" />
-                                    <TextInput
-                                        id="phone"
-                                        type="tel"
-                                        className="mt-1 block w-full"
-                                        value={data.phone}
-                                        onChange={(e) => setData({ ...data, phone: e.target.value })}
-                                    />
-                                    <InputError message={errors.phone} className="mt-1.5" />
-                                </div>
-
-                                <div>
-                                    <InputLabel htmlFor="photo" value="Photo" />
-                                    <input
-                                        id="photo"
-                                        type="file"
-                                        className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-900/30 file:text-indigo-700 dark:file:text-indigo-300 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50 transition-all"
-                                        onChange={(e) => setData({ ...data, photo: e.target.files[0] })}
-                                        accept="image/*"
-                                    />
-                                    <InputError message={errors.photo} className="mt-1.5" />
+                                        ))
+                                    ) : (
+                                        <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                                            {errors.submit}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
+                    )}
 
-                        {/* Service Types Selection */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Service Types *</h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Choose the services this worker can provide. You can select multiple.</p>
+                    {/* Basic Information */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Basic Information</h2>
 
-                            {/* Selected Service Types as Tags */}
-                            {selectedServiceTypes.length > 0 && (
-                                <div className="mb-6">
-                                    <div className="flex flex-wrap gap-2">
-                                        {selectedServiceTypes.map((serviceType) => {
-                                            const service = serviceTypes.find(st => st.value === serviceType);
-                                            return (
-                                                <span
-                                                    key={serviceType}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold border-2 border-indigo-200 dark:border-indigo-700"
-                                                >
-                                                    <span>{service?.icon}</span>
-                                                    <span>{service?.label}</span>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeServiceType(serviceType)}
-                                                        className="ml-1 text-primary-600 hover:text-primary-800 font-bold"
-                                                    >
-                                                        ×
-                                                    </button>
-                                                </span>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Service Type Options */}
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                {serviceTypes.map((service) => (
-                                    <button
-                                        key={service.value}
-                                        type="button"
-                                        onClick={() => addServiceType(service.value)}
-                                        disabled={selectedServiceTypes.includes(service.value)}
-                                        className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                                            selectedServiceTypes.includes(service.value)
-                                                ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
-                                                : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
-                                        }`}
-                                    >
-                                        <div className="text-3xl mb-2">{service.icon}</div>
-                                        <div className="font-semibold text-gray-900 dark:text-white">{service.label}</div>
-                                    </button>
-                                ))}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                            <div>
+                                <InputLabel htmlFor="name" value="Full Name *" />
+                                <TextInput
+                                    id="name"
+                                    type="text"
+                                    className="mt-1 block w-full"
+                                    value={data.name}
+                                    onChange={(e) => setData({ ...data, name: e.target.value })}
+                                    required
+                                />
+                                <InputError message={errors.name} className="mt-1.5" />
                             </div>
-                            <InputError message={errors.service_types} className="mt-1.5" />
+
+                            <div>
+                                <InputLabel htmlFor="phone" value="Phone" />
+                                <TextInput
+                                    id="phone"
+                                    type="tel"
+                                    className="mt-1 block w-full"
+                                    value={data.phone}
+                                    onChange={(e) => setData({ ...data, phone: e.target.value })}
+                                />
+                                <InputError message={errors.phone} className="mt-1.5" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="photo" value="Photo" />
+                                <input
+                                    id="photo"
+                                    type="file"
+                                    className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-900/30 file:text-indigo-700 dark:file:text-indigo-300 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50 transition-all"
+                                    onChange={(e) => setData({ ...data, photo: e.target.files[0] })}
+                                    accept="image/*"
+                                />
+                                <InputError message={errors.photo} className="mt-1.5" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="age" value="Age" />
+                                <TextInput
+                                    id="age"
+                                    type="number"
+                                    min="18"
+                                    max="100"
+                                    className="mt-1 block w-full"
+                                    value={data.age}
+                                    onChange={(e) => setData({ ...data, age: e.target.value })}
+                                />
+                                <InputError message={errors.age} className="mt-1.5" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="gender" value="Gender" />
+                                <select
+                                    id="gender"
+                                    className="mt-1 block w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4"
+                                    value={data.gender}
+                                    onChange={(e) => setData({ ...data, gender: e.target.value })}
+                                >
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <InputError message={errors.gender} className="mt-1.5" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="religion" value="Religion" />
+                                <select
+                                    id="religion"
+                                    className="mt-1 block w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4"
+                                    value={data.religion}
+                                    onChange={(e) => setData({ ...data, religion: e.target.value })}
+                                >
+                                    <option value="">Select Religion</option>
+                                    <option value="sunni_nazar_niyaz">Sunni (Nazar Niyaz)</option>
+                                    <option value="sunni_no_nazar_niyaz">Sunni (No Nazar Niyaz)</option>
+                                    <option value="shia">Shia</option>
+                                    <option value="christian">Christian</option>
+                                </select>
+                                <InputError message={errors.religion} className="mt-1.5" />
+                            </div>
                         </div>
+                    </div>
 
-                        {/* Locations Selection */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Locations *</h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Add locations where this worker can provide services. You can add multiple locations.</p>
+                    {/* Languages Selection */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Languages</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Select the languages this worker speaks</p>
 
-                            {/* Selected Locations as Tags */}
-                            {selectedLocations.length > 0 && (
-                                <div className="mb-6">
-                                    <div className="flex flex-wrap gap-2">
-                                        {selectedLocations.map((location) => (
+                        {/* Selected Languages as Tags */}
+                        {selectedLanguages.length > 0 && (
+                            <div className="mb-6">
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedLanguages.map((languageId) => {
+                                        const language = languages.find(l => l.id === languageId);
+                                        return (
                                             <span
-                                                key={location.id}
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-semibold border-2 border-green-200 dark:border-green-700"
+                                                key={languageId}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold border-2 border-blue-200 dark:border-blue-700"
                                             >
-                                                <span>📍</span>
-                                                <span>{location.display_text}</span>
+                                                <span>{language?.name}</span>
                                                 <button
                                                     type="button"
-                                                    onClick={() => removeLocation(location.id)}
-                                                    className="ml-1 text-green-600 hover:text-green-800 font-bold"
+                                                    onClick={() => {
+                                                        setSelectedLanguages(selectedLanguages.filter(id => id !== languageId));
+                                                    }}
+                                                    className="ml-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-bold"
                                                 >
                                                     ×
                                                 </button>
                                             </span>
-                                        ))}
-                                    </div>
+                                        );
+                                    })}
                                 </div>
-                            )}
+                            </div>
+                        )}
 
-                            {/* Location Search */}
-                            <div className="relative" ref={locationRef}>
-                                <input
-                                    type="text"
-                                    value={locationQuery}
-                                    onChange={(e) => setLocationQuery(e.target.value)}
-                                    onFocus={() => {
-                                        if (locationSuggestions.length > 0) {
-                                            setShowLocationSuggestions(true);
+                        {/* Language Options */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {languages.map((language) => (
+                                <button
+                                    key={language.id}
+                                    type="button"
+                                    onClick={() => {
+                                        if (!selectedLanguages.includes(language.id)) {
+                                            setSelectedLanguages([...selectedLanguages, language.id]);
                                         }
                                     }}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3 shadow-sm"
-                                    placeholder="Search location (e.g., Karachi, Clifton or type area name)..."
-                                />
-                                {showLocationSuggestions && locationSuggestions.length > 0 && (
-                                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-auto">
-                                        {locationSuggestions
-                                            .filter(suggestion => !selectedLocations.some(loc => loc.id === (suggestion.id || suggestion.display_text)))
-                                            .map((suggestion, index) => (
-                                                <div
-                                                    key={index}
-                                                    onClick={() => handleLocationSelect(suggestion)}
-                                                    className="px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
+                                    disabled={selectedLanguages.includes(language.id)}
+                                    className={`p-3 rounded-xl border-2 transition-all duration-300 text-left ${selectedLanguages.includes(language.id)
+                                            ? "border-blue-500 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 opacity-50 cursor-not-allowed"
+                                            : "border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer bg-white dark:bg-gray-700"
+                                        }`}
+                                >
+                                    <div className="font-semibold text-gray-900 dark:text-white">{language.name}</div>
+                                </button>
+                            ))}
+                        </div>
+                        <InputError message={errors.languages} className="mt-1.5" />
+                    </div>
+
+                    {/* Service Types Selection */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Service Types *</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Choose the services this worker can provide. You can select multiple.</p>
+
+                        {/* Selected Service Types as Tags */}
+                        {selectedServiceTypes.length > 0 && (
+                            <div className="mb-6">
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedServiceTypes.map((serviceType) => {
+                                        const service = serviceTypes.find(st => st.value === serviceType);
+                                        return (
+                                            <span
+                                                key={serviceType}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold border-2 border-indigo-200 dark:border-indigo-700"
+                                            >
+                                                <span>{service?.icon}</span>
+                                                <span>{service?.label}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeServiceType(serviceType)}
+                                                    className="ml-1 text-primary-600 hover:text-primary-800 font-bold"
                                                 >
-                                                    {suggestion.area || suggestion.display_text}
-                                                </div>
-                                            ))}
-                                    </div>
-                                )}
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                    Type to search and select locations. Each location will be added as a tag.
-                                </p>
-                            </div>
-                            <InputError message={errors.locations} className="mt-1.5" />
-                        </div>
-
-                        {/* Professional Details */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Professional Details</h2>
-
-                            <div className="grid md:grid-cols-2 gap-6 mt-6">
-                                <div>
-                                    <InputLabel htmlFor="experience_years" value="Experience (Years) *" />
-                                    <TextInput
-                                        id="experience_years"
-                                        type="number"
-                                        className="mt-1 block w-full"
-                                        value={data.experience_years}
-                                        onChange={(e) => setData({ ...data, experience_years: e.target.value })}
-                                        required
-                                        min="0"
-                                    />
-                                    <InputError message={errors.experience_years} className="mt-1.5" />
-                                </div>
-
-                                <div>
-                                    <InputLabel htmlFor="availability" value="Availability *" />
-                                    <select
-                                        id="availability"
-                                        className="mt-1 block w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4"
-                                        value={data.availability}
-                                        onChange={(e) => setData({ ...data, availability: e.target.value })}
-                                        required
-                                    >
-                                        {availabilityOptions.map((option) => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <InputError message={errors.availability} className="mt-1.5" />
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <InputLabel htmlFor="skills" value="Skills" />
-                                    <TextInput
-                                        id="skills"
-                                        type="text"
-                                        className="mt-1 block w-full"
-                                        value={data.skills}
-                                        onChange={(e) => setData({ ...data, skills: e.target.value })}
-                                        placeholder="e.g., Cooking, Cleaning, Child Care"
-                                    />
-                                    <InputError message={errors.skills} className="mt-1.5" />
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <InputLabel htmlFor="bio" value="Bio / Description" />
-                                    <TextArea
-                                        id="bio"
-                                        className="mt-1 block w-full"
-                                        value={data.bio}
-                                        onChange={(e) => setData({ ...data, bio: e.target.value })}
-                                        rows="4"
-                                        placeholder="Describe the worker's experience, skills, and qualifications..."
-                                    />
-                                    <InputError message={errors.bio} className="mt-1.5" />
+                                                    ×
+                                                </button>
+                                            </span>
+                                        );
+                                    })}
                                 </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* Submit Button */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-                            <div className="flex items-center justify-end gap-4">
+                        {/* Service Type Options */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {serviceTypes.map((service) => (
                                 <button
+                                    key={service.value}
                                     type="button"
-                                    onClick={() => navigate(route("business.workers.index"))}
-                                    className="px-6 py-3.5 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 font-bold shadow-md hover:shadow-lg"
+                                    onClick={() => addServiceType(service.value)}
+                                    disabled={selectedServiceTypes.includes(service.value)}
+                                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${selectedServiceTypes.includes(service.value)
+                                            ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
+                                            : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
+                                        }`}
                                 >
-                                    Cancel
+                                    <div className="text-3xl mb-2">{service.icon}</div>
+                                    <div className="font-semibold text-gray-900 dark:text-white">{service.label}</div>
                                 </button>
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {processing ? (
-                                        <span className="flex items-center justify-center gap-2">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                            Adding Worker...
+                            ))}
+                        </div>
+                        <InputError message={errors.service_types} className="mt-1.5" />
+                    </div>
+
+                    {/* Locations Selection */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Locations *</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Add locations where this worker can provide services. You can add multiple locations.</p>
+
+                        {/* Selected Locations as Tags */}
+                        {selectedLocations.length > 0 && (
+                            <div className="mb-6">
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedLocations.map((location) => (
+                                        <span
+                                            key={location.id}
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-semibold border-2 border-green-200 dark:border-green-700"
+                                        >
+                                            <span>📍</span>
+                                            <span>{location.display_text}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeLocation(location.id)}
+                                                className="ml-1 text-green-600 hover:text-green-800 font-bold"
+                                            >
+                                                ×
+                                            </button>
                                         </span>
-                                    ) : (
-                                        "Add Worker"
-                                    )}
-                                </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Location Search */}
+                        <div className="relative" ref={locationRef}>
+                            <input
+                                type="text"
+                                value={locationQuery}
+                                onChange={(e) => setLocationQuery(e.target.value)}
+                                onFocus={() => {
+                                    if (locationSuggestions.length > 0) {
+                                        setShowLocationSuggestions(true);
+                                    }
+                                }}
+                                className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3 shadow-sm"
+                                placeholder="Search location (e.g., Karachi, Clifton or type area name)..."
+                            />
+                            {showLocationSuggestions && locationSuggestions.length > 0 && (
+                                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-auto">
+                                    {locationSuggestions
+                                        .filter(suggestion => !selectedLocations.some(loc => loc.id === (suggestion.id || suggestion.display_text)))
+                                        .map((suggestion, index) => (
+                                            <div
+                                                key={index}
+                                                onClick={() => handleLocationSelect(suggestion)}
+                                                className="px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
+                                            >
+                                                {suggestion.area || suggestion.display_text}
+                                            </div>
+                                        ))}
+                                </div>
+                            )}
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                Type to search and select locations. Each location will be added as a tag.
+                            </p>
+                        </div>
+                        <InputError message={errors.locations} className="mt-1.5" />
+                    </div>
+
+                    {/* Professional Details */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Professional Details</h2>
+
+                        <div className="grid md:grid-cols-2 gap-6 mt-6">
+                            <div>
+                                <InputLabel htmlFor="experience_years" value="Experience (Years) *" />
+                                <TextInput
+                                    id="experience_years"
+                                    type="number"
+                                    className="mt-1 block w-full"
+                                    value={data.experience_years}
+                                    onChange={(e) => setData({ ...data, experience_years: e.target.value })}
+                                    required
+                                    min="0"
+                                />
+                                <InputError message={errors.experience_years} className="mt-1.5" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="availability" value="Availability *" />
+                                <select
+                                    id="availability"
+                                    className="mt-1 block w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4"
+                                    value={data.availability}
+                                    onChange={(e) => setData({ ...data, availability: e.target.value })}
+                                    required
+                                >
+                                    {availabilityOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.availability} className="mt-1.5" />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <InputLabel htmlFor="skills" value="Skills" />
+                                <TextInput
+                                    id="skills"
+                                    type="text"
+                                    className="mt-1 block w-full"
+                                    value={data.skills}
+                                    onChange={(e) => setData({ ...data, skills: e.target.value })}
+                                    placeholder="e.g., Cooking, Cleaning, Child Care"
+                                />
+                                <InputError message={errors.skills} className="mt-1.5" />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <InputLabel htmlFor="bio" value="Bio / Description" />
+                                <TextArea
+                                    id="bio"
+                                    className="mt-1 block w-full"
+                                    value={data.bio}
+                                    onChange={(e) => setData({ ...data, bio: e.target.value })}
+                                    rows="4"
+                                    placeholder="Describe the worker's experience, skills, and qualifications..."
+                                />
+                                <InputError message={errors.bio} className="mt-1.5" />
                             </div>
                         </div>
-                    </form>
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                        <div className="flex items-center justify-end gap-4">
+                            <button
+                                type="button"
+                                onClick={() => navigate(route("business.workers.index"))}
+                                className="px-6 py-3.5 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 font-bold shadow-md hover:shadow-lg"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {processing ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                        Adding Worker...
+                                    </span>
+                                ) : (
+                                    "Add Worker"
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </DashboardLayout>
     );

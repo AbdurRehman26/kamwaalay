@@ -25,7 +25,9 @@ class UserResource extends JsonResource
     private function ensureProfileLoaded(): void
     {
         if ($this->hasRole(['helper', 'business']) && !$this->relationLoaded('profile')) {
-            $this->load('profile');
+            $this->load('profile.languages');
+        } elseif ($this->profile && !$this->profile->relationLoaded('languages')) {
+            $this->profile->load('languages');
         }
     }
 
@@ -81,10 +83,22 @@ class UserResource extends JsonResource
             'service_type' => $this->when($this->profile, $this->service_type),
             'skills' => $this->when($this->profile, $this->skills),
             'experience_years' => $this->when($this->profile, $this->experience_years),
+            'age' => $this->when($this->profile, $this->age),
+            'gender' => $this->when($this->profile, $this->gender),
+            'religion' => $this->when($this->profile, $this->religion),
             'city' => $this->when($this->profile, $this->city),
             'area' => $this->when($this->profile, $this->area),
             'availability' => $this->when($this->profile, $this->availability),
             'bio' => $this->when($this->profile, $this->bio),
+            'languages' => $this->when($this->profile && $this->profile->relationLoaded('languages'), function () {
+                return $this->profile->languages->map(function ($language) {
+                    return [
+                        'id' => $language->id,
+                        'name' => $language->name,
+                        'code' => $language->code,
+                    ];
+                });
+            }),
             'verification_status' => $this->when($this->profile, $this->verification_status),
             'police_verified' => $this->when($this->profile, $this->police_verified),
             'is_active' => $this->when(isset($this->is_active), $this->is_active),

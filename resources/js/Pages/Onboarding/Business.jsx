@@ -6,13 +6,14 @@ import { useDropzone } from "react-dropzone";
 import { onboardingService } from "@/services/onboarding";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 
 export default function OnboardingBusiness() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [currentStep, setCurrentStep] = useState(1);
-    const totalSteps = 3;
-    
+    const totalSteps = 2;
+
     const [offers, setOffers] = useState([{
         selectedServiceTypes: [],
         selectedLocations: [],
@@ -32,33 +33,14 @@ export default function OnboardingBusiness() {
         nic: null,
         nic_number: "",
         bio: user?.bio || "",
-        city: user?.city || "",
-        area: user?.area || "",
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
     const [fileError, setFileError] = useState(null);
 
-    // Update profile data when user loads
-    useEffect(() => {
-        if (user) {
-            setProfileData(prev => ({
-                ...prev,
-                bio: user?.bio || prev.bio,
-                city: user?.city || prev.city,
-                area: user?.area || prev.area,
-            }));
-        }
-    }, [user]);
+    // Fetch service types from API
+    const { serviceTypes, loading: serviceTypesLoading } = useServiceTypes();
 
-    const serviceTypes = [
-        { value: "maid", label: "Maid", icon: "🧹" },
-        { value: "cook", label: "Cook", icon: "👨‍🍳" },
-        { value: "babysitter", label: "Babysitter", icon: "👶" },
-        { value: "caregiver", label: "Caregiver", icon: "👵" },
-        { value: "cleaner", label: "Cleaner", icon: "✨" },
-        { value: "all_rounder", label: "All Rounder", icon: "🌟" },
-    ];
 
     // Fetch location suggestions for each offer
     useEffect(() => {
@@ -190,9 +172,9 @@ export default function OnboardingBusiness() {
 
     const validateStep = (step) => {
         if (step === 1) {
-            const validOffers = offers.filter(offer => 
-                offer.selectedServiceTypes.length > 0 && 
-                offer.selectedLocations.length > 0 && 
+            const validOffers = offers.filter(offer =>
+                offer.selectedServiceTypes.length > 0 &&
+                offer.selectedLocations.length > 0 &&
                 offer.work_type
             );
             if (validOffers.length === 0) {
@@ -207,9 +189,9 @@ export default function OnboardingBusiness() {
 
     const saveServiceListing = async () => {
         // Validate all offers
-        const validOffers = offers.filter(offer => 
-            offer.selectedServiceTypes.length > 0 && 
-            offer.selectedLocations.length > 0 && 
+        const validOffers = offers.filter(offer =>
+            offer.selectedServiceTypes.length > 0 &&
+            offer.selectedLocations.length > 0 &&
             offer.work_type
         );
 
@@ -249,9 +231,9 @@ export default function OnboardingBusiness() {
         if (firstOffer.description) {
             formData.append("description", firstOffer.description);
         }
-        formData.append("bio", profileData.bio || "");
-        formData.append("city", profileData.city || "");
-        formData.append("area", profileData.area || "");
+        if (profileData.bio) {
+            formData.append("bio", profileData.bio);
+        }
         // Don't include NIC on step 1 - it's optional
 
         try {
@@ -293,37 +275,28 @@ export default function OnboardingBusiness() {
 
     const handleSkip = () => {
         if (currentStep === 2) {
-            // Skip verification documents and go to step 3
-            setCurrentStep(3);
-        } else if (currentStep === 3) {
-            // Skip business profile and complete onboarding
+            // Skip verification documents and complete onboarding
             submit(new Event("submit"));
         }
     };
 
     const submit = async (e) => {
         e.preventDefault();
-        
+
         // If on step 1, save service listing
         if (currentStep === 1) {
             await handleNext();
             return;
         }
-        
-        // If on step 2, just proceed to next step (don't submit)
-        if (currentStep === 2) {
-            handleNext();
-            return;
-        }
-        
-        // Final submission on step 3 - update with verification documents and profile if provided
+
+        // Final submission on step 2 - update with verification documents if provided
         setProcessing(true);
         setErrors({});
-        
+
         // Validate all offers (should already be saved from step 1, but validate again)
-        const validOffers = offers.filter(offer => 
-            offer.selectedServiceTypes.length > 0 && 
-            offer.selectedLocations.length > 0 && 
+        const validOffers = offers.filter(offer =>
+            offer.selectedServiceTypes.length > 0 &&
+            offer.selectedLocations.length > 0 &&
             offer.work_type
         );
 
@@ -363,11 +336,11 @@ export default function OnboardingBusiness() {
         if (firstOffer.description) {
             formData.append("description", firstOffer.description);
         }
-        formData.append("bio", profileData.bio || "");
-        formData.append("city", profileData.city || "");
-        formData.append("area", profileData.area || "");
+        if (profileData.bio) {
+            formData.append("bio", profileData.bio);
+        }
         formData.append("nic_number", profileData.nic_number || "");
-        
+
         // Add verification documents if provided (optional)
         if (profileData.nic) {
             formData.append("nic", profileData.nic);
@@ -430,13 +403,12 @@ export default function OnboardingBusiness() {
             <div>
                 <div
                     {...getRootProps()}
-                    className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${
-                        isDragActive
-                            ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
-                            : error
+                    className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${isDragActive
+                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
+                        : error
                             ? "border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20"
                             : "border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    }`}
+                        }`}
                 >
                     <input {...getInputProps()} />
                     <div className="space-y-2">
@@ -485,7 +457,6 @@ export default function OnboardingBusiness() {
     const steps = [
         { number: 1, title: "Service Information", description: "Tell us about the services you offer" },
         { number: 2, title: "Profile Verification", description: "Upload your verification documents" },
-        { number: 3, title: "Business Profile", description: "Add more details about your business" },
     ];
 
     return (
@@ -517,27 +488,24 @@ export default function OnboardingBusiness() {
                         {steps.map((step, index) => (
                             <div key={step.number} className="flex items-center flex-1">
                                 <div className="flex flex-col items-center flex-1">
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all ${
-                                        currentStep > step.number
-                                            ? "bg-green-500 text-white"
-                                            : currentStep === step.number
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all ${currentStep > step.number
+                                        ? "bg-green-500 text-white"
+                                        : currentStep === step.number
                                             ? "bg-indigo-600 text-white ring-4 ring-indigo-200 dark:ring-indigo-800"
                                             : "bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300"
-                                    }`}>
+                                        }`}>
                                         {currentStep > step.number ? "✓" : step.number}
                                     </div>
                                     <div className="mt-2 text-center">
-                                        <p className={`text-sm font-semibold ${
-                                            currentStep >= step.number ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400"
-                                        }`}>
+                                        <p className={`text-sm font-semibold ${currentStep >= step.number ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400"
+                                            }`}>
                                             {step.title}
                                         </p>
                                     </div>
                                 </div>
                                 {index < steps.length - 1 && (
-                                    <div className={`flex-1 h-1 mx-4 transition-all ${
-                                        currentStep > step.number ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
-                                    }`} />
+                                    <div className={`flex-1 h-1 mx-4 transition-all ${currentStep > step.number ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
+                                        }`} />
                                 )}
                             </div>
                         ))}
@@ -569,7 +537,7 @@ export default function OnboardingBusiness() {
                                 </div>
                             </div>
                         )}
-                        
+
                         {/* Step 1: Service Information */}
                         {currentStep === 1 && offers.map((offer, offerIndex) => (
                             <div key={offerIndex} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
@@ -590,7 +558,7 @@ export default function OnboardingBusiness() {
                                 <div className="mb-8">
                                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Service Types *</h3>
                                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Choose the services for this offer. You can select multiple.</p>
-                                    
+
                                     {/* Selected Service Types as Tags */}
                                     {offer.selectedServiceTypes.length > 0 && (
                                         <div className="mb-4">
@@ -626,11 +594,10 @@ export default function OnboardingBusiness() {
                                                 type="button"
                                                 onClick={() => addServiceTypeToOffer(offerIndex, service.value)}
                                                 disabled={offer.selectedServiceTypes.includes(service.value)}
-                                                className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                                                    offer.selectedServiceTypes.includes(service.value)
-                                                        ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
-                                                        : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
-                                                }`}
+                                                className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${offer.selectedServiceTypes.includes(service.value)
+                                                    ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
+                                                    : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
+                                                    }`}
                                             >
                                                 <div className="text-3xl mb-2">{service.icon}</div>
                                                 <div className="font-semibold text-gray-900 dark:text-white">{service.label}</div>
@@ -643,7 +610,7 @@ export default function OnboardingBusiness() {
                                 <div className="mb-8">
                                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Locations *</h3>
                                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Add locations for this offer. You can add multiple locations.</p>
-                                    
+
                                     {/* Selected Locations as Tags */}
                                     {offer.selectedLocations.length > 0 && (
                                         <div className="mb-4">
@@ -784,90 +751,44 @@ export default function OnboardingBusiness() {
                         {/* Step 2: Profile Verification Section */}
                         {currentStep === 2 && (
                             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Profile Verification</h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Optional: Upload your documents for verification. You can skip this step and complete it later.</p>
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Profile Verification</h2>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Optional: Upload your documents for verification. You can skip this step and complete it later.</p>
 
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
-                                        National Identity Card (NIC) <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
-                                    </label>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload a clear photo or scan of your NIC (front and back if needed)</p>
-                                    <NICDropzone
-                                        onFileAccepted={(file) => {
-                                            if (file === null) {
-                                                setProfileData({ ...profileData, nic: null });
-                                            } else {
-                                                setProfileData({ ...profileData, nic: file });
-                                            }
-                                            setFileError(null);
-                                        }}
-                                        file={profileData.nic}
-                                        error={errors.nic?.[0] || errors.nic}
-                                    />
-                                </div>
+                                <div className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
+                                            National Identity Card (NIC) <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
+                                        </label>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload a clear photo or scan of your NIC (front and back if needed)</p>
+                                        <NICDropzone
+                                            onFileAccepted={(file) => {
+                                                if (file === null) {
+                                                    setProfileData({ ...profileData, nic: null });
+                                                } else {
+                                                    setProfileData({ ...profileData, nic: file });
+                                                }
+                                                setFileError(null);
+                                            }}
+                                            file={profileData.nic}
+                                            error={errors.nic?.[0] || errors.nic}
+                                        />
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
-                                        NIC Number <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={profileData.nic_number}
-                                        onChange={(e) => setProfileData({ ...profileData, nic_number: e.target.value })}
-                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                        placeholder="e.g., 42101-1234567-1"
-                                    />
-                                    {errors.nic_number && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.nic_number}</div>}
-                                </div>
-                            </div>
-                        </div>
-                        )}
-
-                        {/* Step 3: Business Profile Section */}
-                        {currentStep === 3 && (
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Business Profile</h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Optional: Add more details about your business</p>
-
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">City</label>
-                                    <input
-                                        type="text"
-                                        value={profileData.city}
-                                        onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
-                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                        placeholder="e.g., Karachi"
-                                    />
-                                    {errors.city && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.city}</div>}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Area</label>
-                                    <input
-                                        type="text"
-                                        value={profileData.area}
-                                        onChange={(e) => setProfileData({ ...profileData, area: e.target.value })}
-                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                        placeholder="e.g., DHA"
-                                    />
-                                    {errors.area && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.area}</div>}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Bio</label>
-                                    <textarea
-                                        value={profileData.bio}
-                                        onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
-                                        rows={4}
-                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                        placeholder="Tell us about your business..."
-                                    />
-                                    {errors.bio && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.bio}</div>}
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
+                                            NIC Number <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={profileData.nic_number}
+                                            onChange={(e) => setProfileData({ ...profileData, nic_number: e.target.value })}
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                            placeholder="e.g., 42101-1234567-1"
+                                        />
+                                        {errors.nic_number && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.nic_number}</div>}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         )}
 
                         {/* Navigation Buttons */}
@@ -897,22 +818,6 @@ export default function OnboardingBusiness() {
                                             "Save & Continue →"
                                         )}
                                     </button>
-                                ) : currentStep === 2 ? (
-                                    <>
-                                        <button
-                                            type="button"
-                                            onClick={handleSkip}
-                                            className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-                                        >
-                                            Skip
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300"
-                                        >
-                                            Continue →
-                                        </button>
-                                    </>
                                 ) : (
                                     <>
                                         <button
