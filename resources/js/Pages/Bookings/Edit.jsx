@@ -13,17 +13,17 @@ export default function BookingEdit() {
     const { user } = useAuth();
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
-    
+
     const [data, setData] = useState({
         service_type: "",
         work_type: "",
+        estimated_salary: "",
         city: "Karachi",
         area: "",
         start_date: "",
         start_time: "",
         name: user?.name || "",
         phone: user?.phone || "",
-        email: user?.email || "",
         address: user?.address || "",
         special_requirements: "",
     });
@@ -49,13 +49,13 @@ export default function BookingEdit() {
                     setData({
                         service_type: bookingData.service_type || "",
                         work_type: bookingData.work_type || "",
+                        estimated_salary: bookingData.estimated_salary || "",
                         city: bookingData.city || "Karachi",
                         area: bookingData.area || "",
                         start_date: bookingData.start_date || "",
                         start_time: bookingData.start_time || "",
                         name: bookingData.name || user?.name || "",
                         phone: bookingData.phone || user?.phone || "",
-                        email: bookingData.email || user?.email || "",
                         address: bookingData.address || user?.address || "",
                         special_requirements: bookingData.special_requirements || "",
                     });
@@ -125,7 +125,7 @@ export default function BookingEdit() {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
-        
+
         // Always set city to Karachi
         const submitData = {
             ...data,
@@ -241,6 +241,19 @@ export default function BookingEdit() {
                                 {errors.work_type && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.work_type}</div>}
                             </div>
 
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Estimated Salary (PKR/month)</label>
+                                <input
+                                    type="number"
+                                    value={data.estimated_salary}
+                                    onChange={(e) => setData(prev => ({ ...prev, estimated_salary: e.target.value }))}
+                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                    placeholder="e.g., 25000"
+                                    min="0"
+                                />
+                                {errors.estimated_salary && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.estimated_salary}</div>}
+                            </div>
+
                             <div className="relative" ref={suggestionsRef}>
                                 <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Area *</label>
                                 <input
@@ -275,27 +288,6 @@ export default function BookingEdit() {
                                 {errors.area && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.area}</div>}
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Start Date</label>
-                                <input
-                                    type="date"
-                                    value={data.start_date}
-                                    onChange={(e) => setData(prev => ({ ...prev, start_date: e.target.value }))}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                />
-                                {errors.start_date && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.start_date}</div>}
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Start Time</label>
-                                <input
-                                    type="time"
-                                    value={data.start_time}
-                                    onChange={(e) => setData(prev => ({ ...prev, start_time: e.target.value }))}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                />
-                                {errors.start_time && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.start_time}</div>}
-                            </div>
 
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Your Name *</label>
@@ -304,9 +296,8 @@ export default function BookingEdit() {
                                     value={data.name}
                                     onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}
                                     disabled={!!user}
-                                    className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${
-                                        user ? "border-gray-200 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed dark:text-gray-300" : "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                                    }`}
+                                    className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${user ? "border-gray-200 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed dark:text-gray-300" : "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                        }`}
                                     required
                                 />
                                 {errors.name && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.name}</div>}
@@ -319,27 +310,17 @@ export default function BookingEdit() {
                                     value={data.phone}
                                     onChange={(e) => setData(prev => ({ ...prev, phone: e.target.value }))}
                                     disabled={!!user}
-                                    className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${
-                                        user ? "border-gray-200 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed dark:text-gray-300" : "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                                    }`}
+                                    className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${user ? "border-gray-200 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed dark:text-gray-300" : "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                        }`}
                                     required
                                 />
+                                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1.5">
+                                    <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                    <span>Your phone number will not be visible to helpers unless you accept their application.</span>
+                                </p>
                                 {errors.phone && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.phone}</div>}
-                            </div>
-
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Email *</label>
-                                <input
-                                    type="email"
-                                    value={data.email}
-                                    onChange={(e) => setData(prev => ({ ...prev, email: e.target.value }))}
-                                    disabled={!!user}
-                                    className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${
-                                        user ? "border-gray-200 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed dark:text-gray-300" : "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                                    }`}
-                                    required
-                                />
-                                {errors.email && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.email}</div>}
                             </div>
 
                             <div className="md:col-span-2">
@@ -350,6 +331,12 @@ export default function BookingEdit() {
                                     rows={3}
                                     className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                 />
+                                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1.5">
+                                    <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                    <span>Your address will not be visible to helpers unless you accept their application.</span>
+                                </p>
                                 {errors.address && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.address}</div>}
                             </div>
 
