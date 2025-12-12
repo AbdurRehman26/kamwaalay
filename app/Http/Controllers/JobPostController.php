@@ -170,7 +170,55 @@ class JobPostController extends Controller
                                 new OA\Property(property: "user", type: "object", nullable: true),
                                 new OA\Property(property: "assigned_user", type: "object", nullable: true),
                                 new OA\Property(property: "review", type: "object", nullable: true),
-                                new OA\Property(property: "job_applications", type: "array", items: new OA\Items(type: "object"), nullable: true),
+                                new OA\Property(
+                                    property: "job_applications",
+                                    type: "array",
+                                    nullable: true,
+                                    description: "List of job applications with applicant details",
+                                    items: new OA\Items(
+                                        type: "object",
+                                        properties: [
+                                            new OA\Property(property: "id", type: "integer"),
+                                            new OA\Property(property: "user_id", type: "integer"),
+                                            new OA\Property(property: "message", type: "string", nullable: true),
+                                            new OA\Property(property: "proposed_rate", type: "number", nullable: true),
+                                            new OA\Property(property: "status", type: "string"),
+                                            new OA\Property(property: "status_label", type: "string"),
+                                            new OA\Property(property: "applied_at", type: "string", format: "date-time", nullable: true),
+                                            new OA\Property(
+                                                property: "user",
+                                                type: "object",
+                                                description: "Applicant user details including profile information",
+                                                properties: [
+                                                    new OA\Property(property: "id", type: "integer"),
+                                                    new OA\Property(property: "name", type: "string"),
+                                                    new OA\Property(property: "phone", type: "string", nullable: true),
+                                                    new OA\Property(property: "photo", type: "string", nullable: true),
+                                                    new OA\Property(property: "age", type: "integer", nullable: true),
+                                                    new OA\Property(property: "gender", type: "string", nullable: true, enum: ["male", "female", "other"]),
+                                                    new OA\Property(property: "religion", type: "string", nullable: true, enum: ["sunni_nazar_niyaz", "sunni_no_nazar_niyaz", "shia", "christian"]),
+                                                    new OA\Property(property: "experience_years", type: "integer", nullable: true),
+                                                    new OA\Property(property: "bio", type: "string", nullable: true),
+                                                    new OA\Property(property: "city", type: "string", nullable: true),
+                                                    new OA\Property(property: "area", type: "string", nullable: true),
+                                                    new OA\Property(
+                                                        property: "languages",
+                                                        type: "array",
+                                                        nullable: true,
+                                                        items: new OA\Items(
+                                                            type: "object",
+                                                            properties: [
+                                                                new OA\Property(property: "id", type: "integer"),
+                                                                new OA\Property(property: "name", type: "string"),
+                                                                new OA\Property(property: "code", type: "string"),
+                                                            ]
+                                                        )
+                                                    ),
+                                                ]
+                                            ),
+                                        ]
+                                    )
+                                ),
                             ]
                         ),
                     ]
@@ -182,7 +230,14 @@ class JobPostController extends Controller
     public function show(JobPost $jobPost)
     {
         // Allow public viewing of job posts
-        $jobPost->load(['user', 'assignedUser', 'review', 'jobApplications']);
+        // Load job applications with user profile details
+        $jobPost->load([
+            'user', 
+            'assignedUser', 
+            'review', 
+            'jobApplications.user.profile.languages',
+            'jobApplications.user.roles'
+        ]);
 
         return response()->json([
             'job_post' => new JobPostResource($jobPost),
