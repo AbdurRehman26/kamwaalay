@@ -20,7 +20,7 @@ export default function Contact() {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
-        
+
         try {
             await contactService.sendMessage(formData);
             setSubmitted(true);
@@ -50,47 +50,48 @@ export default function Contact() {
                     <p className="text-xl text-white/90">We'd love to hear from you</p>
                 </div>
             </div>
-            <div className="container mx-auto px-4 py-12">
+            <div className="container mx-auto px-4 py-12 dark:bg-gray-900">
                 <div className="max-w-2xl mx-auto">
                     {submitted ? (
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                            <h3 className="text-xl font-bold text-green-800 mb-2">Thank You!</h3>
-                            <p className="text-green-700">We'll get back to you soon.</p>
+                        <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-2xl p-8 text-center shadow-sm">
+                            <div className="text-4xl mb-4">✅</div>
+                            <h3 className="text-2xl font-bold text-green-800 dark:text-green-300 mb-2">Message Sent!</h3>
+                            <p className="text-green-700 dark:text-green-400">Thank you for contacting us. We'll get back to you shortly.</p>
                         </div>
                     ) : (
-                        <form onSubmit={submit} className="bg-white rounded-lg shadow-md p-8">
+                        <form onSubmit={submit} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-8">
                             <div className="mb-6">
-                                <InputLabel htmlFor="name" value="Name" className="text-gray-700 font-medium" />
+                                <InputLabel htmlFor="name" value="Name" className="text-gray-700 dark:text-gray-300 font-bold mb-2" />
                                 <TextInput
                                     id="name"
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    className="mt-2 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors"
                                     required
                                 />
                                 <InputError message={errors.name} className="mt-2" />
                             </div>
                             <div className="mb-6">
-                                <InputLabel htmlFor="phone" value="Phone (Optional)" className="text-gray-700 font-medium" />
+                                <InputLabel htmlFor="phone" value="Phone (Optional)" className="text-gray-700 dark:text-gray-300 font-bold mb-2" />
                                 <TextInput
                                     id="phone"
                                     type="tel"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    className="mt-2 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors"
                                     placeholder="+92 300 1234567"
                                 />
                                 <InputError message={errors.phone} className="mt-2" />
                             </div>
                             <div className="mb-6">
-                                <InputLabel htmlFor="message" value="Message" className="text-gray-700 font-medium" />
+                                <InputLabel htmlFor="message" value="Message" className="text-gray-700 dark:text-gray-300 font-bold mb-2" />
                                 <textarea
                                     id="message"
                                     value={formData.message}
                                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                     rows={6}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    className="mt-2 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors"
                                     required
                                 />
                                 <InputError message={errors.message} className="mt-2" />
@@ -98,31 +99,36 @@ export default function Contact() {
                             <PrimaryButton
                                 type="submit"
                                 disabled={processing}
-                                className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition duration-300 font-semibold shadow-lg hover:shadow-xl"
+                                className="w-full justify-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-indigo-500/30 disabled:opacity-75"
                             >
-                                {processing ? "Sending..." : "Send Message"}
+                                {processing ? (
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        <span>Sending...</span>
+                                    </div>
+                                ) : "Send Message"}
                             </PrimaryButton>
                         </form>
                     )}
                     <div className="mt-12 grid md:grid-cols-3 gap-6">
-                        <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                            <div className="text-4xl mb-3">📧</div>
-                            <h3 className="font-bold text-gray-900 mb-2">Email</h3>
-                            <a href="mailto:contact@kamwaalay.com" className="text-primary-600 hover:text-primary-800 transition-colors">
+                        <a href="mailto:contact@kamwaalay.com" className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                            <div className="w-12 h-12 mx-auto bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">📧</div>
+                            <h3 className="font-bold text-gray-900 dark:text-white mb-2">Email</h3>
+                            <p className="text-indigo-600 dark:text-indigo-400 font-medium group-hover:underline">
                                 contact@kamwaalay.com
-                            </a>
-                        </div>
-                        <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                            <div className="text-4xl mb-3">📞</div>
-                            <h3 className="font-bold text-gray-900 mb-2">Phone</h3>
-                            <a href="tel:+923001234567" className="text-primary-600 hover:text-primary-800 transition-colors">
+                            </p>
+                        </a>
+                        <a href="tel:+923001234567" className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                            <div className="w-12 h-12 mx-auto bg-green-50 dark:bg-green-900/30 rounded-full flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">📞</div>
+                            <h3 className="font-bold text-gray-900 dark:text-white mb-2">Phone</h3>
+                            <p className="text-green-600 dark:text-green-400 font-medium group-hover:underline">
                                 +92 300 1234567
-                            </a>
-                        </div>
-                        <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                            <div className="text-4xl mb-3">📍</div>
-                            <h3 className="font-bold text-gray-900 mb-2">Address</h3>
-                            <p className="text-gray-600">Karachi, Pakistan</p>
+                            </p>
+                        </a>
+                        <div className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                            <div className="w-12 h-12 mx-auto bg-purple-50 dark:bg-purple-900/30 rounded-full flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">📍</div>
+                            <h3 className="font-bold text-gray-900 dark:text-white mb-2">Address</h3>
+                            <p className="text-gray-600 dark:text-gray-400">Karachi, Pakistan</p>
                         </div>
                     </div>
                 </div>
