@@ -21,7 +21,7 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
         if (!user || !isOpen) return;
 
         const token = authService.getToken() || "";
-        
+
         pusherRef.current = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY || "", {
             cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER || "mt1",
             authEndpoint: "/api/broadcasting/auth",
@@ -50,12 +50,12 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
         const loadConversationAndMessages = async () => {
             setLoading(true);
             setError("");
-            
+
             try {
                 // First, try to get existing conversations to find if one exists with this recipient
                 const conversationsData = await messagesService.getConversations();
                 const conversations = conversationsData.conversations || [];
-                
+
                 const existingConversation = conversations.find(
                     (conv) => conv.other_user?.id === recipientId
                 );
@@ -65,12 +65,12 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
                     // Load messages for existing conversation
                     const messagesData = await messagesService.getMessages(existingConversation.id);
                     setMessages(messagesData.messages?.data || []);
-                    
+
                     // Subscribe to conversation channel
                     if (pusherRef.current) {
                         const channelName = `conversation.${existingConversation.id}`;
                         channelRef.current = pusherRef.current.subscribe(channelName);
-                        
+
                         channelRef.current.bind("message.sent", (data) => {
                             if (data.message) {
                                 setMessages((prev) => [...prev, data.message]);
@@ -108,20 +108,20 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
 
         try {
             const data = await messagesService.sendMessage(recipientId, newMessage.trim());
-            
+
             // Add the new message to the list
             setMessages((prev) => [...prev, data.message]);
             setNewMessage("");
-            
+
             // Update conversation ID if this is a new conversation
             if (data.conversation && !conversationIdRef.current) {
                 conversationIdRef.current = data.conversation.id;
-                
+
                 // Subscribe to new conversation channel
                 if (pusherRef.current) {
                     const channelName = `conversation.${data.conversation.id}`;
                     channelRef.current = pusherRef.current.subscribe(channelName);
-                    
+
                     channelRef.current.bind("message.sent", (data) => {
                         if (data.message) {
                             setMessages((prev) => [...prev, data.message]);
@@ -144,15 +144,15 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
     return (
         <div className="fixed inset-0 z-50 flex items-end justify-end p-4 pointer-events-none">
             {/* Backdrop */}
-            <div 
+            <div
                 className="fixed inset-0 bg-black bg-opacity-50 pointer-events-auto"
                 onClick={onClose}
             />
-            
+
             {/* Chat Popup */}
-            <div className="relative w-full max-w-md h-[600px] bg-white rounded-t-2xl shadow-2xl flex flex-col pointer-events-auto">
+            <div className="relative w-full max-w-md h-[600px] bg-white dark:bg-gray-800 rounded-t-2xl shadow-2xl flex flex-col pointer-events-auto">
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-t-2xl">
+                <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-t-2xl">
                     <div className="flex items-center gap-3">
                         {recipientPhoto ? (
                             <img
@@ -182,16 +182,16 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
                 </div>
 
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+                <div className="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-900">
                     {loading ? (
                         <div className="flex items-center justify-center h-full">
-                            <p className="text-gray-500">Loading messages...</p>
+                            <p className="text-gray-500 dark:text-gray-400">Loading messages...</p>
                         </div>
                     ) : messages.length === 0 ? (
                         <div className="flex items-center justify-center h-full">
                             <div className="text-center">
-                                <p className="text-gray-500 mb-2">No messages yet</p>
-                                <p className="text-sm text-gray-400">Start a conversation with {recipientName}</p>
+                                <p className="text-gray-500 dark:text-gray-400 mb-2">No messages yet</p>
+                                <p className="text-sm text-gray-400 dark:text-gray-500">Start a conversation with {recipientName}</p>
                             </div>
                         </div>
                     ) : (
@@ -204,17 +204,15 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
                                         className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
                                     >
                                         <div
-                                            className={`max-w-[75%] rounded-lg px-4 py-2 ${
-                                                isOwnMessage
+                                            className={`max-w-[75%] rounded-lg px-4 py-2 ${isOwnMessage
                                                     ? "bg-primary-600 text-white"
-                                                    : "bg-white text-gray-900 border border-gray-200"
-                                            }`}
+                                                    : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700"
+                                                }`}
                                         >
                                             <p className="text-sm">{message.message}</p>
                                             <p
-                                                className={`text-xs mt-1 ${
-                                                    isOwnMessage ? "text-primary-100" : "text-gray-500"
-                                                }`}
+                                                className={`text-xs mt-1 ${isOwnMessage ? "text-primary-100" : "text-gray-500 dark:text-gray-400"
+                                                    }`}
                                             >
                                                 {new Date(message.created_at).toLocaleTimeString([], {
                                                     hour: "2-digit",
@@ -232,20 +230,20 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
 
                 {/* Error Message */}
                 {error && (
-                    <div className="px-4 py-2 bg-red-50 border-t border-red-200">
-                        <p className="text-sm text-red-600">{error}</p>
+                    <div className="px-4 py-2 bg-red-50 dark:bg-red-900/20 border-t border-red-200 dark:border-red-800">
+                        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
                     </div>
                 )}
 
                 {/* Input Area */}
-                <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 bg-white">
+                <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                     <div className="flex items-center gap-2">
                         <input
                             type="text"
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             placeholder="Type a message..."
-                            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="flex-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:placeholder-gray-400"
                             disabled={sending}
                         />
                         <button
