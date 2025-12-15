@@ -207,14 +207,14 @@
                 ]
             }
         },
-        "/api/admin/bookings": {
+        "/api/admin/job-posts": {
             "get": {
                 "tags": [
                     "Admin"
                 ],
                 "summary": "List bookings (admin)",
                 "description": "Get paginated list of all bookings with optional status filter. Requires admin role.",
-                "operationId": "34c684e10699731bca2840d71f096b71",
+                "operationId": "18d15a3daf41119177bfc5ef70e9d820",
                 "parameters": [
                     {
                         "name": "status",
@@ -1554,7 +1554,9 @@
                                                 "babysitter",
                                                 "caregiver",
                                                 "cleaner",
-                                                "all_rounder"
+                                                "domestic_helper",
+                                                "driver",
+                                                "security_guard"
                                             ]
                                         }
                                     },
@@ -1759,7 +1761,9 @@
                                             "babysitter",
                                             "caregiver",
                                             "cleaner",
-                                            "all_rounder"
+                                            "domestic_helper",
+                                            "driver",
+                                            "security_guard"
                                         ]
                                     },
                                     "skills": {
@@ -1911,7 +1915,9 @@
                                 "babysitter",
                                 "caregiver",
                                 "cleaner",
-                                "all_rounder"
+                                "domestic_helper",
+                                "driver",
+                                "security_guard"
                             ]
                         }
                     },
@@ -2021,7 +2027,9 @@
                                             "babysitter",
                                             "caregiver",
                                             "cleaner",
-                                            "all_rounder"
+                                            "domestic_helper",
+                                            "driver",
+                                            "security_guard"
                                         ]
                                     },
                                     "skills": {
@@ -2177,7 +2185,9 @@
                                             "babysitter",
                                             "caregiver",
                                             "cleaner",
-                                            "all_rounder"
+                                            "domestic_helper",
+                                            "driver",
+                                            "security_guard"
                                         ]
                                     },
                                     "skills": {
@@ -2389,7 +2399,9 @@
                                 "babysitter",
                                 "caregiver",
                                 "cleaner",
-                                "all_rounder"
+                                "domestic_helper",
+                                "driver",
+                                "security_guard"
                             ]
                         }
                     },
@@ -2469,8 +2481,7 @@
                                     "work_type",
                                     "area",
                                     "name",
-                                    "phone",
-                                    "email"
+                                    "phone"
                                 ],
                                 "properties": {
                                     "service_type": {
@@ -2481,7 +2492,9 @@
                                             "babysitter",
                                             "caregiver",
                                             "cleaner",
-                                            "all_rounder"
+                                            "domestic_helper",
+                                            "driver",
+                                            "security_guard"
                                         ]
                                     },
                                     "work_type": {
@@ -2517,7 +2530,8 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "maxLength": 255
+                                        "maxLength": 255,
+                                        "nullable": true
                                     },
                                     "address": {
                                         "type": "string",
@@ -2605,19 +2619,19 @@
                 ]
             }
         },
-        "/api/bookings/{booking}/apply": {
+        "/api/job-posts/{jobPost}/apply": {
             "get": {
                 "tags": [
                     "Job Applications"
                 ],
                 "summary": "Get job application form",
-                "description": "Get booking data for creating a job application. Requires helper/business role and completed onboarding.",
-                "operationId": "df0ebd0f3c7454ff105e7bba97074171",
+                "description": "Get booking data for creating a job application. Requires helper/business role and completed onboarding. Returns job details even if user has already applied.",
+                "operationId": "01d21d43cbe66e2d5076da6f68449f86",
                 "parameters": [
                     {
-                        "name": "booking",
+                        "name": "jobPost",
                         "in": "path",
-                        "description": "Booking ID",
+                        "description": "Job Post ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -2631,8 +2645,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "booking": {
+                                        "job_post": {
+                                            "description": "Job post details",
                                             "type": "object"
+                                        },
+                                        "has_applied": {
+                                            "description": "Whether the user has already applied to this job",
+                                            "type": "boolean"
                                         }
                                     },
                                     "type": "object"
@@ -2644,7 +2663,7 @@
                         "description": "Forbidden - Only helpers and businesses can apply"
                     },
                     "422": {
-                        "description": "Onboarding not completed or already applied"
+                        "description": "Onboarding not completed"
                     }
                 },
                 "security": [
@@ -2659,12 +2678,12 @@
                 ],
                 "summary": "Submit job application",
                 "description": "Submit a job application for a service request. Requires helper/business role and completed onboarding.",
-                "operationId": "ba9b0a9ab6bcc49dfdd2e76dfc3545ba",
+                "operationId": "dd4c85fc6112827020f25e82ed678859",
                 "parameters": [
                     {
-                        "name": "booking",
+                        "name": "jobPost",
                         "in": "path",
-                        "description": "Booking ID",
+                        "description": "Job Post ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -3175,8 +3194,113 @@
                                                     "nullable": true
                                                 },
                                                 "job_applications": {
+                                                    "description": "List of job applications with applicant details",
                                                     "type": "array",
                                                     "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "user_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "message": {
+                                                                "type": "string",
+                                                                "nullable": true
+                                                            },
+                                                            "proposed_rate": {
+                                                                "type": "number",
+                                                                "nullable": true
+                                                            },
+                                                            "status": {
+                                                                "type": "string"
+                                                            },
+                                                            "status_label": {
+                                                                "type": "string"
+                                                            },
+                                                            "applied_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "nullable": true
+                                                            },
+                                                            "user": {
+                                                                "description": "Applicant user details including profile information",
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "phone": {
+                                                                        "type": "string",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "photo": {
+                                                                        "type": "string",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "age": {
+                                                                        "type": "integer",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "gender": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "male",
+                                                                            "female",
+                                                                            "other"
+                                                                        ],
+                                                                        "nullable": true
+                                                                    },
+                                                                    "religion": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "sunni_nazar_niyaz",
+                                                                            "sunni_no_nazar_niyaz",
+                                                                            "shia",
+                                                                            "christian"
+                                                                        ],
+                                                                        "nullable": true
+                                                                    },
+                                                                    "experience_years": {
+                                                                        "type": "integer",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "bio": {
+                                                                        "type": "string",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "city": {
+                                                                        "type": "string",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "area": {
+                                                                        "type": "string",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "languages": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "id": {
+                                                                                    "type": "integer"
+                                                                                },
+                                                                                "name": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "code": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        },
+                                                                        "nullable": true
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
                                                         "type": "object"
                                                     },
                                                     "nullable": true
@@ -3275,7 +3399,9 @@
                                             "babysitter",
                                             "caregiver",
                                             "cleaner",
-                                            "all_rounder"
+                                            "domestic_helper",
+                                            "driver",
+                                            "security_guard"
                                         ]
                                     },
                                     "work_type": {
@@ -3310,7 +3436,8 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "maxLength": 255
+                                        "maxLength": 255,
+                                        "nullable": true
                                     },
                                     "address": {
                                         "type": "string",
@@ -3459,14 +3586,14 @@
                 ]
             }
         },
-        "/api/bookings/browse": {
+        "/api/job-posts/browse": {
             "get": {
                 "tags": [
                     "JobPosts"
                 ],
                 "summary": "Browse available job posts",
                 "description": "Browse all available pending job posts (public access). Shows only pending posts that haven't been assigned yet. If user is authenticated and is a helper/business, excludes job posts they already applied to.",
-                "operationId": "ba5c4f4528269686e482bf236a91d5d4",
+                "operationId": "f7b399064012f2f734a045ac074992ff",
                 "parameters": [
                     {
                         "name": "service_type",
@@ -3480,7 +3607,9 @@
                                 "babysitter",
                                 "caregiver",
                                 "cleaner",
-                                "all_rounder"
+                                "domestic_helper",
+                                "driver",
+                                "security_guard"
                             ]
                         }
                     },
@@ -4830,7 +4959,9 @@
                                                         "babysitter",
                                                         "caregiver",
                                                         "cleaner",
-                                                        "all_rounder"
+                                                        "domestic_helper",
+                                                        "driver",
+                                                        "security_guard"
                                                     ]
                                                 },
                                                 "work_type": {
@@ -4880,6 +5011,42 @@
                                     },
                                     "bio": {
                                         "type": "string",
+                                        "nullable": true
+                                    },
+                                    "age": {
+                                        "description": "Age of the helper",
+                                        "type": "integer",
+                                        "maximum": 100,
+                                        "minimum": 18,
+                                        "nullable": true
+                                    },
+                                    "gender": {
+                                        "description": "Gender of the helper",
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "religion": {
+                                        "description": "Religion of the helper",
+                                        "type": "string",
+                                        "enum": [
+                                            "sunni_nazar_niyaz",
+                                            "sunni_no_nazar_niyaz",
+                                            "shia",
+                                            "christian"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "languages": {
+                                        "description": "Array of language IDs (can be sent as JSON string in FormData)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
                                         "nullable": true
                                     }
                                 },
@@ -4961,27 +5128,119 @@
                     "Onboarding"
                 ],
                 "summary": "Complete business onboarding",
-                "description": "Complete business onboarding by submitting business information. Requires business role.",
+                "description": "Complete business onboarding by submitting services, locations, and profile information. Requires business role.",
                 "operationId": "d9121b7d2b0a0f274c604f0c0c40ea18",
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
+                                "required": [
+                                    "services",
+                                    "locations",
+                                    "work_type"
+                                ],
                                 "properties": {
-                                    "business_name": {
+                                    "services": {
+                                        "description": "Array of service type slugs (can be sent as JSON string in FormData)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "maid",
+                                                "cook",
+                                                "babysitter",
+                                                "caregiver",
+                                                "cleaner",
+                                                "domestic_helper",
+                                                "driver",
+                                                "security_guard"
+                                            ]
+                                        }
+                                    },
+                                    "locations": {
+                                        "description": "Array of location IDs (can be sent as JSON string in FormData)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "work_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "full_time",
+                                            "part_time"
+                                        ]
+                                    },
+                                    "monthly_rate": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 2000,
+                                        "nullable": true
+                                    },
+                                    "nic": {
+                                        "description": "NIC document file (jpeg, jpg, png, pdf, max 5MB) - optional",
+                                        "type": "string",
+                                        "format": "binary",
+                                        "nullable": true
+                                    },
+                                    "nic_number": {
                                         "type": "string",
                                         "maxLength": 255,
                                         "nullable": true
                                     },
-                                    "business_address": {
+                                    "bio": {
                                         "type": "string",
-                                        "maxLength": 500,
                                         "nullable": true
                                     },
-                                    "business_description": {
+                                    "city": {
                                         "type": "string",
-                                        "maxLength": 2000,
+                                        "maxLength": 255,
+                                        "nullable": true
+                                    },
+                                    "area": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "nullable": true
+                                    },
+                                    "age": {
+                                        "description": "Age",
+                                        "type": "integer",
+                                        "maximum": 100,
+                                        "minimum": 18,
+                                        "nullable": true
+                                    },
+                                    "gender": {
+                                        "description": "Gender",
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "religion": {
+                                        "description": "Religion",
+                                        "type": "string",
+                                        "enum": [
+                                            "sunni_nazar_niyaz",
+                                            "sunni_no_nazar_niyaz",
+                                            "shia",
+                                            "christian"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "languages": {
+                                        "description": "Array of language IDs (can be sent as JSON string in FormData)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
                                         "nullable": true
                                     }
                                 },
@@ -5336,6 +5595,88 @@
                 }
             }
         },
+        "/api/service-types": {
+            "get": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Get service types",
+                "description": "Get a list of all active service types",
+                "operationId": "53d2b051aaa72f06aa6fa8e994bda316",
+                "responses": {
+                    "200": {
+                        "description": "List of service types",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "slug": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "icon": {
+                                                "type": "string",
+                                                "nullable": true
+                                            },
+                                            "sort_order": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/languages": {
+            "get": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Get languages",
+                "description": "Get a list of all active languages",
+                "operationId": "eab77f0a4147ece7a9d4312dfe2b804b",
+                "responses": {
+                    "200": {
+                        "description": "List of languages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "code": {
+                                                "type": "string"
+                                            },
+                                            "sort_order": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/profile": {
             "get": {
                 "tags": [
@@ -5375,6 +5716,54 @@
                                                     "description": "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)",
                                                     "type": "boolean",
                                                     "example": true
+                                                },
+                                                "age": {
+                                                    "description": "Age from profile",
+                                                    "type": "integer",
+                                                    "example": 25,
+                                                    "nullable": true
+                                                },
+                                                "gender": {
+                                                    "description": "Gender from profile",
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "male",
+                                                        "female",
+                                                        "other"
+                                                    ],
+                                                    "example": "male",
+                                                    "nullable": true
+                                                },
+                                                "religion": {
+                                                    "description": "Religion from profile",
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "sunni_nazar_niyaz",
+                                                        "sunni_no_nazar_niyaz",
+                                                        "shia",
+                                                        "christian"
+                                                    ],
+                                                    "example": "sunni_nazar_niyaz",
+                                                    "nullable": true
+                                                },
+                                                "languages": {
+                                                    "description": "Languages from profile",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "code": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "nullable": true
                                                 }
                                             },
                                             "type": "object"
@@ -5465,10 +5854,49 @@
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "name"
+                                ],
                                 "properties": {
                                     "name": {
                                         "type": "string",
                                         "maxLength": 255
+                                    },
+                                    "age": {
+                                        "description": "Age",
+                                        "type": "integer",
+                                        "maximum": 100,
+                                        "minimum": 18,
+                                        "nullable": true
+                                    },
+                                    "gender": {
+                                        "description": "Gender",
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "religion": {
+                                        "description": "Religion",
+                                        "type": "string",
+                                        "enum": [
+                                            "sunni_nazar_niyaz",
+                                            "sunni_no_nazar_niyaz",
+                                            "shia",
+                                            "christian"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "languages": {
+                                        "description": "Array of language IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -5506,6 +5934,54 @@
                                                     "description": "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)",
                                                     "type": "boolean",
                                                     "example": true
+                                                },
+                                                "age": {
+                                                    "description": "Age from profile",
+                                                    "type": "integer",
+                                                    "example": 25,
+                                                    "nullable": true
+                                                },
+                                                "gender": {
+                                                    "description": "Gender from profile",
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "male",
+                                                        "female",
+                                                        "other"
+                                                    ],
+                                                    "example": "male",
+                                                    "nullable": true
+                                                },
+                                                "religion": {
+                                                    "description": "Religion from profile",
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "sunni_nazar_niyaz",
+                                                        "sunni_no_nazar_niyaz",
+                                                        "shia",
+                                                        "christian"
+                                                    ],
+                                                    "example": "sunni_nazar_niyaz",
+                                                    "nullable": true
+                                                },
+                                                "languages": {
+                                                    "description": "Languages from profile",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "code": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "nullable": true
                                                 }
                                             },
                                             "type": "object"
@@ -5759,19 +6235,19 @@
                 ]
             }
         },
-        "/api/bookings/{booking}/review/create": {
+        "/api/job-posts/{jobPost}/review/create": {
             "get": {
                 "tags": [
                     "Reviews"
                 ],
                 "summary": "Get review creation form",
                 "description": "Get booking data for creating a review. Only booking owner can create reviews.",
-                "operationId": "f9104138a8386385ebef57f5d53484f7",
+                "operationId": "555be40fe5ad59a99f028e0f3a262a9a",
                 "parameters": [
                     {
-                        "name": "booking",
+                        "name": "jobPost",
                         "in": "path",
-                        "description": "Booking ID",
+                        "description": "Job Post ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -5805,19 +6281,19 @@
                 ]
             }
         },
-        "/api/bookings/{booking}/review": {
+        "/api/job-posts/{jobPost}/review": {
             "post": {
                 "tags": [
                     "Reviews"
                 ],
                 "summary": "Create review",
                 "description": "Create a review for a completed booking. Only booking owner can create reviews.",
-                "operationId": "49a718327a09eb05d7869809a8972e45",
+                "operationId": "0b715e15f3cdc33d213e3bd6e045cf7f",
                 "parameters": [
                     {
-                        "name": "booking",
+                        "name": "jobPost",
                         "in": "path",
-                        "description": "Booking ID",
+                        "description": "Job Post ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -6074,7 +6550,9 @@
                                 "babysitter",
                                 "caregiver",
                                 "cleaner",
-                                "all_rounder"
+                                "domestic_helper",
+                                "driver",
+                                "security_guard"
                             ]
                         }
                     },
@@ -6186,7 +6664,9 @@
                                                         "babysitter",
                                                         "caregiver",
                                                         "cleaner",
-                                                        "all_rounder"
+                                                        "domestic_helper",
+                                                        "driver",
+                                                        "security_guard"
                                                     ]
                                                 },
                                                 "work_type": {
@@ -6228,7 +6708,9 @@
                                             "babysitter",
                                             "caregiver",
                                             "cleaner",
-                                            "all_rounder"
+                                            "domestic_helper",
+                                            "driver",
+                                            "security_guard"
                                         ],
                                         "nullable": true
                                     },
@@ -6432,7 +6914,9 @@
                                                 "babysitter",
                                                 "caregiver",
                                                 "cleaner",
-                                                "all_rounder"
+                                                "domestic_helper",
+                                                "driver",
+                                                "security_guard"
                                             ]
                                         }
                                     },

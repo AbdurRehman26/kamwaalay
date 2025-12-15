@@ -110,7 +110,7 @@ test('admins can view bookings list', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->getJson('/api/admin/bookings');
+    ])->getJson('/api/admin/job-posts');
 
     $response->assertStatus(200);
     $response->assertJsonStructure(['bookings']);
@@ -127,7 +127,7 @@ test('admins can filter bookings by status', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->getJson('/api/admin/bookings?status=pending');
+    ])->getJson('/api/admin/job-posts?status=pending');
 
     $response->assertStatus(200);
     $response->assertJsonStructure(['bookings']);

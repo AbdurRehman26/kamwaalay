@@ -18,12 +18,12 @@ export const routes = {
     businesses: {
         show: (id) => `/businesses/${id}`,
     },
-    bookings: {
-        index: () => "/job-postings",
-        create: () => "/job/create",
-        show: (id) => `/bookings/${id}`,
-        edit: (id) => `/bookings/${id}/edit`,
-        browse: () => "/bookings/browse",
+    "job-posts": {
+        index: () => "/my-job-posts",
+        create: () => "/job-posts/create",
+        show: (id) => `/job-posts/${id}`,
+        edit: (id) => `/job-posts/${id}/edit`,
+        browse: () => "/job-posts/browse",
     },
     "service-listings": {
         index: () => "/service-listings",
@@ -34,7 +34,7 @@ export const routes = {
     },
     "job-applications": {
         index: () => "/job-posts",
-        create: (bookingId) => `/bookings/${bookingId}/apply`,
+        create: (bookingId) => `/job-posts/${bookingId}/apply`,
         show: (id) => `/job-applications/${id}`,
         "my-applications": () => "/my-applications",
         "my-request-applications": () => "/my-request-applications",
@@ -54,7 +54,7 @@ export const routes = {
     admin: {
         dashboard: () => "/admin/dashboard",
         helpers: () => "/admin/helpers",
-        bookings: () => "/admin/bookings",
+        "job-posts": () => "/admin/job-posts",
         documents: () => "/admin/documents",
     },
     about: () => "/about",

@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import axios from "axios";
-import { bookingsService } from "@/services/bookings";
+import { jobPostsService } from "@/services/jobPosts";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
@@ -42,7 +42,7 @@ export default function BookingEdit() {
     // Fetch booking data
     useEffect(() => {
         if (bookingId) {
-            bookingsService.getBooking(bookingId)
+            jobPostsService.getBooking(bookingId)
                 .then((response) => {
                     const bookingData = response.job_post || response.booking;
                     setBooking(bookingData);
@@ -133,8 +133,8 @@ export default function BookingEdit() {
         };
 
         try {
-            await bookingsService.updateBooking(bookingId, submitData);
-            navigate(route("bookings.index"));
+            await jobPostsService.updateBooking(bookingId, submitData);
+            navigate(route("job-posts.index"));
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
@@ -162,7 +162,7 @@ export default function BookingEdit() {
                 <div className="text-center py-12">
                     <p className="text-red-600 dark:text-red-400">Service request not found</p>
                     <Link
-                        to={route("bookings.index")}
+                        to={route("job-posts.index")}
                         className="mt-4 inline-block bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold"
                     >
                         Back to Service Requests
@@ -369,7 +369,7 @@ export default function BookingEdit() {
                                 )}
                             </button>
                             <Link
-                                to={route("bookings.index")}
+                                to={route("job-posts.index")}
                                 className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3.5 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 text-center shadow-md hover:shadow-lg"
                             >
                                 Cancel

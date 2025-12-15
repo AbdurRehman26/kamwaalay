@@ -253,7 +253,7 @@ export default function MyRequestApplications() {
                                     {application.status === "accepted" && (
                                         <div className="ml-4">
                                             <Link
-                                                to={route("bookings.show", (application.job_post || application.booking)?.id)}
+                                                to={route("job-posts.show", (application.job_post || application.booking)?.id)}
                                                 className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-4 py-2 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/40 transition duration-300 font-medium text-sm font-semibold"
                                             >
                                                 View Booking

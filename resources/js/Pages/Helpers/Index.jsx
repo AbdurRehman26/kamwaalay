@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import axios from "axios";
 import { helpersService } from "@/services/helpers";
-import { bookingsService } from "@/services/bookings";
+import { jobPostsService } from "@/services/jobPosts";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import ChatPopup from "@/Components/ChatPopup";
@@ -255,7 +255,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         setFormErrors({});
 
         try {
-            await bookingsService.createBooking(formData);
+            await jobPostsService.createBooking(formData);
             // Reset form
             setFormData({
                 service_type: "",

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout.jsx";
 import { homeService } from "@/services/home";
-import { bookingsService } from "@/services/bookings";
+import { jobPostsService } from "@/services/jobPosts";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import {
@@ -57,7 +57,7 @@ export default function Home() {
 
         // Fetch jobs only for guests, helpers, and businesses (not regular users)
         if (!user || isHelperOrBusiness(user)) {
-            bookingsService.browseBookings({ page: 1, per_page: 6 })
+            jobPostsService.browseBookings({ page: 1, per_page: 6 })
                 .then((data) => {
                     // Get first 6 jobs
                     setJobs((data.job_posts?.data || data.bookings?.data || []).slice(0, 6));
@@ -205,7 +205,7 @@ export default function Home() {
                                 )}
                                 {isUser(user) && (
                                     <Link
-                                        to={route("bookings.create")}
+                                        to={route("job-posts.create")}
                                         className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-bold text-lg hover:bg-white/20 transition-all duration-300 flex items-center justify-center"
                                     >
                                         Post a Job
@@ -616,7 +616,7 @@ export default function Home() {
                             {jobs.map((job) => (
                                 <Link
                                     key={job.id}
-                                    to={route("bookings.show", job.id)}
+                                    to={route("job-posts.show", job.id)}
                                     className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300 transform hover:-translate-y-1"
                                 >
                                     <div className="p-6">
@@ -811,7 +811,7 @@ export default function Home() {
                                         </Link>
                                     ) : (
                                         <Link
-                                            to={route("bookings.create")}
+                                            to={route("job-posts.create")}
                                             className="inline-block px-8 py-4 bg-white text-indigo-600 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg"
                                         >
                                             Post a Job

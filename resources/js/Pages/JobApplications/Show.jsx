@@ -345,7 +345,7 @@ export default function JobApplicationShow() {
                                 {jobPost && (
                                     <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
                                         <Link
-                                            to={route("bookings.show", jobPost.id)}
+                                            to={route("job-posts.show", jobPost.id)}
                                             className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold text-sm"
                                         >
                                             View Full Job Details →
@@ -403,7 +403,7 @@ export default function JobApplicationShow() {
                             </div>
                             <p className="text-green-800 dark:text-green-300 font-semibold text-xl mb-4">Application Accepted!</p>
                             <Link
-                                to={route("bookings.show", jobPost.id)}
+                                to={route("job-posts.show", jobPost.id)}
                                 className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300 font-semibold"
                             >
                                 View Booking Details

@@ -230,7 +230,7 @@ export default function JobApplicationsIndex() {
 
                                     const handleCardClick = (e) => {
                                         // Navigate to job detail page
-                                        navigate(route("bookings.show", job.id));
+                                        navigate(route("job-posts.show", job.id));
                                     };
 
                                     return (

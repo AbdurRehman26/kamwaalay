@@ -184,7 +184,7 @@ class AdminController extends Controller
     }
 
     #[OA\Get(
-        path: "/api/admin/bookings",
+        path: "/api/admin/job-posts",
         summary: "List bookings (admin)",
         description: "Get paginated list of all bookings with optional status filter. Requires admin role.",
         tags: ["Admin"],

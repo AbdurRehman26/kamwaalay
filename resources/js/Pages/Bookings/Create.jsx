@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import axios from "axios";
-import { bookingsService } from "@/services/bookings";
+import { jobPostsService } from "@/services/jobPosts";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
@@ -38,7 +38,7 @@ export default function BookingCreate() {
 
     // Fetch prefill data from API
     useEffect(() => {
-        bookingsService.getBookingCreatePrefill()
+        jobPostsService.getBookingCreatePrefill()
             .then((response) => {
                 if (response.prefill) {
                     setPrefill(response.prefill);
@@ -137,9 +137,9 @@ export default function BookingCreate() {
         };
 
         try {
-            const response = await bookingsService.createBooking(submitData);
+            const response = await jobPostsService.createBooking(submitData);
             // Redirect to job postings index or show success message
-            navigate(route("bookings.index"));
+            navigate(route("job-posts.index"));
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);

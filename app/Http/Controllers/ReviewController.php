@@ -13,13 +13,13 @@ use OpenApi\Attributes as OA;
 class ReviewController extends Controller
 {
     #[OA\Get(
-        path: "/api/bookings/{booking}/review/create",
+        path: "/api/job-posts/{jobPost}/review/create",
         summary: "Get review creation form",
         description: "Get booking data for creating a review. Only booking owner can create reviews.",
         tags: ["Reviews"],
         security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+            new OA\Parameter(name: "jobPost", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Job Post ID"),
         ],
         responses: [
             new OA\Response(
@@ -53,13 +53,13 @@ class ReviewController extends Controller
     }
 
     #[OA\Post(
-        path: "/api/bookings/{booking}/review",
+        path: "/api/job-posts/{jobPost}/review",
         summary: "Create review",
         description: "Create a review for a completed booking. Only booking owner can create reviews.",
         tags: ["Reviews"],
         security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+            new OA\Parameter(name: "jobPost", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Job Post ID"),
         ],
         requestBody: new OA\RequestBody(
             required: true,

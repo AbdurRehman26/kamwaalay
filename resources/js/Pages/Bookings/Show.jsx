@@ -1,7 +1,7 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { useState, useEffect } from "react";
-import { bookingsService } from "@/services/bookings";
+import { jobPostsService } from "@/services/jobPosts";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 
@@ -15,7 +15,7 @@ export default function BookingShow() {
 
     useEffect(() => {
         if (bookingId) {
-            bookingsService.getBooking(bookingId)
+            jobPostsService.getBooking(bookingId)
                 .then((data) => {
                     setBooking(data.job_post || data.booking);
                     setLoading(false);
@@ -46,7 +46,7 @@ export default function BookingShow() {
                 <div className="container mx-auto px-4 py-12 text-center">
                     <p className="text-red-600 dark:text-red-400">{error || "Booking not found"}</p>
                     <Link
-                        to={route("bookings.index")}
+                        to={route("job-posts.index")}
                         className="mt-4 inline-block bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold"
                     >
                         Back to My Requests
@@ -162,7 +162,7 @@ export default function BookingShow() {
                         {user ? (
                             <>
                                 <Link
-                                    to={route("bookings.index")}
+                                    to={route("job-posts.index")}
                                     className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold text-center"
                                 >
                                     Back to My Requests
@@ -179,7 +179,7 @@ export default function BookingShow() {
                         ) : (
                             <>
                                 <Link
-                                    to={route("bookings.browse")}
+                                    to={route("job-posts.browse")}
                                     className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold text-center"
                                 >
                                     Back to Search Jobs

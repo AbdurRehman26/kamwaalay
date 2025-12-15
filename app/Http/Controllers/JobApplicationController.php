@@ -112,13 +112,13 @@ class JobApplicationController extends Controller
     }
 
     #[OA\Get(
-        path: "/api/bookings/{booking}/apply",
+        path: "/api/job-posts/{jobPost}/apply",
         summary: "Get job application form",
         description: "Get booking data for creating a job application. Requires helper/business role and completed onboarding. Returns job details even if user has already applied.",
         tags: ["Job Applications"],
         security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+            new OA\Parameter(name: "jobPost", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Job Post ID"),
         ],
         responses: [
             new OA\Response(
@@ -169,13 +169,13 @@ class JobApplicationController extends Controller
     }
 
     #[OA\Post(
-        path: "/api/bookings/{booking}/apply",
+        path: "/api/job-posts/{jobPost}/apply",
         summary: "Submit job application",
         description: "Submit a job application for a service request. Requires helper/business role and completed onboarding.",
         tags: ["Job Applications"],
         security: [["sanctum" => []]],
         parameters: [
-            new OA\Parameter(name: "booking", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Booking ID"),
+            new OA\Parameter(name: "jobPost", in: "path", required: true, schema: new OA\Schema(type: "integer"), description: "Job Post ID"),
         ],
         requestBody: new OA\RequestBody(
             required: true,

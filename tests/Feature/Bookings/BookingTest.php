@@ -21,7 +21,7 @@ test('guests can view service requests', function () {
         'status' => 'pending',
     ]);
 
-    $response = $this->getJson('/api/bookings/browse');
+    $response = $this->getJson('/api/job-posts/browse');
 
     $response->assertStatus(200);
     $response->assertJsonStructure([
@@ -38,7 +38,7 @@ test('guests can view individual service requests', function () {
         'status' => 'pending',
     ]);
 
-    $response = $this->getJson("/api/bookings/{$jobPost->id}");
+    $response = $this->getJson("/api/job-posts/{$jobPost->id}");
 
     $response->assertStatus(200);
     $response->assertJsonStructure([

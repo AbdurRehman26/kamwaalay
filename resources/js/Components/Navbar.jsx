@@ -151,7 +151,7 @@ export default function Navbar() {
                                     )}
                                     {isUser(user) && (
                                         <Link
-                                            to={route("bookings.create")}
+                                            to={route("job-posts.create")}
                                             className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-5 py-2.5 rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 font-semibold"
                                         >
                                             <span className="flex items-center gap-2">
@@ -292,7 +292,7 @@ export default function Navbar() {
                                     )}
                                     {isUser(user) && (
                                         <Link
-                                            to={route("bookings.create")}
+                                            to={route("job-posts.create")}
                                             onClick={() => setMobileMenuOpen(false)}
                                             className="block py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 font-semibold text-center shadow-md"
                                         >

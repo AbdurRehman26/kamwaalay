@@ -83,8 +83,8 @@ export default function DashboardOverview() {
                                 👤
                             </div>
                             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${user?.onboarding_complete
-                                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
-                                    : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300"
+                                ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                                : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300"
                                 }`}>
                                 {user?.onboarding_complete ? "Complete" : "Action Needed"}
                             </span>
@@ -103,8 +103,8 @@ export default function DashboardOverview() {
                                     🛡️
                                 </div>
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${user?.verification_status === "verified"
-                                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
-                                        : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
+                                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                                    : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
                                     }`}>
                                     {user?.verification_status === "verified" ? "Verified" : "Pending"}
                                 </span>
@@ -142,7 +142,7 @@ export default function DashboardOverview() {
                     {isUser(user) && (
                         <>
                             <Link
-                                to={route("bookings.create")}
+                                to={route("job-posts.create")}
                                 className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
                             >
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-bl-full group-hover:bg-indigo-500/10 transition-colors"></div>
@@ -152,7 +152,7 @@ export default function DashboardOverview() {
                             </Link>
 
                             <Link
-                                to={route("bookings.index")}
+                                to={route("job-posts.index")}
                                 className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
                             >
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-bl-full group-hover:bg-blue-500/10 transition-colors"></div>

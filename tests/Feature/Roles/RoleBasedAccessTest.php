@@ -104,7 +104,7 @@ test('users and businesses can create service requests', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->postJson('/api/bookings', [
+    ])->postJson('/api/job-posts', [
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'phone' => '03001234567',
@@ -127,7 +127,7 @@ test('helpers cannot create service requests', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->postJson('/api/bookings', [
+    ])->postJson('/api/job-posts', [
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'phone' => '03001234567',

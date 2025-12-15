@@ -2,14 +2,14 @@ import { Link } from "react-router-dom";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { route } from "@/utils/routes";
 import { useState, useEffect } from "react";
-import { bookingsService } from "@/services/bookings";
+import { jobPostsService } from "@/services/jobPosts";
 
 export default function BookingsIndex() {
     const [bookings, setBookings] = useState({ data: [], links: [], meta: {} });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        bookingsService.getBookings()
+        jobPostsService.getBookings()
             .then((data) => {
                 setBookings(data.job_posts || data.bookings || { data: [], links: [], meta: {} });
                 setLoading(false);
@@ -50,7 +50,7 @@ export default function BookingsIndex() {
                             </p>
                         </div>
                         <Link
-                            to={route("bookings.create")}
+                            to={route("job-posts.create")}
                             className="inline-flex items-center justify-center px-6 py-3 bg-white text-indigo-600 font-bold rounded-xl hover:bg-indigo-50 transition-all duration-300 shadow-lg group whitespace-nowrap"
                         >
                             <span className="mr-2 text-xl group-hover:rotate-90 transition-transform">➕</span>
@@ -104,8 +104,8 @@ export default function BookingsIndex() {
                                         <div className="flex flex-wrap gap-4 mt-2">
                                             {booking.job_applications_count !== undefined && (
                                                 <div className={`flex items-center px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-700 ${booking.job_applications_count > 0
-                                                        ? "text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/30 bg-indigo-50 dark:bg-indigo-900/20"
-                                                        : "text-gray-500 dark:text-gray-400"
+                                                    ? "text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/30 bg-indigo-50 dark:bg-indigo-900/20"
+                                                    : "text-gray-500 dark:text-gray-400"
                                                     }`}>
                                                     <span className="mr-2 text-lg">👥</span>
                                                     <span className="font-semibold">
@@ -130,13 +130,13 @@ export default function BookingsIndex() {
 
                                     <div className="flex items-center gap-3 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-gray-700">
                                         <Link
-                                            to={route("bookings.show", booking.id)}
+                                            to={route("job-posts.show", booking.id)}
                                             className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors"
                                         >
                                             View Details
                                         </Link>
                                         <Link
-                                            to={route("bookings.edit", booking.id)}
+                                            to={route("job-posts.edit", booking.id)}
                                             className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                                             onClick={(e) => e.stopPropagation()}
                                         >
@@ -157,8 +157,8 @@ export default function BookingsIndex() {
                                             to={link.url || "#"}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center min-w-[40px] ${link.active
-                                                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
-                                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-700"
+                                                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
+                                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-700"
                                                 } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                         />
                                     ))}
@@ -174,7 +174,7 @@ export default function BookingsIndex() {
                             Ready to get help? Post your first job request today and connect with skilled helpers.
                         </p>
                         <Link
-                            to={route("bookings.create")}
+                            to={route("job-posts.create")}
                             className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-1"
                         >
                             <span className="mr-2 text-xl">✨</span> Post Your First Job

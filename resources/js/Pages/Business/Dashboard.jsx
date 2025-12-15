@@ -129,15 +129,15 @@ export default function BusinessDashboard() {
                             <button
                                 onClick={() => setActiveTab("workers")}
                                 className={`flex-1 py-5 px-6 text-center font-bold text-sm transition-all relative ${activeTab === "workers"
-                                        ? "text-indigo-600 dark:text-indigo-400"
-                                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                    ? "text-indigo-600 dark:text-indigo-400"
+                                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                     }`}
                             >
                                 Recent Workers
                                 {recentWorkers && recentWorkers.length > 0 && (
                                     <span className={`ml-2 py-0.5 px-2.5 rounded-full text-xs ${activeTab === "workers"
-                                            ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300"
-                                            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                                        ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300"
+                                        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                                         }`}>
                                         {recentWorkers.length}
                                     </span>
@@ -149,15 +149,15 @@ export default function BusinessDashboard() {
                             <button
                                 onClick={() => setActiveTab("bookings")}
                                 className={`flex-1 py-5 px-6 text-center font-bold text-sm transition-all relative ${activeTab === "bookings"
-                                        ? "text-indigo-600 dark:text-indigo-400"
-                                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                    ? "text-indigo-600 dark:text-indigo-400"
+                                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                     }`}
                             >
                                 Recent Bookings
                                 {recentBookings && recentBookings.length > 0 && (
                                     <span className={`ml-2 py-0.5 px-2.5 rounded-full text-xs ${activeTab === "bookings"
-                                            ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300"
-                                            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                                        ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300"
+                                        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                                         }`}>
                                         {recentBookings.length}
                                     </span>
@@ -229,7 +229,7 @@ export default function BusinessDashboard() {
                                 <div className="flex justify-between items-center mb-6">
                                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recent Incoming Bookings</h3>
                                     <Link
-                                        to={route("bookings.index")}
+                                        to={route("job-posts.index")}
                                         className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-bold flex items-center gap-1 group"
                                     >
                                         View All <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -249,8 +249,8 @@ export default function BusinessDashboard() {
                                                     </div>
                                                 </div>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${booking.status === "confirmed" ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300" :
-                                                        booking.status === "pending" ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300" :
-                                                            "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                                                    booking.status === "pending" ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300" :
+                                                        "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                                                     }`}>
                                                     {booking.status}
                                                 </span>

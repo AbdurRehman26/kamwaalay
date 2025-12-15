@@ -287,7 +287,7 @@ class JobPostController extends Controller
     }
 
     #[OA\Get(
-        path: "/api/bookings/browse",
+        path: "/api/job-posts/browse",
         summary: "Browse available job posts",
         description: "Browse all available pending job posts (public access). Shows only pending posts that haven't been assigned yet. If user is authenticated and is a helper/business, excludes job posts they already applied to.",
         tags: ["JobPosts"],

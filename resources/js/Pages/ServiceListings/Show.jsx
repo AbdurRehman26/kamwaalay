@@ -384,13 +384,13 @@ export default function ServiceListingShow() {
                                             )}
                                             <div className="flex gap-3 mt-4">
                                                 <Link
-                                                    to={route("bookings.show", booking.id)}
+                                                    to={route("job-posts.show", booking.id)}
                                                     className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-indigo-500/30 font-bold"
                                                 >
                                                     View Details
                                                 </Link>
                                                 <Link
-                                                    to={`/bookings/${booking.id}/apply`}
+                                                    to={`/job-posts/${booking.id}/apply`}
                                                     className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-md hover:shadow-green-500/30 font-bold"
                                                 >
                                                     Apply Now

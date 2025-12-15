@@ -12,8 +12,8 @@ export const jobApplicationsService = {
     },
 
     async createApplication(bookingId, data) {
-        // Correct endpoint: /bookings/{booking}/apply
-        const response = await api.post(`/bookings/${bookingId}/apply`, data);
+        // Correct endpoint: /job-posts/{jobPost}/apply
+        const response = await api.post(`/job-posts/${bookingId}/apply`, data);
         return response.data;
     },
 
@@ -48,8 +48,8 @@ export const jobApplicationsService = {
     },
 
     async getApplicationCreate(bookingId) {
-        // Correct endpoint: /bookings/{booking}/apply
-        const response = await api.get(`/bookings/${bookingId}/apply`);
+        // Correct endpoint: /job-posts/{jobPost}/apply
+        const response = await api.get(`/job-posts/${bookingId}/apply`);
         return response.data;
     },
 };

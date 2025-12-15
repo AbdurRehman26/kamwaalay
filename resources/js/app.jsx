@@ -140,32 +140,22 @@ function AppRoutes() {
                     <ProfileEdit />
                 </ProtectedRoute>
             } />
-            <Route path="/job-postings" element={
+            <Route path="/my-job-posts" element={
                 <ProtectedRoute>
                     <BookingsIndex />
                 </ProtectedRoute>
             } />
-            <Route path="/bookings" element={
-                <ProtectedRoute>
-                    <BookingsIndex />
-                </ProtectedRoute>
-            } />
-            <Route path="/job/create" element={
+            <Route path="/job-posts/create" element={
                 <ProtectedRoute>
                     <BookingsCreate />
                 </ProtectedRoute>
             } />
-            <Route path="/bookings/create" element={
-                <ProtectedRoute>
-                    <BookingsCreate />
-                </ProtectedRoute>
-            } />
-            <Route path="/bookings/:bookingId/edit" element={
+            <Route path="/job-posts/:bookingId/edit" element={
                 <ProtectedRoute>
                     <BookingsEdit />
                 </ProtectedRoute>
             } />
-            <Route path="/bookings/:bookingId" element={<BookingsShow />} />
+            <Route path="/job-posts/:bookingId" element={<BookingsShow />} />
             <Route path="/service-listings/create" element={
                 <ProtectedRoute>
                     <ServiceListingsCreate />
@@ -182,7 +172,7 @@ function AppRoutes() {
                 </ProtectedRoute>
             } />
             <Route path="/job-posts" element={<JobApplicationsIndex />} />
-            <Route path="/bookings/:bookingId/apply" element={
+            <Route path="/job-posts/:bookingId/apply" element={
                 <ProtectedRoute>
                     <JobApplicationsCreate />
                 </ProtectedRoute>
