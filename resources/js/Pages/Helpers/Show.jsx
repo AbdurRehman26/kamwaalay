@@ -241,8 +241,8 @@ export default function HelperShow() {
                                             {listing.status && (
                                                 <div className="mb-3">
                                                     <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${listing.status === "active"
-                                                            ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
-                                                            : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
+                                                        ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                                                        : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
                                                         }`}>
                                                         {listing.status === "active" ? "✓ Active" : listing.status}
                                                     </span>
@@ -331,7 +331,11 @@ export default function HelperShow() {
                                 {helper.religion && (
                                     <div>
                                         <p className="text-sm text-gray-600 dark:text-gray-400">Religion</p>
-                                        <p className="font-semibold text-gray-900 dark:text-white capitalize">{helper.religion.replace(/_/g, " ")}</p>
+                                        <p className="font-semibold text-gray-900 dark:text-white capitalize">
+                                            {typeof helper.religion === "object"
+                                                ? helper.religion.label
+                                                : helper.religion.replace(/_/g, " ")}
+                                        </p>
                                     </div>
                                 )}
                                 {helper.languages && helper.languages.length > 0 && (

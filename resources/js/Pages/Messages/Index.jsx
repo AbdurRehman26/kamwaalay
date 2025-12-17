@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { messagesService } from "@/services/messages";
 import { authService } from "@/services/auth";
 import DashboardLayout from "@/Layouts/DashboardLayout";
+import DeleteChatModal from "@/Components/DeleteChatModal";
 import Pusher from "pusher-js";
 
 export default function MessagesIndex() {
@@ -14,6 +15,9 @@ export default function MessagesIndex() {
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
     const [error, setError] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [conversationToDelete, setConversationToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const messagesEndRef = useRef(null);
     const pusherRef = useRef(null);
     const channelRef = useRef(null);
@@ -156,6 +160,61 @@ export default function MessagesIndex() {
         }
     };
 
+    const handleDeleteConversation = (e, conversation) => {
+        e.stopPropagation();
+        setConversationToDelete(conversation);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDeleteConversation = async () => {
+        if (!conversationToDelete) return;
+
+        setIsDeleting(true);
+        try {
+            await messagesService.deleteConversation(conversationToDelete.id);
+            setConversations((prev) => prev.filter((c) => c.id !== conversationToDelete.id));
+            if (selectedConversation?.id === conversationToDelete.id) {
+                setSelectedConversation(null);
+                setMessages([]);
+            }
+        } catch (error) {
+            console.error("Error deleting conversation:", error);
+            setError("Failed to delete conversation");
+            setTimeout(() => setError(""), 5000);
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteModal(false);
+            setConversationToDelete(null);
+        }
+    };
+
+    const handleDeleteMessage = async (messageId) => {
+        if (!confirm("Are you sure you want to delete this message?")) return;
+
+        try {
+            await messagesService.deleteMessage(messageId);
+            setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
+            // Update conversation last message if needed
+            setConversations((prev) =>
+                prev.map((c) => {
+                    if (c.id === selectedConversation.id && c.last_message?.id === messageId) {
+                        return {
+                            ...c,
+                            last_message: messages.length > 1
+                                ? messages[messages.length - 2] // Approximate new last message
+                                : null
+                        };
+                    }
+                    return c;
+                })
+            );
+        } catch (error) {
+            console.error("Error deleting message:", error);
+            alert("Failed to delete message");
+        }
+    };
+
     // Scroll to bottom when new messages arrive (not when loading existing messages)
     useEffect(() => {
         // Only scroll if we're at or near the bottom (user hasn't scrolled up to read old messages)
@@ -207,10 +266,17 @@ export default function MessagesIndex() {
                             ) : (
                                 <div className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {conversations.map((conversation) => (
-                                        <button
+                                        <div
                                             key={conversation.id}
                                             onClick={() => handleSelectConversation(conversation)}
-                                            className={`w-full p-4 text-left hover:bg-white dark:hover:bg-gray-800 transition-all duration-200 ${selectedConversation?.id === conversation.id ? "bg-white dark:bg-gray-800 border-l-4 border-indigo-600 dark:border-indigo-400" : ""
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter" || e.key === " ") {
+                                                    handleSelectConversation(conversation);
+                                                }
+                                            }}
+                                            className={`w-full p-4 text-left hover:bg-white dark:hover:bg-gray-800 transition-all duration-200 cursor-pointer ${selectedConversation?.id === conversation.id ? "bg-white dark:bg-gray-800 border-l-4 border-indigo-600 dark:border-indigo-400" : ""
                                                 }`}
                                         >
                                             <div className="flex items-center gap-3">
@@ -229,14 +295,25 @@ export default function MessagesIndex() {
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between mb-1">
-                                                        <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
+                                                        <p className="text-sm font-bold text-gray-900 dark:text-white truncate flex-1">
                                                             {conversation.other_user.name}
                                                         </p>
-                                                        {conversation.unread_count > 0 && (
-                                                            <span className="flex-shrink-0 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
-                                                                {conversation.unread_count}
-                                                            </span>
-                                                        )}
+                                                        <div className="flex items-center gap-2">
+                                                            {conversation.unread_count > 0 && (
+                                                                <span className="flex-shrink-0 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
+                                                                    {conversation.unread_count}
+                                                                </span>
+                                                            )}
+                                                            <button
+                                                                onClick={(e) => handleDeleteConversation(e, conversation)}
+                                                                className="p-2 bg-red-100 dark:bg-red-900/50 hover:bg-red-200 dark:hover:bg-red-800/70 rounded-lg text-red-600 dark:text-red-400 hover:text-red-700 transition-colors shadow-sm"
+                                                                title="Delete Chat"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                     {conversation.last_message && (
                                                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -253,7 +330,7 @@ export default function MessagesIndex() {
                                                     )}
                                                 </div>
                                             </div>
-                                        </button>
+                                        </div>
                                     ))}
                                 </div>
                             )}
@@ -264,24 +341,35 @@ export default function MessagesIndex() {
                             {selectedConversation ? (
                                 <>
                                     {/* Chat Header */}
-                                    <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center gap-3 shadow-sm">
-                                        {selectedConversation.other_user.photo ? (
-                                            <img
-                                                src={`/storage/${selectedConversation.other_user.photo}`}
-                                                alt={selectedConversation.other_user.name}
-                                                className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-                                            />
-                                        ) : (
-                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center text-white font-bold shadow-md">
-                                                {selectedConversation.other_user.name.charAt(0).toUpperCase()}
+                                    <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between shadow-sm">
+                                        <div className="flex items-center gap-3">
+                                            {selectedConversation.other_user.photo ? (
+                                                <img
+                                                    src={`/storage/${selectedConversation.other_user.photo}`}
+                                                    alt={selectedConversation.other_user.name}
+                                                    className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                                                />
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center text-white font-bold shadow-md">
+                                                    {selectedConversation.other_user.name.charAt(0).toUpperCase()}
+                                                </div>
+                                            )}
+                                            <div>
+                                                <p className="font-bold text-gray-900 dark:text-white">
+                                                    {selectedConversation.other_user.name}
+                                                </p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">Online</p>
                                             </div>
-                                        )}
-                                        <div>
-                                            <p className="font-bold text-gray-900 dark:text-white">
-                                                {selectedConversation.other_user.name}
-                                            </p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">Online</p>
                                         </div>
+                                        <button
+                                            onClick={(e) => handleDeleteConversation(e, selectedConversation)}
+                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-full transition-colors"
+                                            title="Delete Conversation"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
                                     </div>
 
                                     {/* Messages */}
@@ -302,16 +390,27 @@ export default function MessagesIndex() {
                                                         key={message.id}
                                                         className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
                                                     >
-                                                        <div className="flex items-end gap-2 max-w-[70%]">
+                                                        <div className="flex items-end gap-2 max-w-[70%] group">
                                                             {!isOwnMessage && (
                                                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                                                     {message.sender?.name?.charAt(0).toUpperCase() || "U"}
                                                                 </div>
                                                             )}
+                                                            {isOwnMessage && (
+                                                                <button
+                                                                    onClick={() => handleDeleteMessage(message.id)}
+                                                                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-gray-400 hover:text-red-500"
+                                                                    title="Delete Message"
+                                                                >
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                    </svg>
+                                                                </button>
+                                                            )}
                                                             <div
                                                                 className={`px-4 py-3 rounded-2xl shadow-sm ${isOwnMessage
-                                                                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-br-none"
-                                                                        : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-bl-none border border-gray-200 dark:border-gray-700"
+                                                                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-br-none"
+                                                                    : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-bl-none border border-gray-200 dark:border-gray-700"
                                                                     }`}
                                                             >
                                                                 {!isOwnMessage && (
@@ -385,6 +484,18 @@ export default function MessagesIndex() {
                     </div>
                 </div>
             </div>
+
+            {/* Delete Chat Confirmation Modal */}
+            <DeleteChatModal
+                show={showDeleteModal}
+                onClose={() => {
+                    setShowDeleteModal(false);
+                    setConversationToDelete(null);
+                }}
+                onConfirm={confirmDeleteConversation}
+                contactName={conversationToDelete?.other_user?.name || ""}
+                isDeleting={isDeleting}
+            />
         </DashboardLayout>
     );
 }

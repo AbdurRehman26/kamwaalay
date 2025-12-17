@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\Religion;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
@@ -57,6 +58,27 @@ class UserResource extends JsonResource
     }
 
     /**
+     * Get religion with value and label from enum
+     */
+    private function getReligionData(): ?array
+    {
+        $religionValue = $this->profile?->religion;
+        if (!$religionValue) {
+            return null;
+        }
+        
+        $religionEnum = Religion::tryFrom($religionValue);
+        if (!$religionEnum) {
+            return ['value' => $religionValue, 'label' => $religionValue];
+        }
+        
+        return [
+            'value' => $religionEnum->value,
+            'label' => $religionEnum->label(),
+        ];
+    }
+
+    /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
@@ -85,7 +107,7 @@ class UserResource extends JsonResource
             'experience_years' => $this->when($this->profile, $this->experience_years),
             'age' => $this->when($this->profile, $this->profile?->age),
             'gender' => $this->when($this->profile, $this->profile?->gender),
-            'religion' => $this->when($this->profile, $this->profile?->religion),
+            'religion' => $this->when($this->profile, fn() => $this->getReligionData()),
             'city' => $this->when($this->profile, $this->city),
             'area' => $this->when($this->profile, $this->area),
             'availability' => $this->when($this->profile, $this->availability),

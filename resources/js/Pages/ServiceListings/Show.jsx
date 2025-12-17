@@ -157,7 +157,11 @@ export default function ServiceListingShow() {
                                     {listing.user?.religion && (
                                         <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2 mt-2">
                                             <span>🕌</span>
-                                            <span className="capitalize">{listing.user.religion.replace(/_/g, " ")}</span>
+                                            <span className="capitalize">
+                                                {typeof listing.user.religion === "object"
+                                                    ? listing.user.religion.label
+                                                    : listing.user.religion.replace(/_/g, " ")}
+                                            </span>
                                         </p>
                                     )}
                                     {listing.user?.languages && listing.user.languages.length > 0 && (

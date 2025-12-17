@@ -29,5 +29,21 @@ export const messagesService = {
         });
         return response.data;
     },
+
+    /**
+     * Delete a conversation
+     */
+    async deleteConversation(conversationId) {
+        const response = await api.delete(`/conversations/${conversationId}`);
+        return response.data;
+    },
+
+    /**
+     * Delete a message
+     */
+    async deleteMessage(messageId) {
+        const response = await api.delete(`/messages/${messageId}`);
+        return response.data;
+    },
 };
 

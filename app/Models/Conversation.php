@@ -14,11 +14,61 @@ class Conversation extends Model
         'user_one_id',
         'user_two_id',
         'last_message_at',
+        'user_one_deleted_at',
+        'user_two_deleted_at',
     ];
 
     protected $casts = [
         'last_message_at' => 'datetime',
+        'user_one_deleted_at' => 'datetime',
+        'user_two_deleted_at' => 'datetime',
     ];
+
+    /**
+     * Get the deletion timestamp for a specific user
+     */
+    public function getDeletedAtForUser(int $userId): ?\Carbon\Carbon
+    {
+        if ($this->user_one_id === $userId) {
+            return $this->user_one_deleted_at;
+        }
+        if ($this->user_two_id === $userId) {
+            return $this->user_two_deleted_at;
+        }
+        return null;
+    }
+
+    /**
+     * Mark conversation as deleted for a specific user
+     */
+    public function markAsDeletedForUser(int $userId): bool
+    {
+        if ($this->user_one_id === $userId) {
+            $this->user_one_deleted_at = now();
+            return $this->save();
+        }
+        if ($this->user_two_id === $userId) {
+            $this->user_two_deleted_at = now();
+            return $this->save();
+        }
+        return false;
+    }
+
+    /**
+     * Clear deletion timestamp for a user (used when new messages arrive)
+     */
+    public function clearDeletedAtForUser(int $userId): bool
+    {
+        if ($this->user_one_id === $userId) {
+            $this->user_one_deleted_at = null;
+            return $this->save();
+        }
+        if ($this->user_two_id === $userId) {
+            $this->user_two_deleted_at = null;
+            return $this->save();
+        }
+        return false;
+    }
 
     /**
      * Get user one

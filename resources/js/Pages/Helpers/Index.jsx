@@ -767,7 +767,9 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                         <div className="flex items-center gap-2 text-sm">
                                                             <span className="text-gray-500 dark:text-gray-400 w-5 text-center">🕌</span>
                                                             <span className="text-gray-700 dark:text-gray-300 capitalize text-xs">
-                                                                {helper.religion.replace(/_/g, " ")}
+                                                                {typeof helper.religion === "object"
+                                                                    ? helper.religion.label
+                                                                    : helper.religion.replace(/_/g, " ")}
                                                             </span>
                                                         </div>
                                                     )}

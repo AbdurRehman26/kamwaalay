@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Religion;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProfileUpdateRequest extends FormRequest
@@ -12,7 +13,7 @@ class ProfileUpdateRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'age' => ['nullable', 'integer', 'min:18', 'max:100'],
             'gender' => ['nullable', 'in:male,female,other'],
-            'religion' => ['nullable', 'in:sunni_nazar_niyaz,sunni_no_nazar_niyaz,shia,christian'],
+            'religion' => ['nullable', 'in:' . Religion::validationString()],
             'languages' => ['nullable', 'array'],
             'languages.*' => ['required', 'integer', 'exists:languages,id'],
         ];

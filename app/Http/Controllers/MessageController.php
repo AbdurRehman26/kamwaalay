@@ -83,16 +83,45 @@ class MessageController extends Controller
     {
         $user = Auth::user();
         
-        $conversations = Conversation::where('user_one_id', $user->id)
-            ->orWhere('user_two_id', $user->id)
-            ->with(['userOne.profile', 'userTwo.profile', 'messages' => function ($query) {
-                $query->latest()->limit(1);
-            }])
+        $conversations = Conversation::where(function ($query) use ($user) {
+                $query->where('user_one_id', $user->id)
+                    ->orWhere('user_two_id', $user->id);
+            })
+            ->with(['userOne.profile', 'userTwo.profile'])
             ->orderBy('last_message_at', 'desc')
             ->get()
+            ->filter(function ($conversation) use ($user) {
+                // Get user's deletion timestamp
+                $deletedAt = $conversation->getDeletedAtForUser($user->id);
+                
+                // If user hasn't deleted this conversation, show it
+                if (!$deletedAt) {
+                    return true;
+                }
+                
+                // If user deleted it, only show if there are new messages after deletion
+                return $conversation->messages()
+                    ->where('created_at', '>', $deletedAt)
+                    ->exists();
+            })
             ->map(function ($conversation) use ($user) {
                 $otherUser = $conversation->getOtherUser($user->id);
-                $lastMessage = $conversation->messages->first();
+                $deletedAt = $conversation->getDeletedAtForUser($user->id);
+                
+                // Get last message (after deletion timestamp if applicable)
+                $lastMessageQuery = $conversation->messages()->latest();
+                if ($deletedAt) {
+                    $lastMessageQuery->where('created_at', '>', $deletedAt);
+                }
+                $lastMessage = $lastMessageQuery->first();
+                
+                // Get unread count (after deletion timestamp if applicable)
+                $unreadQuery = $conversation->messages()
+                    ->where('sender_id', '!=', $user->id)
+                    ->where('is_read', false);
+                if ($deletedAt) {
+                    $unreadQuery->where('created_at', '>', $deletedAt);
+                }
                 
                 return [
                     'id' => $conversation->id,
@@ -107,13 +136,11 @@ class MessageController extends Controller
                         'sender_id' => $lastMessage->sender_id,
                         'created_at' => $lastMessage->created_at->toIso8601String(),
                     ] : null,
-                    'unread_count' => $conversation->messages()
-                        ->where('sender_id', '!=', $user->id)
-                        ->where('is_read', false)
-                        ->count(),
+                    'unread_count' => $unreadQuery->count(),
                     'updated_at' => $conversation->updated_at->toIso8601String(),
                 ];
-            });
+            })
+            ->values();
 
         return response()->json([
             'conversations' => $conversations,
@@ -199,8 +226,18 @@ class MessageController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $messages = $conversation->messages()
-            ->with('sender.profile')
+        // Get user's deletion timestamp
+        $deletedAt = $conversation->getDeletedAtForUser($user->id);
+        
+        // Build messages query - filter by deletion timestamp if applicable
+        $messagesQuery = $conversation->messages()
+            ->with('sender.profile');
+        
+        if ($deletedAt) {
+            $messagesQuery->where('created_at', '>', $deletedAt);
+        }
+        
+        $messages = $messagesQuery
             ->orderBy('created_at', 'asc')
             ->paginate(20);
 
@@ -390,6 +427,90 @@ class MessageController extends Controller
                 'id' => $conversation->id,
             ],
         ], 201);
+    }
+    #[OA\Delete(
+        path: "/api/messages/{message}",
+        summary: "Delete a message",
+        description: "Delete a specific message. Only the sender can delete their message.",
+        tags: ["Messages"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "message",
+                in: "path",
+                required: true,
+                description: "Message ID",
+                schema: new OA\Schema(type: "integer")
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Message deleted successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Message deleted successfully"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Unauthorized - Only sender can delete"),
+            new OA\Response(response: 404, description: "Message not found"),
+            new OA\Response(response: 401, description: "Unauthenticated"),
+        ]
+    )]
+    public function deleteMessage(Message $message): JsonResponse
+    {
+        if ($message->sender_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $message->delete();
+
+        return response()->json(['message' => 'Message deleted successfully']);
+    }
+
+    #[OA\Delete(
+        path: "/api/conversations/{conversation}",
+        summary: "Delete a conversation for current user",
+        description: "Delete a conversation for the current user only. The other participant will still see the conversation. If the other participant sends a new message, this user will see the conversation again with only messages from the deletion time onwards.",
+        tags: ["Messages"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "conversation",
+                in: "path",
+                required: true,
+                description: "Conversation ID",
+                schema: new OA\Schema(type: "integer")
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Conversation deleted for current user",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "message", type: "string", example: "Conversation deleted successfully"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 403, description: "Unauthorized - Not a participant"),
+            new OA\Response(response: 404, description: "Conversation not found"),
+            new OA\Response(response: 401, description: "Unauthenticated"),
+        ]
+    )]
+    public function deleteConversation(Conversation $conversation): JsonResponse
+    {
+        $user = Auth::user();
+        
+        if ($conversation->user_one_id !== $user->id && $conversation->user_two_id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Mark conversation as deleted for this user only (soft delete per participant)
+        $conversation->markAsDeletedForUser($user->id);
+
+        return response()->json(['message' => 'Conversation deleted successfully']);
     }
 }
 

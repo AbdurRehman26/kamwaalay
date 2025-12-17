@@ -388,7 +388,9 @@ export default function ServiceListingsIndex() {
                                                     <div className="flex items-center gap-2 text-sm">
                                                         <span className="text-gray-500 dark:text-gray-400">🕌</span>
                                                         <span className="text-gray-700 dark:text-gray-300 capitalize">
-                                                            {listing.user.religion.replace(/_/g, " ")}
+                                                            {typeof listing.user.religion === "object"
+                                                                ? listing.user.religion.label
+                                                                : listing.user.religion.replace(/_/g, " ")}
                                                         </span>
                                                     </div>
                                                 )}

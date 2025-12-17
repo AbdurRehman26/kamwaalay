@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Religion;
 use App\Http\Resources\UserResource;
 use App\Models\ServiceListing;
 use Illuminate\Http\JsonResponse;
@@ -178,7 +179,7 @@ class OnboardingController extends Controller
             'bio' => 'nullable|string',
             'age' => 'nullable|integer|min:18|max:100',
             'gender' => 'nullable|in:male,female,other',
-            'religion' => 'nullable|in:sunni_nazar_niyaz,sunni_no_nazar_niyaz,shia,christian',
+            'religion' => 'nullable|in:' . Religion::validationString(),
             'languages' => 'nullable|array',
             'languages.*' => 'required|integer|exists:languages,id',
         ]);
@@ -414,7 +415,7 @@ class OnboardingController extends Controller
             'area' => 'nullable|string|max:255',
             'age' => 'nullable|integer|min:18|max:100',
             'gender' => 'nullable|in:male,female,other',
-            'religion' => 'nullable|in:sunni_nazar_niyaz,sunni_no_nazar_niyaz,shia,christian',
+            'religion' => 'nullable|in:' . Religion::validationString(),
             'languages' => 'nullable|array',
             'languages.*' => 'required|integer|exists:languages,id',
         ]);
