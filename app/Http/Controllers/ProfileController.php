@@ -36,6 +36,7 @@ class ProfileController extends Controller
                                 new OA\Property(property: "name", type: "string", example: "John Doe"),
                                 new OA\Property(property: "email", type: "string", nullable: true, example: "user@example.com"),
                                 new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
+                                new OA\Property(property: "photo", type: "string", nullable: true, example: "profiles/photos/abc123.jpg", description: "Profile photo path"),
                                 new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
                                 new OA\Property(property: "age", type: "integer", nullable: true, example: 25, description: "Age from profile"),
                                 new OA\Property(property: "gender", type: "string", nullable: true, enum: ["male", "female", "other"], example: "male", description: "Gender from profile"),
@@ -73,6 +74,7 @@ class ProfileController extends Controller
                         new OA\Property(property: "name", type: "string", example: "John Doe"),
                         new OA\Property(property: "email", type: "string", nullable: true, example: "user@example.com"),
                         new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
+                        new OA\Property(property: "photo", type: "string", nullable: true, example: "profiles/photos/abc123.jpg", description: "Profile photo path"),
                         new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
                     ]
                 )
@@ -134,6 +136,7 @@ class ProfileController extends Controller
                                 new OA\Property(property: "id", type: "integer", example: 1),
                                 new OA\Property(property: "name", type: "string", example: "John Doe"),
                                 new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
+                                new OA\Property(property: "photo", type: "string", nullable: true, example: "profiles/photos/abc123.jpg", description: "Profile photo path"),
                                 new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
                                 new OA\Property(property: "age", type: "integer", nullable: true, example: 25, description: "Age from profile"),
                                 new OA\Property(property: "gender", type: "string", nullable: true, enum: ["male", "female", "other"], example: "male", description: "Gender from profile"),
