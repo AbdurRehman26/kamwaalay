@@ -21,7 +21,7 @@ export default function UpdateProfileInformation({
         phone: user?.phone || "",
         age: user?.age || "",
         gender: user?.gender || "",
-        religion: user?.religion || "",
+        religion: user?.religion?.value || user?.religion || "",
         languages: user?.languages?.map(l => l.id) || [],
     });
     const [errors, setErrors] = useState({});
@@ -36,7 +36,7 @@ export default function UpdateProfileInformation({
                 phone: user.phone || "",
                 age: user.age || "",
                 gender: user.gender || "",
-                religion: user.religion || "",
+                religion: user.religion?.value || user.religion || "",
                 languages: user.languages?.map(l => l.id) || [],
             });
         }

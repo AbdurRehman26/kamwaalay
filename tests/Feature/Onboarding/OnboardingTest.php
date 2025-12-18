@@ -183,3 +183,60 @@ test('onboarding requires at least one service', function () {
     $response->assertJsonValidationErrors(['services']);
 });
 
+test('helper onboarding accepts null or empty strings for optional fields', function () {
+    $helper = User::factory()->create();
+    $helper->assignRole('helper');
+    $location = Location::first();
+    $token = $helper->createToken('test-token')->plainTextToken;
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+        'Accept' => 'application/json',
+    ])->post('/api/onboarding/helper', [
+        'services' => ['maid'],
+        'locations' => [$location->id],
+        'work_type' => 'full_time',
+        'age' => 'null', // Simulating FormData
+        'gender' => '', // Simulating empty
+        'religion' => 'null',
+        'bio' => '',
+    ]);
+
+    $response->assertStatus(200);
+    
+    $helper->refresh();
+    expect($helper->profile->age)->toBeNull();
+    expect($helper->profile->gender)->toBeNull();
+    expect($helper->profile->religion)->toBeNull();
+});
+
+test('business onboarding accepts null or empty strings for optional fields', function () {
+    $business = User::factory()->create();
+    $business->assignRole('business');
+    $location = Location::first();
+    $token = $business->createToken('test-token')->plainTextToken;
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+        'Accept' => 'application/json',
+    ])->post('/api/onboarding/business', [
+        'services' => ['maid'],
+        'locations' => [$location->id],
+        'work_type' => 'full_time',
+        'age' => 'null', 
+        'gender' => '', 
+        'religion' => 'null',
+        'bio' => '',
+        'city' => '',
+        'area' => 'null',
+    ]);
+
+    $response->assertStatus(200);
+    
+    $business->refresh();
+    expect($business->profile->age)->toBeNull();
+    expect($business->profile->gender)->toBeNull();
+    expect($business->profile->religion)->toBeNull();
+    expect($business->profile->city)->toBeNull();
+    expect($business->profile->area)->toBeNull();
+});

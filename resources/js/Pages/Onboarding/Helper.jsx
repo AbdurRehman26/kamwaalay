@@ -13,7 +13,7 @@ export default function OnboardingHelper() {
     const { user } = useAuth();
     const [currentStep, setCurrentStep] = useState(1);
     const totalSteps = 3;
-    
+
     const [offers, setOffers] = useState([{
         selectedServiceTypes: [],
         selectedLocations: [],
@@ -37,7 +37,7 @@ export default function OnboardingHelper() {
         bio: user?.bio || "",
         age: user?.age || "",
         gender: user?.gender || "",
-        religion: user?.religion || "",
+        religion: user?.religion?.value || user?.religion || "",
         selectedLanguages: [],
     });
     const [processing, setProcessing] = useState(false);
@@ -56,7 +56,7 @@ export default function OnboardingHelper() {
 
     // Fetch service types from API
     const { serviceTypes, loading: serviceTypesLoading } = useServiceTypes();
-    
+
     // Fetch languages from API
     const { languages } = useLanguages();
 
@@ -69,7 +69,7 @@ export default function OnboardingHelper() {
                 bio: user?.bio || prev.bio,
                 age: user?.age || prev.age,
                 gender: user?.gender || prev.gender,
-                religion: user?.religion || prev.religion,
+                religion: user?.religion?.value || user?.religion || prev.religion,
             }));
         }
     }, [user]);
@@ -253,7 +253,7 @@ export default function OnboardingHelper() {
 
     const saveServiceListing = async () => {
         const offer = offers[0];
-        
+
         // Prepare FormData for service listing
         const formData = new FormData();
         formData.append("services", JSON.stringify(offer.selectedServiceTypes));
@@ -327,25 +327,25 @@ export default function OnboardingHelper() {
 
     const submit = async (e) => {
         e.preventDefault();
-        
+
         // If on step 1, save service listing
         if (currentStep === 1) {
             await handleNext();
             return;
         }
-        
+
         // If on step 2, just proceed to next step (don't submit)
         if (currentStep === 2) {
             handleNext();
             return;
         }
-        
+
         // Only submit on step 3 if explicitly triggered by button click
         // Prevent accidental submission from Enter key press
         if (currentStep === 3 && !isExplicitSubmit) {
             return;
         }
-        
+
         // Final submission on step 3 - update profile with verification documents if provided
         setProcessing(true);
         setErrors({});
@@ -377,7 +377,7 @@ export default function OnboardingHelper() {
         if (profileData.selectedLanguages && profileData.selectedLanguages.length > 0) {
             formData.append("languages", JSON.stringify(profileData.selectedLanguages));
         }
-        
+
         // Add verification documents if provided (optional)
         if (profileData.nic_number) {
             formData.append("nic_number", profileData.nic_number);
@@ -404,7 +404,7 @@ export default function OnboardingHelper() {
             setProcessing(false);
         }
     };
-    
+
     // Prevent Enter key from submitting form on step 3
     const handleKeyDown = (e) => {
         if (currentStep === 3 && e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
@@ -599,27 +599,24 @@ export default function OnboardingHelper() {
                         {steps.map((step, index) => (
                             <div key={step.number} className="flex items-center flex-1">
                                 <div className="flex flex-col items-center flex-1">
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all ${
-                                        currentStep > step.number
-                                            ? "bg-green-500 text-white"
-                                            : currentStep === step.number
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all ${currentStep > step.number
+                                        ? "bg-green-500 text-white"
+                                        : currentStep === step.number
                                             ? "bg-indigo-600 text-white ring-4 ring-indigo-200 dark:ring-indigo-800"
                                             : "bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300"
-                                    }`}>
+                                        }`}>
                                         {currentStep > step.number ? "✓" : step.number}
                                     </div>
                                     <div className="mt-2 text-center">
-                                        <p className={`text-sm font-semibold ${
-                                            currentStep >= step.number ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400"
-                                        }`}>
+                                        <p className={`text-sm font-semibold ${currentStep >= step.number ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400"
+                                            }`}>
                                             {step.title}
                                         </p>
                                     </div>
                                 </div>
                                 {index < steps.length - 1 && (
-                                    <div className={`flex-1 h-1 mx-4 transition-all ${
-                                        currentStep > step.number ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
-                                    }`} />
+                                    <div className={`flex-1 h-1 mx-4 transition-all ${currentStep > step.number ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
+                                        }`} />
                                 )}
                             </div>
                         ))}
@@ -713,11 +710,10 @@ export default function OnboardingHelper() {
                                                 type="button"
                                                 onClick={() => addServiceTypeToOffer(offerIndex, service.value)}
                                                 disabled={offer.selectedServiceTypes.includes(service.value)}
-                                                className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                                                    offer.selectedServiceTypes.includes(service.value)
-                                                        ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
-                                                        : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
-                                                }`}
+                                                className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${offer.selectedServiceTypes.includes(service.value)
+                                                    ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
+                                                    : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
+                                                    }`}
                                             >
                                                 <div className="text-3xl mb-2">{service.icon}</div>
                                                 <div className="font-semibold text-gray-900 dark:text-white">{service.label}</div>
@@ -815,11 +811,10 @@ export default function OnboardingHelper() {
                                                     setFieldErrors(prev => ({ ...prev, workType: "" }));
                                                 }
                                             }}
-                                            className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${
-                                                fieldErrors.workType 
-                                                    ? "border-red-300 dark:border-red-600" 
-                                                    : "border-gray-300 dark:border-gray-600"
-                                            } dark:bg-gray-700 dark:text-white`}
+                                            className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${fieldErrors.workType
+                                                ? "border-red-300 dark:border-red-600"
+                                                : "border-gray-300 dark:border-gray-600"
+                                                } dark:bg-gray-700 dark:text-white`}
                                             required
                                         >
                                             <option value="">Select Type</option>
@@ -895,210 +890,209 @@ export default function OnboardingHelper() {
                         {/* Step 2: Profile Verification Section */}
                         {currentStep === 2 && (
                             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Profile Verification</h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Optional: Upload your documents for verification. You can skip this step and complete it later.</p>
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Profile Verification</h2>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Optional: Upload your documents for verification. You can skip this step and complete it later.</p>
 
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
-                                        National Identity Card (NIC) <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
-                                    </label>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload a clear photo or scan of your NIC (front and back if needed)</p>
-                                    <NICFileInput
-                                        onFileAccepted={(file) => {
-                                            setProfileData({ ...profileData, nic: file });
-                                            setFieldErrors(prev => ({ ...prev, nicFileType: "", nicFileSize: "" }));
-                                        }}
-                                        file={profileData.nic}
-                                        error={errors.nic}
-                                    />
-                                    {(fieldErrors.nicFileType || fieldErrors.nicFileSize) && (
-                                        <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
-                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.nicFileType || fieldErrors.nicFileSize}</p>
-                                        </div>
-                                    )}
-                                </div>
+                                <div className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
+                                            National Identity Card (NIC) <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
+                                        </label>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload a clear photo or scan of your NIC (front and back if needed)</p>
+                                        <NICFileInput
+                                            onFileAccepted={(file) => {
+                                                setProfileData({ ...profileData, nic: file });
+                                                setFieldErrors(prev => ({ ...prev, nicFileType: "", nicFileSize: "" }));
+                                            }}
+                                            file={profileData.nic}
+                                            error={errors.nic}
+                                        />
+                                        {(fieldErrors.nicFileType || fieldErrors.nicFileSize) && (
+                                            <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
+                                                <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.nicFileType || fieldErrors.nicFileSize}</p>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
-                                        NIC Number <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={profileData.nic_number}
-                                        onChange={(e) => setProfileData({ ...profileData, nic_number: e.target.value })}
-                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                        placeholder="e.g., 42101-1234567-1"
-                                    />
-                                    {errors.nic_number && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.nic_number}</div>}
-                                </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
+                                            NIC Number <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={profileData.nic_number}
+                                            onChange={(e) => setProfileData({ ...profileData, nic_number: e.target.value })}
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                            placeholder="e.g., 42101-1234567-1"
+                                        />
+                                        {errors.nic_number && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.nic_number}</div>}
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
-                                        Photo <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
-                                    </label>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload your profile photo (optional)</p>
-                                    <PhotoFileInput
-                                        onFileAccepted={(file) => {
-                                            setProfileData({ ...profileData, photo: file });
-                                            setFieldErrors(prev => ({ ...prev, photoFileType: "", photoFileSize: "" }));
-                                        }}
-                                        file={profileData.photo}
-                                        error={errors.photo}
-                                    />
-                                    {(fieldErrors.photoFileType || fieldErrors.photoFileSize) && (
-                                        <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
-                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.photoFileType || fieldErrors.photoFileSize}</p>
-                                        </div>
-                                    )}
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
+                                            Photo <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
+                                        </label>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload your profile photo (optional)</p>
+                                        <PhotoFileInput
+                                            onFileAccepted={(file) => {
+                                                setProfileData({ ...profileData, photo: file });
+                                                setFieldErrors(prev => ({ ...prev, photoFileType: "", photoFileSize: "" }));
+                                            }}
+                                            file={profileData.photo}
+                                            error={errors.photo}
+                                        />
+                                        {(fieldErrors.photoFileType || fieldErrors.photoFileSize) && (
+                                            <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
+                                                <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.photoFileType || fieldErrors.photoFileSize}</p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         )}
 
                         {/* Step 3: Helper Profile Section */}
                         {currentStep === 3 && (
                             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Your Profile</h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Optional: Add more details about yourself</p>
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Your Profile</h2>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Optional: Add more details about yourself</p>
 
-                            <div className="space-y-6">
-                                <div className="grid md:grid-cols-2 gap-6">
+                                <div className="space-y-6">
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Age</label>
+                                            <input
+                                                type="number"
+                                                min="18"
+                                                max="100"
+                                                value={profileData.age}
+                                                onChange={(e) => setProfileData({ ...profileData, age: e.target.value })}
+                                                className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                                placeholder="e.g., 25"
+                                            />
+                                            {errors.age && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.age}</div>}
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Gender</label>
+                                            <select
+                                                value={profileData.gender}
+                                                onChange={(e) => setProfileData({ ...profileData, gender: e.target.value })}
+                                                className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                            >
+                                                <option value="">Select Gender</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                            {errors.gender && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.gender}</div>}
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Religion</label>
+                                            <select
+                                                value={profileData.religion}
+                                                onChange={(e) => setProfileData({ ...profileData, religion: e.target.value })}
+                                                className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                            >
+                                                <option value="">Select Religion</option>
+                                                <option value="sunni_nazar_niyaz">Sunni (Nazar Niyaz)</option>
+                                                <option value="sunni_no_nazar_niyaz">Sunni (No Nazar Niyaz)</option>
+                                                <option value="shia">Shia</option>
+                                                <option value="christian">Christian</option>
+                                            </select>
+                                            {errors.religion && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.religion}</div>}
+                                        </div>
+                                    </div>
+
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Age</label>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Years of Experience</label>
                                         <input
                                             type="number"
-                                            min="18"
-                                            max="100"
-                                            value={profileData.age}
-                                            onChange={(e) => setProfileData({ ...profileData, age: e.target.value })}
+                                            min="0"
+                                            value={profileData.experience_years}
+                                            onChange={(e) => setProfileData({ ...profileData, experience_years: e.target.value })}
                                             className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                            placeholder="e.g., 25"
+                                            placeholder="e.g., 5"
                                         />
-                                        {errors.age && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.age}</div>}
+                                        {errors.experience_years && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.experience_years}</div>}
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Gender</label>
-                                        <select
-                                            value={profileData.gender}
-                                            onChange={(e) => setProfileData({ ...profileData, gender: e.target.value })}
-                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                        >
-                                            <option value="">Select Gender</option>
-                                            <option value="male">Male</option>
-                                            <option value="female">Female</option>
-                                            <option value="other">Other</option>
-                                        </select>
-                                        {errors.gender && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.gender}</div>}
-                                    </div>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Languages</label>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Select the languages you speak</p>
 
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Religion</label>
-                                        <select
-                                            value={profileData.religion}
-                                            onChange={(e) => setProfileData({ ...profileData, religion: e.target.value })}
-                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                        >
-                                            <option value="">Select Religion</option>
-                                            <option value="sunni_nazar_niyaz">Sunni (Nazar Niyaz)</option>
-                                            <option value="sunni_no_nazar_niyaz">Sunni (No Nazar Niyaz)</option>
-                                            <option value="shia">Shia</option>
-                                            <option value="christian">Christian</option>
-                                        </select>
-                                        {errors.religion && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.religion}</div>}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Years of Experience</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        value={profileData.experience_years}
-                                        onChange={(e) => setProfileData({ ...profileData, experience_years: e.target.value })}
-                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                        placeholder="e.g., 5"
-                                    />
-                                    {errors.experience_years && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.experience_years}</div>}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Languages</label>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Select the languages you speak</p>
-                                    
-                                    {/* Selected Languages as Tags */}
-                                    {profileData.selectedLanguages.length > 0 && (
-                                        <div className="mb-4">
-                                            <div className="flex flex-wrap gap-2">
-                                                {profileData.selectedLanguages.map((languageId) => {
-                                                    const language = languages.find(l => l.id === languageId);
-                                                    return (
-                                                        <span
-                                                            key={languageId}
-                                                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold border-2 border-blue-200 dark:border-blue-700"
-                                                        >
-                                                            <span>{language?.name}</span>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    setProfileData({
-                                                                        ...profileData,
-                                                                        selectedLanguages: profileData.selectedLanguages.filter(id => id !== languageId)
-                                                                    });
-                                                                }}
-                                                                className="ml-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-bold"
+                                        {/* Selected Languages as Tags */}
+                                        {profileData.selectedLanguages.length > 0 && (
+                                            <div className="mb-4">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {profileData.selectedLanguages.map((languageId) => {
+                                                        const language = languages.find(l => l.id === languageId);
+                                                        return (
+                                                            <span
+                                                                key={languageId}
+                                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold border-2 border-blue-200 dark:border-blue-700"
                                                             >
-                                                                ×
-                                                            </button>
-                                                        </span>
-                                                    );
-                                                })}
+                                                                <span>{language?.name}</span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        setProfileData({
+                                                                            ...profileData,
+                                                                            selectedLanguages: profileData.selectedLanguages.filter(id => id !== languageId)
+                                                                        });
+                                                                    }}
+                                                                    className="ml-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-bold"
+                                                                >
+                                                                    ×
+                                                                </button>
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {/* Language Options */}
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                        {languages.map((language) => (
-                                            <button
-                                                key={language.id}
-                                                type="button"
-                                                onClick={() => {
-                                                    if (!profileData.selectedLanguages.includes(language.id)) {
-                                                        setProfileData({
-                                                            ...profileData,
-                                                            selectedLanguages: [...profileData.selectedLanguages, language.id]
-                                                        });
-                                                    }
-                                                }}
-                                                disabled={profileData.selectedLanguages.includes(language.id)}
-                                                className={`p-3 rounded-xl border-2 transition-all duration-300 text-left ${
-                                                    profileData.selectedLanguages.includes(language.id)
+                                        {/* Language Options */}
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                            {languages.map((language) => (
+                                                <button
+                                                    key={language.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (!profileData.selectedLanguages.includes(language.id)) {
+                                                            setProfileData({
+                                                                ...profileData,
+                                                                selectedLanguages: [...profileData.selectedLanguages, language.id]
+                                                            });
+                                                        }
+                                                    }}
+                                                    disabled={profileData.selectedLanguages.includes(language.id)}
+                                                    className={`p-3 rounded-xl border-2 transition-all duration-300 text-left ${profileData.selectedLanguages.includes(language.id)
                                                         ? "border-blue-500 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 opacity-50 cursor-not-allowed"
                                                         : "border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer bg-white dark:bg-gray-700"
-                                                }`}
-                                            >
-                                                <div className="font-semibold text-gray-900 dark:text-white">{language.name}</div>
-                                            </button>
-                                        ))}
+                                                        }`}
+                                                >
+                                                    <div className="font-semibold text-gray-900 dark:text-white">{language.name}</div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {errors.languages && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.languages}</div>}
                                     </div>
-                                    {errors.languages && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.languages}</div>}
-                                </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Bio</label>
-                                    <textarea
-                                        value={profileData.bio}
-                                        onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
-                                        rows={4}
-                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                        placeholder="Tell us about yourself..."
-                                    />
-                                    {errors.bio && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.bio}</div>}
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Bio</label>
+                                        <textarea
+                                            value={profileData.bio}
+                                            onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                                            rows={4}
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                            placeholder="Tell us about yourself..."
+                                        />
+                                        {errors.bio && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.bio}</div>}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         )}
 
                         {/* Navigation Buttons */}

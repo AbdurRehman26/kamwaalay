@@ -161,6 +161,14 @@ class OnboardingController extends Controller
         }
         $dataToValidate['languages'] = $decodedLanguages;
 
+        // Sanitize nullable fields that might come as strings "null" or "" from FormData
+        $nullableFields = ['age', 'gender', 'religion', 'bio', 'experience_years', 'nic_number', 'monthly_rate', 'description'];
+        foreach ($nullableFields as $field) {
+            if (isset($dataToValidate[$field]) && ($dataToValidate[$field] === 'null' || $dataToValidate[$field] === '')) {
+                $dataToValidate[$field] = null;
+            }
+        }
+
         // Validate the decoded data
         $validator = Validator::make($dataToValidate, [
             'services' => 'required|array|min:1',
@@ -399,6 +407,14 @@ class OnboardingController extends Controller
             }
         }
         $dataToValidate['languages'] = $decodedLanguages;
+
+        // Sanitize nullable fields that might come as strings "null" or "" from FormData
+        $nullableFields = ['age', 'gender', 'religion', 'bio', 'city', 'area', 'nic_number', 'monthly_rate', 'description'];
+        foreach ($nullableFields as $field) {
+            if (isset($dataToValidate[$field]) && ($dataToValidate[$field] === 'null' || $dataToValidate[$field] === '')) {
+                $dataToValidate[$field] = null;
+            }
+        }
 
         $validator = Validator::make($dataToValidate, [
             'services' => 'required|array|min:1',
