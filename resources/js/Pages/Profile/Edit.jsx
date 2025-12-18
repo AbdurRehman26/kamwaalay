@@ -1,6 +1,7 @@
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { useState, useEffect } from "react";
 import DeleteUserForm from "./Partials/DeleteUserForm";
+import UpdateProfilePhoto from "./Partials/UpdateProfilePhoto";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
 import { profileService } from "@/services/profile";
@@ -72,6 +73,12 @@ export default function Edit() {
                 </div>
 
                 <div className="space-y-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-8">
+                        <UpdateProfilePhoto
+                            className="max-w-xl"
+                        />
+                    </div>
+
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-8">
                         <UpdateProfileInformationForm
                             mustVerifyEmail={profileData.must_verify_email}

@@ -87,7 +87,10 @@ class UserResource extends JsonResource
             'experience_years' => $this->when($this->profile, $this->experience_years),
             'age' => $this->when($this->profile, $this->profile?->age),
             'gender' => $this->when($this->profile, $this->profile?->gender ? (string) $this->profile->gender : null),
-            'religion' => $this->when($this->profile, $this->profile?->religion),
+            'religion' => $this->when($this->profile, $this->profile?->religion ? [
+                'value' => $this->profile->religion instanceof \App\Enums\Religion ? $this->profile->religion->value : $this->profile->religion,
+                'label' => $this->profile->religion instanceof \App\Enums\Religion ? $this->profile->religion->label() : str_replace('_', ' ', $this->profile->religion),
+            ] : null),
             'city' => $this->when($this->profile, $this->city),
             'area' => $this->when($this->profile, $this->area),
             'availability' => $this->when($this->profile, $this->availability),

@@ -38,6 +38,7 @@ class Profile extends Model
         return [
             'experience_years' => 'integer',
             'age' => 'integer',
+            'religion' => \App\Enums\Religion::class,
             'police_verified' => 'boolean',
             'is_active' => 'boolean',
             'rating' => 'decimal:2',

@@ -329,6 +329,7 @@ class OnboardingController extends Controller
                         new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
                         new OA\Property(property: "nic", type: "string", format: "binary", nullable: true, description: "NIC document file (jpeg, jpg, png, pdf, max 5MB) - optional"),
                         new OA\Property(property: "nic_number", type: "string", nullable: true, maxLength: 255),
+                        new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
                         new OA\Property(property: "bio", type: "string", nullable: true),
                         new OA\Property(property: "city", type: "string", nullable: true, maxLength: 255),
                         new OA\Property(property: "area", type: "string", nullable: true, maxLength: 255),
@@ -426,6 +427,7 @@ class OnboardingController extends Controller
             'description' => 'nullable|string|max:2000',
             'nic' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:5120',
             'nic_number' => 'nullable|string|max:255',
+            'photo' => 'nullable|image|max:2048',
             'bio' => 'nullable|string',
             'city' => 'nullable|string|max:255',
             'area' => 'nullable|string|max:255',
@@ -446,6 +448,9 @@ class OnboardingController extends Controller
 
         // Update user profile if provided
         $profileData = [];
+        if ($request->hasFile('photo')) {
+            $profileData['photo'] = $request->file('photo')->store('businesses/photos', 'public');
+        }
         if ($request->has('bio')) {
             $profileData['bio'] = $validated['bio'];
         }
