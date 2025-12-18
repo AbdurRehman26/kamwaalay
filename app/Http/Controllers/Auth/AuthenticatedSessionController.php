@@ -124,7 +124,7 @@ class AuthenticatedSessionController extends Controller
 
         if ($normalizedPhone === $demoPhoneNumber || $normalizedPhone === '+' . $demoPhoneNumber) {
             // Find first user with ONLY business role
-            $user = User::find(4);
+            $user = User::find(6);
 
 
             if (!$user) {
