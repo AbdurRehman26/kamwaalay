@@ -132,7 +132,7 @@ export default function Home() {
     return (
         <PublicLayout>
             {/* Hero Section */}
-            <section className="relative min-h-[75vh] flex items-center bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden">
+            <section className="relative min-h-[75vh] flex items-center bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white">
                 {/* Abstract Background Shapes */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[100px] animate-pulse"></div>
@@ -140,7 +140,7 @@ export default function Home() {
                     <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[60%] bg-blue-500/10 rounded-full blur-[100px] animate-pulse delay-2000"></div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 relative z-10 w-full">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 relative z-30 w-full">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div className="text-center lg:text-left">
                             <div className="inline-block px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-6 animate-fade-in-up">

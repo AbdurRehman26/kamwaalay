@@ -269,7 +269,7 @@ export default function ServiceListingsIndex() {
                                                     <div className="flex flex-wrap gap-2">
                                                         {listing.service_types && listing.service_types.length > 0 ? (
                                                             listing.service_types.map((st, idx) => (
-                                                                <span key={idx} className="bg-gradient-to-r from-primary-600 to-indigo-600 text-white text-sm px-4 py-1.5 rounded-full font-bold capitalize shadow-sm">
+                                                                <span key={idx} className="bg-gradient-to-r from-primary-600 to-indigo-600 text-white text-sm px-4 py-1.5 rounded-full font-bold capitalize shadow-sm hover:shadow-md transition-shadow cursor-default">
                                                                     {typeof st === "string" ? st.replace("_", " ") : st}
                                                                 </span>
                                                             ))
