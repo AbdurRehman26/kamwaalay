@@ -15,7 +15,6 @@ export default function CreateWorker() {
         phone: "",
         photo: null,
         service_type: "",
-        skills: "",
         experience_years: 0,
         city: "",
         area: "",
@@ -185,19 +184,6 @@ export default function CreateWorker() {
                                     className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
                                 />
                                 <InputError message={errors.photo} className="mt-2" />
-                            </div>
-
-                            <div className="md:col-span-2">
-                                <InputLabel htmlFor="skills" value="Skills" className="text-gray-700 font-medium" />
-                                <textarea
-                                    id="skills"
-                                    value={data.skills}
-                                    onChange={(e) => setData("skills", e.target.value)}
-                                    rows={3}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                                    placeholder="Enter skills separated by commas..."
-                                />
-                                <InputError message={errors.skills} className="mt-2" />
                             </div>
 
                             <div className="md:col-span-2">

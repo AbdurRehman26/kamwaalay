@@ -81,7 +81,6 @@ test('businesses can create a worker', function () {
                 'area' => 'Saddar',
             ],
         ],
-        'skills' => 'Cleaning, Laundry',
         'experience_years' => 5,
         'availability' => 'full_time',
         'bio' => 'Experienced worker',
@@ -138,7 +137,7 @@ test('businesses can update their worker', function () {
     expect($helper->name)->toBe('New Name');
     // Check that service listing was created with the correct service types
     expect($helper->serviceListings)->not->toBeEmpty();
-    expect($helper->serviceListings->first()->service_types)->toContain('cook');
+    expect($helper->serviceListings->first()->serviceTypes->pluck('slug')->toArray())->toContain('cook');
 });
 
 test('businesses can remove a worker', function () {

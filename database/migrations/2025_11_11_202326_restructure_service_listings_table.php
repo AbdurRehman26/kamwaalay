@@ -19,18 +19,18 @@ return new class extends Migration
             $table->json('service_types')->nullable()->after('profile_id');
             $table->json('locations')->nullable()->after('service_types');
         });
-        
+
         // Migrate existing data if any
         // Get all service listings with their service types and locations
         $listings = DB::table('service_listings')->get();
-        
+
         foreach ($listings as $listing) {
             // Get user's profile, create if doesn't exist
             $profile = DB::table('profiles')
                 ->where('profileable_id', $listing->user_id)
                 ->where('profileable_type', 'App\Models\User')
                 ->first();
-            
+
             if (!$profile) {
                 // Create profile for user
                 $profileId = DB::table('profiles')->insertGetId([
@@ -42,18 +42,18 @@ return new class extends Migration
                 ]);
                 $profile = (object)['id' => $profileId];
             }
-            
+
             // Get service types
             $serviceTypes = DB::table('service_listing_service_types')
                 ->where('service_listing_id', $listing->id)
                 ->pluck('service_type')
                 ->toArray();
-            
+
             // Get locations (as location IDs - we'll need to find them)
             $serviceLocations = DB::table('service_listing_locations')
                 ->where('service_listing_id', $listing->id)
                 ->get();
-            
+
             $locationIds = [];
             foreach ($serviceLocations as $sl) {
                 // Find location by city and area
@@ -63,12 +63,12 @@ return new class extends Migration
                     ->where('locations.area', $sl->area)
                     ->select('locations.id')
                     ->first();
-                
+
                 if ($location) {
                     $locationIds[] = $location->id;
                 }
             }
-            
+
             // Update the listing with profile_id and JSON data
             DB::table('service_listings')
                 ->where('id', $listing->id)
@@ -78,17 +78,17 @@ return new class extends Migration
                     'locations' => json_encode($locationIds),
                 ]);
         }
-        
+
         // Now drop user_id and make profile_id required (not unique - multiple listings per profile allowed)
         Schema::table('service_listings', function (Blueprint $table) {
             // Drop user_id (after data migration)
             $table->dropForeign(['user_id']);
             $table->dropColumn('user_id');
-            
+
             // Make profile_id required (not nullable) - no unique constraint
             $table->foreignId('profile_id')->nullable(false)->change();
         });
-        
+
         // Drop pivot tables
         Schema::dropIfExists('service_listing_service_types');
         Schema::dropIfExists('service_listing_locations');
@@ -107,7 +107,7 @@ return new class extends Migration
             $table->timestamps();
             $table->unique(['service_listing_id', 'service_type'], 'sl_service_types_unique');
         });
-        
+
         Schema::create('service_listing_locations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('service_listing_id')->constrained('service_listings')->onDelete('cascade');
@@ -116,15 +116,15 @@ return new class extends Migration
             $table->timestamps();
             $table->unique(['service_listing_id', 'city', 'area'], 'sl_locations_unique');
         });
-        
+
         // Migrate data back to pivot tables
         $listings = DB::table('service_listings')->get();
-        
+
         foreach ($listings as $listing) {
             // Get profile to find user_id
             $profile = DB::table('profiles')->where('id', $listing->profile_id)->first();
             $userId = $profile ? $profile->profileable_id : null;
-            
+
             // Decode service types
             $serviceTypes = json_decode($listing->service_types ?? '[]', true);
             foreach ($serviceTypes as $serviceType) {
@@ -135,7 +135,7 @@ return new class extends Migration
                     'updated_at' => now(),
                 ]);
             }
-            
+
             // Decode locations
             $locationIds = json_decode($listing->locations ?? '[]', true);
             foreach ($locationIds as $locationId) {
@@ -144,7 +144,7 @@ return new class extends Migration
                     ->where('locations.id', $locationId)
                     ->select('cities.name as city', 'locations.area')
                     ->first();
-                
+
                 if ($location) {
                     DB::table('service_listing_locations')->insert([
                         'service_listing_id' => $listing->id,
@@ -156,12 +156,12 @@ return new class extends Migration
                 }
             }
         }
-        
+
         // Modify service_listings table back
         Schema::table('service_listings', function (Blueprint $table) {
             // Add user_id back
             $table->foreignId('user_id')->after('id')->constrained()->onDelete('cascade');
-            
+
             // Drop new columns
             $table->dropForeign(['profile_id']);
             $table->dropColumn(['profile_id', 'service_types', 'locations']);

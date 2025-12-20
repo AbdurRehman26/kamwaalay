@@ -17,7 +17,6 @@ class Profile extends Model
         'profileable_id',
         'photo',
         'service_type',
-        'skills',
         'experience_years',
         'age',
         'gender',

@@ -200,6 +200,15 @@ export default function ServiceListingShow() {
                                     ) : (
                                         <p className="text-gray-500 dark:text-gray-400">Location not specified</p>
                                     )}
+                                    {listing.pin_address && (
+                                        <div className="mt-3 pt-3 border-t border-indigo-100 dark:border-indigo-800">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Pin Address:</p>
+                                            <p className="text-gray-900 dark:text-white flex items-start gap-2 font-medium">
+                                                <span className="mt-1">📌</span>
+                                                <span>{listing.pin_address}</span>
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div className="mb-8">

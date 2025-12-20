@@ -14,6 +14,10 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+        <!-- Google Places API -->
+        <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_PLACES_API_KEY') }}&libraries=places,geocoding&loading=async" async defer></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
         <!-- Scripts -->
         @viteReactRefresh
         @vite(['resources/js/app.jsx'])

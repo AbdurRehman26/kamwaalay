@@ -306,7 +306,6 @@ class BusinessController extends Controller
                                 new OA\Property(property: "area", type: "string"),
                             ]
                         )),
-                        new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
                         new OA\Property(property: "availability", type: "string", enum: ["full_time", "part_time", "available"]),
                         new OA\Property(property: "bio", type: "string", nullable: true),
@@ -346,7 +345,6 @@ class BusinessController extends Controller
             'locations' => 'required|array|min:1',
             'locations.*.city' => 'required|string|max:255',
             'locations.*.area' => 'required|string|max:255',
-            'skills' => 'nullable|string',
             'experience_years' => 'required|integer|min:0',
             'availability' => 'required|in:full_time,part_time,available',
             'bio' => 'nullable|string',
@@ -392,7 +390,6 @@ class BusinessController extends Controller
         // Create profile for the worker
         $profileData = [
             'service_type' => $validated['service_types'][0], // Primary service type
-            'skills' => $validated['skills'] ?? null,
             'experience_years' => $validated['experience_years'],
             'city' => $primaryLocation['city'],
             'area' => $primaryLocation['area'],
@@ -408,25 +405,32 @@ class BusinessController extends Controller
 
         $profile = $helper->profile()->create($profileData);
 
-        // Create service listing with all service types and locations
-        $serviceListingData = [
+        // Create service listing
+        $locationIds = array_map(function($location) {
+            // Find or create location ID
+            $locationModel = \App\Models\Location::firstOrCreate([
+                'city_id' => \App\Models\City::firstOrCreate(['name' => $location['city']])->id,
+                'area' => $location['area'],
+            ]);
+            return $locationModel->id;
+        }, $validated['locations']);
+
+        $listing = \App\Models\ServiceListing::create([
             'profile_id' => $profile->id,
             'work_type' => $validated['availability'], // Map availability to work_type
-            'service_types' => $validated['service_types'], // JSON array
-            'locations' => array_map(function($location) {
-                // Find or create location ID
-                $locationModel = \App\Models\Location::firstOrCreate([
-                    'city_id' => \App\Models\City::firstOrCreate(['name' => $location['city']])->id,
-                    'area' => $location['area'],
-                ]);
-                return $locationModel->id;
-            }, $validated['locations']), // JSON array of location IDs
             'description' => $validated['bio'],
             'is_active' => true,
             'status' => 'active',
-        ];
+        ]);
 
-        \App\Models\ServiceListing::create($serviceListingData);
+        // Sync service types (convert slugs to IDs)
+        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $validated['service_types'])
+            ->pluck('id')
+            ->toArray();
+        $listing->serviceTypes()->sync($serviceTypeIds);
+
+        // Sync locations
+        $listing->locations()->sync($locationIds);
 
         // Attach to business via pivot table
         $business->helpers()->attach($helper->id, [
@@ -497,7 +501,6 @@ class BusinessController extends Controller
                     properties: [
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
                         new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
-                        new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
                         new OA\Property(property: "city", type: "string", maxLength: 255),
                         new OA\Property(property: "area", type: "string", maxLength: 255),
@@ -590,7 +593,6 @@ class BusinessController extends Controller
             'locations' => 'required|array|min:1',
             'locations.*.city' => 'required|string|max:255',
             'locations.*.area' => 'required|string|max:255',
-            'skills' => 'nullable|string',
             'experience_years' => 'required|integer|min:0',
             'availability' => 'required|in:full_time,part_time,available',
             'bio' => 'nullable|string',
@@ -614,7 +616,6 @@ class BusinessController extends Controller
 
         // Update profile data
         $profileData = [
-            'skills' => $validated['skills'] ?? null,
             'experience_years' => $validated['experience_years'],
             'availability' => $validated['availability'],
             'bio' => $validated['bio'] ?? null,
@@ -634,25 +635,32 @@ class BusinessController extends Controller
         // Update service listings - delete old ones and create new ones
         $profile->serviceListings()->delete();
 
-        // Create service listing with all service types and locations
-        $serviceListingData = [
+        // Create service listing
+        $locationIds = array_map(function($location) {
+            // Find or create location ID
+            $locationModel = \App\Models\Location::firstOrCreate([
+                'city_id' => \App\Models\City::firstOrCreate(['name' => $location['city']])->id,
+                'area' => $location['area'],
+            ]);
+            return $locationModel->id;
+        }, $validated['locations']);
+
+        $listing = \App\Models\ServiceListing::create([
             'profile_id' => $profile->id,
             'work_type' => $validated['availability'], // Map availability to work_type
-            'service_types' => $validated['service_types'], // JSON array
-            'locations' => array_map(function($location) {
-                // Find or create location ID
-                $locationModel = \App\Models\Location::firstOrCreate([
-                    'city_id' => \App\Models\City::firstOrCreate(['name' => $location['city']])->id,
-                    'area' => $location['area'],
-                ]);
-                return $locationModel->id;
-            }, $validated['locations']), // JSON array of location IDs
             'description' => $validated['bio'],
             'is_active' => true,
             'status' => 'active',
-        ];
+        ]);
 
-        \App\Models\ServiceListing::create($serviceListingData);
+        // Sync service types (convert slugs to IDs)
+        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $validated['service_types'])
+            ->pluck('id')
+            ->toArray();
+        $listing->serviceTypes()->sync($serviceTypeIds);
+
+        // Sync locations
+        $listing->locations()->sync($locationIds);
 
         return response()->json([
             'message' => 'Worker updated successfully!',

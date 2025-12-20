@@ -83,7 +83,6 @@ class UserResource extends JsonResource
             // Profile fields (from profile - works for both helpers and businesses)
             'photo' => $this->when($this->profile, $this->photo),
             'service_type' => $this->when($this->profile, $this->service_type),
-            'skills' => $this->when($this->profile, $this->skills),
             'experience_years' => $this->when($this->profile, $this->experience_years),
             'age' => $this->when($this->profile, $this->profile?->age),
             'gender' => $this->when($this->profile, $this->profile?->gender ? (string) $this->profile->gender : null),

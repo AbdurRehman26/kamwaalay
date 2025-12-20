@@ -19,18 +19,33 @@ class ServiceListingFactory extends Factory
      */
     public function definition(): array
     {
-        $serviceTypes = ['maid', 'cook', 'babysitter', 'caregiver', 'cleaner', 'all_rounder'];
-        
         return [
             'profile_id' => Profile::factory(),
-            'service_types' => [fake()->randomElement($serviceTypes)],
-            'locations' => [Location::first()?->id ?? Location::factory()->create()->id],
             'work_type' => fake()->randomElement(['full_time', 'part_time']),
             'monthly_rate' => fake()->numberBetween(10000, 30000),
             'description' => fake()->sentence(),
+            'pin_address' => fake()->address(),
             'is_active' => true,
             'status' => 'active',
         ];
+    }
+
+    /**
+     * Configure the factory to attach service types and locations after creation
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (ServiceListing $listing) {
+            // Attach a random service type
+            $serviceType = \App\Models\ServiceType::inRandomOrder()->first();
+            if ($serviceType) {
+                $listing->serviceTypes()->attach($serviceType->id);
+            }
+
+            // Attach a location
+            $location = Location::first() ?? Location::factory()->create();
+            $listing->locations()->attach($location->id);
+        });
     }
 }
 

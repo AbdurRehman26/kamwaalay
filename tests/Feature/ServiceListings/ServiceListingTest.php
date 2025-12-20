@@ -43,6 +43,7 @@ test('helpers can create service listings', function () {
         'work_type' => 'full_time',
         'monthly_rate' => 15000,
         'description' => 'Professional maid service',
+        'pin_address' => '123 Test St, Karachi',
     ]);
 
     $response->assertStatus(200);
@@ -53,10 +54,8 @@ test('helpers can create service listings', function () {
     $newListing = ServiceListing::find($newListingId);
     
     expect($newListing)->not->toBeNull();
-    expect($newListing->service_types)->toBeArray();
-    expect(count($newListing->service_types))->toBeGreaterThanOrEqual(1);
-    expect($newListing->locations)->toBeArray();
-    expect(count($newListing->locations))->toBeGreaterThanOrEqual(1);
+    expect($newListing->serviceTypes()->count())->toBeGreaterThanOrEqual(1);
+    expect($newListing->locations()->count())->toBeGreaterThanOrEqual(1);
 });
 
 test('guests can view service listings', function () {
@@ -148,18 +147,17 @@ test('helpers can update their service listings', function () {
         'locations' => [$pechsLocation->id],
         'monthly_rate' => 20000,
         'description' => 'Updated description',
+        'pin_address' => '456 Updated St, Karachi',
         'status' => 'active',
         'is_active' => true,
     ]);
 
     $response->assertStatus(200);
     $listing->refresh();
-    expect($listing->service_types)->toBeArray();
-    expect($listing->service_types)->toHaveCount(1);
-    expect($listing->service_types[0])->toBe('cook');
-    expect($listing->locations)->toBeArray();
-    expect($listing->locations)->toHaveCount(1);
-    $updatedLocation = Location::find($listing->locations[0]);
+    expect($listing->serviceTypes()->count())->toBe(1);
+    expect($listing->serviceTypes()->first()->slug)->toBe('cook');
+    expect($listing->locations()->count())->toBe(1);
+    $updatedLocation = $listing->locations()->first();
     expect($updatedLocation->id)->toBe($pechsLocation->id);
 });
 
@@ -182,13 +180,14 @@ test('service listings require service types', function () {
         'work_type' => 'full_time',
         'monthly_rate' => 15000,
         'description' => 'Professional service',
+        'pin_address' => '123 Test St, Karachi',
     ]);
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors(['service_types']);
 });
 
-test('service listings require locations', function () {
+test('service listings require pin_address', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
@@ -211,6 +210,6 @@ test('service listings require locations', function () {
     ]);
 
     $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['locations']);
+    $response->assertJsonValidationErrors(['pin_address']);
 });
 

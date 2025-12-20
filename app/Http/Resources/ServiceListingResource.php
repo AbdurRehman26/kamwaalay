@@ -14,29 +14,55 @@ class ServiceListingResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // Get service types from JSON column
-        $serviceTypes = $this->service_types ?? [];
-        $firstServiceType = !empty($serviceTypes) ? $serviceTypes[0] : null;
+        // Get service types from relationship
+        $serviceTypes = [];
+        $firstServiceType = null;
+        if ($this->relationLoaded('serviceTypes')) {
+            $serviceTypes = $this->serviceTypes->pluck('slug')->toArray();
+            $firstServiceType = $serviceTypes[0] ?? null;
+        } else {
+            // Fallback: load if not already loaded
+            $serviceTypes = $this->serviceTypes()->pluck('slug')->toArray();
+            $firstServiceType = $serviceTypes[0] ?? null;
+        }
         
-        // Get locations from JSON column (location IDs)
-        $locationIds = $this->locations ?? [];
-        
-        // Fetch all location details
+        // Get locations from relationship
+        $locationIds = [];
         $locationDetails = [];
         $firstLocation = null;
-        if (!empty($locationIds)) {
-            $locations = \App\Models\Location::whereIn('id', $locationIds)
-                ->with('city')
-                ->get();
+        
+        if ($this->relationLoaded('locations')) {
+            $locations = $this->locations;
+            $locationIds = $locations->pluck('id')->toArray();
             
             $locationDetails = $locations->map(function ($location) {
                 return [
                     'id' => $location->id,
-                    'city_name' => $location->city->name,
+                    'city_name' => $location->city->name ?? '',
                     'area' => $location->area ?? '',
                     'display_text' => $location->area 
-                        ? $location->city->name . ', ' . $location->area 
-                        : $location->city->name,
+                        ? ($location->city->name ?? '') . ', ' . $location->area 
+                        : ($location->city->name ?? ''),
+                ];
+            })->toArray();
+            
+            // Get first location for backward compatibility
+            if (!empty($locationDetails)) {
+                $firstLocation = $locationDetails[0];
+            }
+        } else {
+            // Fallback: load if not already loaded
+            $locations = $this->locations()->with('city')->get();
+            $locationIds = $locations->pluck('id')->toArray();
+            
+            $locationDetails = $locations->map(function ($location) {
+                return [
+                    'id' => $location->id,
+                    'city_name' => $location->city->name ?? '',
+                    'area' => $location->area ?? '',
+                    'display_text' => $location->area 
+                        ? ($location->city->name ?? '') . ', ' . $location->area 
+                        : ($location->city->name ?? ''),
                 ];
             })->toArray();
             
@@ -52,6 +78,9 @@ class ServiceListingResource extends JsonResource
             'work_type' => $this->work_type,
             'monthly_rate' => $this->monthly_rate,
             'description' => $this->description,
+            'pin_address' => $this->pin_address,
+            'pin_latitude' => $this->pin_latitude,
+            'pin_longitude' => $this->pin_longitude,
             'is_active' => $this->is_active,
             'status' => $this->status,
             'service_types' => $serviceTypes,

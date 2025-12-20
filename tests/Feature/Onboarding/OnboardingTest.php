@@ -78,9 +78,10 @@ test('helpers can complete onboarding', function () {
     
     // Check service types are in JSON column
     $listing = $listings->first();
-    expect($listing->service_types)->toBeArray();
-    expect($listing->service_types)->toContain('maid');
-    expect($listing->service_types)->toContain('cleaner');
+    expect($listing->serviceTypes()->count())->toBeGreaterThanOrEqual(1);
+    $slugs = $listing->serviceTypes()->pluck('slug')->toArray();
+    expect($slugs)->toContain('maid');
+    expect($slugs)->toContain('cleaner');
 });
 
 test('businesses can view onboarding page', function () {

@@ -107,7 +107,6 @@ class DummyUsersSeeder extends Seeder
                         'age' => 32,
                         'gender' => 'female',
                         'religion' => 'sunni_nazar_niyaz',
-                        'skills' => 'Cleaning, Laundry, Cooking basics',
                         'experience_years' => 5,
                         'bio' => 'Experienced and reliable maid with 5 years of experience. Good with cleaning and household chores.',
                         'verification_status' => 'verified',
@@ -359,11 +358,21 @@ class DummyUsersSeeder extends Seeder
 
                     // Create service listings for each group
                     foreach ($groupedServices as $group) {
-                        // Add JSON columns
-                        $group['common']['service_types'] = $group['service_types'];
-                        $group['common']['locations'] = $group['locations'];
+                        // Create the listing without service_types and locations
+                        $listing = \App\Models\ServiceListing::create($group['common']);
 
-                        \App\Models\ServiceListing::create($group['common']);
+                        // Sync service types (convert slugs to IDs)
+                        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $group['service_types'])
+                            ->pluck('id')
+                            ->toArray();
+                        if (!empty($serviceTypeIds)) {
+                            $listing->serviceTypes()->sync($serviceTypeIds);
+                        }
+
+                        // Sync locations
+                        if (!empty($group['locations'])) {
+                            $listing->locations()->sync($group['locations']);
+                        }
                     }
                 }
 
@@ -495,11 +504,21 @@ class DummyUsersSeeder extends Seeder
 
                     // Create service listings for each group
                     foreach ($groupedServices as $group) {
-                        // Add JSON columns
-                        $group['common']['service_types'] = $group['service_types'];
-                        $group['common']['locations'] = $group['locations'];
+                        // Create the listing without service_types and locations
+                        $listing = \App\Models\ServiceListing::create($group['common']);
 
-                        \App\Models\ServiceListing::create($group['common']);
+                        // Sync service types (convert slugs to IDs)
+                        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $group['service_types'])
+                            ->pluck('id')
+                            ->toArray();
+                        if (!empty($serviceTypeIds)) {
+                            $listing->serviceTypes()->sync($serviceTypeIds);
+                        }
+
+                        // Sync locations
+                        if (!empty($group['locations'])) {
+                            $listing->locations()->sync($group['locations']);
+                        }
                     }
 
                     $listingCount = count($groupedServices);

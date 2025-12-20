@@ -237,10 +237,6 @@ class User extends Authenticatable
         return $this->profile?->service_type;
     }
 
-    public function getSkillsAttribute()
-    {
-        return $this->profile?->skills;
-    }
 
     public function getExperienceYearsAttribute()
     {

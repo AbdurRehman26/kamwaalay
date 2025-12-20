@@ -34,7 +34,6 @@ export default function EditWorker() {
         experience_years: "",
         availability: "full_time",
         bio: "",
-        skills: "",
         photo: null,
         existingPhoto: null,
     });
@@ -66,7 +65,6 @@ export default function EditWorker() {
                             experience_years: worker.experience_years || "",
                             availability: worker.availability || "full_time",
                             bio: worker.bio || "",
-                            skills: worker.skills || "",
                             photo: null,
                             existingPhoto: worker.photo || null,
                         });
@@ -234,9 +232,8 @@ export default function EditWorker() {
         }
         formData.append("experience_years", experienceYears.toString());
         formData.append("availability", data.availability || "full_time");
-        // Always send bio and skills, even if empty (Laravel nullable handles empty strings)
+        // Always send bio, even if empty (Laravel nullable handles empty strings)
         formData.append("bio", data.bio || "");
-        formData.append("skills", data.skills || "");
 
         if (data.photo) {
             formData.append("photo", data.photo);
@@ -651,19 +648,6 @@ export default function EditWorker() {
                                     ))}
                                 </select>
                                 <InputError message={errors.availability} className="mt-1.5" />
-                            </div>
-
-                            <div className="md:col-span-2">
-                                <InputLabel htmlFor="skills" value="Skills" />
-                                <TextInput
-                                    id="skills"
-                                    type="text"
-                                    className="mt-1 block w-full"
-                                    value={data.skills}
-                                    onChange={(e) => setData({ ...data, skills: e.target.value })}
-                                    placeholder="e.g., Cooking, Cleaning, Child Care"
-                                />
-                                <InputError message={errors.skills} className="mt-1.5" />
                             </div>
 
                             <div className="md:col-span-2">

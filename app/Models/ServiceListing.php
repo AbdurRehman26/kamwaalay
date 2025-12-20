@@ -5,17 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ServiceListing extends Model
 {
     use HasFactory;
     protected $fillable = [
         'profile_id',
-        'service_types',
-        'locations',
         'work_type',
         'monthly_rate',
         'description',
+        'pin_address',
+        'pin_latitude',
+        'pin_longitude',
         'is_active',
         'status',
     ];
@@ -23,9 +25,9 @@ class ServiceListing extends Model
     protected function casts(): array
     {
         return [
-            'service_types' => 'array',
-            'locations' => 'array',
             'monthly_rate' => 'decimal:2',
+            'pin_latitude' => 'decimal:8',
+            'pin_longitude' => 'decimal:8',
             'is_active' => 'boolean',
         ];
     }
@@ -47,6 +49,24 @@ class ServiceListing extends Model
     }
 
     /**
+     * Get the service types for this listing
+     */
+    public function serviceTypes(): BelongsToMany
+    {
+        return $this->belongsToMany(ServiceType::class, 'service_listing_service_types')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the locations for this listing
+     */
+    public function locations(): BelongsToMany
+    {
+        return $this->belongsToMany(Location::class, 'service_listing_locations')
+            ->withTimestamps();
+    }
+
+    /**
      * Scope for active listings
      */
     public function scopeActive($query)
@@ -55,19 +75,23 @@ class ServiceListing extends Model
     }
 
     /**
-     * Scope for service type (using JSON column)
+     * Scope for service type (using relationship)
      */
-    public function scopeByServiceType($query, $serviceType)
+    public function scopeByServiceType($query, $serviceTypeSlug)
     {
-        return $query->whereJsonContains('service_types', $serviceType);
+        return $query->whereHas('serviceTypes', function ($q) use ($serviceTypeSlug) {
+            $q->where('slug', $serviceTypeSlug);
+        });
     }
 
     /**
-     * Scope for location ID (using JSON column)
+     * Scope for location ID (using relationship)
      */
     public function scopeByLocationId($query, $locationId)
     {
-        return $query->whereJsonContains('locations', $locationId);
+        return $query->whereHas('locations', function ($q) use ($locationId) {
+            $q->where('locations.id', $locationId);
+        });
     }
 
     /**
@@ -75,20 +99,38 @@ class ServiceListing extends Model
      */
     public function getServiceTypeLabelAttribute(): string
     {
-        $serviceTypes = $this->service_types ?? [];
-        if (count($serviceTypes) > 0) {
-            return str_replace('_', ' ', $serviceTypes[0]);
+        $firstServiceType = $this->serviceTypes()->first();
+        if ($firstServiceType) {
+            return $firstServiceType->name;
         }
         
         return 'Service';
     }
 
     /**
-     * Get the first service type (for backward compatibility)
+     * Get the first service type slug (for backward compatibility)
      */
     public function getServiceTypeAttribute(): ?string
     {
-        $serviceTypes = $this->service_types ?? [];
-        return $serviceTypes[0] ?? null;
+        $firstServiceType = $this->serviceTypes()->first();
+        return $firstServiceType ? $firstServiceType->slug : null;
+    }
+
+    /**
+     * Get service types as array of slugs (for backward compatibility)
+     * Note: This accessor conflicts with the relationship name, so use serviceTypes() for relationship
+     */
+    public function getServiceTypesSlugsAttribute(): array
+    {
+        return $this->serviceTypes()->pluck('slug')->toArray();
+    }
+
+    /**
+     * Get locations as array of IDs (for backward compatibility)
+     * Note: This accessor conflicts with the relationship name, so use locations() for relationship
+     */
+    public function getLocationsIdsAttribute(): array
+    {
+        return $this->locations()->pluck('locations.id')->toArray();
     }
 }

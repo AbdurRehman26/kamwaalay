@@ -15,6 +15,8 @@ export default function ServiceListingCreate() {
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
     const locationRef = useRef(null);
     const searchTimeoutRef = useRef(null);
+    const pinAddressInputRef = useRef(null);
+    const autocompleteRef = useRef(null);
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -23,7 +25,11 @@ export default function ServiceListingCreate() {
         work_type: "",
         monthly_rate: "",
         description: "",
+        pin_address: "",
+        pin_latitude: "",
+        pin_longitude: "",
     });
+    const [gettingLocation, setGettingLocation] = useState(false);
 
     // Fetch service types from API
     const { serviceTypes } = useServiceTypes();
@@ -100,6 +106,146 @@ export default function ServiceListingCreate() {
         };
     }, []);
 
+    // Initialize Google Places Autocomplete
+    // Note: Using deprecated Autocomplete API for now as PlaceAutocompleteElement has compatibility issues
+    useEffect(() => {
+        if (pinAddressInputRef.current && window.google && window.google.maps && window.google.maps.places) {
+            try {
+                // Use the deprecated Autocomplete API (still works and more stable)
+                const autocomplete = new window.google.maps.places.Autocomplete(
+                    pinAddressInputRef.current,
+                    {
+                        componentRestrictions: { country: "pk" },
+                        fields: ["formatted_address", "geometry", "name"],
+                        types: ["address"]
+                    }
+                );
+
+                autocompleteRef.current = autocomplete;
+
+                autocomplete.addListener("place_changed", () => {
+                    const place = autocomplete.getPlace();
+                    if (place.formatted_address) {
+                        const lat = place.geometry?.location?.lat();
+                        const lng = place.geometry?.location?.lng();
+                        setCommonFields({ 
+                            ...commonFields, 
+                            pin_address: place.formatted_address,
+                            pin_latitude: lat ? lat.toString() : "",
+                            pin_longitude: lng ? lng.toString() : ""
+                        });
+                    }
+                });
+
+                return () => {
+                    if (autocompleteRef.current) {
+                        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
+                    }
+                };
+            } catch (error) {
+                console.error("Error initializing Google Places Autocomplete:", error);
+                // Silently fail - user can still type addresses manually
+            }
+        }
+    }, [commonFields.pin_address]);
+
+    const handleGetCurrentLocation = () => {
+        if (!navigator.geolocation) {
+            setErrors({ pin_address: "Geolocation is not supported by your browser." });
+            return;
+        }
+
+        // Check if we're in a secure context (HTTPS or localhost)
+        if (!window.isSecureContext && window.location.protocol !== "https:" && !window.location.hostname.includes("localhost") && !window.location.hostname.includes("127.0.0.1")) {
+            setErrors({ 
+                pin_address: "Geolocation requires HTTPS or localhost. Please access the site via https://localhost or manually enter your address. The address autocomplete will still work." 
+            });
+            return;
+        }
+
+        if (!window.google || !window.google.maps || !window.google.maps.Geocoder) {
+            setErrors({ pin_address: "Google Maps API is not loaded. Please refresh the page." });
+            return;
+        }
+
+        setGettingLocation(true);
+        setErrors({ ...errors, pin_address: null });
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                
+                try {
+                    // Use Google Geocoding API for reverse geocoding
+                    const geocoder = new window.google.maps.Geocoder();
+                    const latlng = { lat: latitude, lng: longitude };
+                    
+                    geocoder.geocode({ location: latlng }, (results, status) => {
+                        if (status === "OK" && results && results.length > 0) {
+                            // Use the formatted address from Google
+                            const formattedAddress = results[0].formatted_address;
+                            setCommonFields({ 
+                                ...commonFields, 
+                                pin_address: formattedAddress,
+                                pin_latitude: latitude.toString(),
+                                pin_longitude: longitude.toString()
+                            });
+                        } else {
+                            // Fallback to coordinates if geocoding fails
+                            setCommonFields({ 
+                                ...commonFields, 
+                                pin_address: `${latitude}, ${longitude}`,
+                                pin_latitude: latitude.toString(),
+                                pin_longitude: longitude.toString()
+                            });
+                        }
+                        setGettingLocation(false);
+                    });
+                } catch (error) {
+                    console.error("Error reverse geocoding:", error);
+                    // Fallback to coordinates
+                    setCommonFields({ 
+                        ...commonFields, 
+                        pin_address: `${latitude}, ${longitude}`,
+                        pin_latitude: latitude.toString(),
+                        pin_longitude: longitude.toString()
+                    });
+                    setGettingLocation(false);
+                }
+            },
+            (error) => {
+                console.error("Error getting location:", error);
+                let errorMessage = "Unable to get your location.";
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = "Location access denied. Please enable location permissions in your browser settings.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = "Location information unavailable.";
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = "Location request timed out. Please try again.";
+                        break;
+                    default:
+                        // Handle secure origin error (code 1)
+                        if (error.code === 1 || error.message?.includes("secure origins")) {
+                            errorMessage = "Geolocation requires HTTPS or localhost. Please use https://localhost or manually enter your address.";
+                        } else {
+                            errorMessage = `Unable to get your location: ${error.message || "Unknown error"}`;
+                        }
+                        break;
+                }
+                setErrors({ ...errors, pin_address: errorMessage });
+                setGettingLocation(false);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    };
+
     const submit = (e) => {
         e.preventDefault();
         setProcessing(true);
@@ -112,14 +258,14 @@ export default function ServiceListingCreate() {
             return;
         }
 
-        if (selectedLocations.length === 0) {
-            setErrors({ locations: "Please select at least one location." });
+        if (!commonFields.work_type) {
+            setErrors({ work_type: "Work type is required." });
             setProcessing(false);
             return;
         }
 
-        if (!commonFields.work_type) {
-            setErrors({ work_type: "Work type is required." });
+        if (!commonFields.pin_address || commonFields.pin_address.trim() === "") {
+            setErrors({ pin_address: "Pin address is required." });
             setProcessing(false);
             return;
         }
@@ -150,18 +296,15 @@ export default function ServiceListingCreate() {
             })
             .filter(id => id !== null);
 
-        if (validLocationIds.length === 0) {
-            setErrors({ locations: "Please select valid locations with location IDs." });
-            setProcessing(false);
-            return;
-        }
-
         const apiData = {
             service_types: selectedServiceTypes,
-            locations: validLocationIds,
+            locations: validLocationIds.length > 0 ? validLocationIds : null, // Optional
             work_type: commonFields.work_type,
             monthly_rate: commonFields.monthly_rate || null,
             description: commonFields.description || null,
+            pin_address: commonFields.pin_address, // Required
+            pin_latitude: commonFields.pin_latitude ? parseFloat(commonFields.pin_latitude) : null,
+            pin_longitude: commonFields.pin_longitude ? parseFloat(commonFields.pin_longitude) : null,
         };
 
         serviceListingsService.createListing(apiData)
@@ -265,9 +408,9 @@ export default function ServiceListingCreate() {
                         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
                             <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                                 <span className="text-2xl">📍</span>
-                                Select Locations *
+                                Select Locations (Optional)
                             </h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Add locations where you offer your services. You can add multiple locations.</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Add locations where you offer your services. You can add multiple locations. This is optional.</p>
 
                             {/* Notice about Karachi only */}
                             <div className="mb-6 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 rounded-lg">
@@ -390,9 +533,49 @@ export default function ServiceListingCreate() {
                                         onChange={(e) => setCommonFields({ ...commonFields, description: e.target.value })}
                                         rows={6}
                                         className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
-                                        placeholder="Describe the services you offer, your experience, skills, etc..."
+                                        placeholder="Describe the services you offer, your experience, etc..."
                                     />
                                     {errors.description && <div className="text-red-600 dark:text-red-400 text-sm mt-1 font-semibold">{errors.description}</div>}
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                                        <span className="text-2xl mr-2">📍</span>
+                                        Exact Pin Address *
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            ref={pinAddressInputRef}
+                                            type="text"
+                                            value={commonFields.pin_address}
+                                            onChange={(e) => setCommonFields({ ...commonFields, pin_address: e.target.value })}
+                                            className="flex-1 border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all px-4 py-3"
+                                            placeholder="Start typing address or click button to get current location"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleGetCurrentLocation}
+                                            disabled={gettingLocation}
+                                            className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+                                        >
+                                            {gettingLocation ? (
+                                                <>
+                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                    <span>Getting...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span>📍</span>
+                                                    <span>Get Current Location</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                        Enter the exact address where you provide services, or click the button to automatically detect your current location.
+                                    </p>
+                                    {errors.pin_address && <div className="text-red-600 dark:text-red-400 text-sm mt-1 font-semibold">{errors.pin_address}</div>}
                                 </div>
                             </div>
 

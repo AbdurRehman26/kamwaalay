@@ -46,12 +46,15 @@ test('helpers can edit their service listing', function () {
         'profile_id' => $profile->id,
     ]);
 
-    // Service types and locations are now stored in JSON columns
+    // Service types and locations are now stored in pivot tables
+    $serviceType = \App\Models\ServiceType::where('slug', 'maid')->first();
     $location = Location::first();
-    $listing->update([
-        'service_types' => ['maid'],
-        'locations' => [$location->id],
-    ]);
+    if ($serviceType) {
+        $listing->serviceTypes()->sync([$serviceType->id]);
+    }
+    if ($location) {
+        $listing->locations()->sync([$location->id]);
+    }
     
     $token = $helper->createToken('test-token')->plainTextToken;
 
@@ -159,12 +162,15 @@ test('guests can view individual service listing', function () {
         'status' => 'active',
     ]);
 
-    // Service types and locations are now stored in JSON columns
+    // Service types and locations are now stored in pivot tables
+    $serviceType = \App\Models\ServiceType::where('slug', 'maid')->first();
     $location = Location::first();
-    $listing->update([
-        'service_types' => ['maid'],
-        'locations' => [$location->id],
-    ]);
+    if ($serviceType) {
+        $listing->serviceTypes()->sync([$serviceType->id]);
+    }
+    if ($location) {
+        $listing->locations()->sync([$location->id]);
+    }
 
     $response = $this->getJson("/api/service-listings/{$listing->id}");
 

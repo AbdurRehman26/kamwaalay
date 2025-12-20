@@ -226,7 +226,6 @@ class HelperController extends Controller
                     properties: [
                         new OA\Property(property: "photo", type: "string", format: "binary", description: "Helper profile photo"),
                         new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
-                        new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
                         new OA\Property(property: "city", type: "string", maxLength: 255),
                         new OA\Property(property: "area", type: "string", maxLength: 255),
@@ -256,7 +255,6 @@ class HelperController extends Controller
         $validated = $request->validate([
             'photo' => 'nullable|image|max:2048',
             'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
-            'skills' => 'nullable|string',
             'experience_years' => 'required|integer|min:0',
             'city' => 'required|string|max:255',
             'area' => 'required|string|max:255',
@@ -343,7 +341,6 @@ class HelperController extends Controller
                     properties: [
                         new OA\Property(property: "photo", type: "string", format: "binary", description: "Helper profile photo"),
                         new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
-                        new OA\Property(property: "skills", type: "string", nullable: true),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
                         new OA\Property(property: "city", type: "string", maxLength: 255),
                         new OA\Property(property: "area", type: "string", maxLength: 255),
@@ -383,7 +380,6 @@ class HelperController extends Controller
         $validated = $request->validate([
             'photo' => 'nullable|image|max:2048',
             'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
-            'skills' => 'nullable|string',
             'experience_years' => 'required|integer|min:0',
             'city' => 'required|string|max:255',
             'area' => 'required|string|max:255',

@@ -256,17 +256,26 @@ class OnboardingController extends Controller
             $profile = $user->profile()->create([]);
         }
 
-        // Create service listing with profile link and JSON arrays
+        // Create service listing
         $listing = ServiceListing::create([
             'profile_id' => $profile->id,
-            'service_types' => $validated['services'], // Array of service type strings
-            'locations' => $validated['locations'], // Array of location IDs
             'work_type' => $validated['work_type'],
             'monthly_rate' => $validated['monthly_rate'] ?? null,
             'description' => $validated['description'] ?? null,
             'is_active' => true,
             'status' => 'active',
         ]);
+
+        // Sync service types (convert slugs to IDs)
+        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $validated['services'])
+            ->pluck('id')
+            ->toArray();
+        $listing->serviceTypes()->sync($serviceTypeIds);
+
+        // Sync locations (if provided)
+        if (!empty($validated['locations'])) {
+            $listing->locations()->sync($validated['locations']);
+        }
 
         return response()->json([
             'message' => 'Welcome! Your profile has been set up successfully.',
@@ -504,17 +513,26 @@ class OnboardingController extends Controller
             $profile = $user->profile()->create([]);
         }
 
-        // Create service listing with profile link and JSON arrays
+        // Create service listing
         $listing = ServiceListing::create([
             'profile_id' => $profile->id,
-            'service_types' => $validated['services'], // Array of service type strings
-            'locations' => $validated['locations'], // Array of location IDs
             'work_type' => $validated['work_type'],
             'monthly_rate' => $validated['monthly_rate'] ?? null,
             'description' => $validated['description'] ?? null,
             'is_active' => true,
             'status' => 'active',
         ]);
+
+        // Sync service types (convert slugs to IDs)
+        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $validated['services'])
+            ->pluck('id')
+            ->toArray();
+        $listing->serviceTypes()->sync($serviceTypeIds);
+
+        // Sync locations (if provided)
+        if (!empty($validated['locations'])) {
+            $listing->locations()->sync($validated['locations']);
+        }
 
         return response()->json([
             'message' => 'Welcome! Your business profile has been set up successfully.',

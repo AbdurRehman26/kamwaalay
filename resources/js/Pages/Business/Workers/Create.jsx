@@ -33,7 +33,6 @@ export default function CreateWorker() {
         experience_years: "",
         availability: "full_time",
         bio: "",
-        skills: "",
         photo: null,
     });
     const [selectedLanguages, setSelectedLanguages] = useState([]);
@@ -146,7 +145,6 @@ export default function CreateWorker() {
         formData.append("experience_years", data.experience_years);
         formData.append("availability", data.availability);
         formData.append("bio", data.bio);
-        formData.append("skills", data.skills);
 
         if (data.photo) {
             formData.append("photo", data.photo);
@@ -533,19 +531,6 @@ export default function CreateWorker() {
                                     ))}
                                 </select>
                                 <InputError message={errors.availability} className="mt-1.5" />
-                            </div>
-
-                            <div className="md:col-span-2">
-                                <InputLabel htmlFor="skills" value="Skills" />
-                                <TextInput
-                                    id="skills"
-                                    type="text"
-                                    className="mt-1 block w-full"
-                                    value={data.skills}
-                                    onChange={(e) => setData({ ...data, skills: e.target.value })}
-                                    placeholder="e.g., Cooking, Cleaning, Child Care"
-                                />
-                                <InputError message={errors.skills} className="mt-1.5" />
                             </div>
 
                             <div className="md:col-span-2">

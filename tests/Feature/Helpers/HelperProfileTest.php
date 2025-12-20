@@ -48,7 +48,6 @@ test('helpers can create their profile', function () {
         'Accept' => 'application/json',
     ])->postJson('/api/helpers', [
         'service_type' => 'maid',
-        'skills' => 'Cleaning, Laundry',
         'experience_years' => 5,
         'city' => 'Karachi',
         'area' => 'Saddar',
@@ -61,7 +60,6 @@ test('helpers can create their profile', function () {
         'profileable_id' => $helper->id,
         'profileable_type' => 'App\Models\User',
         'service_type' => 'maid',
-        'skills' => 'Cleaning, Laundry',
     ]);
 });
 
@@ -70,7 +68,6 @@ test('helpers can update their profile', function () {
     $helper->assignRole('helper');
     $helper->profile()->create([
         'service_type' => 'maid',
-        'skills' => 'Cleaning',
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;
@@ -80,7 +77,6 @@ test('helpers can update their profile', function () {
         'Accept' => 'application/json',
     ])->putJson("/api/helpers/{$helper->id}", [
         'service_type' => 'cook',
-        'skills' => 'Cooking, Baking',
         'experience_years' => 8,
         'city' => 'Karachi',
         'area' => 'PECHS',
@@ -93,7 +89,6 @@ test('helpers can update their profile', function () {
         'profileable_id' => $helper->id,
         'profileable_type' => 'App\Models\User',
         'service_type' => 'cook',
-        'skills' => 'Cooking, Baking',
     ]);
 });
 
@@ -106,17 +101,19 @@ test('helpers can see their service listings on profile', function () {
 
     $listing = ServiceListing::factory()->create([
         'profile_id' => $profile->id,
-        'service_types' => ['maid'],
         'is_active' => true,
         'status' => 'active',
     ]);
 
-    // Service types and locations are now stored in JSON columns
+    // Service types and locations are now stored in pivot tables
+    $serviceType = \App\Models\ServiceType::where('slug', 'maid')->first();
     $location = Location::first();
-    $listing->update([
-        'service_types' => ['maid'],
-        'locations' => [$location->id],
-    ]);
+    if ($serviceType) {
+        $listing->serviceTypes()->sync([$serviceType->id]);
+    }
+    if ($location) {
+        $listing->locations()->sync([$location->id]);
+    }
 
     $response = $this->getJson("/api/helpers/{$helper->id}");
 
