@@ -136,7 +136,7 @@ class DummyUsersSeeder extends Seeder
                         'age' => 45,
                         'gender' => 'male',
                         'religion' => 'sunni_no_nazar_niyaz',
-                        'skills' => 'Pakistani cuisine, BBQ, Baking',
+
                         'experience_years' => 8,
                         'bio' => 'Professional cook specializing in Pakistani and continental dishes. Available for part-time cooking.',
                         'verification_status' => 'verified',
@@ -166,7 +166,7 @@ class DummyUsersSeeder extends Seeder
                         'age' => 28,
                         'gender' => 'female',
                         'religion' => 'sunni_nazar_niyaz',
-                        'skills' => 'Childcare, Homework help, First aid',
+
                         'experience_years' => 3,
                         'bio' => 'Caring and patient babysitter with experience in childcare. Good with kids of all ages.',
                         'verification_status' => 'verified',
@@ -196,7 +196,7 @@ class DummyUsersSeeder extends Seeder
                         'age' => 52,
                         'gender' => 'female',
                         'religion' => 'shia',
-                        'skills' => 'Elderly care, Medication management, Physical therapy',
+
                         'experience_years' => 10,
                         'bio' => 'Experienced caregiver specializing in elderly care. Trained in basic medical assistance.',
                         'verification_status' => 'verified',
@@ -226,7 +226,7 @@ class DummyUsersSeeder extends Seeder
                         'age' => 38,
                         'gender' => 'male',
                         'religion' => 'sunni_no_nazar_niyaz',
-                        'skills' => 'Deep cleaning, Window cleaning, Carpet cleaning',
+
                         'experience_years' => 4,
                         'bio' => 'Professional cleaner with expertise in deep cleaning and maintenance.',
                         'verification_status' => 'verified',
@@ -256,7 +256,7 @@ class DummyUsersSeeder extends Seeder
                         'age' => 35,
                         'gender' => 'female',
                         'religion' => 'christian',
-                        'skills' => 'Cooking, Cleaning, Childcare, Errands',
+
                         'experience_years' => 6,
                         'bio' => 'Versatile all-rounder helper capable of handling multiple household tasks efficiently.',
                         'verification_status' => 'verified',
