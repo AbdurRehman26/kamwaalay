@@ -24,7 +24,7 @@ class User extends Authenticatable implements FilamentUser
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'email', 'phone', 'address', 'is_active', 'verified_at'])
+            ->logOnly(['name', 'email', 'phone', 'address', 'is_active', 'phone_verified_at'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
@@ -49,7 +49,7 @@ class User extends Authenticatable implements FilamentUser
         'phone',
         'address',
         'is_active',
-        'verified_at',
+        'phone_verified_at',
     ];
 
     /**
@@ -70,7 +70,7 @@ class User extends Authenticatable implements FilamentUser
     protected function casts(): array
     {
         return [
-            'verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];

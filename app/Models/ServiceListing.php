@@ -71,15 +71,6 @@ class ServiceListing extends Model
     }
 
     /**
-     * Get the locations for this listing
-     */
-    public function locations(): BelongsToMany
-    {
-        return $this->belongsToMany(Location::class, 'service_listing_locations')
-            ->withTimestamps();
-    }
-
-    /**
      * Scope for active listings
      */
     public function scopeActive($query)
@@ -94,16 +85,6 @@ class ServiceListing extends Model
     {
         return $query->whereHas('serviceTypes', function ($q) use ($serviceTypeSlug) {
             $q->where('slug', $serviceTypeSlug);
-        });
-    }
-
-    /**
-     * Scope for location ID (using relationship)
-     */
-    public function scopeByLocationId($query, $locationId)
-    {
-        return $query->whereHas('locations', function ($q) use ($locationId) {
-            $q->where('locations.id', $locationId);
         });
     }
 
@@ -136,15 +117,6 @@ class ServiceListing extends Model
     public function getServiceTypesSlugsAttribute(): array
     {
         return $this->serviceTypes()->pluck('slug')->toArray();
-    }
-
-    /**
-     * Get locations as array of IDs (for backward compatibility)
-     * Note: This accessor conflicts with the relationship name, so use locations() for relationship
-     */
-    public function getLocationsIdsAttribute(): array
-    {
-        return $this->locations()->pluck('locations.id')->toArray();
     }
 
     /**

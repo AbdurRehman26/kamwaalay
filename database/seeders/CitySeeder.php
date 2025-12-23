@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\City;
 use App\Models\Country;
-use App\Models\Location;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
@@ -140,23 +139,6 @@ class CitySeeder extends Seeder
                 // Update city with coordinates if available (moved from below to be part of city creation/update)
                 // We do this here because we extracted them above
 
-
-                // Create or update location with coordinates
-                if ($latitude !== null && $longitude !== null) {
-                    Location::updateOrCreate(
-                        [
-                            'city_id' => $city->id,
-                            'area' => null, // City-level location doesn't have an area
-                        ],
-                        [
-                            'city_id' => $city->id,
-                            'area' => null,
-                            'latitude' => $latitude,
-                            'longitude' => $longitude,
-                            'is_active' => true,
-                        ]
-                    );
-                }
 
                 $imported++;
             } catch (\Exception $e) {

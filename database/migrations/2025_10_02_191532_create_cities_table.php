@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('state')->nullable();
             $table->foreignId('country_id')->default(1)->constrained('countries')->onDelete('restrict');
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

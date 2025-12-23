@@ -19,25 +19,6 @@ beforeEach(function () {
     }
 });
 
-test('users can register with email', function () {
-    $response = $this->postJson('/api/register', [
-        'name' => 'Test User',
-        'email' => 'test@example.com',
-        'password' => 'password',
-        'password_confirmation' => 'password',
-        'role' => 'user',
-    ]);
-
-    // User gets JSON response with verification info, not logged in yet
-    $response->assertStatus(200)
-        ->assertJsonStructure(['message', 'user_id', 'verification_method', 'identifier']);
-    $this->assertGuest(); // User should NOT be logged in until OTP is verified
-    $this->assertDatabaseHas('users', [
-        'email' => 'test@example.com',
-        'name' => 'Test User',
-    ]);
-});
-
 test('users can register with phone number', function () {
     $response = $this->postJson('/api/register', [
         'name' => 'Test User',
@@ -46,10 +27,9 @@ test('users can register with phone number', function () {
         'password_confirmation' => 'password',
         'role' => 'user',
     ]);
-
     // User gets JSON response with verification info, not logged in yet
     $response->assertStatus(200)
-        ->assertJsonStructure(['message', 'user_id', 'verification_method', 'identifier']);
+        ->assertJsonStructure(['message', 'verification_method', 'identifier']);
     $this->assertGuest(); // User should NOT be logged in until OTP is verified
     // Phone number is formatted to include country code
     $this->assertDatabaseHas('users', [

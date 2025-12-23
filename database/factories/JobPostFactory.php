@@ -21,12 +21,8 @@ class JobPostFactory extends Factory
         return [
             'user_id' => User::factory(),
             'name' => fake()->name(),
-            'email' => fake()->safeEmail(),
             'phone' => '03' . fake()->numerify('########'),
-            'service_type' => fake()->randomElement(['maid', 'cook', 'babysitter', 'caregiver', 'cleaner', 'all_rounder']),
             'work_type' => fake()->randomElement(['full_time', 'part_time']),
-            'city' => 'Karachi',
-            'area' => fake()->randomElement(['Saddar', 'DHA', 'PECHS', 'Clifton', 'Korangi', 'Bahadurabad']),
             'address' => fake()->address(),
             'special_requirements' => fake()->optional()->sentence(),
             'status' => fake()->randomElement(['pending', 'confirmed', 'cancelled', 'completed']),

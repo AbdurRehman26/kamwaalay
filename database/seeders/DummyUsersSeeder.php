@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\Profile;
 use App\Models\ServiceListing;
 use App\Models\City;
-use App\Models\Location;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -34,7 +33,6 @@ class DummyUsersSeeder extends Seeder
                     'address' => 'House 123, Street 4, Karachi',
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'DHA',
                     ]
                 ],
                 [
@@ -46,7 +44,6 @@ class DummyUsersSeeder extends Seeder
                     'address' => 'Apartment 45, Block 2, Karachi',
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'Clifton',
                     ]
                 ],
                 [
@@ -58,7 +55,6 @@ class DummyUsersSeeder extends Seeder
                     'address' => 'Villa 789, Phase 5, Karachi',
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'Gulshan-e-Iqbal',
                     ]
                 ],
             ];
@@ -66,7 +62,7 @@ class DummyUsersSeeder extends Seeder
             foreach ($users as $userData) {
                 $profileData = $userData['profile'] ?? [];
                 unset($userData['profile']);
-                
+
                 // Remove 'role' from data array
                 $role = $userData['role'];
                 unset($userData['role']);
@@ -103,7 +99,6 @@ class DummyUsersSeeder extends Seeder
                     'is_active' => true,
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'Saddar',
                         'age' => 32,
                         'gender' => 'female',
                         'religion' => 'sunni_nazar_niyaz',
@@ -118,8 +113,8 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [1, 2], // English, Urdu
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'maid', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'Saddar', 'monthly_rate' => 15000, 'description' => 'Professional maid service'],
-                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'Saddar', 'monthly_rate' => 13500, 'description' => 'Deep cleaning services'],
+                        ['service_type' => 'maid', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 15000, 'description' => 'Professional maid service'],
+                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 13500, 'description' => 'Deep cleaning services'],
                     ],
                 ],
                 [
@@ -132,7 +127,6 @@ class DummyUsersSeeder extends Seeder
                     'is_active' => true,
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'PECHS',
                         'age' => 45,
                         'gender' => 'male',
                         'religion' => 'sunni_no_nazar_niyaz',
@@ -148,8 +142,8 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [1, 2, 3], // English, Urdu, Punjabi
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'cook', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'PECHS', 'monthly_rate' => 21000, 'description' => 'Pakistani and continental cuisine'],
-                        ['service_type' => 'cook', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'DHA', 'monthly_rate' => 24000, 'description' => 'Full-time cooking services'],
+                        ['service_type' => 'cook', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 21000, 'description' => 'Pakistani and continental cuisine'],
+                        ['service_type' => 'cook', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 24000, 'description' => 'Full-time cooking services'],
                     ],
                 ],
                 [
@@ -162,7 +156,6 @@ class DummyUsersSeeder extends Seeder
                     'is_active' => true,
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'DHA',
                         'age' => 28,
                         'gender' => 'female',
                         'religion' => 'sunni_nazar_niyaz',
@@ -178,8 +171,8 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [1, 2], // English, Urdu
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'babysitter', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'DHA', 'monthly_rate' => 18000, 'description' => 'Full-time babysitting'],
-                        ['service_type' => 'caregiver', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'DHA', 'monthly_rate' => 19500, 'description' => 'Elderly care assistance'],
+                        ['service_type' => 'babysitter', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 18000, 'description' => 'Full-time babysitting'],
+                        ['service_type' => 'caregiver', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 19500, 'description' => 'Elderly care assistance'],
                     ],
                 ],
                 [
@@ -192,7 +185,6 @@ class DummyUsersSeeder extends Seeder
                     'is_active' => true,
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'North Karachi',
                         'age' => 52,
                         'gender' => 'female',
                         'religion' => 'shia',
@@ -208,8 +200,8 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [1, 2, 4], // English, Urdu, Sindhi
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'North Karachi', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
-                        ['service_type' => 'caregiver', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'DHA', 'monthly_rate' => 25500, 'description' => 'Part-time elderly assistance'],
+                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
+                        ['service_type' => 'caregiver', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 25500, 'description' => 'Part-time elderly assistance'],
                     ],
                 ],
                 [
@@ -222,7 +214,6 @@ class DummyUsersSeeder extends Seeder
                     'is_active' => true,
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'Korangi',
                         'age' => 38,
                         'gender' => 'male',
                         'religion' => 'sunni_no_nazar_niyaz',
@@ -238,8 +229,8 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [2, 4], // Urdu, Sindhi
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'Korangi', 'monthly_rate' => 13500, 'description' => 'Deep cleaning services'],
-                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'PECHS', 'monthly_rate' => 15000, 'description' => 'Office and home cleaning'],
+                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 13500, 'description' => 'Deep cleaning services'],
+                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 15000, 'description' => 'Office and home cleaning'],
                     ],
                 ],
                 [
@@ -252,7 +243,6 @@ class DummyUsersSeeder extends Seeder
                     'is_active' => true,
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'Bahadurabad',
                         'age' => 35,
                         'gender' => 'female',
                         'religion' => 'christian',
@@ -268,9 +258,9 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [1, 2, 3], // English, Urdu, Punjabi
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'Bahadurabad', 'monthly_rate' => 19500, 'description' => 'Complete household management'],
-                        ['service_type' => 'maid', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'Clifton', 'monthly_rate' => 18000, 'description' => 'Part-time maid services'],
-                        ['service_type' => 'babysitter', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'Bahadurabad', 'monthly_rate' => 16500, 'description' => 'Babysitting when needed'],
+                        ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 19500, 'description' => 'Complete household management'],
+                        ['service_type' => 'maid', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 18000, 'description' => 'Part-time maid services'],
+                        ['service_type' => 'babysitter', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 16500, 'description' => 'Babysitting when needed'],
                     ],
                 ],
             ];
@@ -340,20 +330,6 @@ class DummyUsersSeeder extends Seeder
                         if (!in_array($serviceData['service_type'], $groupedServices[$key]['service_types'])) {
                             $groupedServices[$key]['service_types'][] = $serviceData['service_type'];
                         }
-
-                        // Add location
-                        $city = City::where('name', $serviceData['city'])->first();
-                        if ($city) {
-                            $location = Location::where('city_id', $city->id)
-                                ->where('area', $serviceData['area'])
-                                ->first();
-                            
-                            if ($location) {
-                                if (!in_array($location->id, $groupedServices[$key]['locations'])) {
-                                    $groupedServices[$key]['locations'][] = $location->id;
-                                }
-                            }
-                        }
                     }
 
                     // Create service listings for each group
@@ -395,16 +371,15 @@ class DummyUsersSeeder extends Seeder
                     'is_active' => true,
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'PECHS',
                         'bio' => 'Leading agency providing verified domestic help services.',
                         'is_active' => true,
                     ],
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'maid', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'PECHS', 'monthly_rate' => 15000, 'description' => 'Professional maid services'],
-                        ['service_type' => 'cook', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'PECHS', 'monthly_rate' => 21000, 'description' => 'Experienced cooking services'],
-                        ['service_type' => 'babysitter', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'DHA', 'monthly_rate' => 18000, 'description' => 'Reliable babysitting'],
-                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'PECHS', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
+                        ['service_type' => 'maid', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 15000, 'description' => 'Professional maid services'],
+                        ['service_type' => 'cook', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 21000, 'description' => 'Experienced cooking services'],
+                        ['service_type' => 'babysitter', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 18000, 'description' => 'Reliable babysitting'],
+                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
                     ],
                 ],
                 [
@@ -417,15 +392,14 @@ class DummyUsersSeeder extends Seeder
                     'is_active' => true,
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'Clifton',
                         'bio' => 'Reliable and professional care services for homes and businesses.',
                         'is_active' => true,
                     ],
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'Clifton', 'monthly_rate' => 21000, 'description' => 'Complete household management'],
-                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'area' => 'Clifton', 'monthly_rate' => 15000, 'description' => 'Professional cleaning'],
-                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'area' => 'DHA', 'monthly_rate' => 25500, 'description' => 'Medical assistance and care'],
+                        ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 21000, 'description' => 'Complete household management'],
+                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 15000, 'description' => 'Professional cleaning'],
+                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 25500, 'description' => 'Medical assistance and care'],
                     ],
                 ],
             ];
@@ -486,20 +460,6 @@ class DummyUsersSeeder extends Seeder
                         if (!in_array($serviceData['service_type'], $groupedServices[$key]['service_types'])) {
                             $groupedServices[$key]['service_types'][] = $serviceData['service_type'];
                         }
-
-                        // Add location
-                        $city = City::where('name', $serviceData['city'])->first();
-                        if ($city) {
-                            $location = Location::where('city_id', $city->id)
-                                ->where('area', $serviceData['area'])
-                                ->first();
-                            
-                            if ($location) {
-                                if (!in_array($location->id, $groupedServices[$key]['locations'])) {
-                                    $groupedServices[$key]['locations'][] = $location->id;
-                                }
-                            }
-                        }
                     }
 
                     // Create service listings for each group
@@ -542,7 +502,6 @@ class DummyUsersSeeder extends Seeder
                     'address' => 'Admin Office, Main Building, Karachi',
                     'profile' => [
                         'city' => 'Karachi',
-                        'area' => 'DHA',
                     ]
                 ],
             ];

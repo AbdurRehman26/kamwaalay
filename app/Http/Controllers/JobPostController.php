@@ -351,23 +351,13 @@ class JobPostController extends Controller
             $query->where('service_type', $request->service_type);
         }
 
-        // Filter by location
+        // Filter by city name
         $locationDisplay = '';
-        if ($request->has('location_id') && $request->location_id) {
-            $location = \App\Models\Location::find($request->location_id);
-            if ($location) {
-                $location->load('city');
-                $query->where('city', $location->city->name)
-                      ->where('area', $location->area);
-                $locationDisplay = $location->area 
-                    ? $location->city->name . ', ' . $location->area 
-                    : $location->city->name;
-            }
-        } elseif ($request->has('city_name') && $request->city_name) {
-            $query->where('city', $request->city_name);
+        if ($request->has('city_name') && $request->city_name) {
+            $query->whereHas('city', function ($q) use ($request) {
+                $q->where('name', $request->city_name);
+            });
             $locationDisplay = $request->city_name;
-        } elseif ($request->has('area') && $request->area) {
-            $query->where('area', 'like', '%' . $request->area . '%');
         }
 
         // Filter by work type
@@ -387,7 +377,7 @@ class JobPostController extends Controller
 
         $jobPosts = $query->orderBy('created_at', 'desc')->paginate(12);
 
-        $filters = $request->only(['service_type', 'location_id', 'city_name', 'area', 'work_type']);
+        $filters = $request->only(['service_type', 'city_name', 'work_type']);
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
         }

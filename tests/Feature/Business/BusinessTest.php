@@ -30,7 +30,7 @@ beforeEach(function () {
 test('businesses can view their dashboard', function () {
     $business = User::factory()->create();
     $business->assignRole('business');
-    
+
     $token = $business->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
@@ -49,7 +49,7 @@ test('businesses can view their workers', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
     $business->helpers()->attach($helper->id);
-    
+
     $token = $business->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
@@ -64,7 +64,7 @@ test('businesses can view their workers', function () {
 test('businesses can create a worker', function () {
     $business = User::factory()->create();
     $business->assignRole('business');
-    
+
     $token = $business->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
@@ -108,7 +108,7 @@ test('businesses can update their worker', function () {
     $helper->assignRole('helper');
     $profile = $helper->profile()->create([]);
     $business->helpers()->attach($helper->id);
-    
+
     $token = $business->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
@@ -147,7 +147,7 @@ test('businesses can remove a worker', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
     $business->helpers()->attach($helper->id);
-    
+
     $token = $business->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
@@ -168,7 +168,7 @@ test('only business owner can manage their workers', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
     $business1->helpers()->attach($helper->id);
-    
+
     $token = $business2->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([

@@ -24,20 +24,6 @@ return new class extends Migration
         ];
 
         DB::table('service_types')->insertOrIgnore($serviceTypes);
-
-        // Insert languages (if languages table exists)
-        if (Schema::hasTable('languages')) {
-            $languages = [
-                ['name' => 'English', 'code' => 'en', 'sort_order' => 1, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Urdu', 'code' => 'ur', 'sort_order' => 2, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Punjabi', 'code' => 'pa', 'sort_order' => 3, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Sindhi', 'code' => 'sd', 'sort_order' => 4, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Pashto', 'code' => 'ps', 'sort_order' => 5, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Balochi', 'code' => 'bal', 'sort_order' => 6, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ];
-
-            DB::table('languages')->insertOrIgnore($languages);
-        }
     }
 
     /**
@@ -56,17 +42,5 @@ return new class extends Migration
             'driver',
             'security_guard',
         ])->delete();
-
-        // Remove languages (if languages table exists)
-        if (Schema::hasTable('languages')) {
-            DB::table('languages')->whereIn('code', [
-                'en',
-                'ur',
-                'pa',
-                'sd',
-                'ps',
-                'bal',
-            ])->delete();
-        }
     }
 };

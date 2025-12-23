@@ -9,7 +9,7 @@ test('users can authenticate using email', function () {
     $user = User::factory()->unverified()->create([
         'email' => 'test@example.com',
         'password' => bcrypt('password'),
-        'verified_at' => null, // Ensure user is unverified
+        'phone_verified_at' => null, // Ensure user is unverified
     ]);
 
     $response = $this->postJson('/api/login', [
@@ -34,7 +34,7 @@ test('users can authenticate using phone number', function () {
         'phone' => '03001234567',
         'email' => '03001234567@phone.kamwaalay.local', // Phone-only users get placeholder email
         'password' => bcrypt('password'),
-        'verified_at' => null, // Ensure phone is unverified
+        'phone_verified_at' => null, // Ensure phone is unverified
     ]);
 
     $response = $this->postJson('/api/login', [

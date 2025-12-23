@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\ServiceListing;
 use App\Models\Profile;
-use App\Models\Location;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -31,7 +30,7 @@ class ServiceListingFactory extends Factory
     }
 
     /**
-     * Configure the factory to attach service types and locations after creation
+     * Configure the factory to attach service types after creation
      */
     public function configure(): static
     {
@@ -41,11 +40,6 @@ class ServiceListingFactory extends Factory
             if ($serviceType) {
                 $listing->serviceTypes()->attach($serviceType->id);
             }
-
-            // Attach a location
-            $location = Location::first() ?? Location::factory()->create();
-            $listing->locations()->attach($location->id);
         });
     }
 }
-

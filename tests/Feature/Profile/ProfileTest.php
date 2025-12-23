@@ -98,7 +98,7 @@ test('users must provide correct password to delete account', function () {
 test('email verification is not reset when profile is updated', function () {
     $user = User::factory()->create([
         'email' => 'old@example.com',
-        'verified_at' => now(),
+        'phone_verified_at' => now(),
     ]);
     $user->assignRole('user');
     
@@ -114,6 +114,6 @@ test('email verification is not reset when profile is updated', function () {
     $response->assertStatus(200);
     $user->refresh();
     // Email verification should remain unchanged as email is not part of profile updates
-    expect($user->verified_at)->not->toBeNull();
+    expect($user->phone_verified_at)->not->toBeNull();
 });
 

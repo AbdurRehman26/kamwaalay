@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\UserResource;
-use App\Models\EmailOtp;
 use App\Models\PhoneOtp;
 use App\Models\User;
 use App\Models\UserSession;
@@ -372,19 +371,19 @@ class AuthenticatedSessionController extends Controller
     private function sendEmailOtp(User $user): void
     {
         // Clean up expired OTPs
-        EmailOtp::cleanupExpired();
+        PhoneOtp::cleanupExpired();
 
         // Generate OTP
-        $otp = EmailOtp::generateOtp();
+        $otp = PhoneOtp::generateOtp();
 
-        // Invalidate previous OTPs for this email
-        EmailOtp::where('email', $user->email)
+        // Invalidate previous OTPs for this email (using phone column to store email)
+        PhoneOtp::where('phone', $user->email)
             ->where('verified', false)
             ->delete();
 
-        // Create new OTP record
-        $emailOtp = EmailOtp::create([
-            'email' => $user->email,
+        // Create new OTP record (using PhoneOtp table to store email OTPs)
+        $phoneOtp = PhoneOtp::create([
+            'phone' => $user->email, // Store email in phone column
             'otp' => $otp,
             'role' => $user->roles->first()->name ?? 'user',
             'expires_at' => Carbon::now()->addMinutes(3), // OTP valid for 3 minutes

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Models\EmailOtp;
 use App\Models\PhoneOtp;
 use App\Models\UserSession;
 use Illuminate\Auth\Events\Registered;
@@ -345,8 +344,8 @@ class VerificationController extends Controller
         $isDemoCode = $request->otp === '123456';
 
         if (!$isDemoCode) {
-            // Find OTP record
-            $emailOtp = EmailOtp::where('email', $email)
+            // Find OTP record (using phone column to store email)
+            $emailOtp = PhoneOtp::where('phone', $email)
                 ->where('otp', $request->otp)
                 ->where('verified', false)
                 ->latest()
@@ -763,19 +762,19 @@ class VerificationController extends Controller
     private function sendEmailOtp(User $user, string $role): void
     {
         // Clean up expired OTPs
-        EmailOtp::cleanupExpired();
+        PhoneOtp::cleanupExpired();
 
         // Generate OTP
-        $otp = EmailOtp::generateOtp();
+        $otp = PhoneOtp::generateOtp();
 
-        // Invalidate previous OTPs for this email
-        EmailOtp::where('email', $user->email)
+        // Invalidate previous OTPs for this email (using phone column)
+        PhoneOtp::where('phone', $user->email)
             ->where('verified', false)
             ->delete();
 
-        // Create new OTP record
-        $emailOtp = EmailOtp::create([
-            'email' => $user->email,
+        // Create new OTP record (using PhoneOtp to store email OTPs)
+        $emailOtp = PhoneOtp::create([
+            'phone' => $user->email, // Store email in phone column
             'otp' => $otp,
             'role' => $role,
             'expires_at' => Carbon::now()->addMinutes(3),
@@ -860,19 +859,19 @@ class VerificationController extends Controller
     private function sendLoginEmailOtp(User $user): void
     {
         // Clean up expired OTPs
-        EmailOtp::cleanupExpired();
+        PhoneOtp::cleanupExpired();
 
         // Generate OTP
-        $otp = EmailOtp::generateOtp();
+        $otp = PhoneOtp::generateOtp();
 
-        // Invalidate previous OTPs for this email
-        EmailOtp::where('email', $user->email)
+        // Invalidate previous OTPs for this email (using phone column)
+        PhoneOtp::where('phone', $user->email)
             ->where('verified', false)
             ->delete();
 
-        // Create new OTP record
-        $emailOtp = EmailOtp::create([
-            'email' => $user->email,
+        // Create new OTP record (using PhoneOtp to store email OTPs)
+        $emailOtp = PhoneOtp::create([
+            'phone' => $user->email, // Store email in phone column
             'otp' => $otp,
             'role' => $user->roles->first()->name ?? 'user',
             'expires_at' => Carbon::now()->addMinutes(3),

@@ -54,36 +54,20 @@ class BusinessController extends Controller
         $query = User::role('business')
             ->where('users.is_active', true);
 
-        // Filter by location (from profile)
+        // Filter by city name (from profile)
         $locationDisplay = '';
-        if ($request->has('location_id') && $request->location_id) {
-            $location = \App\Models\Location::find($request->location_id);
-            if ($location) {
-                $location->load('city');
-                $query->whereHas('profile', function ($q) use ($location) {
-                    $q->where('city', $location->city->name)
-                      ->where('area', $location->area);
-                });
-                $locationDisplay = $location->area
-                    ? $location->city->name . ', ' . $location->area
-                    : $location->city->name;
-            }
-        } elseif ($request->has('city_name') && $request->city_name) {
+        if ($request->has('city_name') && $request->city_name) {
             $query->whereHas('profile', function ($q) use ($request) {
                 $q->where('city', $request->city_name);
             });
             $locationDisplay = $request->city_name;
-        } elseif ($request->has('area') && $request->area) {
-            $query->whereHas('profile', function ($q) use ($request) {
-                $q->where('area', 'like', '%' . $request->area . '%');
-            });
         }
 
         $businesses = $query->with(['roles', 'profile', 'serviceListings'])
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        $filters = $request->only(['location_id', 'city_name', 'area']);
+        $filters = $request->only(['city_name']);
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
         }
@@ -389,10 +373,8 @@ class BusinessController extends Controller
 
         // Create profile for the worker
         $profileData = [
-            'service_type' => $validated['service_types'][0], // Primary service type
             'experience_years' => $validated['experience_years'],
             'city' => $primaryLocation['city'],
-            'area' => $primaryLocation['area'],
             'availability' => $validated['availability'],
             'bio' => $validated['bio'] ?? null,
             'is_active' => true,
@@ -405,17 +387,8 @@ class BusinessController extends Controller
 
         $profile = $helper->profile()->create($profileData);
 
-        // Create service listing
-        $locationIds = array_map(function($location) {
-            // Find or create location ID
-            $locationModel = \App\Models\Location::firstOrCreate([
-                'city_id' => \App\Models\City::firstOrCreate(['name' => $location['city']])->id,
-                'area' => $location['area'],
-            ]);
-            return $locationModel->id;
-        }, $validated['locations']);
-
         $listing = \App\Models\ServiceListing::create([
+            'user_id' => $helper->id,
             'profile_id' => $profile->id,
             'work_type' => $validated['availability'], // Map availability to work_type
             'description' => $validated['bio'],
@@ -428,9 +401,6 @@ class BusinessController extends Controller
             ->pluck('id')
             ->toArray();
         $listing->serviceTypes()->sync($serviceTypeIds);
-
-        // Sync locations
-        $listing->locations()->sync($locationIds);
 
         // Attach to business via pivot table
         $business->helpers()->attach($helper->id, [
@@ -635,17 +605,8 @@ class BusinessController extends Controller
         // Update service listings - delete old ones and create new ones
         $profile->serviceListings()->delete();
 
-        // Create service listing
-        $locationIds = array_map(function($location) {
-            // Find or create location ID
-            $locationModel = \App\Models\Location::firstOrCreate([
-                'city_id' => \App\Models\City::firstOrCreate(['name' => $location['city']])->id,
-                'area' => $location['area'],
-            ]);
-            return $locationModel->id;
-        }, $validated['locations']);
-
         $listing = \App\Models\ServiceListing::create([
+            'user_id' => $helper->id,
             'profile_id' => $profile->id,
             'work_type' => $validated['availability'], // Map availability to work_type
             'description' => $validated['bio'],
@@ -658,9 +619,6 @@ class BusinessController extends Controller
             ->pluck('id')
             ->toArray();
         $listing->serviceTypes()->sync($serviceTypeIds);
-
-        // Sync locations
-        $listing->locations()->sync($locationIds);
 
         return response()->json([
             'message' => 'Worker updated successfully!',

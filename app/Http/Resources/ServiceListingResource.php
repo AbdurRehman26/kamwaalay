@@ -26,50 +26,10 @@ class ServiceListingResource extends JsonResource
             $firstServiceType = $serviceTypes[0] ?? null;
         }
         
-        // Get locations from relationship
-        $locationIds = [];
-        $locationDetails = [];
-        $firstLocation = null;
-        
-        if ($this->relationLoaded('locations')) {
-            $locations = $this->locations;
-            $locationIds = $locations->pluck('id')->toArray();
-            
-            $locationDetails = $locations->map(function ($location) {
-                return [
-                    'id' => $location->id,
-                    'city_name' => $location->city->name ?? '',
-                    'area' => $location->area ?? '',
-                    'display_text' => $location->area 
-                        ? ($location->city->name ?? '') . ', ' . $location->area 
-                        : ($location->city->name ?? ''),
-                ];
-            })->toArray();
-            
-            // Get first location for backward compatibility
-            if (!empty($locationDetails)) {
-                $firstLocation = $locationDetails[0];
-            }
-        } else {
-            // Fallback: load if not already loaded
-            $locations = $this->locations()->with('city')->get();
-            $locationIds = $locations->pluck('id')->toArray();
-            
-            $locationDetails = $locations->map(function ($location) {
-                return [
-                    'id' => $location->id,
-                    'city_name' => $location->city->name ?? '',
-                    'area' => $location->area ?? '',
-                    'display_text' => $location->area 
-                        ? ($location->city->name ?? '') . ', ' . $location->area 
-                        : ($location->city->name ?? ''),
-                ];
-            })->toArray();
-            
-            // Get first location for backward compatibility
-            if (!empty($locationDetails)) {
-                $firstLocation = $locationDetails[0];
-            }
+        // Get city from profile if available
+        $city = null;
+        if ($this->relationLoaded('profile') && $this->profile) {
+            $city = $this->profile->city ?? null;
         }
         
         return [
@@ -86,10 +46,7 @@ class ServiceListingResource extends JsonResource
             'service_types' => $serviceTypes,
             'service_type' => $firstServiceType,
             'service_type_label' => $this->service_type_label,
-            'locations' => $locationIds, // Keep IDs for backward compatibility
-            'location_details' => $locationDetails, // Full location data array
-            'city' => $firstLocation ? $firstLocation['city_name'] : null,
-            'area' => $firstLocation ? $firstLocation['area'] : null,
+            'city' => $city,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'user' => $this->when(
@@ -104,4 +61,3 @@ class ServiceListingResource extends JsonResource
         ];
     }
 }
-

@@ -58,23 +58,13 @@ class JobApplicationController extends Controller
             $query->where('service_type', $request->service_type);
         }
 
-        // Filter by location
+        // Filter by city name
         $locationDisplay = '';
-        if ($request->has('location_id') && $request->location_id) {
-            $location = \App\Models\Location::find($request->location_id);
-            if ($location) {
-                $location->load('city');
-                $query->where('city', $location->city->name)
-                      ->where('area', $location->area);
-                $locationDisplay = $location->area
-                    ? $location->city->name . ', ' . $location->area
-                    : $location->city->name;
-            }
-        } elseif ($request->has('city_name') && $request->city_name) {
-            $query->where('city', $request->city_name);
+        if ($request->has('city_name') && $request->city_name) {
+            $query->whereHas('city', function ($q) use ($request) {
+                $q->where('name', $request->city_name);
+            });
             $locationDisplay = $request->city_name;
-        } elseif ($request->has('area') && $request->area) {
-            $query->where('area', 'like', '%' . $request->area . '%');
         }
 
         // Show all job posts, even if user has already applied

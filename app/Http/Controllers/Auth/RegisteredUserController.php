@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\EmailOtp;
 use App\Models\PhoneOtp;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
@@ -49,7 +48,7 @@ class RegisteredUserController extends Controller
     #[OA\Post(
         path: "/api/register",
         summary: "Register new user",
-        description: "Register a new user account. Requires OTP verification after registration. Either email or phone must be provided.",
+        description: "Register a new user account. Users are auto-verified upon registration.",
         tags: ["Authentication"],
         requestBody: new OA\RequestBody(
             required: true,
@@ -69,13 +68,12 @@ class RegisteredUserController extends Controller
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Registration successful - OTP verification required",
+                description: "Registration successful",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "message", type: "string", example: "Registration successful! Please check your email for the verification code."),
-                        new OA\Property(property: "user_id", type: "integer"),
-                        new OA\Property(property: "verification_method", type: "string", enum: ["email", "phone"]),
-                        new OA\Property(property: "identifier", type: "string", description: "Email or masked phone number"),
+                        new OA\Property(property: "message", type: "string", example: "Registration successful!"),
+                        new OA\Property(property: "user", type: "object"),
+                        new OA\Property(property: "token", type: "string"),
                     ]
                 )
             ),
@@ -122,58 +120,28 @@ class RegisteredUserController extends Controller
             $email = $generatedEmail;
         }
 
-        // Create user but don't log in yet - require OTP verification
+        // Create user and auto-verify (simplified flow without OTP)
         $user = User::create([
             'name' => $request->name,
             'email' => $email,
             'password' => Hash::make($request->password),
             'phone' => $phone,
             'address' => $request->address,
-            'verified_at' => null, // Will be set after OTP verification (first time)
+            'phone_verified_at' => now(), // Auto-verify
         ]);
 
         // Assign role using Spatie Permission
         $user->assignRole($request->role);
 
-        // Don't fire Registered event yet - user is not logged in
-        // Event will be fired after successful OTP verification
+        // Fire Registered event
+        event(new Registered($user));
 
-        // Send OTP based on registration method
-        if ($request->email && !empty($request->email) && strpos($email, '@phone.kamwaalay.local') === false) {
-            // Email registration - send email OTP
-            $this->sendEmailOtp($user, $request->role);
-
-            // Store user ID in session for verification (if session is available)
-            if ($request->hasSession()) {
-                $request->session()->put('verification_user_id', $user->id);
-                $request->session()->put('verification_method', 'email');
-                $request->session()->put('verification_email', $email);
-            }
-
-            return response()->json([
-                'message' => 'Registration successful! Please check your email for the verification code.',
-                'user_id' => $user->id,
-                'verification_method' => 'email',
-                'identifier' => $email,
-            ]);
-        } else {
-            // Phone registration - send phone OTP
-            $this->sendPhoneOtp($phone, $request->role);
-
-            // Store user ID in session for verification (if session is available)
-            if ($request->hasSession()) {
-                $request->session()->put('verification_user_id', $user->id);
-                $request->session()->put('verification_method', 'phone');
-                $request->session()->put('verification_phone', $phone);
-            }
-
-            return response()->json([
-                'message' => 'Registration successful! Please check your phone for the verification code.',
-                'user_id' => $user->id,
-                'verification_method' => 'phone',
-                'identifier' => $this->maskPhone($phone),
-            ]);
-        }
+        return response()->json([
+            'message' => 'Registration successful! Please check your phone for the verification code.',
+            'user_id' => $user->id,
+            'verification_method' => 'phone',
+            'identifier' => $this->maskPhone($phone),
+        ]);
     }
 
     /**
@@ -184,10 +152,10 @@ class RegisteredUserController extends Controller
     {
         // Remove all non-numeric characters except +
         $phone = preg_replace('/[^0-9+]/', '', $phone);
-        
+
         // Remove leading + if present (we'll add it back at the end)
         $phone = ltrim($phone, '+');
-        
+
         // Handle different input formats
         if (strpos($phone, '0092') === 0) {
             // Format: 0092xxxxxxxxx -> +92xxxxxxxxx
@@ -208,12 +176,12 @@ class RegisteredUserController extends Controller
                 $phone = '92' . $phone;
             }
         }
-        
+
         // Ensure it starts with +
         if (strpos($phone, '+') !== 0) {
             $phone = '+' . $phone;
         }
-        
+
         return $phone;
     }
 
@@ -231,103 +199,5 @@ class RegisteredUserController extends Controller
         }
 
         return substr($phone, 0, 2) . str_repeat('*', strlen($phone) - 4) . substr($phone, -2);
-    }
-
-    /**
-     * Send email OTP for verification
-     */
-    private function sendEmailOtp(User $user, string $role): void
-    {
-        // Clean up expired OTPs
-        EmailOtp::cleanupExpired();
-
-        // Generate OTP
-        $otp = EmailOtp::generateOtp();
-
-        // Invalidate previous OTPs for this email
-        EmailOtp::where('email', $user->email)
-            ->where('verified', false)
-            ->delete();
-
-        // Create new OTP record
-        $emailOtp = EmailOtp::create([
-            'email' => $user->email,
-            'otp' => $otp,
-            'role' => $role,
-            'expires_at' => Carbon::now()->addMinutes(3), // OTP valid for 3 minutes
-        ]);
-
-        // Send email with OTP
-        try {
-            // Log mailer configuration for debugging
-            Log::info('Mailer config', [
-                'default' => config('mail.default'),
-                'from_address' => config('mail.from.address'),
-                'from_name' => config('mail.from.name'),
-                'to_email' => $user->email,
-            ]);
-
-            Mail::send('emails.verify-otp', ['otp' => $otp, 'user' => $user], function ($message) use ($user) {
-                $message->from(config('mail.from.address'), config('mail.from.name'))
-                    ->to($user->email, $user->name)
-                    ->subject('Verify Your Email - kamwaalay');
-            });
-
-            Log::info("Email sent successfully to {$user->email}");
-        } catch (\Exception $e) {
-            // Log error but don't fail registration
-            Log::error('Failed to send email OTP: ' . $e->getMessage());
-            Log::error('Email sending error details: ' . $e->getTraceAsString());
-            Log::error('Exception class: ' . get_class($e));
-        }
-
-        // For development, log the OTP
-        Log::info("Email OTP for {$user->email}: {$otp}");
-    }
-
-    /**
-     * Send phone OTP for verification
-     */
-    private function sendPhoneOtp(string $phone, string $role): void
-    {
-        // Clean up expired OTPs
-        PhoneOtp::cleanupExpired();
-
-        // Generate OTP
-        $otp = PhoneOtp::generateOtp();
-
-        // Invalidate previous OTPs for this phone
-        PhoneOtp::where('phone', $phone)
-            ->where('verified', false)
-            ->delete();
-
-        // Create new OTP record
-        $phoneOtp = PhoneOtp::create([
-            'phone' => $phone,
-            'otp' => $otp,
-            'role' => $role,
-            'expires_at' => Carbon::now()->addMinutes(3), // OTP valid for 3 minutes
-        ]);
-
-        // Send SMS (mock implementation - replace with actual SMS service)
-        $this->sendSms($phone, $otp);
-
-        // For development, log the OTP
-        Log::info("Phone OTP for {$phone}: {$otp}");
-    }
-
-    /**
-     * Send SMS using Twilio
-     */
-    private function sendSms(string $phone, string $otp): void
-    {
-        try {
-            $twilioService = app(\App\Services\TwilioService::class);
-            $twilioService->sendOtp($phone, $otp, 'registration');
-        } catch (\Exception $e) {
-            // Log error but don't fail registration - OTP is still logged for development
-            Log::error("Failed to send SMS via Twilio for {$phone}: " . $e->getMessage());
-            Log::info("Registration OTP for {$phone}: {$otp}");
-        }
     }
 }

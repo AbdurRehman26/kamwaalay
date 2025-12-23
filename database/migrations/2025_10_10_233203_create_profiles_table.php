@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->morphs('profileable'); // Creates profileable_type and profileable_id
             $table->string('photo')->nullable();
-            $table->enum('service_type', ['maid', 'cook', 'babysitter', 'caregiver', 'cleaner', 'all_rounder'])->nullable();
+            $table->integer('age')->nullable();
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
+            $table->enum('religion', ['sunni_nazar_niyaz', 'sunni_no_nazar_niyaz', 'shia', 'christian'])->nullable();
             $table->text('skills')->nullable();
             $table->integer('experience_years')->default(0);
             $table->string('city')->nullable();
-            $table->string('area')->nullable();
             $table->enum('availability', ['full_time', 'part_time', 'available'])->nullable();
             $table->text('bio')->nullable();
             $table->enum('verification_status', ['pending', 'verified', 'rejected'])->nullable()->default('pending');

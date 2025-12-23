@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('service_listings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Helper or Business posting the service
             $table->enum('work_type', ['full_time', 'part_time']);
             $table->decimal('monthly_rate', 10, 2)->nullable();
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->foreignId('profile_id')->nullable()->constrained('profiles')->onDelete('cascade');
             $table->enum('status', ['active', 'paused', 'closed'])->default('active');
+            $table->text('pin_address')->nullable();
+            $table->decimal('pin_latitude', 10, 8)->nullable();
+            $table->decimal('pin_longitude', 11, 8)->nullable();
             $table->timestamps();
         });
     }

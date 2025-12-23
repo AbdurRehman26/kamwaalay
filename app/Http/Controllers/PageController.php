@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
-use App\Models\Location;
 use App\Models\ServiceType;
 use App\Models\Language;
 use Illuminate\Http\Request;
@@ -183,152 +182,6 @@ class PageController extends Controller
     }
 
     #[OA\Get(
-        path: "/api/karachi-locations/search",
-        summary: "Search Karachi locations",
-        description: "Search Karachi locations for autocomplete (deprecated - use /api/locations/search)",
-        tags: ["Pages"],
-        parameters: [
-            new OA\Parameter(name: "q", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Search query"),
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "List of matching location areas",
-                content: new OA\JsonContent(
-                    type: "array",
-                    items: new OA\Items(type: "string")
-                )
-            ),
-        ]
-    )]
-    /**
-     * Search Karachi locations for autocomplete (deprecated - use searchLocations)
-     */
-    public function searchKarachiLocations(Request $request)
-    {
-        $query = $request->get('q', '');
-
-        $karachi = City::where('name', 'Karachi')->first();
-
-        if (!$karachi) {
-            return response()->json([]);
-        }
-
-        $locations = Location::where('city_id', $karachi->id)
-            ->where('area', 'like', '%' . $query . '%')
-            ->where('is_active', true)
-            ->orderBy('area')
-            ->limit(10)
-            ->pluck('area')
-            ->unique()
-            ->values();
-
-        return response()->json($locations);
-    }
-
-    #[OA\Get(
-        path: "/api/locations/search",
-        summary: "Search locations",
-        description: "Search locations (cities and areas) for autocomplete",
-        tags: ["Pages"],
-        parameters: [
-            new OA\Parameter(name: "q", in: "query", required: false, schema: new OA\Schema(type: "string", minLength: 2), description: "Search query (minimum 2 characters)"),
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "List of matching locations",
-                content: new OA\JsonContent(
-                    type: "array",
-                    items: new OA\Items(
-                        type: "object",
-                        properties: [
-                            new OA\Property(property: "id", type: "integer"),
-                            new OA\Property(property: "city_id", type: "integer"),
-                            new OA\Property(property: "city_name", type: "string"),
-                            new OA\Property(property: "area", type: "string", nullable: true),
-                            new OA\Property(property: "display_text", type: "string"),
-                            new OA\Property(property: "latitude", type: "number", nullable: true),
-                            new OA\Property(property: "longitude", type: "number", nullable: true),
-                        ]
-                    )
-                )
-            ),
-        ]
-    )]
-    /**
-     * Search locations for autocomplete (city and area)
-     */
-    public function searchLocations(Request $request)
-    {
-        $query = $request->get('q', '');
-        $cityId = $request->get('city_id');
-        
-        // If city_id is provided, we can allow empty query or shorter query if we want to show all areas
-        // But let's keep min length 2 unless just listing for a city? 
-        // Plan says: "If Specific Areas -> Show search input". So normal search behavior.
-        
-        if (strlen($query) < 2) {
-            return response()->json([]);
-        }
-
-        $results = collect();
-
-        // Search locations by area
-        $locationsQuery = Location::with('city')
-            ->where('area', 'like', '%' . $query . '%')
-            ->where('is_active', true);
-            
-        if ($cityId) {
-            $locationsQuery->where('city_id', $cityId);
-        }
-            
-        $locations = $locationsQuery->limit(15)
-            ->get()
-            ->map(function ($location) {
-                $displayText = $location->area;
-
-                return [
-                    'id' => $location->id,
-                    'city_id' => $location->city_id,
-                    'city_name' => $location->city->name,
-                    'area' => $location->area,
-                    'display_text' => $displayText,
-                    'latitude' => $location->latitude,
-                    'longitude' => $location->longitude,
-                ];
-            });
-
-        $results = $results->concat($locations);
-
-        // Also search cities by name - ONLY if no city_id is specified
-        if (!$cityId) {
-            $cities = City::where('name', 'like', '%' . $query . '%')
-            ->where('is_active', true)
-            ->limit(10)
-            ->get()
-            ->map(function ($city) {
-                return [
-                    'id' => null, // Use main location ID if available? For now keeping null as per original
-                    'city_id' => $city->id,
-                    'city_name' => $city->name,
-                    'area' => null,
-                    'display_text' => $city->name,
-                    'latitude' => null,
-                    'longitude' => null,
-                ];
-            });
-
-            $results = $results->concat($cities);
-        }
-
-        // Deduplicate and limit results
-        $results = $results->unique('display_text')->take(20)->values();
-
-        return response()->json($results);
-    }
-
-    #[OA\Get(
         path: "/api/service-types",
         summary: "Get service types",
         description: "Get a list of all active service types",
@@ -411,7 +264,7 @@ class PageController extends Controller
     #[OA\Get(
         path: "/api/cities",
         summary: "Get cities",
-        description: "Get a list of all active cities with their main location ID",
+        description: "Get a list of all active cities",
         tags: ["Pages"],
         responses: [
             new OA\Response(
@@ -425,7 +278,6 @@ class PageController extends Controller
                             new OA\Property(property: "id", type: "integer"),
                             new OA\Property(property: "name", type: "string"),
                             new OA\Property(property: "code", type: "string"),
-                            new OA\Property(property: "main_location_id", type: "integer", nullable: true, description: "ID of the location record representing the whole city"),
                         ]
                     )
                 )
@@ -438,17 +290,12 @@ class PageController extends Controller
     public function cities(): JsonResponse
     {
         $cities = City::where('is_active', true)
-            ->with(['locations' => function ($q) {
-                $q->whereNull('area');
-            }])
             ->get()
             ->map(function ($city) {
-                $mainLocation = $city->locations->first();
                 return [
                     'id' => $city->id,
                     'name' => $city->name,
-                    'code' => $city->state, // Mapping state to code or adding code field if exists? City model has state.
-                    'main_location_id' => $mainLocation ? $mainLocation->id : null,
+                    'code' => $city->state,
                 ];
             });
 

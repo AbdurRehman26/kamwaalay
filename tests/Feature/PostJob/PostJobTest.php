@@ -19,7 +19,7 @@ beforeEach(function () {
     // Create a country and city for tests
     $country = Country::firstOrCreate(['name' => 'Pakistan', 'code' => 'PK']);
     City::firstOrCreate(
-        ['name' => 'Karachi'], 
+        ['name' => 'Karachi'],
         ['is_active' => true, 'country_id' => $country->id]
     );
 });
@@ -57,7 +57,7 @@ test('guests can view individual service requests', function () {
 test('users can create service requests', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
-    
+
     $city = City::where('name', 'Karachi')->first();
     $token = $user->createToken('test-token')->plainTextToken;
 
@@ -81,8 +81,6 @@ test('users can create service requests', function () {
     $this->assertDatabaseHas('job_posts', [
         'user_id' => $user->id,
         'name' => 'John Doe',
-        'service_type' => 'maid',
-        'city' => 'Karachi',
     ]);
 });
 
@@ -93,7 +91,7 @@ test('logged in users have name email and phone prefilled', function () {
         'phone' => '03001234567',
     ]);
     $user->assignRole('user');
-    
+
     $token = $user->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
@@ -115,35 +113,6 @@ test('logged in users have name email and phone prefilled', function () {
     $response->assertJsonPath('user.phone', '03001234567');
 });
 
-test('service requests are created with Karachi as default city', function () {
-    $user = User::factory()->create();
-    $user->assignRole('user');
-    
-    $city = City::where('name', 'Karachi')->first();
-    $token = $user->createToken('test-token')->plainTextToken;
-
-    $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
-        'Accept' => 'application/json',
-    ])->postJson('/api/job-posts', [
-        'name' => 'John Doe',
-        'email' => 'john@example.com',
-        'phone' => '03001234567',
-        'service_type' => 'maid',
-        'work_type' => 'full_time',
-        'city_id' => $city->id,
-        'area' => 'Saddar',
-        'address' => '123 Main Street',
-        'special_requirements' => 'Need a maid',
-    ]);
-
-    $response->assertStatus(200);
-    $this->assertDatabaseHas('job_posts', [
-        'city' => 'Karachi',
-        'area' => 'Saddar',
-    ]);
-});
-
 test('users can view their own bookings', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
@@ -151,7 +120,7 @@ test('users can view their own bookings', function () {
     $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
     ]);
-    
+
     $token = $user->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
@@ -172,7 +141,7 @@ test('users can update their own bookings', function () {
         'user_id' => $user->id,
         'status' => 'pending',
     ]);
-    
+
     $token = $user->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
@@ -197,7 +166,7 @@ test('users can delete their own bookings', function () {
     $jobPost = JobPost::factory()->create([
         'user_id' => $user->id,
     ]);
-    
+
     $token = $user->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([

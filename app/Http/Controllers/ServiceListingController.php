@@ -23,9 +23,7 @@ class ServiceListingController extends Controller
         tags: ["Service Listings"],
         parameters: [
             new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
-            new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer")),
             new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string")),
-            new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string")),
             new OA\Parameter(name: "work_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["full_time", "part_time"])),
             new OA\Parameter(name: "sort_by", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["created_at", "rate_low", "rate_high"])),
         ],
@@ -56,7 +54,7 @@ class ServiceListingController extends Controller
                 abort(403, 'Service listings are only available to helpers.');
             }
         }
-        $query = ServiceListing::with(['profile.profileable', 'serviceTypes', 'locations.city'])
+        $query = ServiceListing::with(['profile.profileable', 'serviceTypes'])
             ->where('service_listings.is_active', true)
             ->where('service_listings.status', 'active');
 
@@ -65,45 +63,13 @@ class ServiceListingController extends Controller
             $query->byServiceType($request->service_type);
         }
 
-        // Filter by location (using relationship)
+        // Filter by city name (from profile)
         $locationDisplay = '';
-        if ($request->has('location_id') && $request->location_id) {
-            $location = \App\Models\Location::find($request->location_id);
-            if ($location) {
-                $location->load('city');
-                $query->byLocationId($request->location_id);
-                $locationDisplay = $location->area
-                    ? $location->city->name . ', ' . $location->area
-                    : $location->city->name;
-            }
-        } elseif ($request->has('city_name') && $request->city_name) {
-            // For city filtering, we need to find location IDs first
-            $cityLocationIds = \App\Models\Location::whereHas('city', function ($q) use ($request) {
-                $q->where('name', $request->city_name);
-            })->pluck('id')->toArray();
-            
-            if (!empty($cityLocationIds)) {
-                $query->whereHas('locations', function ($q) use ($cityLocationIds) {
-                    $q->whereIn('locations.id', $cityLocationIds);
-                });
-            } else {
-                // No locations found for this city, return empty result
-                $query->whereRaw('1 = 0');
-            }
+        if ($request->has('city_name') && $request->city_name) {
+            $query->whereHas('profile', function ($q) use ($request) {
+                $q->where('city', $request->city_name);
+            });
             $locationDisplay = $request->city_name;
-        } elseif ($request->has('area') && $request->area) {
-            // For area filtering, we need to find location IDs first
-            $areaLocationIds = \App\Models\Location::where('area', 'like', '%' . $request->area . '%')
-                ->pluck('id')->toArray();
-            
-            if (!empty($areaLocationIds)) {
-                $query->whereHas('locations', function ($q) use ($areaLocationIds) {
-                    $q->whereIn('locations.id', $areaLocationIds);
-                });
-            } else {
-                // No locations found for this area, return empty result
-                $query->whereRaw('1 = 0');
-            }
         }
 
         // Filter by work type
@@ -123,7 +89,7 @@ class ServiceListingController extends Controller
 
         $listings = $query->paginate(12);
 
-        $filters = $request->only(['service_type', 'location_id', 'city_name', 'area', 'work_type', 'sort_by']);
+        $filters = $request->only(['service_type', 'city_name', 'work_type', 'sort_by']);
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
         }
@@ -187,33 +153,8 @@ class ServiceListingController extends Controller
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(
-                        property: "listings",
-                        type: "array",
-                        nullable: true,
-                        description: "Array of listings (new format) - creates ONE listing with multiple service types and locations",
-                        items: new OA\Items(
-                            type: "object",
-                            required: ["service_type", "work_type", "city", "area"],
-                            properties: [
-                                new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
-                                new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
-                                new OA\Property(property: "city", type: "string", maxLength: 255),
-                                new OA\Property(property: "area", type: "string", maxLength: 255),
-                                new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
-                                new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
-                                new OA\Property(property: "pin_address", type: "string", maxLength: 500, description: "Exact pin address/location (required)"),
-                                new OA\Property(property: "pin_latitude", type: "number", nullable: true, format: "float", description: "Latitude coordinate (-90 to 90)"),
-                                new OA\Property(property: "pin_longitude", type: "number", nullable: true, format: "float", description: "Longitude coordinate (-180 to 180)"),
-                            ]
-                        )
-                    ),
-                    new OA\Property(property: "service_types", type: "array", nullable: true, items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]), description: "Array of service types (actual format)"),
-                    new OA\Property(property: "locations", type: "array", nullable: true, items: new OA\Items(type: "integer"), description: "Array of location IDs (optional)"),
-                    new OA\Property(property: "service_type", type: "string", nullable: true, enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"], description: "Single listing format (backward compatibility)"),
+                    new OA\Property(property: "service_types", type: "array", nullable: true, items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]), description: "Array of service types"),
                     new OA\Property(property: "work_type", type: "string", nullable: true, enum: ["full_time", "part_time"]),
-                    new OA\Property(property: "city", type: "string", nullable: true, maxLength: 255),
-                    new OA\Property(property: "area", type: "string", nullable: true, maxLength: 255),
                     new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
                     new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
                     new OA\Property(property: "pin_address", type: "string", maxLength: 500, description: "Exact pin address/location (required)"),
@@ -256,7 +197,7 @@ class ServiceListingController extends Controller
             ], 422);
         }
 
-        // Handle services and locations if sent as JSON string (from FormData)
+        // Handle services if sent as JSON string (from FormData)
         $servicesData = $request->input('service_types');
         $decodedServices = $servicesData;
         if (is_string($servicesData)) {
@@ -270,28 +211,12 @@ class ServiceListingController extends Controller
             $decodedServices = $decoded;
         }
 
-        $locationsData = $request->input('locations');
-        $decodedLocations = $locationsData;
-        if (is_string($locationsData)) {
-            $decoded = json_decode($locationsData, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return response()->json([
-                    'message' => 'Invalid locations data format.',
-                    'errors' => ['locations' => ['Invalid locations data format.']]
-                ], 422);
-            }
-            $decodedLocations = $decoded;
-        }
-
         $dataToValidate = $request->all();
         $dataToValidate['service_types'] = $decodedServices;
-        $dataToValidate['locations'] = $decodedLocations;
 
         $validator = Validator::make($dataToValidate, [
             'service_types' => 'required|array|min:1',
             'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
-            'locations' => 'nullable|array',
-            'locations.*' => 'required|integer|exists:locations,id',
             'work_type' => 'required|in:full_time,part_time',
             'monthly_rate' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:2000',
@@ -318,6 +243,7 @@ class ServiceListingController extends Controller
 
         // Create service listing
         $listing = ServiceListing::create([
+            'user_id' => $user->id,
             'profile_id' => $profile->id,
             'work_type' => $validated['work_type'],
             'monthly_rate' => $validated['monthly_rate'] ?? null,
@@ -336,14 +262,9 @@ class ServiceListingController extends Controller
             ->toArray();
         $listing->serviceTypes()->sync($serviceTypeIds);
 
-        // Sync locations (if provided)
-        if (!empty($validated['locations'])) {
-            $listing->locations()->sync($validated['locations']);
-        }
-
         return response()->json([
             'message' => 'Service listing created successfully!',
-            'listing' => new ServiceListingResource($listing->load(['profile.profileable', 'serviceTypes', 'locations.city'])),
+            'listing' => new ServiceListingResource($listing->load(['profile.profileable', 'serviceTypes'])),
         ]);
     }
 
@@ -379,14 +300,14 @@ class ServiceListingController extends Controller
         // Everyone can view service listings (helpers, businesses, users, and guests)
         // No restrictions on viewing
 
-        $serviceListing->load(['profile.profileable', 'serviceTypes', 'locations.city']);
+        $serviceListing->load(['profile.profileable', 'serviceTypes']);
 
         // Get other active service listings from the same profile
         $otherListings = ServiceListing::where('profile_id', $serviceListing->profile_id)
             ->where('id', '!=', $serviceListing->id)
             ->where('is_active', true)
             ->where('status', 'active')
-            ->with(['serviceTypes', 'locations.city'])
+            ->with(['serviceTypes'])
             ->limit(4)
             ->get();
 
@@ -403,28 +324,9 @@ class ServiceListingController extends Controller
                 ->where('status', 'pending')
                 ->whereNull('assigned_user_id');
 
-            // Match by service type (if listing has service types)
-            $serviceTypeSlugs = $serviceListing->serviceTypes()->pluck('slug')->toArray();
-            if (!empty($serviceTypeSlugs)) {
-                $jobPostQuery->whereIn('service_type', $serviceTypeSlugs);
-            }
-
             // Match by work type
             if ($serviceListing->work_type) {
                 $jobPostQuery->where('work_type', $serviceListing->work_type);
-            }
-
-            // Match by location (if listing has locations)
-            $locations = $serviceListing->locations()->with('city')->get();
-            if ($locations->isNotEmpty()) {
-                $jobPostQuery->where(function ($q) use ($locations) {
-                    foreach ($locations as $location) {
-                        $q->orWhere(function ($subQ) use ($location) {
-                            $subQ->where('city', $location->city->name)
-                                 ->where('area', $location->area);
-                        });
-                    }
-                });
             }
 
             // Exclude job posts the user already applied to
@@ -477,7 +379,7 @@ class ServiceListingController extends Controller
                     abort(403);
                 }
 
-        $serviceListing->load(['profile.profileable', 'serviceTypes', 'locations.city']);
+        $serviceListing->load(['profile.profileable', 'serviceTypes']);
 
         return response()->json([
             'listing' => new ServiceListingResource($serviceListing),
@@ -499,7 +401,6 @@ class ServiceListingController extends Controller
                 required: ["service_types", "work_type", "pin_address", "status"],
                 properties: [
                     new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
-                    new OA\Property(property: "locations", type: "array", nullable: true, description: "Optional array of location IDs", items: new OA\Items(type: "integer")),
                     new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
                     new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
                     new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
@@ -541,8 +442,6 @@ class ServiceListingController extends Controller
         $validated = $request->validate([
             'service_types' => 'required|array|min:1',
             'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
-            'locations' => 'nullable|array',
-            'locations.*' => 'required|integer|exists:locations,id',
             'work_type' => 'required|in:full_time,part_time',
             'monthly_rate' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:2000',
@@ -572,17 +471,9 @@ class ServiceListingController extends Controller
             ->toArray();
         $serviceListing->serviceTypes()->sync($serviceTypeIds);
 
-        // Sync locations (if provided)
-        if (!empty($validated['locations'])) {
-            $serviceListing->locations()->sync($validated['locations']);
-        } else {
-            // If locations is empty array, remove all locations
-            $serviceListing->locations()->sync([]);
-        }
-
         return response()->json([
             'message' => 'Service listing updated successfully!',
-            'listing' => new ServiceListingResource($serviceListing->load(['profile.profileable', 'serviceTypes', 'locations.city'])),
+            'listing' => new ServiceListingResource($serviceListing->load(['profile.profileable', 'serviceTypes'])),
         ]);
     }
 
@@ -670,7 +561,7 @@ class ServiceListingController extends Controller
 
         // Get service listings for this profile
         $listings = ServiceListing::where('profile_id', $profile->id)
-            ->with(['serviceTypes', 'locations.city'])
+            ->with(['serviceTypes'])
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 

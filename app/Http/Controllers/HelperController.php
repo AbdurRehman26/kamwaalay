@@ -95,29 +95,12 @@ class HelperController extends Controller
             });
             
             $locationDisplay = 'Near Me';
-        } elseif ($request->has('location_id') && $request->location_id) {
-            $location = \App\Models\Location::find($request->location_id);
-            if ($location) {
-                $location->load('city');
-                $query->whereHas('profile', function ($q) use ($location) {
-                    $q->where('city', $location->city->name)
-                      ->where('area', $location->area);
-                });
-                $locationDisplay = $location->area
-                    ? $location->city->name . ', ' . $location->area
-                    : $location->city->name;
-            }
         } elseif ($request->has('city_name') && $request->city_name) {
             // If city name provided, filter by city
             $query->whereHas('profile', function ($q) use ($request) {
                 $q->where('city', $request->city_name);
             });
             $locationDisplay = $request->city_name;
-        } elseif ($request->has('area') && $request->area) {
-            // If area provided, filter by area in any city
-            $query->whereHas('profile', function ($q) use ($request) {
-                $q->where('area', 'like', '%' . $request->area . '%');
-            });
         }
 
         // Filter by experience

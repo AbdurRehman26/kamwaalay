@@ -49,7 +49,7 @@ class ProfileTest extends TestCase
     public function test_email_verification_status_is_unchanged_when_profile_is_updated(): void
     {
         $user = User::factory()->create([
-            'verified_at' => now(),
+            'phone_verified_at' => now(),
         ]);
         $token = $user->createToken('test-token')->plainTextToken;
 
@@ -63,7 +63,7 @@ class ProfileTest extends TestCase
         $response->assertStatus(200);
 
         // Email verification should remain unchanged as email is not part of profile updates
-        $this->assertNotNull($user->refresh()->verified_at);
+        $this->assertNotNull($user->refresh()->phone_verified_at);
     }
 
     public function test_user_can_delete_their_account(): void

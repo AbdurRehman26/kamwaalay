@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->enum('document_type', ['aadhaar', 'police_verification', 'other'])->default('other');
+            $table->enum('document_type', ['nic', 'police_verification', 'other'])->default('other');
             $table->string('document_number')->nullable();
             $table->string('file_path');
             $table->enum('status', ['pending', 'verified', 'rejected'])->default('pending');

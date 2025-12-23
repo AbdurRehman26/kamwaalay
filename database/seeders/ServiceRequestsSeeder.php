@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\JobPost;
 use App\Models\User;
+use App\Models\City;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
 
@@ -22,10 +23,15 @@ class ServiceRequestsSeeder extends Seeder
             return;
         }
 
-        $serviceTypes = ['maid', 'cook', 'babysitter', 'caregiver', 'cleaner', 'all_rounder'];
+        // Get city
+        $city = City::where('name', 'Karachi')->first();
+        if (!$city) {
+            $this->command->warn('Karachi city not found. Please run CitiesSeeder first.');
+            return;
+        }
+
         $workTypes = ['full_time', 'part_time'];
         $statuses = ['pending', 'pending', 'pending', 'pending', 'pending', 'confirmed', 'pending']; // Mostly pending
-        $cities = ['Karachi'];
         $areas = ['DHA', 'Clifton', 'Gulshan-e-Iqbal', 'PECHS', 'Saddar', 'Korangi', 'North Karachi', 'Bahadurabad', 'Karimabad'];
         
         $specialRequirements = [
@@ -52,7 +58,6 @@ class ServiceRequestsSeeder extends Seeder
             $numRequests = rand(2, 4);
             
             for ($i = 0; $i < $numRequests; $i++) {
-                $serviceType = $serviceTypes[array_rand($serviceTypes)];
                 $workType = $workTypes[array_rand($workTypes)];
                 $status = $statuses[array_rand($statuses)];
                 $area = $areas[array_rand($areas)];
@@ -64,16 +69,13 @@ class ServiceRequestsSeeder extends Seeder
                 
                 $serviceRequests[] = [
                     'user_id' => $user->id,
-                    'assigned_user_id' => $status === 'confirmed' ? null : null, // Can be assigned later
-                    'service_type' => $serviceType,
+                    'assigned_user_id' => null, // Can be assigned later
+                    'city_id' => $city->id,
                     'work_type' => $workType,
-                    'city' => $cities[0],
-                    'area' => $area,
                     'start_date' => rand(0, 10) > 3 ? $startDate->toDateString() : null, // 70% have start dates
                     'start_time' => rand(0, 10) > 5 ? $startTime->format('H:i') : null, // 50% have start times
                     'name' => $user->name,
                     'phone' => $user->phone ?? '0300' . rand(1000000, 9999999),
-                    'email' => $user->email,
                     'address' => $user->address ?? "House " . rand(1, 999) . ", Street " . rand(1, 50) . ", " . $area . ", Karachi",
                     'special_requirements' => $specialReq,
                     'status' => $status,
@@ -89,11 +91,10 @@ class ServiceRequestsSeeder extends Seeder
             JobPost::firstOrCreate(
                 [
                     'user_id' => $request['user_id'],
-                    'service_type' => $request['service_type'],
+                    'city_id' => $request['city_id'],
                     'work_type' => $request['work_type'],
-                    'city' => $request['city'],
-                    'area' => $request['area'],
-                    'email' => $request['email'],
+                    'name' => $request['name'],
+                    'phone' => $request['phone'],
                     'start_date' => $request['start_date'],
                 ],
                 $request
@@ -103,4 +104,3 @@ class ServiceRequestsSeeder extends Seeder
         $this->command->info('Created ' . count($serviceRequests) . ' service requests.');
     }
 }
-
