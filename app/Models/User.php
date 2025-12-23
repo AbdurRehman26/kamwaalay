@@ -146,6 +146,12 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Document::class, 'user_id');
     }
 
+    // User sessions relationship (login session tracking)
+    public function userSessions()
+    {
+        return $this->hasMany(UserSession::class);
+    }
+
     // Profile relationship (polymorphic one-to-one)
     public function profile()
     {

@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\EmailOtp;
 use App\Models\PhoneOtp;
 use App\Models\User;
+use App\Models\UserSession;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -144,7 +145,11 @@ class AuthenticatedSessionController extends Controller
             ]);
 
             // Create Sanctum token for API authentication
-            $token = $user->createToken('api-token')->plainTextToken;
+            $tokenResult = $user->createToken('api-token');
+            $token = $tokenResult->plainTextToken;
+
+            // Record user session
+            UserSession::createFromRequest($request, $user->id, $tokenResult->accessToken->id);
 
                     return response()->json([
                         'message' => 'Login successful! (Demo mode)',
@@ -194,7 +199,11 @@ class AuthenticatedSessionController extends Controller
         // If account is verified, login directly without OTP
         if ($isVerified) {
             // Create Sanctum token for API authentication
-            $token = $user->createToken('api-token')->plainTextToken;
+            $tokenResult = $user->createToken('api-token');
+            $token = $tokenResult->plainTextToken;
+
+            // Record user session
+            UserSession::createFromRequest($request, $user->id, $tokenResult->accessToken->id);
 
             // Check if onboarding is complete and set redirect info
             $onboardingComplete = $user->hasCompletedOnboarding();

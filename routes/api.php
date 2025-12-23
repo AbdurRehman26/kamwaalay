@@ -144,6 +144,44 @@ Route::middleware('auth:sanctum')->group(function () {
     // Logout
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
 
+    // User Sessions (device/login tracking)
+    Route::get('/user/sessions', function (Request $request) {
+        $sessions = $request->user()->userSessions()
+            ->orderBy('last_activity', 'desc')
+            ->get()
+            ->map(function ($session) {
+                return [
+                    'id' => $session->id,
+                    'device' => $session->device_description,
+                    'device_type' => $session->device_type,
+                    'browser' => $session->browser,
+                    'platform' => $session->platform,
+                    'ip_address' => $session->ip_address,
+                    'is_mobile' => $session->is_mobile,
+                    'last_activity' => $session->last_activity?->diffForHumans(),
+                    'created_at' => $session->created_at?->diffForHumans(),
+                ];
+            });
+
+        return response()->json([
+            'sessions' => $sessions,
+            'count' => $sessions->count(),
+        ]);
+    });
+
+    Route::delete('/user/sessions/{session}', function (Request $request, int $session) {
+        $userSession = $request->user()->userSessions()->findOrFail($session);
+
+        // Delete the associated Sanctum token if exists
+        if ($userSession->token_id) {
+            $request->user()->tokens()->where('id', $userSession->token_id)->delete();
+        }
+
+        $userSession->delete();
+
+        return response()->json(['message' => 'Session revoked successfully']);
+    });
+
     // Helper profile management
     Route::get('/helpers/create', [HelperController::class, 'create']);
     Route::post('/helpers', [HelperController::class, 'store']);
