@@ -26,6 +26,7 @@ return new class extends Migration
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
             $table->text('special_requirements')->nullable();
+            $table->decimal('estimated_salary', 10, 2)->nullable()->after('work_type');
             $table->enum('status', ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'])->default('pending');
             $table->text('admin_notes')->nullable();
             $table->timestamps();

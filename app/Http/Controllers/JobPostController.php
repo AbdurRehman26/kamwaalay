@@ -130,6 +130,7 @@ class JobPostController extends Controller
             'longitude' => 'nullable|numeric|between:-180,180',
             'special_requirements' => 'nullable|string',
             'assigned_user_id' => 'nullable|exists:users,id',
+            'estimated_salary' => 'nullable|numeric|min:0',
         ]);
 
         // Get city name from city model
@@ -481,6 +482,7 @@ class JobPostController extends Controller
             'special_requirements' => 'nullable|string',
             'status' => 'sometimes|in:pending,confirmed,in_progress,completed,cancelled',
             'admin_notes' => 'nullable|string',
+            'estimated_salary' => 'nullable|numeric|min:0',
         ]);
 
         if (isset($validated['service_type'])) {

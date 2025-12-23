@@ -87,12 +87,17 @@ export default function BookingsIndex() {
                                             </span>
                                         </div>
 
-                                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4 gap-4">
+                                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4 gap-4 flex-wrap">
                                             <span className="flex items-center gap-1">
                                                 💼 <span className="capitalize">{booking.work_type?.replace("_", " ") || "N/A"}</span>
                                             </span>
+                                            {booking.estimated_salary && (
+                                                <span className="flex items-center gap-1 text-green-600 dark:text-green-400 font-semibold">
+                                                    💰 <span>PKR {parseInt(booking.estimated_salary).toLocaleString()}</span>
+                                                </span>
+                                            )}
                                             <span className="flex items-center gap-1">
-                                                📍 <span>{booking.city || "N/A"}{booking.area ? `, ${booking.area}` : ""}</span>
+                                                📍 <span>{booking.city || "N/A"}</span>
                                             </span>
                                             {booking.start_date && (
                                                 <span className="flex items-center gap-1">
@@ -100,6 +105,20 @@ export default function BookingsIndex() {
                                                 </span>
                                             )}
                                         </div>
+
+                                        {booking.address && (
+                                            <div className="mb-3">
+                                                <div className="flex items-start gap-1 text-sm text-gray-600 dark:text-gray-300">
+                                                    <span className="mt-0.5">🏠</span>
+                                                    <span>{booking.address}</span>
+                                                </div>
+                                                {booking.address_privacy_note && (
+                                                    <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-1 ml-5 italic">
+                                                        ℹ️ {booking.address_privacy_note}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
 
                                         <div className="flex flex-wrap gap-4 mt-2">
                                             {booking.job_applications_count !== undefined && (

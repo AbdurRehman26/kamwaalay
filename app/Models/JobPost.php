@@ -24,19 +24,20 @@ class JobPost extends Model
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
-    
+
     protected $table = 'job_posts';
-    
+
     protected static function newFactory()
     {
         return \Database\Factories\JobPostFactory::new();
     }
-    
+
     protected $fillable = [
         'user_id',
         'assigned_user_id',
         'service_type_id',
         'work_type',
+        'estimated_salary',
         'city_id',
         'start_date',
         'start_time',
@@ -56,6 +57,11 @@ class JobPost extends Model
             'start_date' => 'date',
             'start_time' => 'datetime',
         ];
+    }
+
+    public function serviceType(): BelongsTo
+    {
+        return $this->belongsTo(ServiceType::class);
     }
 
     public function user(): BelongsTo
@@ -104,6 +110,10 @@ class JobPost extends Model
 
     public function getServiceTypeLabelAttribute(): string
     {
+        if ($this->serviceType) {
+            return $this->serviceType->name;
+        }
+
         return match($this->service_type) {
             'maid' => 'Maid',
             'cook' => 'Cook',
@@ -113,7 +123,7 @@ class JobPost extends Model
             'domestic_helper' => 'Domestic Helper',
             'driver' => 'Driver',
             'security_guard' => 'Security Guard',
-            default => ucfirst(str_replace('_', ' ', $this->service_type)),
+            default => ucfirst(str_replace('_', ' ', (string)$this->service_type)),
         };
     }
 

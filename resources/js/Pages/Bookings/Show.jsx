@@ -105,9 +105,29 @@ export default function BookingShow() {
                                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Work Type</h3>
                                 <p className="text-gray-900 dark:text-white capitalize">{booking.work_type?.replace("_", " ") || "N/A"}</p>
                             </div>
+                            {booking.estimated_salary && (
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Estimated Salary</h3>
+                                    <p className="text-green-600 dark:text-green-400 font-bold">PKR {parseInt(booking.estimated_salary).toLocaleString()}</p>
+                                </div>
+                            )}
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Location</h3>
-                                <p className="text-gray-900 dark:text-white">{booking.city}, {booking.area}</p>
+                                <p className="text-gray-900 dark:text-white mb-2">{booking.city || "N/A"}</p>
+                                {booking.address && (
+                                    <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+                                        <div className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                            <span className="mt-0.5">🏠</span>
+                                            <span>{booking.address}</span>
+                                        </div>
+                                        {booking.address_privacy_note && (
+                                            <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-2 italic flex items-start gap-1">
+                                                <span className="mt-0.5">ℹ️</span>
+                                                <span>{booking.address_privacy_note}</span>
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                             {booking.start_date && (
                                 <div>
