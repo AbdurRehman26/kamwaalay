@@ -91,7 +91,6 @@ export default function ServiceListingCreate() {
                 id: location.id || location.display_text,
                 display_text: location.display_text,
                 city_name: location.city_name,
-                city_name: location.city_name,
                 area: location.area || "",
             }]);
         }
