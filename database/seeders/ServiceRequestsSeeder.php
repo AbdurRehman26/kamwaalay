@@ -30,6 +30,13 @@ class ServiceRequestsSeeder extends Seeder
             return;
         }
 
+        // Get available service types
+        $serviceTypes = \App\Models\ServiceType::pluck('id')->toArray();
+        if (empty($serviceTypes)) {
+            $this->command->warn('No service types found. Please run ServiceTypeSeeder first.');
+            return;
+        }
+
         $workTypes = ['full_time', 'part_time'];
         $statuses = ['pending', 'pending', 'pending', 'pending', 'pending', 'confirmed', 'pending']; // Mostly pending
         $areas = ['DHA', 'Clifton', 'Gulshan-e-Iqbal', 'PECHS', 'Saddar', 'Korangi', 'North Karachi', 'Bahadurabad', 'Karimabad'];
@@ -48,6 +55,7 @@ class ServiceRequestsSeeder extends Seeder
             null,
             null,
             null,
+            null,
         ];
 
         $serviceRequests = [];
@@ -62,6 +70,7 @@ class ServiceRequestsSeeder extends Seeder
                 $status = $statuses[array_rand($statuses)];
                 $area = $areas[array_rand($areas)];
                 $specialReq = $specialRequirements[array_rand($specialRequirements)];
+                $serviceTypeId = $serviceTypes[array_rand($serviceTypes)];
                 
                 // Random start date between tomorrow and 30 days from now
                 $startDate = Carbon::now()->addDays(rand(1, 30));
@@ -71,6 +80,7 @@ class ServiceRequestsSeeder extends Seeder
                     'user_id' => $user->id,
                     'assigned_user_id' => null, // Can be assigned later
                     'city_id' => $city->id,
+                    'service_type_id' => $serviceTypeId,
                     'work_type' => $workType,
                     'start_date' => rand(0, 10) > 3 ? $startDate->toDateString() : null, // 70% have start dates
                     'start_time' => rand(0, 10) > 5 ? $startTime->format('H:i') : null, // 50% have start times
@@ -92,6 +102,7 @@ class ServiceRequestsSeeder extends Seeder
                 [
                     'user_id' => $request['user_id'],
                     'city_id' => $request['city_id'],
+                    'service_type_id' => $request['service_type_id'],
                     'work_type' => $request['work_type'],
                     'name' => $request['name'],
                     'phone' => $request['phone'],

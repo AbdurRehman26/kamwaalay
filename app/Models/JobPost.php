@@ -35,6 +35,7 @@ class JobPost extends Model
     protected $fillable = [
         'user_id',
         'assigned_user_id',
+        'service_type_id',
         'work_type',
         'city_id',
         'start_date',
@@ -42,6 +43,8 @@ class JobPost extends Model
         'name',
         'phone',
         'address',
+        'latitude',
+        'longitude',
         'special_requirements',
         'status',
         'admin_notes',

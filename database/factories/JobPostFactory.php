@@ -20,6 +20,7 @@ class JobPostFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
+            'service_type_id' => \App\Models\ServiceType::inRandomOrder()->first()->id ?? \App\Models\ServiceType::factory(),
             'name' => fake()->name(),
             'phone' => '03' . fake()->numerify('########'),
             'work_type' => fake()->randomElement(['full_time', 'part_time']),

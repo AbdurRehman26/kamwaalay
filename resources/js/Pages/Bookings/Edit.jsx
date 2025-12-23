@@ -6,6 +6,7 @@ import { jobPostsService } from "@/services/jobPosts";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
+import MapPicker from "@/Components/MapPicker";
 
 export default function BookingEdit() {
     const { bookingId } = useParams();
@@ -19,22 +20,17 @@ export default function BookingEdit() {
         work_type: "",
         estimated_salary: "",
         city: "Karachi",
-        area: "",
         start_date: "",
         start_time: "",
         name: user?.name || "",
         phone: user?.phone || "",
         address: user?.address || "",
+        latitude: null,
+        longitude: null,
         special_requirements: "",
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
-
-    const [searchQuery, setSearchQuery] = useState("");
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const searchTimeoutRef = useRef(null);
-    const suggestionsRef = useRef(null);
 
     // Fetch service types from API
     const { serviceTypes } = useServiceTypes();
@@ -51,15 +47,14 @@ export default function BookingEdit() {
                         work_type: bookingData.work_type || "",
                         estimated_salary: bookingData.estimated_salary || "",
                         city: bookingData.city || "Karachi",
-                        area: bookingData.area || "",
                         start_date: bookingData.start_date || "",
                         start_time: bookingData.start_time || "",
                         name: bookingData.name || user?.name || "",
                         phone: bookingData.phone || user?.phone || "",
                         address: bookingData.address || user?.address || "",
-                        special_requirements: bookingData.special_requirements || "",
+                        latitude: bookingData.latitude || null,
+                        longitude: bookingData.longitude || null,
                     });
-                    setSearchQuery(bookingData.area || "");
                     setLoading(false);
                 })
                 .catch((error) => {
@@ -69,36 +64,7 @@ export default function BookingEdit() {
         }
     }, [bookingId, user]);
 
-    // Fetch location suggestions for area
-    useEffect(() => {
-        if (searchQuery.length >= 2) {
-            if (searchTimeoutRef.current) {
-                clearTimeout(searchTimeoutRef.current);
-            }
-            searchTimeoutRef.current = setTimeout(() => {
-                axios
-                    .get("/api/karachi-locations/search", {
-                        params: { q: searchQuery },
-                    })
-                    .then((response) => {
-                        setSuggestions(response.data);
-                        setShowSuggestions(true);
-                    })
-                    .catch((error) => {
-                        console.error("Error fetching locations:", error);
-                        setSuggestions([]);
-                    });
-            }, 300);
-        } else {
-            setSuggestions([]);
-            setShowSuggestions(false);
-        }
-        return () => {
-            if (searchTimeoutRef.current) {
-                clearTimeout(searchTimeoutRef.current);
-            }
-        };
-    }, [searchQuery]);
+
 
     // Handle outside click
     useEffect(() => {
@@ -114,12 +80,6 @@ export default function BookingEdit() {
         };
     }, []);
 
-    // Handle area selection
-    const handleAreaSelect = (area) => {
-        setSearchQuery(area);
-        setData(prev => ({ ...prev, area }));
-        setShowSuggestions(false);
-    };
 
     const submit = async (e) => {
         e.preventDefault();
@@ -254,41 +214,6 @@ export default function BookingEdit() {
                                 {errors.estimated_salary && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.estimated_salary}</div>}
                             </div>
 
-                            <div className="relative" ref={suggestionsRef}>
-                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Area *</label>
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => {
-                                        setSearchQuery(e.target.value);
-                                        setData(prev => ({ ...prev, area: e.target.value }));
-                                    }}
-                                    onFocus={() => {
-                                        if (suggestions.length > 0) {
-                                            setShowSuggestions(true);
-                                        }
-                                    }}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                    placeholder="Type to search area..."
-                                    required
-                                />
-                                {showSuggestions && suggestions.length > 0 && (
-                                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-auto">
-                                        {suggestions.map((suggestion, index) => (
-                                            <div
-                                                key={index}
-                                                onClick={() => handleAreaSelect(suggestion)}
-                                                className="px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
-                                            >
-                                                {suggestion}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                                {errors.area && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.area}</div>}
-                            </div>
-
-
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Your Name *</label>
                                 <input
@@ -324,13 +249,31 @@ export default function BookingEdit() {
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Address</label>
-                                <textarea
-                                    value={data.address}
-                                    onChange={(e) => setData(prev => ({ ...prev, address: e.target.value }))}
-                                    rows={3}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                />
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Location & Address</label>
+
+                                <div className="mb-4">
+                                    <MapPicker
+                                        latitude={data.latitude}
+                                        longitude={data.longitude}
+                                        onChange={(lat, lng, address) => setData(prev => ({
+                                            ...prev,
+                                            latitude: lat,
+                                            longitude: lng,
+                                            address: address || prev.address
+                                        }))}
+                                    />
+                                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                        Click on the map, dragon the marker, or use the "Locate Me" button to pin your exact location.
+                                    </p>
+                                </div>
+
+                                <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase">Address (Auto-detected)</label>
+                                    <p className="text-gray-900 dark:text-gray-200 font-medium">
+                                        {data.address || "No location selected"}
+                                    </p>
+                                </div>
+
                                 <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1.5">
                                     <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />

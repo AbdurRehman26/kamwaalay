@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\JobPostResource;
 use App\Http\Resources\UserResource;
 use App\Models\JobPost;
+use App\Models\ServiceType;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -59,17 +60,18 @@ class JobPostController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["service_type", "work_type", "area", "name", "phone"],
+                required: ["service_type", "work_type", "name", "phone"],
                 properties: [
                     new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
                     new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
-                    new OA\Property(property: "area", type: "string", maxLength: 255),
                     new OA\Property(property: "start_date", type: "string", format: "date", nullable: true),
                     new OA\Property(property: "start_time", type: "string", format: "time", nullable: true, example: "09:00"),
                     new OA\Property(property: "name", type: "string", maxLength: 255),
                     new OA\Property(property: "phone", type: "string", maxLength: 20),
                     new OA\Property(property: "email", type: "string", format: "email", maxLength: 255, nullable: true),
                     new OA\Property(property: "address", type: "string", nullable: true),
+                    new OA\Property(property: "latitude", type: "number", format: "float", nullable: true),
+                    new OA\Property(property: "longitude", type: "number", format: "float", nullable: true),
                     new OA\Property(property: "special_requirements", type: "string", nullable: true),
                     new OA\Property(property: "assigned_user_id", type: "integer", nullable: true),
                 ]
@@ -92,7 +94,8 @@ class JobPostController extends Controller
                                 new OA\Property(property: "service_type", type: "string"),
                                 new OA\Property(property: "work_type", type: "string"),
                                 new OA\Property(property: "city", type: "string", example: "Karachi"),
-                                new OA\Property(property: "area", type: "string"),
+                                new OA\Property(property: "latitude", type: "number", format: "float", nullable: true),
+                                new OA\Property(property: "longitude", type: "number", format: "float", nullable: true),
                                 new OA\Property(property: "status", type: "string", example: "pending"),
                                 new OA\Property(property: "user", type: "object", nullable: true),
                                 new OA\Property(property: "assigned_user", type: "object", nullable: true),
@@ -117,13 +120,14 @@ class JobPostController extends Controller
             'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'work_type' => 'required|in:full_time,part_time',
             'city_id' => 'required|exists:cities,id',
-            'area' => 'required|string|max:255',
             'start_date' => 'nullable|date',
             'start_time' => 'nullable|date_format:H:i',
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'special_requirements' => 'nullable|string',
             'assigned_user_id' => 'nullable|exists:users,id',
         ]);
@@ -132,6 +136,11 @@ class JobPostController extends Controller
         $city = \App\Models\City::find($validated['city_id']);
         $validated['city'] = $city ? $city->name : 'Karachi';
         $validated['user_id'] = Auth::id();
+
+        // Map service_type string to ID
+        $serviceType = ServiceType::where('slug', $validated['service_type'])->firstOrFail();
+        $validated['service_type_id'] = $serviceType->id;
+        unset($validated['service_type']);
 
         $jobPost = JobPost::create($validated);
 
@@ -410,6 +419,8 @@ class JobPostController extends Controller
                     new OA\Property(property: "phone", type: "string", maxLength: 20),
                     new OA\Property(property: "email", type: "string", format: "email", maxLength: 255, nullable: true),
                     new OA\Property(property: "address", type: "string", nullable: true),
+                    new OA\Property(property: "latitude", type: "number", format: "float", nullable: true),
+                    new OA\Property(property: "longitude", type: "number", format: "float", nullable: true),
                     new OA\Property(property: "special_requirements", type: "string", nullable: true),
                     new OA\Property(property: "status", type: "string", enum: ["pending", "confirmed", "in_progress", "completed", "cancelled"]),
                     new OA\Property(property: "admin_notes", type: "string", nullable: true),
@@ -434,6 +445,8 @@ class JobPostController extends Controller
                                 new OA\Property(property: "work_type", type: "string"),
                                 new OA\Property(property: "city", type: "string"),
                                 new OA\Property(property: "area", type: "string"),
+                                new OA\Property(property: "latitude", type: "number", format: "float", nullable: true),
+                                new OA\Property(property: "longitude", type: "number", format: "float", nullable: true),
                                 new OA\Property(property: "status", type: "string"),
                                 new OA\Property(property: "user", type: "object", nullable: true),
                                 new OA\Property(property: "assigned_user", type: "object", nullable: true),
@@ -457,21 +470,23 @@ class JobPostController extends Controller
         $validated = $request->validate([
             'service_type' => 'sometimes|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'work_type' => 'sometimes|in:full_time,part_time',
-            'area' => 'sometimes|string|max:255',
             'start_date' => 'nullable|date',
             'start_time' => 'nullable|date_format:H:i',
             'name' => 'sometimes|string|max:255',
             'phone' => 'sometimes|string|max:20',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'special_requirements' => 'nullable|string',
             'status' => 'sometimes|in:pending,confirmed,in_progress,completed,cancelled',
             'admin_notes' => 'nullable|string',
         ]);
 
-        // Always set city to Karachi if updating location fields
-        if (isset($validated['area'])) {
-            $validated['city'] = 'Karachi';
+        if (isset($validated['service_type'])) {
+            $serviceType = ServiceType::where('slug', $validated['service_type'])->firstOrFail();
+            $validated['service_type_id'] = $serviceType->id;
+            unset($validated['service_type']);
         }
 
         $jobPost->update($validated);

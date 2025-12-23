@@ -96,7 +96,7 @@ class CitySeeder extends Seeder
                         'name' => $cityData['name'],
                         'state' => $state,
                         'country_id' => $pakistan->id,
-                        'is_active' => false, // Default to inactive, specific cities activated in LocationsSeeder
+                        'is_active' => true, // Default to inactive, specific cities activated in LocationsSeeder
                     ]
                 );
 
