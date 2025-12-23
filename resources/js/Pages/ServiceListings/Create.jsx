@@ -13,6 +13,12 @@ export default function ServiceListingCreate() {
     const [locationQuery, setLocationQuery] = useState("");
     const [locationSuggestions, setLocationSuggestions] = useState([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+
+    // New state for City and Scope selection
+    const [cities, setCities] = useState([]);
+    const [selectedCity, setSelectedCity] = useState(null); // The city currently being used to filter areas
+    const [locationScope, setLocationScope] = useState("specific_areas"); // 'specific_areas' or 'whole_city'
+
     const locationRef = useRef(null);
     const searchTimeoutRef = useRef(null);
     const pinAddressInputRef = useRef(null);
@@ -34,6 +40,15 @@ export default function ServiceListingCreate() {
     // Fetch service types from API
     const { serviceTypes } = useServiceTypes();
 
+    // Fetch Cities
+    useEffect(() => {
+        api.get("/cities")
+            .then(response => {
+                setCities(response.data);
+            })
+            .catch(error => console.error("Error fetching cities:", error));
+    }, []);
+
     // Fetch location suggestions
     useEffect(() => {
         if (locationQuery.length >= 2) {
@@ -43,7 +58,10 @@ export default function ServiceListingCreate() {
             searchTimeoutRef.current = setTimeout(() => {
                 api
                     .get("/locations/search", {
-                        params: { q: locationQuery },
+                        params: {
+                            q: locationQuery,
+                            city_id: selectedCity?.id // Filter by selected city if any
+                        },
                     })
                     .then((response) => {
                         setLocationSuggestions(response.data);
@@ -73,12 +91,34 @@ export default function ServiceListingCreate() {
                 id: location.id || location.display_text,
                 display_text: location.display_text,
                 city_name: location.city_name,
+                city_name: location.city_name,
                 area: location.area || "",
             }]);
         }
         setLocationQuery("");
         setShowLocationSuggestions(false);
     };
+
+    const handleWholeCitySelect = () => {
+        if (!selectedCity || !selectedCity.main_location_id) return;
+
+        const exists = selectedLocations.some(loc => loc.id === selectedCity.main_location_id);
+        if (!exists) {
+            setSelectedLocations([...selectedLocations, {
+                id: selectedCity.main_location_id,
+                display_text: `${selectedCity.name} (Whole City)`,
+                city_name: selectedCity.name,
+                area: null,
+            }]);
+        }
+    };
+
+    // Effect to handle Whole City selection when scope changes
+    useEffect(() => {
+        if (locationScope === "whole_city" && selectedCity) {
+            handleWholeCitySelect();
+        }
+    }, [locationScope, selectedCity]);
 
     const removeServiceType = (serviceType) => {
         setSelectedServiceTypes(selectedServiceTypes.filter(st => st !== serviceType));
@@ -128,8 +168,8 @@ export default function ServiceListingCreate() {
                     if (place.formatted_address) {
                         const lat = place.geometry?.location?.lat();
                         const lng = place.geometry?.location?.lng();
-                        setCommonFields({ 
-                            ...commonFields, 
+                        setCommonFields({
+                            ...commonFields,
                             pin_address: place.formatted_address,
                             pin_latitude: lat ? lat.toString() : "",
                             pin_longitude: lng ? lng.toString() : ""
@@ -157,8 +197,8 @@ export default function ServiceListingCreate() {
 
         // Check if we're in a secure context (HTTPS or localhost)
         if (!window.isSecureContext && window.location.protocol !== "https:" && !window.location.hostname.includes("localhost") && !window.location.hostname.includes("127.0.0.1")) {
-            setErrors({ 
-                pin_address: "Geolocation requires HTTPS or localhost. Please access the site via https://localhost or manually enter your address. The address autocomplete will still work." 
+            setErrors({
+                pin_address: "Geolocation requires HTTPS or localhost. Please access the site via https://localhost or manually enter your address. The address autocomplete will still work."
             });
             return;
         }
@@ -174,26 +214,26 @@ export default function ServiceListingCreate() {
         navigator.geolocation.getCurrentPosition(
             async (position) => {
                 const { latitude, longitude } = position.coords;
-                
+
                 try {
                     // Use Google Geocoding API for reverse geocoding
                     const geocoder = new window.google.maps.Geocoder();
                     const latlng = { lat: latitude, lng: longitude };
-                    
+
                     geocoder.geocode({ location: latlng }, (results, status) => {
                         if (status === "OK" && results && results.length > 0) {
                             // Use the formatted address from Google
                             const formattedAddress = results[0].formatted_address;
-                            setCommonFields({ 
-                                ...commonFields, 
+                            setCommonFields({
+                                ...commonFields,
                                 pin_address: formattedAddress,
                                 pin_latitude: latitude.toString(),
                                 pin_longitude: longitude.toString()
                             });
                         } else {
                             // Fallback to coordinates if geocoding fails
-                            setCommonFields({ 
-                                ...commonFields, 
+                            setCommonFields({
+                                ...commonFields,
                                 pin_address: `${latitude}, ${longitude}`,
                                 pin_latitude: latitude.toString(),
                                 pin_longitude: longitude.toString()
@@ -204,8 +244,8 @@ export default function ServiceListingCreate() {
                 } catch (error) {
                     console.error("Error reverse geocoding:", error);
                     // Fallback to coordinates
-                    setCommonFields({ 
-                        ...commonFields, 
+                    setCommonFields({
+                        ...commonFields,
                         pin_address: `${latitude}, ${longitude}`,
                         pin_latitude: latitude.toString(),
                         pin_longitude: longitude.toString()
@@ -392,8 +432,8 @@ export default function ServiceListingCreate() {
                                         onClick={() => addServiceType(service.value)}
                                         disabled={selectedServiceTypes.includes(service.value)}
                                         className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${selectedServiceTypes.includes(service.value)
-                                                ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 dark:border-indigo-600 opacity-50 cursor-not-allowed"
-                                                : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 cursor-pointer hover:shadow-md"
+                                            ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 dark:border-indigo-600 opacity-50 cursor-not-allowed"
+                                            : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 cursor-pointer hover:shadow-md"
                                             }`}
                                     >
                                         <div className="text-3xl mb-2">{service.icon}</div>
@@ -452,39 +492,101 @@ export default function ServiceListingCreate() {
                                 </div>
                             )}
 
-                            {/* Location Search */}
-                            <div className="relative" ref={locationRef}>
-                                <input
-                                    type="text"
-                                    value={locationQuery}
-                                    onChange={(e) => setLocationQuery(e.target.value)}
-                                    onFocus={() => {
-                                        if (locationSuggestions.length > 0) {
-                                            setShowLocationSuggestions(true);
-                                        }
-                                    }}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 px-4 py-3 transition-all"
-                                    placeholder="Search location (e.g., Karachi, Clifton or type area name)..."
-                                />
-                                {showLocationSuggestions && locationSuggestions.length > 0 && (
-                                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-xl max-h-60 overflow-auto">
-                                        {locationSuggestions
-                                            .filter(suggestion => !selectedLocations.some(loc => loc.id === (suggestion.id || suggestion.display_text)))
-                                            .map((suggestion, index) => (
-                                                <div
-                                                    key={index}
-                                                    onClick={() => handleLocationSelect(suggestion)}
-                                                    className="px-4 py-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 text-gray-900 dark:text-white"
-                                                >
-                                                    {suggestion.display_text}
-                                                </div>
-                                            ))}
+                            {/* City and Scope Selection */}
+                            <div className="mb-6 space-y-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Select City</label>
+                                    <select
+                                        value={selectedCity?.id || ""}
+                                        onChange={(e) => {
+                                            const cityId = parseInt(e.target.value);
+                                            const city = cities.find(c => c.id === cityId);
+                                            setSelectedCity(city || null);
+                                            setLocationScope("specific_areas"); // Reset scope when city changes
+                                            setLocationQuery(""); // Clear query
+                                        }}
+                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all px-4 py-3"
+                                    >
+                                        <option value="">-- Choose a City --</option>
+                                        {cities.map(city => (
+                                            <option key={city.id} value={city.id}>{city.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {selectedCity && (
+                                    <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-600">
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Service Coverage for {selectedCity.name}</label>
+                                        <div className="flex gap-4">
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    name="locationScope"
+                                                    value="specific_areas"
+                                                    checked={locationScope === "specific_areas"}
+                                                    onChange={(e) => setLocationScope(e.target.value)}
+                                                    className="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                                                />
+                                                <span className="text-gray-900 dark:text-white font-medium">Specific Areas</span>
+                                            </label>
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    name="locationScope"
+                                                    value="whole_city"
+                                                    checked={locationScope === "whole_city"}
+                                                    onChange={(e) => setLocationScope(e.target.value)}
+                                                    className="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                                                />
+                                                <span className="text-gray-900 dark:text-white font-medium">Whole City</span>
+                                            </label>
+                                        </div>
                                     </div>
                                 )}
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                    Type to search and select locations. Each location will be added as a tag.
-                                </p>
                             </div>
+
+                            {/* Location Search - Only show if Specific Areas is selected */}
+                            {selectedCity && locationScope === "specific_areas" && (
+                                <div className="relative" ref={locationRef}>
+                                    <input
+                                        type="text"
+                                        value={locationQuery}
+                                        onChange={(e) => setLocationQuery(e.target.value)}
+                                        onFocus={() => {
+                                            if (locationSuggestions.length > 0) {
+                                                setShowLocationSuggestions(true);
+                                            }
+                                        }}
+                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 px-4 py-3 transition-all"
+                                        placeholder={`Search area in ${selectedCity.name}...`}
+                                    />
+                                    {showLocationSuggestions && locationSuggestions.length > 0 && (
+                                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-xl max-h-60 overflow-auto">
+                                            {locationSuggestions
+                                                .filter(suggestion => !selectedLocations.some(loc => loc.id === (suggestion.id || suggestion.display_text)))
+                                                .map((suggestion, index) => (
+                                                    <div
+                                                        key={index}
+                                                        onClick={() => handleLocationSelect(suggestion)}
+                                                        className="px-4 py-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 text-gray-900 dark:text-white"
+                                                    >
+                                                        {suggestion.display_text}
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    )}
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                        Type to search and select specific areas within {selectedCity.name}.
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Info message if no city selected */}
+                            {!selectedCity && (
+                                <p className="text-sm text-gray-500 italic text-center py-4">
+                                    Please select a city first to add locations.
+                                </p>
+                            )}
                             {errors.locations && <div className="text-red-600 dark:text-red-400 text-sm mt-2 font-semibold">{errors.locations}</div>}
                         </div>
 

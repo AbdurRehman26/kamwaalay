@@ -6,30 +6,59 @@ use App\Models\City;
 use App\Models\Location;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
-class KarachiLocationsSeeder extends Seeder
+class LocationsSeeder extends Seeder
 {
+    /**
+     * Cities configuration with their coordinates
+     */
+    protected $cities = [
+        'Karachi' => ['lat' => 24.8607, 'lng' => 67.0011],
+        'Islamabad' => ['lat' => 33.6844, 'lng' => 73.0479],
+        'Lahore' => ['lat' => 31.5204, 'lng' => 74.3587],
+    ];
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // Find Karachi city
-        $karachi = City::where('name', 'Karachi')->first();
+        foreach ($this->cities as $cityName => $coords) {
+            $this->seedCityLocations($cityName, $coords);
+        }
+    }
 
-        if (!$karachi) {
-            $this->command->error('Karachi city not found. Please run CitySeeder first.');
+    protected function seedCityLocations(string $cityName, array $coords): void
+    {
+        $this->command->info("Processing {$cityName}...");
+
+        // Find or create city (CitySeeder should ideally run first, but this is safe)
+        $city = City::where('name', $cityName)->first();
+
+        if (!$city) {
+            $this->command->warn("City {$cityName} not found. Skipping.");
             return;
         }
 
-        // Try multiple possible file paths (prioritize database/data for git-tracked files)
+        // Update city coordinates
+        $city->update([
+            'latitude' => $coords['lat'],
+            'longitude' => $coords['lng'],
+            'is_active' => true,
+        ]);
+        
+        $this->command->info("Updated coordinates for {$cityName}.");
+
+        // Determine file name
+        $fileName = Str::lower($cityName) . '_locations.json';
+        
+        // Try multiple possible file paths
         $possiblePaths = [
-            database_path('data/locations/areas/karachi_locations.json'),
-            database_path('data/karachi_locations.json'),
-            storage_path('app/data/locations/areas/karachi_locations.json'),
-            storage_path('app/data/locations/areas/karachi-locations.json'),
-            storage_path('app/private/data/karachi_locations.json'),
-            base_path('karachi_locations.json'),
+            database_path("data/locations/areas/{$fileName}"),
+            database_path("data/{$fileName}"),
+            storage_path("app/data/locations/areas/{$fileName}"),
+            base_path($fileName),
         ];
 
         $jsonPath = null;
@@ -41,35 +70,31 @@ class KarachiLocationsSeeder extends Seeder
         }
         
         if (!$jsonPath) {
-            $this->command->error('Karachi locations JSON file not found. Tried:');
-            foreach ($possiblePaths as $path) {
-                $this->command->error('  - ' . $path);
-            }
+            $this->command->warn("Locations file not found for {$cityName}. Expected: {$fileName}");
             return;
         }
 
-        $this->command->info('Found Karachi locations file at: ' . $jsonPath);
+        $this->command->info("Found locations file: {$jsonPath}");
 
         $areasData = json_decode(File::get($jsonPath), true);
 
         if (!$areasData || !is_array($areasData)) {
-            $this->command->error('Invalid JSON data in Karachi locations file.');
+            $this->command->error("Invalid JSON data in {$fileName}.");
             return;
         }
 
-        $this->command->info('Importing ' . count($areasData) . ' areas for Karachi...');
+        $this->command->info('Importing ' . count($areasData) . " areas for {$cityName}...");
 
         $imported = 0;
         $skipped = 0;
 
         foreach ($areasData as $areaData) {
             try {
-                // Handle different JSON structures
+                // Handle different JSON structures (name, area, location)
                 $areaName = $areaData['name'] ?? $areaData['area'] ?? $areaData['location'] ?? null;
                 
                 if (empty($areaName)) {
                     $skipped++;
-                    $this->command->warn('Skipping entry with no name/area/location field');
                     continue;
                 }
 
@@ -97,11 +122,11 @@ class KarachiLocationsSeeder extends Seeder
                 // Create location for this area
                 Location::updateOrCreate(
                     [
-                        'city_id' => $karachi->id,
+                        'city_id' => $city->id,
                         'area' => $areaName,
                     ],
                     [
-                        'city_id' => $karachi->id,
+                        'city_id' => $city->id,
                         'area' => $areaName,
                         'latitude' => $latitude,
                         'longitude' => $longitude,
@@ -113,10 +138,10 @@ class KarachiLocationsSeeder extends Seeder
                 $imported++;
             } catch (\Exception $e) {
                 $skipped++;
-                $this->command->warn('Failed to import area: ' . ($areaName ?? 'Unknown') . ' - ' . $e->getMessage());
+                // $this->command->warn("Failed to import area: {$areaName}");
             }
         }
 
-        $this->command->info("Import completed: {$imported} areas imported for Karachi, {$skipped} skipped.");
+        $this->command->info("Completed {$cityName}: {$imported} imported, {$skipped} skipped.");
     }
 }

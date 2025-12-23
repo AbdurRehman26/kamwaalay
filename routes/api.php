@@ -72,6 +72,7 @@ Route::get('/job-posts', [JobApplicationController::class, 'index']);
 // Location search (already API-like)
 Route::get('/karachi-locations/search', [PageController::class, 'searchKarachiLocations']);
 Route::get('/locations/search', [PageController::class, 'searchLocations']);
+Route::get('/cities', [PageController::class, 'cities']);
 
 // Service types
 Route::get('/service-types', [PageController::class, 'serviceTypes']);

@@ -162,10 +162,59 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         };
     }, []);
 
+    const [latitude, setLatitude] = useState(filters?.latitude || "");
+    const [longitude, setLongitude] = useState(filters?.longitude || "");
+
+    const handleNearMe = () => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    setLatitude(latitude);
+                    setLongitude(longitude);
+                    setLocationId("");
+                    setLocationDisplay("Near Me");
+                    setLocationFilterQuery("Near Me");
+
+                    // Directly trigger filter
+                    const params = {
+                        service_type: serviceType || undefined,
+                        latitude: latitude,
+                        longitude: longitude,
+                        sort_by: sortBy,
+                        user_type: userType,
+                        page: 1,
+                    };
+
+                    // Update URL
+                    const urlParams = new URLSearchParams();
+                    if (serviceType) urlParams.append("service_type", serviceType);
+                    urlParams.append("latitude", latitude);
+                    urlParams.append("longitude", longitude);
+                    if (sortBy) urlParams.append("sort_by", sortBy);
+                    if (userType) urlParams.append("user_type", userType);
+                    window.history.pushState({}, "", `${route("helpers.index")}?${urlParams.toString()}`);
+
+                    // Trigger fetch (via useEffect dependency, or setFilters manually if useEffect depends on props/url only? 
+                    // Actually useEffect depends on states, so setting states above will trigger it)
+                },
+                (error) => {
+                    console.error("Error getting location:", error);
+                    alert("Unable to retrieve your location. Please ensure location services are enabled.");
+                }
+            );
+        } else {
+            alert("Geolocation is not supported by your browser.");
+        }
+    };
+
+    // Handle location selection - reset near me coords
     const handleLocationSelect = (location) => {
         setLocationId(location.id || "");
         setLocationDisplay(location.display_text);
         setLocationFilterQuery(location.display_text);
+        setLatitude("");
+        setLongitude("");
         setShowLocationSuggestions(false);
     };
 
@@ -174,6 +223,8 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         const params = {
             service_type: serviceType || undefined,
             location_id: locationId || undefined,
+            latitude: latitude || undefined,
+            longitude: longitude || undefined,
             sort_by: sortBy,
             user_type: userType,
             page: currentPage,
@@ -216,7 +267,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 console.error("Error fetching helpers:", error);
                 setLoading(false);
             });
-    }, [serviceType, locationId, sortBy, userType, currentPage]);
+    }, [serviceType, locationId, latitude, longitude, sortBy, userType, currentPage]);
 
     const handleFilter = () => {
         // Reset to first page when filters change
@@ -224,7 +275,15 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         // Just update URL without navigation
         const params = new URLSearchParams();
         if (serviceType) params.append("service_type", serviceType);
-        if (locationId) params.append("location_id", locationId);
+
+        // Prioritize location_id if selected, or lat/lng if near me
+        if (locationId) {
+            params.append("location_id", locationId);
+        } else if (latitude && longitude) {
+            params.append("latitude", latitude);
+            params.append("longitude", longitude);
+        }
+
         if (sortBy) params.append("sort_by", sortBy);
         if (userType) params.append("user_type", userType);
         window.history.pushState({}, "", `${route("helpers.index")}?${params.toString()}`);
@@ -362,24 +421,37 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         </div>
                         <div className="relative" ref={locationFilterRef}>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Location</label>
-                            <input
-                                type="text"
-                                value={locationFilterQuery || locationDisplay}
-                                onChange={(e) => {
-                                    setLocationFilterQuery(e.target.value);
-                                    if (!e.target.value) {
-                                        setLocationId("");
-                                        setLocationDisplay("");
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if (locationFilterSuggestions.length > 0) {
-                                        setShowLocationSuggestions(true);
-                                    }
-                                }}
-                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
-                                placeholder="Search location..."
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={locationFilterQuery || locationDisplay}
+                                    onChange={(e) => {
+                                        setLocationFilterQuery(e.target.value);
+                                        if (!e.target.value) {
+                                            setLocationId("");
+                                            setLocationDisplay("");
+                                        }
+                                    }}
+                                    onFocus={() => {
+                                        if (locationFilterSuggestions.length > 0) {
+                                            setShowLocationSuggestions(true);
+                                        }
+                                    }}
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm pr-10"
+                                    placeholder="Search location..."
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => handleNearMe()}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                    title="Search Near Me"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                    </svg>
+                                </button>
+                            </div>
                             {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
                                 <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
                                     {locationFilterSuggestions.map((suggestion, index) => (

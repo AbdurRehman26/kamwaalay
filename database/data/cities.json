@@ -1,10 +1,53 @@
 [
-  {
+    {
+        "country": "PK",
+        "name": "Karachi",
+        "lat": 24.8608,
+        "lng": 67.0104
+    },
+    {
+        "country": "PK",
+        "name": "Lahore",
+        "lat": 31.558,
+        "lng": 74.35071
+    },
+    {
+        "country": "PK",
+        "name": "Islamabad",
+        "lat": 33.72148,
+        "lng": 73.04329
+    },
+    {
+        "country": "PK",
+        "name": "Quetta",
+        "lat": 30.18414,
+        "lng": 67.00141
+    },
+
+    {
+        "country": "PK",
+        "name": "Peshawar",
+        "lat": 34.008,
+        "lng": 71.57849
+    },
+    {
+        "country": "PK",
+        "name": "Rawalpindi",
+        "lat": 33.59733,
+        "lng": 73.0479
+    },
+    {
+        "country": "PK",
+        "name": "Hyderabad",
+        "lat": 25.39242,
+        "lng": 68.37366
+    },
+    {
     "country": "PK",
     "name": "Abbottabad",
     "lat": 34.1463,
     "lng": 73.21168
-  },
+    },
   {
     "country": "PK",
     "name": "Adilpur",
@@ -919,18 +962,6 @@
   },
   {
     "country": "PK",
-    "name": "Hyderabad",
-    "lat": 25.39242,
-    "lng": 68.37366
-  },
-  {
-    "country": "PK",
-    "name": "Islamabad",
-    "lat": 33.72148,
-    "lng": 73.04329
-  },
-  {
-    "country": "PK",
     "name": "Islamkot",
     "lat": 24.69904,
     "lng": 70.17982
@@ -1180,12 +1211,6 @@
     "name": "Kanganpur",
     "lat": 30.76468,
     "lng": 74.12286
-  },
-  {
-    "country": "PK",
-    "name": "Karachi",
-    "lat": 24.8608,
-    "lng": 67.0104
   },
   {
     "country": "PK",
@@ -1468,12 +1493,6 @@
     "name": "Ladhewala Waraich",
     "lat": 32.15692,
     "lng": 74.11564
-  },
-  {
-    "country": "PK",
-    "name": "Lahore",
-    "lat": 31.558,
-    "lng": 74.35071
   },
   {
     "country": "PK",
@@ -1969,12 +1988,6 @@
   },
   {
     "country": "PK",
-    "name": "Peshawar",
-    "lat": 34.008,
-    "lng": 71.57849
-  },
-  {
-    "country": "PK",
     "name": "Phalia",
     "lat": 32.43104,
     "lng": 73.579
@@ -2041,12 +2054,6 @@
   },
   {
     "country": "PK",
-    "name": "Quetta",
-    "lat": 30.18414,
-    "lng": 67.00141
-  },
-  {
-    "country": "PK",
     "name": "Rahim Yar Khan",
     "lat": 28.41987,
     "lng": 70.30345
@@ -2098,12 +2105,6 @@
     "name": "Rawala Kot",
     "lat": 33.85782,
     "lng": 73.76043
-  },
-  {
-    "country": "PK",
-    "name": "Rawalpindi",
-    "lat": 33.59733,
-    "lng": 73.0479
   },
   {
     "country": "PK",

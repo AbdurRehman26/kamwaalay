@@ -83,9 +83,19 @@ class HelperController extends Controller
             });
         }
 
-        // Filter by location (from profile)
+        // Filter by location (from profile or service listings pin)
         $locationDisplay = '';
-        if ($request->has('location_id') && $request->location_id) {
+        if ($request->has('latitude') && $request->has('longitude')) {
+            $lat = $request->latitude;
+            $lng = $request->longitude;
+            
+            // Filter users who have service listings near the location
+            $query->whereHas('profile.serviceListings', function ($q) use ($lat, $lng) {
+                $q->nearLocation($lat, $lng);
+            });
+            
+            $locationDisplay = 'Near Me';
+        } elseif ($request->has('location_id') && $request->location_id) {
             $location = \App\Models\Location::find($request->location_id);
             if ($location) {
                 $location->load('city');
@@ -140,7 +150,7 @@ class HelperController extends Controller
                   ->where('service_listings.status', 'active');
         }])->paginate(12);
 
-        $filters = $request->only(['service_type', 'location_id', 'city_name', 'area', 'min_experience', 'sort_by', 'user_type']);
+        $filters = $request->only(['service_type', 'location_id', 'city_name', 'area', 'min_experience', 'sort_by', 'user_type', 'latitude', 'longitude']);
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
         }

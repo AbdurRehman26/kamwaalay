@@ -262,7 +262,12 @@ class PageController extends Controller
     public function searchLocations(Request $request)
     {
         $query = $request->get('q', '');
-
+        $cityId = $request->get('city_id');
+        
+        // If city_id is provided, we can allow empty query or shorter query if we want to show all areas
+        // But let's keep min length 2 unless just listing for a city? 
+        // Plan says: "If Specific Areas -> Show search input". So normal search behavior.
+        
         if (strlen($query) < 2) {
             return response()->json([]);
         }
@@ -270,10 +275,15 @@ class PageController extends Controller
         $results = collect();
 
         // Search locations by area
-        $locations = Location::with('city')
+        $locationsQuery = Location::with('city')
             ->where('area', 'like', '%' . $query . '%')
-            ->where('is_active', true)
-            ->limit(15)
+            ->where('is_active', true);
+            
+        if ($cityId) {
+            $locationsQuery->where('city_id', $cityId);
+        }
+            
+        $locations = $locationsQuery->limit(15)
             ->get()
             ->map(function ($location) {
                 $displayText = $location->area;
@@ -291,14 +301,15 @@ class PageController extends Controller
 
         $results = $results->concat($locations);
 
-        // Also search cities by name
-        $cities = City::where('name', 'like', '%' . $query . '%')
+        // Also search cities by name - ONLY if no city_id is specified
+        if (!$cityId) {
+            $cities = City::where('name', 'like', '%' . $query . '%')
             ->where('is_active', true)
             ->limit(10)
             ->get()
             ->map(function ($city) {
                 return [
-                    'id' => null,
+                    'id' => null, // Use main location ID if available? For now keeping null as per original
                     'city_id' => $city->id,
                     'city_name' => $city->name,
                     'area' => null,
@@ -308,7 +319,8 @@ class PageController extends Controller
                 ];
             });
 
-        $results = $results->concat($cities);
+            $results = $results->concat($cities);
+        }
 
         // Deduplicate and limit results
         $results = $results->unique('display_text')->take(20)->values();
@@ -394,5 +406,52 @@ class PageController extends Controller
         ]);
 
         return response()->json($languages);
+    }
+
+    #[OA\Get(
+        path: "/api/cities",
+        summary: "Get cities",
+        description: "Get a list of all active cities with their main location ID",
+        tags: ["Pages"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "List of cities",
+                content: new OA\JsonContent(
+                    type: "array",
+                    items: new OA\Items(
+                        type: "object",
+                        properties: [
+                            new OA\Property(property: "id", type: "integer"),
+                            new OA\Property(property: "name", type: "string"),
+                            new OA\Property(property: "code", type: "string"),
+                            new OA\Property(property: "main_location_id", type: "integer", nullable: true, description: "ID of the location record representing the whole city"),
+                        ]
+                    )
+                )
+            ),
+        ]
+    )]
+    /**
+     * Get all active cities
+     */
+    public function cities(): JsonResponse
+    {
+        $cities = City::where('is_active', true)
+            ->with(['locations' => function ($q) {
+                $q->whereNull('area');
+            }])
+            ->get()
+            ->map(function ($city) {
+                $mainLocation = $city->locations->first();
+                return [
+                    'id' => $city->id,
+                    'name' => $city->name,
+                    'code' => $city->state, // Mapping state to code or adding code field if exists? City model has state.
+                    'main_location_id' => $mainLocation ? $mainLocation->id : null,
+                ];
+            });
+
+        return response()->json($cities);
     }
 }

@@ -42,7 +42,7 @@ class CitySeeder extends Seeder
                 break;
             }
         }
-        
+
         if (!$jsonPath) {
             $this->command->error('Cities JSON file not found. Tried:');
             foreach ($possiblePaths as $path) {
@@ -97,7 +97,7 @@ class CitySeeder extends Seeder
                         'name' => $cityData['name'],
                         'state' => $state,
                         'country_id' => $pakistan->id,
-                        'is_active' => true,
+                        'is_active' => false, // Default to inactive, specific cities activated in LocationsSeeder
                     ]
                 );
 
@@ -123,11 +123,23 @@ class CitySeeder extends Seeder
                 // Handle coordinates object
                 elseif (isset($cityData['coordinates'])) {
                     $coords = $cityData['coordinates'];
-                    $latitude = isset($coords['lat']) && is_numeric($coords['lat']) ? (float)$coords['lat'] : 
+                    $latitude = isset($coords['lat']) && is_numeric($coords['lat']) ? (float)$coords['lat'] :
                                (isset($coords['latitude']) && is_numeric($coords['latitude']) ? (float)$coords['latitude'] : null);
-                    $longitude = isset($coords['lng']) && is_numeric($coords['lng']) ? (float)$coords['lng'] : 
+                    $longitude = isset($coords['lng']) && is_numeric($coords['lng']) ? (float)$coords['lng'] :
                                 (isset($coords['longitude']) && is_numeric($coords['longitude']) ? (float)$coords['longitude'] : null);
                 }
+
+                // Update city with coordinates
+                if ($latitude !== null && $longitude !== null) {
+                    $city->update([
+                        'latitude' => $latitude,
+                        'longitude' => $longitude,
+                    ]);
+                }
+
+                // Update city with coordinates if available (moved from below to be part of city creation/update)
+                // We do this here because we extracted them above
+
 
                 // Create or update location with coordinates
                 if ($latitude !== null && $longitude !== null) {

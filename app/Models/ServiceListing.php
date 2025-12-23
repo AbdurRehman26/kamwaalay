@@ -133,4 +133,16 @@ class ServiceListing extends Model
     {
         return $this->locations()->pluck('locations.id')->toArray();
     }
+
+    /**
+     * Scope to filter by distance from a point (Haversine formula)
+     */
+    public function scopeNearLocation($query, $latitude, $longitude, $radius = 20)
+    {
+        $haversine = "(6371 * acos(cos(radians($latitude)) * cos(radians(pin_latitude)) * cos(radians(pin_longitude) - radians($longitude)) + sin(radians($latitude)) * sin(radians(pin_latitude))))";
+
+        return $query->select('*') // Select all columns
+                     ->selectRaw("{$haversine} AS distance")
+                     ->whereRaw("{$haversine} < ?", [$radius]);
+    }
 }

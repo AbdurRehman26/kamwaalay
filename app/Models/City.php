@@ -14,6 +14,8 @@ class City extends Model
     protected $fillable = [
         'name',
         'state',
+        'latitude',
+        'longitude',
         'country_id',
         'is_active',
     ];
@@ -21,6 +23,8 @@ class City extends Model
     protected function casts(): array
     {
         return [
+            'latitude' => 'decimal:8',
+            'longitude' => 'decimal:8',
             'is_active' => 'boolean',
         ];
     }
