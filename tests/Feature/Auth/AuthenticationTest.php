@@ -5,28 +5,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('users can authenticate using email', function () {
-    $user = User::factory()->unverified()->create([
-        'email' => 'test@example.com',
-        'password' => bcrypt('password'),
-        'phone_verified_at' => null, // Ensure user is unverified
-    ]);
-
-    $response = $this->postJson('/api/login', [
-        'email' => 'test@example.com',
-        'password' => 'password',
-    ]);
-
-    $response->assertStatus(200);
-    // If user is verified, they get token directly, otherwise they get verification info
-    if ($response->json('token')) {
-        $response->assertJsonStructure(['message', 'user', 'token']);
-    } else {
-        $response->assertJsonStructure(['message', 'verification_method', 'verification_token']);
-    }
-    // Note: User needs to verify OTP before getting authenticated if unverified
-});
-
 test('users can authenticate using phone number', function () {
     // Note: LoginRequest currently requires email, so phone-only users get placeholder emails
     // During registration, phone-only users get email like {phone}@phone.kamwaalay.local

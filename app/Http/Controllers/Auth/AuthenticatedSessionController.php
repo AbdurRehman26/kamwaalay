@@ -241,38 +241,17 @@ class AuthenticatedSessionController extends Controller
             return response()->json($response);
         }
 
-        // Account is not verified - require OTP verification
-        $email = $user->email;
         $phone = $user->phone;
-        $isPhoneEmail = strpos($email, '@phone.kamwaalay.local') !== false;
 
-        // Determine which method to use for OTP (prefer email if real email, otherwise phone)
-        $verificationMethod = null;
-        $verificationIdentifier = null;
-
-        if (!$isPhoneEmail && !empty($email)) {
-            // User has a real email, use email for OTP
-            $verificationMethod = 'email';
-            $verificationIdentifier = $email;
-            $this->sendEmailOtp($user);
-        } elseif (!empty($phone)) {
-            // User has phone, use phone for OTP
-            $verificationMethod = 'phone';
-            $verificationIdentifier = $phone;
-            $this->sendPhoneOtp($phone, $user->roles->first()->name ?? 'user');
-        } else {
-            // Fallback - should not happen, but handle gracefully
-            return response()->json([
-                'message' => 'Unable to send verification code. Please contact support.',
-                'errors' => ['email' => ['Unable to send verification code. Please contact support.']]
-            ], 422);
-        }
+        // User has phone, use phone for OTP
+        $verificationMethod = 'phone';
+        $this->sendPhoneOtp($phone, $user->roles->first()->name ?? 'user');
 
         // Create a signed verification token instead of using session
         $verificationData = [
             'user_id' => $user->id,
             'method' => $verificationMethod,
-            'identifier' => $verificationMethod === 'email' ? $email : $phone,
+            'identifier' => $phone,
             'remember' => $request->boolean('remember'),
             'is_login' => true,
             'expires_at' => now()->addMinutes(10), // Token valid for 10 minutes
@@ -281,12 +260,10 @@ class AuthenticatedSessionController extends Controller
         $verificationToken = encrypt($verificationData);
 
         return response()->json([
-            'message' => $verificationMethod === 'email'
-                ? 'Please check your email for the verification code.'
-                : 'Please check your phone for the verification code.',
+            'message' => 'Please check your phone for the verification code.',
             'user_id' => $user->id,
             'verification_method' => $verificationMethod,
-            'identifier' => $verificationMethod === 'email' ? $email : $this->maskPhone($phone),
+            'identifier' => $this->maskPhone($phone),
             'verification_token' => $verificationToken,
         ]);
     }
@@ -302,37 +279,19 @@ class AuthenticatedSessionController extends Controller
         // Determine which login method was used (email or phone)
         $loginMethod = $request->filled('email') ? 'email' : 'phone';
 
-        $email = $user->email;
         $phone = $user->phone;
-        $isPhoneEmail = strpos($email, '@phone.kamwaalay.local') !== false;
 
-        // Determine which method to use for OTP
-        $verificationMethod = null;
-        $verificationIdentifier = null;
-
-        if ($loginMethod === 'email' && !$isPhoneEmail && !empty($email)) {
-            // User provided email, use email for OTP
-            $verificationMethod = 'email';
-            $verificationIdentifier = $email;
-            $this->sendEmailOtp($user);
-        } elseif ($loginMethod === 'phone' && !empty($phone)) {
+        if ($loginMethod === 'phone' && !empty($phone)) {
             // User provided phone, use phone for OTP
             // Format phone number to +92xxxxx format
             $formattedPhone = $this->formatPhoneNumber($phone);
             $verificationMethod = 'phone';
-            $verificationIdentifier = $formattedPhone;
             $this->sendPhoneOtp($formattedPhone, $user->roles->first()->name ?? 'user');
-        } elseif (!$isPhoneEmail && !empty($email)) {
-            // Fallback to email if available
-            $verificationMethod = 'email';
-            $verificationIdentifier = $email;
-            $this->sendEmailOtp($user);
         } elseif (!empty($phone)) {
             // Fallback to phone if available
             // Format phone number to +92xxxxx format
             $formattedPhone = $this->formatPhoneNumber($phone);
             $verificationMethod = 'phone';
-            $verificationIdentifier = $formattedPhone;
             $this->sendPhoneOtp($formattedPhone, $user->roles->first()->name ?? 'user');
         } else {
             // Should not happen, but handle gracefully
@@ -346,7 +305,7 @@ class AuthenticatedSessionController extends Controller
         $verificationData = [
             'user_id' => $user->id,
             'method' => $verificationMethod,
-            'identifier' => $verificationMethod === 'email' ? $email : $phone,
+            'identifier' => $phone,
             'remember' => $request->boolean('remember'),
             'is_login' => true,
             'expires_at' => now()->addMinutes(10), // Token valid for 10 minutes
@@ -355,66 +314,12 @@ class AuthenticatedSessionController extends Controller
         $verificationToken = encrypt($verificationData);
 
         return response()->json([
-            'message' => $verificationMethod === 'email'
-                ? 'Please check your email for the verification code.'
-                : 'Please check your phone for the verification code.',
+            'message' => 'Please check your phone for the verification code.',
             'user_id' => $user->id,
             'verification_method' => $verificationMethod,
-            'identifier' => $verificationMethod === 'email' ? $email : $this->maskPhone($phone),
+            'identifier' => $this->maskPhone($phone),
             'verification_token' => $verificationToken,
         ], 202); // 202 Accepted - OTP sent
-    }
-
-    /**
-     * Send email OTP for login verification
-     */
-    private function sendEmailOtp(User $user): void
-    {
-        // Clean up expired OTPs
-        PhoneOtp::cleanupExpired();
-
-        // Generate OTP
-        $otp = PhoneOtp::generateOtp();
-
-        // Invalidate previous OTPs for this email (using phone column to store email)
-        PhoneOtp::where('phone', $user->email)
-            ->where('verified', false)
-            ->delete();
-
-        // Create new OTP record (using PhoneOtp table to store email OTPs)
-        $phoneOtp = PhoneOtp::create([
-            'phone' => $user->email, // Store email in phone column
-            'otp' => $otp,
-            'role' => $user->roles->first()->name ?? 'user',
-            'expires_at' => Carbon::now()->addMinutes(3), // OTP valid for 3 minutes
-        ]);
-
-        // Send email with OTP
-        try {
-            // Log mailer configuration for debugging
-            Log::info('Mailer config', [
-                'default' => config('mail.default'),
-                'from_address' => config('mail.from.address'),
-                'from_name' => config('mail.from.name'),
-                'to_email' => $user->email,
-            ]);
-
-            Mail::send('emails.verify-otp', ['otp' => $otp, 'user' => $user], function ($message) use ($user) {
-                $message->from(config('mail.from.address'), config('mail.from.name'))
-                    ->to($user->email, $user->name)
-                    ->subject('Login Verification Code - kamwaalay');
-            });
-
-            Log::info("Email sent successfully to {$user->email}");
-        } catch (\Exception $e) {
-            // Log error but don't fail login
-            Log::error('Failed to send email OTP for login: ' . $e->getMessage());
-            Log::error('Email sending error details: ' . $e->getTraceAsString());
-            Log::error('Exception class: ' . get_class($e));
-        }
-
-        // For development, log the OTP
-        Log::info("Login Email OTP for {$user->email}: {$otp}");
     }
 
     /**
@@ -434,7 +339,7 @@ class AuthenticatedSessionController extends Controller
             ->delete();
 
         // Create new OTP record
-        $phoneOtp = PhoneOtp::create([
+        PhoneOtp::create([
             'phone' => $phone,
             'otp' => $otp,
             'role' => $role,

@@ -29,7 +29,6 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required_without:phone', 'nullable', 'string', 'email'],
             'phone' => ['required_without:email', 'nullable', 'string', 'max:20'],
             'password' => ['nullable', 'string'], // Password is optional - if not provided, OTP flow will be used
         ];
@@ -45,7 +44,7 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         $credentials = ['password' => $this->input('password')];
-        
+
         // Add email or phone to credentials
         if ($this->filled('email')) {
             $credentials['email'] = $this->input('email');
@@ -189,10 +188,10 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        $identifier = $this->filled('email') 
+        $identifier = $this->filled('email')
             ? $this->string('email')
             : $this->formatPhoneNumber($this->input('phone'));
-        
+
         return Str::transliterate(Str::lower($identifier).'|'.$this->ip());
     }
 
@@ -204,10 +203,10 @@ class LoginRequest extends FormRequest
     {
         // Remove all non-numeric characters except +
         $phone = preg_replace('/[^0-9+]/', '', $phone);
-        
+
         // Remove leading + if present (we'll add it back at the end)
         $phone = ltrim($phone, '+');
-        
+
         // Handle different input formats
         if (strpos($phone, '0092') === 0) {
             // Format: 0092xxxxxxxxx -> +92xxxxxxxxx
@@ -228,12 +227,12 @@ class LoginRequest extends FormRequest
                 $phone = '92' . $phone;
             }
         }
-        
+
         // Ensure it starts with +
         if (strpos($phone, '+') !== 0) {
             $phone = '+' . $phone;
         }
-        
+
         return $phone;
     }
 }
