@@ -20,6 +20,19 @@ export default function ServiceListingShow() {
     // Check if current user is the owner of this listing
     const isOwner = user && listing && user.profile?.id === listing.profile_id;
 
+    // Get city display name (full name for detail page)
+    const getCityDisplayName = (listingData) => {
+        let cityName = "";
+
+        if (listingData?.location_details && listingData.location_details.length > 0) {
+            cityName = listingData.location_details[0].city_name;
+        } else if (listingData?.city) {
+            cityName = listingData.city;
+        }
+
+        return cityName || null;
+    };
+
     // Format phone number for WhatsApp (add +92 if needed)
     const formatPhoneForWhatsApp = (phone) => {
         if (!phone) return "";
@@ -183,7 +196,14 @@ export default function ServiceListingShow() {
                                 <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-indigo-100 dark:border-indigo-800">
                                     <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">💼 Work Type</h3>
                                     <p className="text-gray-900 dark:text-white font-semibold text-lg capitalize mb-4">{listing.work_type?.replace("_", " ") || "N/A"}</p>
-                                    <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">📍 Location{listing.location_details && listing.location_details.length > 1 ? "s" : ""}</h3>
+                                    <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">
+                                        📍 Location{listing.location_details && listing.location_details.length > 1 ? "s" : ""}
+                                        {getCityDisplayName(listing) && (
+                                            <span className="ml-2 px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs rounded-md font-bold">
+                                                {getCityDisplayName(listing)}
+                                            </span>
+                                        )}
+                                    </h3>
                                     {listing.location_details && listing.location_details.length > 0 ? (
                                         <div className="space-y-2">
                                             {listing.location_details.map((location, idx) => (

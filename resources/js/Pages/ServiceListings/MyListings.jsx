@@ -42,6 +42,26 @@ export default function MyServiceListings() {
             .join(" ");
     };
 
+    const getCityDisplayName = (listing) => {
+        let cityName = "";
+
+        // Try getting city from location details (assuming all locations are in same city)
+        if (listing.location_details && listing.location_details.length > 0) {
+            cityName = listing.location_details[0].city_name;
+        } else if (listing.city) { // Fallback
+            cityName = listing.city;
+        }
+
+        if (!cityName) return null;
+
+        const lowerCity = cityName.toLowerCase();
+        if (lowerCity === "karachi") return "Khi";
+        if (lowerCity === "islamabad") return "Isb";
+        if (lowerCity === "lahore") return "Lahore";
+
+        return cityName;
+    };
+
     return (
         <DashboardLayout>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -164,6 +184,15 @@ export default function MyServiceListings() {
                                                 </div>
                                             )}
                                         </div>
+
+                                        {/* City Badge */}
+                                        {getCityDisplayName(listing) && (
+                                            <div className="ml-2 flex-shrink-0">
+                                                <span className="inline-block px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 text-xs font-bold rounded-lg uppercase tracking-wider shadow-sm border border-gray-200 dark:border-gray-600">
+                                                    {getCityDisplayName(listing)}
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
                                         <Link
@@ -192,8 +221,8 @@ export default function MyServiceListings() {
                                             to={link.url || "#"}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center min-w-[40px] ${link.active
-                                                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
-                                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-700"
+                                                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
+                                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-700"
                                                 } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                         />
                                     ))}
