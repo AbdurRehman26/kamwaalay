@@ -771,10 +771,10 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 const primaryLocation = uniqueLocations[0];
 
                                 return (
-                                    <Link
+                                    <div
                                         key={helper.id}
-                                        to={profileRoute}
-                                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                                        onClick={() => navigate(profileRoute)}
+                                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
                                     >
                                         <div className="h-48 relative bg-gray-100 dark:bg-gray-700 overflow-hidden">
                                             {isBusiness ? (
@@ -1018,7 +1018,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 )}
                                             </div>
                                         </div>
-                                    </Link>
+                                    </div>
                                 );
                             })}
                         </div>
