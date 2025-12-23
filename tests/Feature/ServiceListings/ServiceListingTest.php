@@ -17,6 +17,27 @@ beforeEach(function () {
     if (!Role::where('name', 'user')->exists()) {
         Role::create(['name' => 'user']);
     }
+    // Create default city
+    if (!App\Models\City::where('id', 1)->exists()) {
+        // Ensure country exists first
+        if (!App\Models\Country::where('id', 1)->exists()) {
+            App\Models\Country::create([
+                'id' => 1,
+                'name' => 'Pakistan',
+                'code' => 'PK',
+                'phone_code' => '+92',
+                'is_active' => true,
+            ]);
+        }
+        App\Models\City::create([
+            'id' => 1,
+            'country_id' => 1,
+            'name' => 'Karachi',
+            'latitude' => 24.8607,
+            'longitude' => 67.0011,
+            'is_active' => true,
+        ]);
+    }
 });
 
 test('helpers can create service listings', function () {
@@ -41,6 +62,7 @@ test('helpers can create service listings', function () {
         'work_type' => 'full_time',
         'monthly_rate' => 15000,
         'description' => 'Professional maid service',
+        'city_id' => 1,
         'pin_address' => '123 Test St, Karachi',
     ]);
 
@@ -53,6 +75,7 @@ test('helpers can create service listings', function () {
     
     expect($newListing)->not->toBeNull();
     expect($newListing->serviceTypes()->count())->toBeGreaterThanOrEqual(1);
+    expect($newListing->city_id)->toBe(1);
 });
 
 test('guests can view service listings', function () {
@@ -64,6 +87,7 @@ test('guests can view service listings', function () {
         'profile_id' => $profile->id,
         'is_active' => true,
         'status' => 'active',
+        'city_id' => 1,
     ]);
 
     $response = $this->getJson('/api/service-listings');
@@ -99,6 +123,7 @@ test('helpers can view their own listings', function () {
     $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
         'profile_id' => $profile->id,
+        'city_id' => 1,
     ]);
 
     $response = $this->getJson("/api/service-listings/{$listing->id}");
@@ -114,6 +139,7 @@ test('helpers can update their service listings', function () {
     $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
         'profile_id' => $profile->id,
+        'city_id' => 1,
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;
@@ -126,6 +152,7 @@ test('helpers can update their service listings', function () {
         'work_type' => 'part_time',
         'monthly_rate' => 20000,
         'description' => 'Updated description',
+        'city_id' => 1,
         'pin_address' => '456 Updated St, Karachi',
         'status' => 'active',
         'is_active' => true,
@@ -145,6 +172,7 @@ test('service listings require service types', function () {
     $profile = $helper->profile()->create([]);
     ServiceListing::factory()->create([
         'profile_id' => $profile->id,
+        'city_id' => 1,
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;
@@ -156,6 +184,7 @@ test('service listings require service types', function () {
         'work_type' => 'full_time',
         'monthly_rate' => 15000,
         'description' => 'Professional service',
+        'city_id' => 1,
         'pin_address' => '123 Test St, Karachi',
     ]);
 

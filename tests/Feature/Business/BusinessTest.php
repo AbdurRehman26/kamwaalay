@@ -25,6 +25,17 @@ beforeEach(function () {
             'is_active' => true,
         ]);
     }
+    
+    // Create Karachi city for tests
+    if (!\App\Models\City::where('name', 'Karachi')->exists()) {
+        \App\Models\City::create([
+            'country_id' => 1,
+            'name' => 'Karachi',
+            'latitude' => 24.8607,
+            'longitude' => 67.0011,
+            'is_active' => true,
+        ]);
+    }
 });
 
 test('businesses can view their dashboard', function () {

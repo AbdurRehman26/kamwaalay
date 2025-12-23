@@ -650,7 +650,9 @@ export default function Home() {
                                             </div>
                                             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                                                 <span className="text-base">📍</span>
-                                                <span className="font-semibold truncate">{job.city}, {job.area}</span>
+                                                <span className="font-semibold truncate">
+                                                    {job.city_name || job.city?.name || (typeof job.city === "string" ? job.city : null) || "Location not specified"}
+                                                </span>
                                             </div>
                                         </div>
 

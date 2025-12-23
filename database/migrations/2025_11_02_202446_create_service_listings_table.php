@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->foreignId('profile_id')->nullable()->constrained('profiles')->onDelete('cascade');
             $table->enum('status', ['active', 'paused', 'closed'])->default('active');
+            $table->string('city_id');
             $table->text('pin_address')->nullable();
             $table->decimal('pin_latitude', 10, 8)->nullable();
             $table->decimal('pin_longitude', 11, 8)->nullable();

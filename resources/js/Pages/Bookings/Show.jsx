@@ -113,7 +113,7 @@ export default function BookingShow() {
                             )}
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Location</h3>
-                                <p className="text-gray-900 dark:text-white mb-2">{booking.city || "N/A"}</p>
+                                <p className="text-gray-900 dark:text-white mb-2">{booking.city_name || booking.city?.name || (typeof booking.city === "string" ? booking.city : null) || "N/A"}</p>
                                 {booking.address && (
                                     <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
                                         <div className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">

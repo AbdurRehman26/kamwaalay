@@ -97,7 +97,7 @@ export default function BookingsIndex() {
                                                 </span>
                                             )}
                                             <span className="flex items-center gap-1">
-                                                📍 <span>{booking.city || "N/A"}</span>
+                                                📍 <span>{booking.city_name || booking.city?.name || (typeof booking.city === "string" ? booking.city : null) || "N/A"}</span>
                                             </span>
                                             {booking.start_date && (
                                                 <span className="flex items-center gap-1">

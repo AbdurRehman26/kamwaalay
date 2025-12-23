@@ -368,8 +368,11 @@ class BusinessController extends Controller
         $helper = User::create($userData);
         $helper->assignRole('helper');
 
-        // Use first location for profile (primary location)
         $primaryLocation = $validated['locations'][0];
+        
+        // Find city to get ID
+        $city = \App\Models\City::where('name', $primaryLocation['city'])->first();
+        $cityId = $city ? $city->id : 1; // Default to 1 if not found
 
         // Create profile for the worker
         $profileData = [
@@ -392,6 +395,8 @@ class BusinessController extends Controller
             'profile_id' => $profile->id,
             'work_type' => $validated['availability'], // Map availability to work_type
             'description' => $validated['bio'],
+            'city_id' => $cityId,
+            'pin_address' => $primaryLocation['area'] . ', ' . $primaryLocation['city'], // Construct address
             'is_active' => true,
             'status' => 'active',
         ]);
@@ -605,11 +610,20 @@ class BusinessController extends Controller
         // Update service listings - delete old ones and create new ones
         $profile->serviceListings()->delete();
 
+        // Get primary location from validated data
+        $primaryLocation = $validated['locations'][0];
+        
+        // Find city to get ID
+        $city = \App\Models\City::where('name', $primaryLocation['city'])->first();
+        $cityId = $city ? $city->id : 1; // Default to 1 if not found
+
         $listing = \App\Models\ServiceListing::create([
             'user_id' => $helper->id,
             'profile_id' => $profile->id,
             'work_type' => $validated['availability'], // Map availability to work_type
             'description' => $validated['bio'],
+            'city_id' => $cityId,
+            'pin_address' => $primaryLocation['area'] . ', ' . $primaryLocation['city'], // Construct address
             'is_active' => true,
             'status' => 'active',
         ]);

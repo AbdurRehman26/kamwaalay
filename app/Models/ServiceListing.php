@@ -28,6 +28,7 @@ class ServiceListing extends Model
         'work_type',
         'monthly_rate',
         'description',
+        'city_id',
         'pin_address',
         'pin_latitude',
         'pin_longitude',
@@ -41,6 +42,7 @@ class ServiceListing extends Model
             'monthly_rate' => 'decimal:2',
             'pin_latitude' => 'decimal:8',
             'pin_longitude' => 'decimal:8',
+            'city_id' => 'integer',
             'is_active' => 'boolean',
         ];
     }
@@ -97,7 +99,7 @@ class ServiceListing extends Model
         if ($firstServiceType) {
             return $firstServiceType->name;
         }
-        
+
         return 'Service';
     }
 

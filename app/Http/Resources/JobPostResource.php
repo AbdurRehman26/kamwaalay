@@ -22,7 +22,12 @@ class JobPostResource extends JsonResource
             'service_type_label' => $this->service_type_label,
             'work_type' => $this->work_type,
             'estimated_salary' => $this->estimated_salary,
-            'city' => $this->cityRelation ? $this->cityRelation->name : null,
+            'city_id' => $this->city_id,
+            'city' => $this->cityRelation ? [
+                'id' => $this->cityRelation->id,
+                'name' => $this->cityRelation->name,
+            ] : null,
+            'city_name' => $this->cityRelation ? $this->cityRelation->name : null, // Backward compatibility
             'start_date' => $this->start_date?->format('Y-m-d'),
             'start_time' => $this->start_time?->toIso8601String(),
             'name' => $this->name,

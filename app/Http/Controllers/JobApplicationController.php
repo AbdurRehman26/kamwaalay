@@ -49,7 +49,7 @@ class JobApplicationController extends Controller
         // Allow guests and all users to browse job applications
         // Only authenticated helpers/businesses with completed onboarding can apply
 
-        $query = JobPost::with(['user', 'jobApplications'])
+        $query = JobPost::with(['user', 'jobApplications', 'cityRelation'])
             ->where('status', 'pending')
             ->whereNull('assigned_user_id');
 
@@ -61,7 +61,7 @@ class JobApplicationController extends Controller
         // Filter by city name
         $locationDisplay = '';
         if ($request->has('city_name') && $request->city_name) {
-            $query->whereHas('city', function ($q) use ($request) {
+            $query->whereHas('cityRelation', function ($q) use ($request) {
                 $q->where('name', $request->city_name);
             });
             $locationDisplay = $request->city_name;
@@ -96,7 +96,7 @@ class JobApplicationController extends Controller
         }
 
         return response()->json([
-            'job_posts' => $jobPosts,
+            'job_posts' => \App\Http\Resources\JobPostResource::collection($jobPosts)->response()->getData(true),
             'filters' => $filters,
         ]);
     }

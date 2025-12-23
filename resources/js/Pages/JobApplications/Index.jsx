@@ -228,6 +228,8 @@ export default function JobApplicationsIndex() {
                                         "cancelled": "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
                                     };
 
+                                    const cityName = job.city_name || (job.city?.name) || (typeof job.city === "string" ? job.city : "") || "City not specified";
+
                                     const handleCardClick = (e) => {
                                         // Navigate to job detail page
                                         navigate(route("job-posts.show", job.id));
@@ -290,18 +292,24 @@ export default function JobApplicationsIndex() {
                                                         </div>
                                                     )}
 
+                                                    {/* Estimated Salary */}
+                                                    {job.estimated_salary && (
+                                                        <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                                                            <span className="w-6 flex justify-center mr-2 text-indigo-500">💰</span>
+                                                            <span className="font-medium">
+                                                                Rs. {parseInt(job.estimated_salary).toLocaleString()}
+                                                            </span>
+                                                        </div>
+                                                    )}
+
                                                     {/* Location */}
-                                                    {(job.city || job.area) && (
+                                                    {(!!job.city || !!job.address) && (
                                                         <div className="flex items-start text-sm text-gray-700 dark:text-gray-300">
                                                             <span className="w-6 flex justify-center mr-2 text-indigo-500 mt-0.5">📍</span>
                                                             <div className="flex-1">
-                                                                <span className="font-medium">
-                                                                    {job.city || "N/A"}
-                                                                    {job.area && `, ${job.area}`}
+                                                                <span className="font-medium block">
+                                                                    {cityName}
                                                                 </span>
-                                                                {job.address && (
-                                                                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5 line-clamp-1">{job.address}</p>
-                                                                )}
                                                             </div>
                                                         </div>
                                                     )}
