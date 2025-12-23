@@ -25,6 +25,7 @@ class JobPost extends Model
         'service_type',
         'work_type',
         'city',
+        'city_id',
         'area',
         'start_date',
         'start_time',
@@ -58,6 +59,14 @@ class JobPost extends Model
     public function helper(): BelongsTo
     {
         return $this->assignedUser();
+    }
+
+    /**
+     * Get the city for this job post
+     */
+    public function cityRelation(): BelongsTo
+    {
+        return $this->belongsTo(City::class, 'city_id');
     }
 
     public function review(): HasOne

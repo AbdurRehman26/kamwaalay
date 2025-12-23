@@ -47,7 +47,9 @@ export default function PublicLayout({ children }) {
                             </p>
                             <div className="flex space-x-4 mt-6">
                                 <a
-                                    href="#"
+                                    href="https://www.facebook.com/profile.php?id=61584642879532"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 dark:bg-gray-800/50 backdrop-blur-sm border border-white/20 dark:border-gray-700 text-indigo-100 dark:text-gray-300 hover:bg-indigo-500/30 dark:hover:bg-indigo-600/30 hover:text-white dark:hover:text-white hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl"
                                     aria-label="Facebook"
                                 >

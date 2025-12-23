@@ -25,6 +25,10 @@ export default function ServiceListingsIndex() {
     const searchTimeoutRef = useRef(null);
     const [chatOpen, setChatOpen] = useState(false);
     const [selectedRecipient, setSelectedRecipient] = useState(null);
+    const [latitude, setLatitude] = useState("");
+    const [longitude, setLongitude] = useState("");
+    const [cityId, setCityId] = useState("");
+    const [cities, setCities] = useState([]);
 
     // Format phone number for WhatsApp (add +92 if needed)
     const formatPhoneForWhatsApp = (phone) => {
@@ -52,12 +56,43 @@ export default function ServiceListingsIndex() {
         return cleaned;
     };
 
+    // Get city initial for display
+    const getCityInitial = (listing) => {
+        let cityName = "";
+
+        if (listing.location_details && listing.location_details.length > 0) {
+            cityName = listing.location_details[0].city_name;
+        } else if (listing.city) {
+            cityName = listing.city;
+        }
+
+        if (!cityName) return null;
+
+        const lowerCity = cityName.toLowerCase();
+        if (lowerCity === "karachi") return "Khi";
+        if (lowerCity === "islamabad") return "Isb";
+        if (lowerCity === "lahore") return "Lahore";
+
+        return cityName.substring(0, 3);
+    };
+
     // Fetch service types from API
     const { serviceTypes: fetchedServiceTypes } = useServiceTypes();
     const serviceTypes = [
         { value: "", label: "All Services" },
         ...fetchedServiceTypes,
     ];
+
+    // Fetch cities on mount
+    useEffect(() => {
+        axios.get("/api/cities")
+            .then((response) => {
+                setCities(response.data.cities || response.data || []);
+            })
+            .catch((error) => {
+                console.error("Error fetching cities:", error);
+            });
+    }, []);
 
     // Fetch location suggestions for filter
     useEffect(() => {
@@ -107,7 +142,30 @@ export default function ServiceListingsIndex() {
         setLocationId(location.id || "");
         setLocationDisplay(location.display_text);
         setLocationFilterQuery(location.display_text);
+        setLatitude("");
+        setLongitude("");
         setShowLocationSuggestions(false);
+    };
+
+    const handleNearMe = () => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    setLatitude(latitude);
+                    setLongitude(longitude);
+                    setLocationId("");
+                    setLocationDisplay("Near Me");
+                    setLocationFilterQuery("Near Me");
+                },
+                (error) => {
+                    console.error("Error getting location:", error);
+                    alert("Unable to retrieve your location. Please ensure location services are enabled.");
+                }
+            );
+        } else {
+            alert("Geolocation is not supported by your browser.");
+        }
     };
 
     // Fetch listings from API
@@ -116,6 +174,9 @@ export default function ServiceListingsIndex() {
             service_type: serviceType || undefined,
             work_type: workType || undefined,
             location_id: locationId || undefined,
+            city_id: cityId || undefined,
+            latitude: latitude || undefined,
+            longitude: longitude || undefined,
             sort_by: sortBy,
         };
 
@@ -133,7 +194,7 @@ export default function ServiceListingsIndex() {
                 console.error("Error fetching listings:", error);
                 setLoading(false);
             });
-    }, [serviceType, workType, locationId, sortBy]);
+    }, [serviceType, workType, locationId, cityId, latitude, longitude, sortBy]);
 
     const handleFilter = () => {
         // Filters are applied via useEffect above
@@ -152,7 +213,7 @@ export default function ServiceListingsIndex() {
             <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
                     <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                        <strong>Note:</strong> We are currently serving Karachi only. We will be going live in different cities soon!
+                        <strong>Note:</strong> We are currently serving Karachi, Lahore, and Islamabad. More cities coming soon!
                     </p>
                 </div>
             </div>
@@ -188,26 +249,56 @@ export default function ServiceListingsIndex() {
                                 <option value="part_time">Part Time</option>
                             </select>
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">City</label>
+                            <select
+                                value={cityId}
+                                onChange={(e) => setCityId(e.target.value)}
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                            >
+                                <option value="">All Cities</option>
+                                {cities.map((city) => (
+                                    <option key={city.id} value={city.id}>
+                                        {city.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                         <div className="relative" ref={locationFilterRef}>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Location</label>
-                            <input
-                                type="text"
-                                value={locationFilterQuery || locationDisplay}
-                                onChange={(e) => {
-                                    setLocationFilterQuery(e.target.value);
-                                    if (!e.target.value) {
-                                        setLocationId("");
-                                        setLocationDisplay("");
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if (locationFilterSuggestions.length > 0) {
-                                        setShowLocationSuggestions(true);
-                                    }
-                                }}
-                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
-                                placeholder="Search location..."
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={locationFilterQuery || locationDisplay}
+                                    onChange={(e) => {
+                                        setLocationFilterQuery(e.target.value);
+                                        if (!e.target.value) {
+                                            setLocationId("");
+                                            setLocationDisplay("");
+                                            setLatitude("");
+                                            setLongitude("");
+                                        }
+                                    }}
+                                    onFocus={() => {
+                                        if (locationFilterSuggestions.length > 0) {
+                                            setShowLocationSuggestions(true);
+                                        }
+                                    }}
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm pr-10"
+                                    placeholder="Search location..."
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => handleNearMe()}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                    title="Search Near Me"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                    </svg>
+                                </button>
+                            </div>
                             {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
                                 <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
                                     {locationFilterSuggestions.map((suggestion, index) => (
@@ -262,7 +353,15 @@ export default function ServiceListingsIndex() {
                                         to={route("service-listings.show", listing.id)}
                                         className="block"
                                     >
-                                        <div className="p-6">
+                                        <div className="p-6 relative">
+                                            {/* City Badge - Top Right */}
+                                            {getCityInitial(listing) && (
+                                                <div className="absolute top-4 right-4">
+                                                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 text-xs font-bold rounded-lg uppercase tracking-wider shadow-sm border border-gray-200 dark:border-gray-600">
+                                                        {getCityInitial(listing)}
+                                                    </span>
+                                                </div>
+                                            )}
                                             {/* Service Types & Rate Section - Highlighted */}
                                             <div className="mb-5">
                                                 <div className="flex items-start justify-between mb-3">

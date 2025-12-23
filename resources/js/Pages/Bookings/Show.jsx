@@ -133,15 +133,80 @@ export default function BookingShow() {
                             </div>
                         )}
 
-                        {!booking.assigned_user_id && isOwner && (
+                        {!booking.assigned_user_id && isOwner && booking.job_applications && booking.job_applications.length > 0 && (
+                            <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-6 mb-6">
+                                <h3 className="text-xl font-bold text-indigo-800 dark:text-indigo-300 mb-4">
+                                    📥 Applications ({booking.job_applications.length})
+                                </h3>
+                                <div className="space-y-4">
+                                    {booking.job_applications.map((application) => (
+                                        <div
+                                            key={application.id}
+                                            className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-indigo-100 dark:border-indigo-900/50 shadow-sm"
+                                        >
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div className="flex items-center gap-3">
+                                                    {application.user?.photo ? (
+                                                        <img
+                                                            src={application.user.photo.startsWith("http") ? application.user.photo : `/storage/${application.user.photo}`}
+                                                            alt={application.user?.name}
+                                                            className="w-12 h-12 rounded-full object-cover border-2 border-indigo-200 dark:border-indigo-700"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-lg">
+                                                            {application.user?.name?.charAt(0) || "?"}
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <p className="font-bold text-gray-900 dark:text-white">{application.user?.name || "Unknown"}</p>
+                                                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                                            {application.user?.experience_years && (
+                                                                <span>🏆 {application.user.experience_years} yrs exp</span>
+                                                            )}
+                                                            {application.user?.area && (
+                                                                <span>📍 {application.user.area}</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    {application.proposed_rate && (
+                                                        <p className="text-lg font-bold text-green-600 dark:text-green-400">
+                                                            PKR {application.proposed_rate}
+                                                        </p>
+                                                    )}
+                                                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${application.status === "pending" ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300" :
+                                                        application.status === "accepted" ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300" :
+                                                            "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300"
+                                                        }`}>
+                                                        {application.status_label || application.status}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {application.message && (
+                                                <p className="mt-3 text-gray-600 dark:text-gray-300 text-sm bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+                                                    "{application.message}"
+                                                </p>
+                                            )}
+                                            {application.status === "pending" && (
+                                                <div className="mt-4 flex gap-2">
+                                                    <Link
+                                                        to={route("helpers.show", application.user?.id)}
+                                                        className="text-sm px-4 py-2 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors font-semibold"
+                                                    >
+                                                        View Profile
+                                                    </Link>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {!booking.assigned_user_id && isOwner && (!booking.job_applications || booking.job_applications.length === 0) && (
                             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
-                                <p className="text-yellow-800 dark:text-yellow-300 mb-4">No helper assigned yet. Check applications to your request.</p>
-                                <Link
-                                    to={route("job-applications.my-request-applications")}
-                                    className="inline-block bg-yellow-600 dark:bg-yellow-700 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 dark:hover:bg-yellow-600 transition duration-300 font-semibold"
-                                >
-                                    View Applications
-                                </Link>
+                                <p className="text-yellow-800 dark:text-yellow-300">No applications yet. Helpers will be able to apply to your job post.</p>
                             </div>
                         )}
 
@@ -167,6 +232,14 @@ export default function BookingShow() {
                                 >
                                     Back to My Requests
                                 </Link>
+                                {isOwner && (
+                                    <Link
+                                        to={route("job-posts.edit", booking.id)}
+                                        className="flex-1 bg-indigo-600 dark:bg-indigo-700 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition duration-300 font-semibold text-center"
+                                    >
+                                        ✏️ Edit Job Post
+                                    </Link>
+                                )}
                                 {isHelper && !booking.assigned_user_id && booking.status === "pending" && (
                                     <Link
                                         to={route("job-applications.create", booking.id)}

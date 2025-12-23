@@ -113,7 +113,7 @@ export default function ServiceListingShow() {
     return (
         <PublicLayout>
             {/* Hero Section */}
-            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden py-16 md:py-24">
+            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden py-8 md:py-12">
                 {/* Abstract Background Shapes */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[100px] animate-pulse"></div>
@@ -121,23 +121,23 @@ export default function ServiceListingShow() {
                 </div>
 
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">{listing.service_type_label}</h1>
-                    <p className="text-xl text-indigo-100/90 max-w-2xl mx-auto leading-relaxed">
+                    <h1 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight">{listing.service_type_label}</h1>
+                    <p className="text-base text-indigo-100/90 max-w-2xl mx-auto leading-relaxed">
                         Service offered by {listing.user?.name}
                     </p>
                     {otherListings && otherListings.length > 0 && (
-                        <p className="text-lg text-indigo-100/80 mt-4">
+                        <p className="text-sm text-indigo-100/80 mt-2">
                             This provider offers {otherListings.length} other service{otherListings.length !== 1 ? "s" : ""}
                         </p>
                     )}
                 </div>
             </div>
 
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="max-w-4xl mx-auto">
                         {/* Main Content Card */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 dark:border-gray-700 relative z-20 -mt-16">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 mb-6 border border-gray-100 dark:border-gray-700 relative z-20 -mt-10">
                             {isOwner && (
                                 <div className="mb-6 flex justify-end">
                                     <Link
@@ -151,10 +151,19 @@ export default function ServiceListingShow() {
                                     </Link>
                                 </div>
                             )}
-                            <div className="grid md:grid-cols-2 gap-6 mb-8">
-                                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-indigo-100 dark:border-indigo-800">
-                                    <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">👤 Service Provider</h3>
-                                    <p className="text-gray-900 dark:text-white font-bold text-2xl mb-2">{listing.user?.name}</p>
+                            <div className="grid md:grid-cols-2 gap-4 mb-6">
+                                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-indigo-100 dark:border-indigo-800">
+                                    <h3 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-2">👤 Service Provider</h3>
+                                    <Link
+                                        to={listing.user?.role === "business" || listing.user?.roles?.some(r => r.name === "business")
+                                            ? route("businesses.show", listing.user?.id)
+                                            : route("helpers.show", listing.user?.id)
+                                        }
+                                        className="text-gray-900 dark:text-white font-bold text-lg mb-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1"
+                                    >
+                                        {listing.user?.name}
+                                        <span className="text-indigo-500 text-sm">→</span>
+                                    </Link>
                                     {user && listing.user?.phone && (
                                         <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                                             <span>📞</span>
@@ -193,10 +202,10 @@ export default function ServiceListingShow() {
                                         </div>
                                     )}
                                 </div>
-                                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-indigo-100 dark:border-indigo-800">
-                                    <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">💼 Work Type</h3>
-                                    <p className="text-gray-900 dark:text-white font-semibold text-lg capitalize mb-4">{listing.work_type?.replace("_", " ") || "N/A"}</p>
-                                    <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">
+                                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-indigo-100 dark:border-indigo-800">
+                                    <h3 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-2">💼 Work Type</h3>
+                                    <p className="text-gray-900 dark:text-white font-semibold text-base capitalize mb-3">{listing.work_type?.replace("_", " ") || "N/A"}</p>
+                                    <h3 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-2">
                                         📍 Location{listing.location_details && listing.location_details.length > 1 ? "s" : ""}
                                         {getCityDisplayName(listing) && (
                                             <span className="ml-2 px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs rounded-md font-bold">
@@ -231,35 +240,35 @@ export default function ServiceListingShow() {
                                     )}
                                 </div>
                             </div>
-                            <div className="mb-8">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <div className="mb-6">
+                                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                                     <span>🛠️</span>
                                     Services Offered
                                 </h3>
-                                <div className="flex flex-wrap gap-3">
+                                <div className="flex flex-wrap gap-2">
                                     {listing.service_types && listing.service_types.length > 0 ? (
                                         listing.service_types.map((serviceType, idx) => (
-                                            <span key={idx} className="bg-gradient-to-r from-primary-600 to-indigo-600 text-white px-6 py-2.5 rounded-full font-bold capitalize shadow-lg transform hover:scale-105 transition-transform">
+                                            <span key={idx} className="bg-gradient-to-r from-primary-600 to-indigo-600 text-white px-4 py-1.5 rounded-full font-semibold text-sm capitalize shadow-md">
                                                 {typeof serviceType === "string" ? serviceType.replace("_", " ") : serviceType}
                                             </span>
                                         ))
                                     ) : (
-                                        <span className="text-gray-500 dark:text-gray-400">No services specified</span>
+                                        <span className="text-gray-500 dark:text-gray-400 text-sm">No services specified</span>
                                     )}
                                 </div>
                             </div>
 
                             {listing.user?.skills && (
-                                <div className="mb-8 p-6 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-800">
-                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                <div className="mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/10 rounded-xl border border-indigo-100 dark:border-indigo-800">
+                                    <h3 className="text-base font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                                         <span>⚡</span>
                                         Key Skills
                                     </h3>
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="flex flex-wrap gap-1.5">
                                         {listing.user.skills.split(",").map((skill, idx) => (
                                             <span
                                                 key={idx}
-                                                className="bg-white dark:bg-gray-800 text-indigo-700 dark:text-indigo-300 px-4 py-2 rounded-lg font-bold border border-indigo-200 dark:border-indigo-700 shadow-sm"
+                                                className="bg-white dark:bg-gray-800 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-md font-semibold text-sm border border-indigo-200 dark:border-indigo-700"
                                             >
                                                 {skill.trim()}
                                             </span>
@@ -268,19 +277,19 @@ export default function ServiceListingShow() {
                                 </div>
                             )}
                             {listing.monthly_rate && (
-                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-800 rounded-xl p-6 mb-8">
-                                    <p className="text-sm font-bold text-green-600 dark:text-green-400 uppercase tracking-wide mb-2">Monthly Rate</p>
-                                    <p className="text-4xl font-bold text-green-700 dark:text-green-300">PKR {listing.monthly_rate}/month</p>
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+                                    <p className="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">Monthly Rate</p>
+                                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">PKR {listing.monthly_rate}/month</p>
                                 </div>
                             )}
                             {listing.description && (
-                                <div className="mb-8">
-                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                <div className="mb-6">
+                                    <h3 className="text-base font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                                         <span>📝</span>
                                         Description
                                     </h3>
-                                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
-                                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">{listing.description}</p>
+                                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                                        <p className="text-gray-700 dark:text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">{listing.description}</p>
                                     </div>
                                 </div>
                             )}

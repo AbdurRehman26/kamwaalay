@@ -32,6 +32,8 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
     const [locationFilterSuggestions, setLocationFilterSuggestions] = useState([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [cityId, setCityId] = useState("");
+    const [cities, setCities] = useState([]);
 
     const [formData, setFormData] = useState({
         service_type: "",
@@ -68,12 +70,45 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         return cleaned;
     };
 
+    // Get city initial for display
+    const getCityInitial = (helper) => {
+        let cityName = "";
+
+        // Get city from service_listings location_details
+        if (helper.service_listings && helper.service_listings.length > 0) {
+            const firstListing = helper.service_listings[0];
+            if (firstListing.location_details && firstListing.location_details.length > 0) {
+                cityName = firstListing.location_details[0].city_name;
+            }
+        }
+
+        if (!cityName) return null;
+
+        const lowerCity = cityName.toLowerCase();
+        if (lowerCity === "karachi") return "Khi";
+        if (lowerCity === "islamabad") return "Isb";
+        if (lowerCity === "lahore") return "Lahore";
+
+        return cityName.substring(0, 3); // First 3 chars as fallback
+    };
+
     // Fetch service types from API
     const { serviceTypes: fetchedServiceTypes } = useServiceTypes();
     const serviceTypes = [
         { value: "", label: "All Services" },
         ...fetchedServiceTypes,
     ];
+
+    // Fetch cities on mount
+    useEffect(() => {
+        axios.get("/api/cities")
+            .then((response) => {
+                setCities(response.data.cities || response.data || []);
+            })
+            .catch((error) => {
+                console.error("Error fetching cities:", error);
+            });
+    }, []);
 
     // Fetch location suggestions for booking form
     useEffect(() => {
@@ -223,6 +258,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         const params = {
             service_type: serviceType || undefined,
             location_id: locationId || undefined,
+            city_id: cityId || undefined,
             latitude: latitude || undefined,
             longitude: longitude || undefined,
             sort_by: sortBy,
@@ -267,7 +303,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 console.error("Error fetching helpers:", error);
                 setLoading(false);
             });
-    }, [serviceType, locationId, latitude, longitude, sortBy, userType, currentPage]);
+    }, [serviceType, locationId, cityId, latitude, longitude, sortBy, userType, currentPage]);
 
     const handleFilter = () => {
         // Reset to first page when filters change
@@ -378,7 +414,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         </div>
                         <div className="ml-3">
                             <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                                <strong>Note:</strong> We are currently serving Karachi only. We will be going live in different cities soon!
+                                <strong>Note:</strong> We are currently serving Karachi, Lahore, and Islamabad. More cities coming soon!
                             </p>
                         </div>
                     </div>
@@ -415,6 +451,21 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 {serviceTypes.map((type) => (
                                     <option key={type.value} value={type.value}>
                                         {type.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">City</label>
+                            <select
+                                value={cityId}
+                                onChange={(e) => setCityId(e.target.value)}
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                            >
+                                <option value="">All Cities</option>
+                                {cities.map((city) => (
+                                    <option key={city.id} value={city.id}>
+                                        {city.name}
                                     </option>
                                 ))}
                             </select>
@@ -756,7 +807,15 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="p-8">
+                                        <div className="p-8 relative">
+                                            {/* City Badge - Top Right of Details */}
+                                            {getCityInitial(helper) && (
+                                                <div className="absolute top-4 right-4">
+                                                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 text-xs font-bold rounded-lg uppercase tracking-wider shadow-sm border border-gray-200 dark:border-gray-600">
+                                                        {getCityInitial(helper)}
+                                                    </span>
+                                                </div>
+                                            )}
                                             <div className="mb-4">
                                                 <span className="inline-block px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-semibold uppercase tracking-wide">
                                                     {primaryServiceType}

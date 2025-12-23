@@ -96,6 +96,13 @@ test('guests can view service listings index', function () {
 });
 
 test('users and businesses can create service requests', function () {
+    // Create country and city first
+    $country = \App\Models\Country::firstOrCreate(['name' => 'Pakistan', 'code' => 'PK']);
+    $city = \App\Models\City::firstOrCreate(
+        ['name' => 'Karachi'], 
+        ['is_active' => true, 'country_id' => $country->id]
+    );
+
     $user = User::factory()->create();
     $user->assignRole('user');
     
@@ -110,6 +117,7 @@ test('users and businesses can create service requests', function () {
         'phone' => '03001234567',
         'service_type' => 'maid',
         'work_type' => 'full_time',
+        'city_id' => $city->id,
         'area' => 'Saddar',
         'address' => '123 Main Street',
         'description' => 'Need a maid',

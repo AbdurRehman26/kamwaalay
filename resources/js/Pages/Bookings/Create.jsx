@@ -17,7 +17,7 @@ export default function BookingCreate() {
         service_type: "",
         work_type: "",
         estimated_salary: "",
-        city: "Karachi",
+        city_id: "",
         area: "",
         start_date: "",
         start_time: "",
@@ -29,6 +29,7 @@ export default function BookingCreate() {
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
+    const [cities, setCities] = useState([]);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
@@ -70,22 +71,35 @@ export default function BookingCreate() {
             });
     }, [user]);
 
+    // Fetch active cities
+    useEffect(() => {
+        axios.get("/api/cities")
+            .then((response) => {
+                setCities(response.data || []);
+            })
+            .catch((error) => {
+                console.error("Error fetching cities:", error);
+            });
+    }, []);
+
     // Fetch service types from API
     const { serviceTypes } = useServiceTypes();
 
-    // Fetch location suggestions for area
+    // Fetch location suggestions for area based on selected city
     useEffect(() => {
-        if (searchQuery.length >= 2) {
+        if (searchQuery.length >= 2 && data.city_id) {
             if (searchTimeoutRef.current) {
                 clearTimeout(searchTimeoutRef.current);
             }
             searchTimeoutRef.current = setTimeout(() => {
                 axios
-                    .get("/api/karachi-locations/search", {
-                        params: { q: searchQuery },
+                    .get("/api/locations/search", {
+                        params: { q: searchQuery, city_id: data.city_id },
                     })
                     .then((response) => {
-                        setSuggestions(response.data);
+                        // Extract area names from response
+                        const areas = response.data.map(loc => loc.area || loc.display_text);
+                        setSuggestions(areas);
                         setShowSuggestions(true);
                     })
                     .catch((error) => {
@@ -102,7 +116,7 @@ export default function BookingCreate() {
                 clearTimeout(searchTimeoutRef.current);
             }
         };
-    }, [searchQuery]);
+    }, [searchQuery, data.city_id]);
 
     // Handle outside click
     useEffect(() => {
@@ -130,10 +144,8 @@ export default function BookingCreate() {
         setProcessing(true);
         setErrors({});
 
-        // Always set city to Karachi
         const submitData = {
             ...data,
-            city: "Karachi",
         };
 
         try {
@@ -185,7 +197,7 @@ export default function BookingCreate() {
                                 </div>
                                 <div className="ml-3">
                                     <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                                        <strong>Note:</strong> We are currently serving <strong>Karachi</strong> only. We will be going live in different cities soon!
+                                        <strong>Note:</strong> We are currently serving <strong>Karachi, Lahore, and Islamabad</strong>. More cities coming soon!
                                     </p>
                                 </div>
                             </div>
@@ -236,6 +248,27 @@ export default function BookingCreate() {
                                         min="0"
                                     />
                                     {errors.estimated_salary && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.estimated_salary}</div>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">City *</label>
+                                    <select
+                                        value={data.city_id}
+                                        onChange={(e) => {
+                                            setData(prev => ({ ...prev, city_id: e.target.value, area: "" }));
+                                            setSearchQuery("");
+                                        }}
+                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                        required
+                                    >
+                                        <option value="">Select City</option>
+                                        {cities.map((city) => (
+                                            <option key={city.id} value={city.id}>
+                                                {city.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.city_id && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.city_id}</div>}
                                 </div>
 
                                 <div className="relative" ref={suggestionsRef}>

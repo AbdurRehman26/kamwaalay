@@ -129,7 +129,7 @@ export default function JobApplicationsIndex() {
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
                     <p className="text-sm text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
                         <span className="text-lg">📍</span>
-                        <strong>Note:</strong> We are currently serving Karachi only.
+                        <strong>Note:</strong> We are currently serving Karachi, Lahore, and Islamabad. More cities coming soon!
                     </p>
                 </div>
             </div>

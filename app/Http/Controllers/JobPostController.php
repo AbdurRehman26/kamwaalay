@@ -116,6 +116,7 @@ class JobPostController extends Controller
         $validated = $request->validate([
             'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
             'work_type' => 'required|in:full_time,part_time',
+            'city_id' => 'required|exists:cities,id',
             'area' => 'required|string|max:255',
             'start_date' => 'nullable|date',
             'start_time' => 'nullable|date_format:H:i',
@@ -127,8 +128,9 @@ class JobPostController extends Controller
             'assigned_user_id' => 'nullable|exists:users,id',
         ]);
 
-        // Always set city to Karachi
-        $validated['city'] = 'Karachi';
+        // Get city name from city model
+        $city = \App\Models\City::find($validated['city_id']);
+        $validated['city'] = $city ? $city->name : 'Karachi';
         $validated['user_id'] = Auth::id();
 
         $jobPost = JobPost::create($validated);

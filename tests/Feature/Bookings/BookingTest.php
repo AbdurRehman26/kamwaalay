@@ -2,6 +2,8 @@
 
 use App\Models\User;
 use App\Models\JobPost;
+use App\Models\City;
+use App\Models\Country;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -14,6 +16,12 @@ beforeEach(function () {
     if (!Role::where('name', 'business')->exists()) {
         Role::create(['name' => 'business']);
     }
+    // Create a country and city for tests
+    $country = Country::firstOrCreate(['name' => 'Pakistan', 'code' => 'PK']);
+    City::firstOrCreate(
+        ['name' => 'Karachi'], 
+        ['is_active' => true, 'country_id' => $country->id]
+    );
 });
 
 test('guests can view service requests', function () {
@@ -50,6 +58,7 @@ test('users can create service requests', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
     
+    $city = City::where('name', 'Karachi')->first();
     $token = $user->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
@@ -61,6 +70,7 @@ test('users can create service requests', function () {
         'phone' => '03001234567',
         'service_type' => 'maid',
         'work_type' => 'full_time',
+        'city_id' => $city->id,
         'area' => 'Saddar',
         'address' => '123 Main Street',
         'special_requirements' => 'Need a maid for house cleaning',
@@ -109,6 +119,7 @@ test('service requests are created with Karachi as default city', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
     
+    $city = City::where('name', 'Karachi')->first();
     $token = $user->createToken('test-token')->plainTextToken;
 
     $response = $this->withHeaders([
@@ -120,6 +131,7 @@ test('service requests are created with Karachi as default city', function () {
         'phone' => '03001234567',
         'service_type' => 'maid',
         'work_type' => 'full_time',
+        'city_id' => $city->id,
         'area' => 'Saddar',
         'address' => '123 Main Street',
         'special_requirements' => 'Need a maid',
