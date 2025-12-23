@@ -96,6 +96,12 @@ export default function ServiceListingsIndex() {
 
     // Fetch location suggestions for filter
     useEffect(() => {
+        // Skip if the query is "Near Me" - that's handled by geolocation
+        if (locationFilterQuery === "Near Me") {
+            setLocationFilterSuggestions([]);
+            setShowLocationSuggestions(false);
+            return;
+        }
         if (locationFilterQuery.length >= 2) {
             if (searchTimeoutRef.current) {
                 clearTimeout(searchTimeoutRef.current);
