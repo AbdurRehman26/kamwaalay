@@ -90,6 +90,7 @@ class UserResource extends JsonResource
                 'value' => $this->profile->religion instanceof \App\Enums\Religion ? $this->profile->religion->value : $this->profile->religion,
                 'label' => $this->profile->religion instanceof \App\Enums\Religion ? $this->profile->religion->label() : str_replace('_', ' ', $this->profile->religion),
             ] : null),
+            'city_id' => $this->when($this->profile, $this->profile?->city_id),
             'city' => $this->when($this->profile, $this->city),
             'area' => $this->when($this->profile, $this->area),
             'availability' => $this->when($this->profile, $this->availability),

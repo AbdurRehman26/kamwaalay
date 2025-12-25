@@ -20,7 +20,6 @@ export default function ServiceListingCreate() {
         work_type: "",
         monthly_rate: "",
         description: "",
-        city_id: "" || 1, // Default to Karachi (ID 1)
         pin_address: "",
         pin_latitude: "",
         pin_longitude: "",
@@ -38,50 +37,6 @@ export default function ServiceListingCreate() {
         if (!selectedServiceTypes.includes(serviceType)) {
             setSelectedServiceTypes([...selectedServiceTypes, serviceType]);
         }
-    };
-
-    // Initialize Google Places Autocomplete
-    const [cities, setCities] = useState([]);
-    const [filteredCities, setFilteredCities] = useState([]);
-    const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
-    const [citySearch, setCitySearch] = useState("");
-
-    // Fetch cities
-    useEffect(() => {
-        api.get("/cities")
-            .then(response => {
-                setCities(response.data);
-                setFilteredCities(response.data);
-
-                // If we have a default city_id (like 1 for Karachi), find its name
-                if (commonFields.city_id) {
-                    const defaultCity = response.data.find(c => c.id == commonFields.city_id);
-                    if (defaultCity) {
-                        setCitySearch(defaultCity.name);
-                    }
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching cities:", error);
-            });
-    }, []);
-
-    // Filter cities when search changes
-    useEffect(() => {
-        if (citySearch) {
-            const filtered = cities.filter(city =>
-                city.name.toLowerCase().includes(citySearch.toLowerCase())
-            );
-            setFilteredCities(filtered);
-        } else {
-            setFilteredCities(cities);
-        }
-    }, [citySearch, cities]);
-
-    const handleCitySelect = (city) => {
-        setCommonFields(prev => ({ ...prev, city_id: city.id }));
-        setCitySearch(city.name);
-        setIsCityDropdownOpen(false);
     };
 
     // Initialize Google Places Autocomplete
@@ -245,12 +200,6 @@ export default function ServiceListingCreate() {
             return;
         }
 
-        if (!commonFields.city_id) {
-            setErrors({ city_id: "Please select a city." });
-            setProcessing(false);
-            return;
-        }
-
         const apiData = {
             service_types: selectedServiceTypes, // Send as array
             ...commonFields,
@@ -363,38 +312,6 @@ export default function ServiceListingCreate() {
                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">These details will apply to all your service listings.</p>
 
                             <div className="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                                        City *
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            value={citySearch}
-                                            onChange={(e) => {
-                                                setCitySearch(e.target.value);
-                                                setIsCityDropdownOpen(true);
-                                            }}
-                                            onFocus={() => setIsCityDropdownOpen(true)}
-                                            placeholder="Search city..."
-                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all px-4 py-3"
-                                        />
-                                        {isCityDropdownOpen && filteredCities.length > 0 && (
-                                            <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-xl max-h-60 rounded-xl py-2 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                                {filteredCities.map((city) => (
-                                                    <div
-                                                        key={city.id}
-                                                        className="cursor-pointer select-none relative py-3 pl-4 pr-9 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-gray-900 dark:text-gray-300 transition-colors"
-                                                        onClick={() => handleCitySelect(city)}
-                                                    >
-                                                        {city.name}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <InputError message={errors.city_id} className="mt-2" />
-                                </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Work Type *</label>
                                     <select

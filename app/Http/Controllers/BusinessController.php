@@ -336,20 +336,7 @@ class BusinessController extends Controller
 
         // Create user account for the worker
         // Generate a unique email if not provided (using phone or timestamp)
-        $email = $request->input('email');
-        if (!$email) {
-            // Generate a unique email based on phone or timestamp
-            $phone = $validated['phone'] ?? '';
-            $baseEmail = $phone ? str_replace([' ', '-', '(', ')'], '', $phone) : 'worker_' . time();
-            $email = $baseEmail . '@worker.kamwaalay.local';
-
-            // Ensure uniqueness
-            $counter = 1;
-            while (User::where('email', $email)->exists()) {
-                $email = $baseEmail . '_' . $counter . '@worker.kamwaalay.local';
-                $counter++;
-            }
-        }
+        // Email generation logic removed as email column is dropped
 
         // Generate a random password if not provided
         $password = $request->input('password');
@@ -359,7 +346,7 @@ class BusinessController extends Controller
 
         $userData = [
             'name' => $validated['name'],
-            'email' => $email,
+
             'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($password),
             'is_active' => true,

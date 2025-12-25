@@ -11,6 +11,7 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'city_id' => ['nullable', 'integer', 'exists:cities,id'],
             'age' => ['nullable', 'integer', 'min:18', 'max:100'],
             'gender' => ['nullable', 'in:male,female,other'],
             'religion' => ['nullable', 'in:' . Religion::validationString()],

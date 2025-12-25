@@ -23,7 +23,6 @@ class ServiceListingFactory extends Factory
             'work_type' => fake()->randomElement(['full_time', 'part_time']),
             'monthly_rate' => fake()->numberBetween(10000, 30000),
             'description' => fake()->sentence(),
-            'city_id' => '1',
             'pin_address' => fake()->address(),
             'is_active' => true,
             'status' => 'active',

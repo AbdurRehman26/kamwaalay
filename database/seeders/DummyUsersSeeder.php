@@ -26,35 +26,29 @@ class DummyUsersSeeder extends Seeder
             $users = [
                 [
                     'name' => 'Ali Ahmed',
-                    'email' => 'user1@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'user',
                     'phone' => '03001234567',
                     'address' => 'House 123, Street 4, Karachi',
                     'profile' => [
-                        'city' => 'Karachi',
                     ]
                 ],
                 [
                     'name' => 'Fatima Khan',
-                    'email' => 'user2@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'user',
                     'phone' => '03001234568',
                     'address' => 'Apartment 45, Block 2, Karachi',
                     'profile' => [
-                        'city' => 'Karachi',
                     ]
                 ],
                 [
                     'name' => 'Hassan Raza',
-                    'email' => 'user3@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'user',
                     'phone' => '03001234569',
                     'address' => 'Villa 789, Phase 5, Karachi',
                     'profile' => [
-                        'city' => 'Karachi',
                     ]
                 ],
             ];
@@ -68,7 +62,7 @@ class DummyUsersSeeder extends Seeder
                 unset($userData['role']);
 
                 $user = User::firstOrCreate(
-                    ['email' => $userData['email']],
+                    ['phone' => $userData['phone']],
                     $userData
                 );
                 if (!$user->hasRole('user')) {
@@ -81,7 +75,7 @@ class DummyUsersSeeder extends Seeder
                     $profileData
                 );
 
-                $this->command->info("Created user: {$user->email}");
+                $this->command->info("Created user: {$user->phone}");
             }
         }
 
@@ -91,14 +85,12 @@ class DummyUsersSeeder extends Seeder
             $helpers = [
                 [
                     'name' => 'Ayesha Bibi',
-                    'email' => 'helper1@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'helper',
                     'phone' => '03001234570',
                     'address' => 'Quarter 12, Workers Colony, Karachi',
                     'is_active' => true,
                     'profile' => [
-                        'city' => 'Karachi',
                         'age' => 32,
                         'gender' => 'female',
                         'religion' => 'sunni_nazar_niyaz',
@@ -113,20 +105,18 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [1, 2], // English, Urdu
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'maid', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 15000, 'description' => 'Professional maid service'],
-                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 13500, 'description' => 'Deep cleaning services'],
+                        ['service_type' => 'maid', 'work_type' => 'full_time', 'monthly_rate' => 15000, 'description' => 'Professional maid service'],
+                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'monthly_rate' => 13500, 'description' => 'Deep cleaning services'],
                     ],
                 ],
                 [
                     'name' => 'Rashid Ali',
-                    'email' => 'helper2@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'helper',
                     'phone' => '03001234571',
                     'address' => 'Street 5, Block A, Karachi',
                     'is_active' => true,
                     'profile' => [
-                        'city' => 'Karachi',
                         'age' => 45,
                         'gender' => 'male',
                         'religion' => 'sunni_no_nazar_niyaz',
@@ -142,20 +132,18 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [1, 2, 3], // English, Urdu, Punjabi
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'cook', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 21000, 'description' => 'Pakistani and continental cuisine'],
-                        ['service_type' => 'cook', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 24000, 'description' => 'Full-time cooking services'],
+                        ['service_type' => 'cook', 'work_type' => 'part_time', 'monthly_rate' => 21000, 'description' => 'Pakistani and continental cuisine'],
+                        ['service_type' => 'cook', 'work_type' => 'full_time', 'monthly_rate' => 24000, 'description' => 'Full-time cooking services'],
                     ],
                 ],
                 [
                     'name' => 'Saima Akhtar',
-                    'email' => 'helper3@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'helper',
                     'phone' => '03001234572',
                     'address' => 'Flat 302, Building B, Karachi',
                     'is_active' => true,
                     'profile' => [
-                        'city' => 'Karachi',
                         'age' => 28,
                         'gender' => 'female',
                         'religion' => 'sunni_nazar_niyaz',
@@ -171,20 +159,18 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [1, 2], // English, Urdu
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'babysitter', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 18000, 'description' => 'Full-time babysitting'],
-                        ['service_type' => 'caregiver', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 19500, 'description' => 'Elderly care assistance'],
+                        ['service_type' => 'babysitter', 'work_type' => 'full_time', 'monthly_rate' => 18000, 'description' => 'Full-time babysitting'],
+                        ['service_type' => 'caregiver', 'work_type' => 'part_time', 'monthly_rate' => 19500, 'description' => 'Elderly care assistance'],
                     ],
                 ],
                 [
                     'name' => 'Noor Jehan',
-                    'email' => 'helper4@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'helper',
                     'phone' => '03001234573',
                     'address' => 'House 56, Sector 11, Karachi',
                     'is_active' => true,
                     'profile' => [
-                        'city' => 'Karachi',
                         'age' => 52,
                         'gender' => 'female',
                         'religion' => 'shia',
@@ -200,20 +186,18 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [1, 2, 4], // English, Urdu, Sindhi
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
-                        ['service_type' => 'caregiver', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 25500, 'description' => 'Part-time elderly assistance'],
+                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
+                        ['service_type' => 'caregiver', 'work_type' => 'part_time', 'monthly_rate' => 25500, 'description' => 'Part-time elderly assistance'],
                     ],
                 ],
                 [
                     'name' => 'Zahid Hussain',
-                    'email' => 'helper5@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'helper',
                     'phone' => '03001234574',
                     'address' => 'Shop 23, Main Road, Karachi',
                     'is_active' => true,
                     'profile' => [
-                        'city' => 'Karachi',
                         'age' => 38,
                         'gender' => 'male',
                         'religion' => 'sunni_no_nazar_niyaz',
@@ -229,20 +213,18 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [2, 4], // Urdu, Sindhi
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 13500, 'description' => 'Deep cleaning services'],
-                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 15000, 'description' => 'Office and home cleaning'],
+                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'monthly_rate' => 13500, 'description' => 'Deep cleaning services'],
+                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'monthly_rate' => 15000, 'description' => 'Office and home cleaning'],
                     ],
                 ],
                 [
                     'name' => 'Mehreen Butt',
-                    'email' => 'helper6@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'helper',
                     'phone' => '03001234575',
                     'address' => 'Flat 201, Tower C, Karachi',
                     'is_active' => true,
                     'profile' => [
-                        'city' => 'Karachi',
                         'age' => 35,
                         'gender' => 'female',
                         'religion' => 'christian',
@@ -258,9 +240,9 @@ class DummyUsersSeeder extends Seeder
                     'languages' => [1, 2, 3], // English, Urdu, Punjabi
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 19500, 'description' => 'Complete household management'],
-                        ['service_type' => 'maid', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 18000, 'description' => 'Part-time maid services'],
-                        ['service_type' => 'babysitter', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 16500, 'description' => 'Babysitting when needed'],
+                        ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'monthly_rate' => 19500, 'description' => 'Complete household management'],
+                        ['service_type' => 'maid', 'work_type' => 'part_time', 'monthly_rate' => 18000, 'description' => 'Part-time maid services'],
+                        ['service_type' => 'babysitter', 'work_type' => 'part_time', 'monthly_rate' => 16500, 'description' => 'Babysitting when needed'],
                     ],
                 ],
             ];
@@ -282,7 +264,7 @@ class DummyUsersSeeder extends Seeder
                 unset($helperData['role']);
 
                 $helper = User::firstOrCreate(
-                    ['email' => $helperData['email']],
+                    ['phone' => $helperData['phone']],
                     $helperData
                 );
                 if (!$helper->hasRole('helper')) {
@@ -318,7 +300,6 @@ class DummyUsersSeeder extends Seeder
                                     'work_type' => $serviceData['work_type'] ?? 'full_time',
                                     'monthly_rate' => $serviceData['monthly_rate'] ?? null,
                                     'description' => $serviceData['description'] ?? null,
-                                    'city_id' => $karachi ? $karachi->id : 1,
                                     'is_active' => true,
                                     'status' => 'active',
                                 ],
@@ -354,7 +335,7 @@ class DummyUsersSeeder extends Seeder
                 }
 
                 $listingCount = isset($groupedServices) ? count($groupedServices) : 0;
-                $this->command->info("Created helper: {$helper->email} with " . $listingCount . " service listing(s)");
+                $this->command->info("Created helper: {$helper->phone} with " . $listingCount . " service listing(s)");
             }
         }
 
@@ -364,43 +345,39 @@ class DummyUsersSeeder extends Seeder
             $businesses = [
                 [
                     'name' => 'HomeHelp Agency',
-                    'email' => 'business1@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'business',
                     'phone' => '03001234576',
                     'address' => 'Office 101, Business Center, Karachi',
                     'is_active' => true,
                     'profile' => [
-                        'city' => 'Karachi',
                         'bio' => 'Leading agency providing verified domestic help services.',
                         'is_active' => true,
                     ],
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'maid', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 15000, 'description' => 'Professional maid services'],
-                        ['service_type' => 'cook', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 21000, 'description' => 'Experienced cooking services'],
-                        ['service_type' => 'babysitter', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 18000, 'description' => 'Reliable babysitting'],
-                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
+                        ['service_type' => 'maid', 'work_type' => 'full_time', 'monthly_rate' => 15000, 'description' => 'Professional maid services'],
+                        ['service_type' => 'cook', 'work_type' => 'full_time', 'monthly_rate' => 21000, 'description' => 'Experienced cooking services'],
+                        ['service_type' => 'babysitter', 'work_type' => 'part_time', 'monthly_rate' => 18000, 'description' => 'Reliable babysitting'],
+                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
                     ],
                 ],
                 [
                     'name' => 'Care Services Pvt Ltd',
-                    'email' => 'business2@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'business',
                     'phone' => '03001234577',
                     'address' => 'Suite 205, Corporate Tower, Karachi',
                     'is_active' => true,
                     'profile' => [
-                        'city' => 'Karachi',
                         'bio' => 'Reliable and professional care services for homes and businesses.',
                         'is_active' => true,
                     ],
                     // Multiple service listings
                     'services' => [
-                        ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 21000, 'description' => 'Complete household management'],
-                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'city' => 'Karachi', 'monthly_rate' => 15000, 'description' => 'Professional cleaning'],
-                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'city' => 'Karachi', 'monthly_rate' => 25500, 'description' => 'Medical assistance and care'],
+                        ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'monthly_rate' => 21000, 'description' => 'Complete household management'],
+                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'monthly_rate' => 15000, 'description' => 'Professional cleaning'],
+                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'monthly_rate' => 25500, 'description' => 'Medical assistance and care'],
                     ],
                 ],
             ];
@@ -418,7 +395,7 @@ class DummyUsersSeeder extends Seeder
                 unset($businessData['role']);
 
                 $business = User::firstOrCreate(
-                    ['email' => $businessData['email']],
+                    ['phone' => $businessData['phone']],
                     $businessData
                 );
                 if (!$business->hasRole('business')) {
@@ -449,7 +426,6 @@ class DummyUsersSeeder extends Seeder
                                     'work_type' => $serviceData['work_type'] ?? 'full_time',
                                     'monthly_rate' => $serviceData['monthly_rate'] ?? null,
                                     'description' => $serviceData['description'] ?? null,
-                                    'city_id' => $karachi ? $karachi->id : 1,
                                     'is_active' => true,
                                     'status' => 'active',
                                 ],
@@ -484,9 +460,9 @@ class DummyUsersSeeder extends Seeder
                     }
 
                     $listingCount = count($groupedServices);
-                    $this->command->info("Created business: {$business->email} with " . $listingCount . " service listing(s)");
+                    $this->command->info("Created business: {$business->phone} with " . $listingCount . " service listing(s)");
                 } else {
-                    $this->command->info("Created business: {$business->email}");
+                    $this->command->info("Created business: {$business->phone}");
                 }
             }
         }
@@ -497,13 +473,11 @@ class DummyUsersSeeder extends Seeder
             $admins = [
                 [
                     'name' => 'Admin Manager',
-                    'email' => 'admin@kamwaalay.com',
                     'password' => Hash::make('password'),
                     'role' => 'admin',
                     'phone' => '03001234578',
                     'address' => 'Admin Office, Main Building, Karachi',
                     'profile' => [
-                        'city' => 'Karachi',
                     ]
                 ],
             ];
@@ -517,7 +491,7 @@ class DummyUsersSeeder extends Seeder
                 unset($adminData['role']);
 
                 $admin = User::firstOrCreate(
-                    ['email' => $adminData['email']],
+                    ['phone' => $adminData['phone']],
                     $adminData
                 );
                 if (!$admin->hasRole('admin')) {
@@ -530,7 +504,7 @@ class DummyUsersSeeder extends Seeder
                     $profileData
                 );
 
-                $this->command->info("Created admin: {$admin->email}");
+                $this->command->info("Created admin: {$admin->phone}");
             }
         }
 

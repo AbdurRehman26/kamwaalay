@@ -25,9 +25,7 @@ class ProfileTest extends TestCase
 
     public function test_profile_information_can_be_updated(): void
     {
-        $user = User::factory()->create([
-            'email' => 'original@example.com',
-        ]);
+        $user = User::factory()->create();
         $token = $user->createToken('test-token')->plainTextToken;
 
         $response = $this->withHeaders([
@@ -42,8 +40,7 @@ class ProfileTest extends TestCase
         $user->refresh();
 
         $this->assertSame('Test User', $user->name);
-        // Email should remain unchanged as it's no longer part of profile updates
-        $this->assertSame('original@example.com', $user->email);
+        $this->assertSame('Test User', $user->name);
     }
 
     public function test_email_verification_status_is_unchanged_when_profile_is_updated(): void

@@ -38,7 +38,7 @@ test('users can register with phone number', function () {
     ]);
 });
 
-test('users cannot register without email or phone', function () {
+test('users cannot register without phone', function () {
     $response = $this->postJson('/api/register', [
         'name' => 'Test User',
         'password' => 'password',
@@ -47,28 +47,28 @@ test('users cannot register without email or phone', function () {
     ]);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['email', 'phone']);
+        ->assertJsonValidationErrors(['phone']);
 });
 
-test('users cannot register with duplicate email', function () {
-    User::factory()->create(['email' => 'test@example.com']);
+test('users cannot register with duplicate phone', function () {
+    User::factory()->create(['phone' => '03001234567']);
 
     $response = $this->postJson('/api/register', [
         'name' => 'Test User',
-        'email' => 'test@example.com',
+        'phone' => '03001234567',
         'password' => 'password',
         'password_confirmation' => 'password',
         'role' => 'user',
     ]);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['email']);
+        ->assertJsonValidationErrors(['phone']);
 });
 
 test('password must be confirmed', function () {
     $response = $this->postJson('/api/register', [
         'name' => 'Test User',
-        'email' => 'test@example.com',
+        'phone' => '03001234567',
         'password' => 'password',
         'password_confirmation' => 'different-password',
         'role' => 'user',
@@ -81,13 +81,13 @@ test('password must be confirmed', function () {
 test('registered user is assigned the correct role', function () {
     $response = $this->postJson('/api/register', [
         'name' => 'Test Helper',
-        'email' => 'helper@example.com',
+        'phone' => '03007654321',
         'password' => 'password',
         'password_confirmation' => 'password',
         'role' => 'helper',
     ]);
 
     $response->assertStatus(200);
-    $user = User::where('email', 'helper@example.com')->first();
+    $user = User::where('phone', '+923007654321')->first();
     expect($user->hasRole('helper'))->toBeTrue();
 });

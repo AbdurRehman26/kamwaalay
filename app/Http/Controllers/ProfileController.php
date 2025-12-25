@@ -175,8 +175,11 @@ class ProfileController extends Controller
 
         $user->save();
 
-        // Update or create profile with age, gender, religion
+        // Update or create profile with city_id, age, gender, religion
         $profileData = [];
+        if (isset($validated['city_id'])) {
+            $profileData['city_id'] = $validated['city_id'];
+        }
         if (isset($validated['age'])) {
             $profileData['age'] = $validated['age'];
         }

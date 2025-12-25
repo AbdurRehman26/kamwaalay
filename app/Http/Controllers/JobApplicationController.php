@@ -17,14 +17,17 @@ class JobApplicationController extends Controller
     #[OA\Get(
         path: "/api/job-posts",
         summary: "Browse available service requests",
-        description: "Browse available service requests for helpers/businesses to apply. Requires completed onboarding.",
+        description: "Browse available service requests for helpers/businesses to apply. When latitude/longitude are provided, results are sorted by distance (nearest first).",
         tags: ["Job Applications"],
         security: [["sanctum" => []]],
         parameters: [
             new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
             new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer")),
+            new OA\Parameter(name: "city_id", in: "query", required: false, schema: new OA\Schema(type: "integer")),
             new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string")),
             new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "latitude", in: "query", required: false, schema: new OA\Schema(type: "number", format: "float"), description: "User's latitude for proximity search"),
+            new OA\Parameter(name: "longitude", in: "query", required: false, schema: new OA\Schema(type: "number", format: "float"), description: "User's longitude for proximity search"),
         ],
         responses: [
             new OA\Response(
@@ -58,19 +61,50 @@ class JobApplicationController extends Controller
             $query->where('service_type', $request->service_type);
         }
 
-        // Filter by city name
+        // Filter by city ID
         $locationDisplay = '';
-        if ($request->has('city_name') && $request->city_name) {
+        if ($request->has('city_id') && $request->city_id) {
+            $query->where('city_id', $request->city_id);
+            // Get city name for display
+            $city = \App\Models\City::find($request->city_id);
+            if ($city) {
+                $locationDisplay = $city->name;
+            }
+        }
+        // Filter by city name (fallback)
+        elseif ($request->has('city_name') && $request->city_name) {
             $query->whereHas('cityRelation', function ($q) use ($request) {
                 $q->where('name', $request->city_name);
             });
             $locationDisplay = $request->city_name;
         }
 
+        // Location-based filtering using latitude and longitude
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+        
+        if ($latitude && $longitude) {
+            $lat = (float) $latitude;
+            $lng = (float) $longitude;
+            
+            // Haversine formula for distance calculation in kilometers
+            // 6371 is Earth's radius in km
+            $haversine = "(6371 * acos(cos(radians($lat)) * cos(radians(latitude)) * cos(radians(longitude) - radians($lng)) + sin(radians($lat)) * sin(radians(latitude))))";
+            
+            // Only include job posts that have coordinates, sort by distance
+            $query->whereNotNull('latitude')
+                  ->whereNotNull('longitude')
+                  ->selectRaw("job_posts.*, $haversine AS distance") // Select job_posts.* to avoid losing other columns
+                  ->orderBy('distance', 'asc');
+        } else {
+            // Default ordering by created_at
+            $query->orderBy('created_at', 'desc');
+        }
+
         // Show all job posts, even if user has already applied
         // This allows users to view their applications and see all available opportunities
 
-        $jobPosts = $query->orderBy('created_at', 'desc')->paginate(12);
+        $jobPosts = $query->paginate(12);
 
         // Get user's applications for the job posts to check if they've applied and get application IDs
         // Only check if user is authenticated
@@ -90,9 +124,15 @@ class JobApplicationController extends Controller
             return $jobPost;
         });
 
-        $filters = $request->only(['service_type', 'location_id', 'city_name', 'area']);
+        $filters = $request->only(['service_type', 'location_id', 'city_id', 'city_name', 'area']);
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
+        }
+        if ($latitude) {
+            $filters['latitude'] = $latitude;
+        }
+        if ($longitude) {
+            $filters['longitude'] = $longitude;
         }
 
         return response()->json([

@@ -34,8 +34,7 @@ class Profile extends Model
         'age',
         'gender',
         'religion',
-        'city',
-        'area',
+        'city_id',
         'availability',
         'bio',
         'verification_status',
@@ -90,7 +89,7 @@ class Profile extends Model
         if (!$this->service_type) {
             return '';
         }
-        
+
         return match($this->service_type) {
             'maid' => 'Maid',
             'cook' => 'Cook',

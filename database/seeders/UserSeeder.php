@@ -16,10 +16,9 @@ class UserSeeder extends Seeder
     {
         // Create the super admin user with all roles
         $superAdmin = User::firstOrCreate(
-            ['email' => 'sydabdrehman@gmail.com'],
             [
                 'name' => 'Super Admin',
-                'email' => 'sydabdrehman@gmail.com',
+                'phone' => '+923202095051',
                 'password' => Hash::make('sydabdrehman@gmail.com'),
             ]
         );
@@ -28,7 +27,7 @@ class UserSeeder extends Seeder
         $roles = Role::all();
         $superAdmin->syncRoles($roles);
 
-        $this->command->info("Super Admin user created/updated: sydabdrehman@gmail.com");
+        $this->command->info("Super Admin user created/updated: +923202095051");
         $this->command->info("Assigned roles: " . $roles->pluck('name')->implode(', '));
     }
 }

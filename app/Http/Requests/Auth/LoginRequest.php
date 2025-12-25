@@ -29,7 +29,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => ['required_without:email', 'nullable', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'max:20'],
             'password' => ['nullable', 'string'], // Password is optional - if not provided, OTP flow will be used
         ];
     }
@@ -46,26 +46,21 @@ class LoginRequest extends FormRequest
         $credentials = ['password' => $this->input('password')];
 
         // Add email or phone to credentials
-        if ($this->filled('email')) {
-            $credentials['email'] = $this->input('email');
-        } elseif ($this->filled('phone')) {
-            // For phone login, we need to find user by phone and use their email for Auth::attempt
-            $phone = $this->formatPhoneNumber($this->input('phone'));
-            // Try both formatted and original format for backward compatibility
-            $user = User::where('phone', $phone)
-                ->orWhere('phone', preg_replace('/[^0-9+]/', '', $this->input('phone')))
-                ->first();
-            if ($user) {
-                $credentials['email'] = $user->email; // Auth::attempt requires email field
-            }
+        // For phone login, we need to find user by phone and use their email for Auth::attempt
+        $phone = $this->formatPhoneNumber($this->input('phone'));
+        // Try both formatted and original format for backward compatibility
+        $user = User::where('phone', $phone)
+            ->orWhere('phone', preg_replace('/[^0-9+]/', '', $this->input('phone')))
+            ->first();
+        if ($user) {
+            $credentials['email'] = $user->email; // Auth::attempt requires email field
         }
 
         if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
-            $field = $this->filled('email') ? 'email' : 'phone';
             throw ValidationException::withMessages([
-                $field => trans('auth.failed'),
+                'phone' => trans('auth.failed'),
             ]);
         }
 
@@ -82,24 +77,17 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $user = null;
-
-        // Check if login is by email or phone
-        if ($this->filled('email')) {
-            $user = User::where('email', $this->input('email'))->first();
-        } elseif ($this->filled('phone')) {
-            // Format phone number to +92xxxxx format
-            $phone = $this->formatPhoneNumber($this->input('phone'));
-            // Try both formatted and original format for backward compatibility
-            $user = User::where('phone', $phone)
-                ->orWhere('phone', preg_replace('/[^0-9+]/', '', $this->input('phone')))
-                ->first();
-        }
+        // Format phone number to +92xxxxx format
+        $phone = $this->formatPhoneNumber($this->input('phone'));
+        // Try both formatted and original format for backward compatibility
+        $user = User::where('phone', $phone)
+            ->orWhere('phone', preg_replace('/[^0-9+]/', '', $this->input('phone')))
+            ->first();
 
         if (!$user) {
             RateLimiter::hit($this->throttleKey());
 
-            $field = $this->filled('email') ? 'email' : 'phone';
+            $field = 'phone';
             throw ValidationException::withMessages([
                 $field => trans('auth.failed'),
             ]);
@@ -110,7 +98,7 @@ class LoginRequest extends FormRequest
             if (!Hash::check($this->input('password'), $user->password)) {
                 RateLimiter::hit($this->throttleKey());
 
-                $field = $this->filled('email') ? 'email' : 'phone';
+                $field = 'phone';
                 throw ValidationException::withMessages([
                     $field => trans('auth.failed'),
                 ]);
@@ -134,17 +122,12 @@ class LoginRequest extends FormRequest
 
         $user = null;
 
-        // Check if login is by email or phone
-        if ($this->filled('email')) {
-            $user = User::where('email', $this->input('email'))->first();
-        } elseif ($this->filled('phone')) {
-            // Format phone number to +92xxxxx format
-            $phone = $this->formatPhoneNumber($this->input('phone'));
-            // Try both formatted and original format for backward compatibility
-            $user = User::where('phone', $phone)
-                ->orWhere('phone', preg_replace('/[^0-9+]/', '', $this->input('phone')))
-                ->first();
-        }
+        // Format phone number to +92xxxxx format
+        $phone = $this->formatPhoneNumber($this->input('phone'));
+        // Try both formatted and original format for backward compatibility
+        $user = User::where('phone', $phone)
+            ->orWhere('phone', preg_replace('/[^0-9+]/', '', $this->input('phone')))
+            ->first();
 
         if (!$user) {
             RateLimiter::hit($this->throttleKey());
@@ -176,7 +159,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'phone' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -188,9 +171,7 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        $identifier = $this->filled('email')
-            ? $this->string('email')
-            : $this->formatPhoneNumber($this->input('phone'));
+        $identifier = $this->formatPhoneNumber($this->input('phone'));
 
         return Str::transliterate(Str::lower($identifier).'|'.$this->ip());
     }

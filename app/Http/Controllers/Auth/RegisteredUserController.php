@@ -56,7 +56,6 @@ class RegisteredUserController extends Controller
                 required: ["name", "password", "role"],
                 properties: [
                     new OA\Property(property: "name", type: "string", maxLength: 255),
-                    new OA\Property(property: "email", type: "string", format: "email", nullable: true, maxLength: 255, description: "Either email or phone is required"),
                     new OA\Property(property: "phone", type: "string", nullable: true, maxLength: 20, description: "Either email or phone is required"),
                     new OA\Property(property: "password", type: "string", format: "password", minLength: 8),
                     new OA\Property(property: "password_confirmation", type: "string", format: "password"),
@@ -89,7 +88,6 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|string|lowercase|email|max:255|unique:'.User::class,
             'phone' => 'nullable|string|max:20|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => 'required|in:user,helper,business',
@@ -97,37 +95,21 @@ class RegisteredUserController extends Controller
         ]);
 
         // Ensure at least one of email or phone is provided
-        if (empty($request->email) && empty($request->phone)) {
+        if (empty($request->phone)) {
             throw ValidationException::withMessages([
-                'email' => ['Either email or phone number is required.'],
-                'phone' => ['Either email or phone number is required.'],
+                'phone' => ['Phone number is required.'],
             ]);
         }
 
         // Normalize and format phone number if provided
         $phone = $request->phone ? $this->formatPhoneNumber($request->phone) : null;
 
-        // Generate email if only phone is provided (for Laravel Auth compatibility)
-        $email = $request->email ? strtolower($request->email) : null;
-        if (empty($email) && $phone) {
-            $generatedEmail = $phone . '@phone.kamwaalay.local';
-            // Check if generated email already exists
-            if (User::where('email', $generatedEmail)->exists()) {
-                throw ValidationException::withMessages([
-                    'phone' => ['This phone number is already registered.'],
-                ]);
-            }
-            $email = $generatedEmail;
-        }
-
         // Create user and auto-verify (simplified flow without OTP)
         $user = User::create([
             'name' => $request->name,
-            'email' => $email,
             'password' => Hash::make($request->password),
             'phone' => $phone,
             'address' => $request->address,
-            'phone_verified_at' => now(), // Auto-verify
         ]);
 
         // Assign role using Spatie Permission

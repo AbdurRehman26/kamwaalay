@@ -39,7 +39,7 @@ class OnboardingController extends Controller
     public function helper(): JsonResponse
     {
         $user = Auth::user();
-        
+
         if (!$user->hasRole('helper')) {
             abort(403);
         }
@@ -111,7 +111,7 @@ class OnboardingController extends Controller
     public function completeHelper(Request $request)
     {
         $user = Auth::user();
-        
+
         if (!$user->hasRole('helper')) {
             abort(403);
         }
@@ -131,25 +131,11 @@ class OnboardingController extends Controller
             $decodedServices = $decoded;
         }
 
-        $locationsData = $request->input('locations');
-        $decodedLocations = $locationsData;
-        if (is_string($locationsData)) {
-            $decoded = json_decode($locationsData, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return response()->json([
-                    'message' => 'Invalid locations data format.',
-                    'errors' => ['locations' => ['Invalid locations data format.']]
-                ], 422);
-            }
-            $decodedLocations = $decoded;
-        }
-
         // Prepare data for validation (merge decoded arrays with other request data)
         // Note: $request->all() includes files for multipart/form-data
         $dataToValidate = $request->all();
         $dataToValidate['services'] = $decodedServices;
-        $dataToValidate['locations'] = $decodedLocations;
-        
+
         // Handle languages if sent as JSON string (from FormData)
         $languagesData = $request->input('languages');
         $decodedLanguages = $languagesData;
@@ -172,9 +158,10 @@ class OnboardingController extends Controller
         // Validate the decoded data
         $validator = Validator::make($dataToValidate, [
             'services' => 'required|array|min:1',
-            'services.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
-            'locations' => 'required|array|min:1',
-            'locations.*' => 'required|integer|exists:locations,id',
+            'services.*' => 'required|integer|exists:service_types,id',
+            'pin_address' => 'required|string|max:500',
+            'pin_latitude' => 'nullable|numeric',
+            'pin_longitude' => 'nullable|numeric',
             'work_type' => 'required|in:full_time,part_time',
             'monthly_rate' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:2000',
@@ -259,6 +246,9 @@ class OnboardingController extends Controller
         // Create service listing
         $listing = ServiceListing::create([
             'profile_id' => $profile->id,
+            'pin_address' => $validated['pin_address'] ?? null,
+            'pin_latitude' => $validated['pin_latitude'] ?? null,
+            'pin_longitude' => $validated['pin_longitude'] ?? null,
             'work_type' => $validated['work_type'],
             'monthly_rate' => $validated['monthly_rate'] ?? null,
             'description' => $validated['description'] ?? null,
@@ -266,16 +256,8 @@ class OnboardingController extends Controller
             'status' => 'active',
         ]);
 
-        // Sync service types (convert slugs to IDs)
-        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $validated['services'])
-            ->pluck('id')
-            ->toArray();
-        $listing->serviceTypes()->sync($serviceTypeIds);
-
-        // Sync locations (if provided)
-        if (!empty($validated['locations'])) {
-            $listing->locations()->sync($validated['locations']);
-        }
+        // Sync service types (services are now sent as IDs directly)
+        $listing->serviceTypes()->sync($validated['services']);
 
         return response()->json([
             'message' => 'Welcome! Your profile has been set up successfully.',
@@ -308,7 +290,7 @@ class OnboardingController extends Controller
     public function business(): JsonResponse
     {
         $user = Auth::user();
-        
+
         if (!$user->hasRole('business')) {
             abort(403);
         }
@@ -371,7 +353,7 @@ class OnboardingController extends Controller
     public function completeBusiness(Request $request)
     {
         $user = Auth::user();
-        
+
         if (!$user->hasRole('business')) {
             abort(403);
         }
@@ -406,7 +388,7 @@ class OnboardingController extends Controller
         $dataToValidate = $request->all();
         $dataToValidate['services'] = $decodedServices;
         $dataToValidate['locations'] = $decodedLocations;
-        
+
         // Handle languages if sent as JSON string (from FormData)
         $languagesData = $request->input('languages');
         $decodedLanguages = $languagesData;

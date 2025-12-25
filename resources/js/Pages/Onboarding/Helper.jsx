@@ -16,23 +16,28 @@ export default function OnboardingHelper() {
 
     const [offers, setOffers] = useState([{
         selectedServiceTypes: [],
-        selectedLocations: [],
+        pin_address: "",
+        pin_latitude: "",
+        pin_longitude: "",
         work_type: "",
         monthly_rate: "",
         description: "",
     }]);
 
-    const [locationQueries, setLocationQueries] = useState([""]);
-    const [locationSuggestions, setLocationSuggestions] = useState([[]]);
-    const [showLocationSuggestions, setShowLocationSuggestions] = useState([false]);
-    const locationRefs = useRef([]);
-    const searchTimeoutRefs = useRef([]);
+    const [cities, setCities] = useState([]);
+    const [citySearches, setCitySearches] = useState([""]);
+    const [showCityDropdowns, setShowCityDropdowns] = useState([false]);
+    const [gettingLocation, setGettingLocation] = useState([false]);
+    const cityRefs = useRef([]);
+    const pinAddressInputRefs = useRef([]);
+    const autocompleteRefs = useRef([]);
 
     // Helper profile fields
     const [profileData, setProfileData] = useState({
         photo: null,
         nic: null,
         nic_number: "",
+        city_id: "",
         experience_years: user?.experience_years || "",
         bio: user?.bio || "",
         age: user?.age || "",
@@ -60,6 +65,17 @@ export default function OnboardingHelper() {
     // Fetch languages from API
     const { languages } = useLanguages();
 
+    // Fetch cities
+    useEffect(() => {
+        axios.get("/api/cities")
+            .then(response => {
+                setCities(response.data.cities || response.data || []);
+            })
+            .catch(error => {
+                console.error("Error fetching cities:", error);
+            });
+    }, []);
+
     // Update profile data when user loads
     useEffect(() => {
         if (user) {
@@ -74,64 +90,141 @@ export default function OnboardingHelper() {
         }
     }, [user]);
 
-    // Fetch location suggestions for each offer
-    useEffect(() => {
-        locationQueries.forEach((query, index) => {
-            if (query.length >= 2) {
-                if (searchTimeoutRefs.current[index]) {
-                    clearTimeout(searchTimeoutRefs.current[index]);
-                }
-                searchTimeoutRefs.current[index] = setTimeout(() => {
-                    axios
-                        .get("/api/locations/search", {
-                            params: { q: query },
-                        })
-                        .then((response) => {
-                            const newSuggestions = [...locationSuggestions];
-                            newSuggestions[index] = response.data;
-                            setLocationSuggestions(newSuggestions);
-                            const newShow = [...showLocationSuggestions];
-                            newShow[index] = true;
-                            setShowLocationSuggestions(newShow);
-                        })
-                        .catch((error) => {
-                            console.error("Error fetching locations:", error);
-                            const newSuggestions = [...locationSuggestions];
-                            newSuggestions[index] = [];
-                            setLocationSuggestions(newSuggestions);
-                        });
-                }, 300);
-            } else {
-                const newSuggestions = [...locationSuggestions];
-                newSuggestions[index] = [];
-                setLocationSuggestions(newSuggestions);
-                const newShow = [...showLocationSuggestions];
-                newShow[index] = false;
-                setShowLocationSuggestions(newShow);
-            }
-        });
-    }, [locationQueries]);
-
     const addOffer = () => {
         setOffers([...offers, {
             selectedServiceTypes: [],
-            selectedLocations: [],
+            pin_address: "",
+            pin_latitude: "",
+            pin_longitude: "",
             work_type: "",
             monthly_rate: "",
             description: "",
         }]);
-        setLocationQueries([...locationQueries, ""]);
-        setLocationSuggestions([...locationSuggestions, []]);
-        setShowLocationSuggestions([...showLocationSuggestions, false]);
+        setCitySearches([...citySearches, ""]);
+        setShowCityDropdowns([...showCityDropdowns, false]);
+        setGettingLocation([...gettingLocation, false]);
     };
 
     const removeOffer = (index) => {
         if (offers.length > 1) {
             setOffers(offers.filter((_, i) => i !== index));
-            setLocationQueries(locationQueries.filter((_, i) => i !== index));
-            setLocationSuggestions(locationSuggestions.filter((_, i) => i !== index));
-            setShowLocationSuggestions(showLocationSuggestions.filter((_, i) => i !== index));
+            setCitySearches(citySearches.filter((_, i) => i !== index));
+            setShowCityDropdowns(showCityDropdowns.filter((_, i) => i !== index));
+            setGettingLocation(gettingLocation.filter((_, i) => i !== index));
         }
+    };
+
+    // Initialize Google Places Autocomplete for each offer
+    useEffect(() => {
+        offers.forEach((offer, index) => {
+            const inputRef = pinAddressInputRefs.current[index];
+            if (inputRef && window.google && window.google.maps && window.google.maps.places && !autocompleteRefs.current[index]) {
+                try {
+                    const autocomplete = new window.google.maps.places.Autocomplete(
+                        inputRef,
+                        {
+                            componentRestrictions: { country: "pk" },
+                            fields: ["formatted_address", "geometry", "name"],
+                            types: ["address"]
+                        }
+                    );
+                    autocompleteRefs.current[index] = autocomplete;
+
+                    autocomplete.addListener("place_changed", () => {
+                        const place = autocomplete.getPlace();
+                        if (place.formatted_address) {
+                            const lat = place.geometry?.location?.lat();
+                            const lng = place.geometry?.location?.lng();
+                            const newOffers = [...offers];
+                            newOffers[index] = {
+                                ...newOffers[index],
+                                pin_address: place.formatted_address,
+                                pin_latitude: lat ? lat.toString() : "",
+                                pin_longitude: lng ? lng.toString() : ""
+                            };
+                            setOffers(newOffers);
+                        }
+                    });
+                } catch (error) {
+                    console.error("Error initializing Google Places Autocomplete:", error);
+                }
+            }
+        });
+    }, [offers.length]);
+
+    const handleGetCurrentLocation = (offerIndex) => {
+        if (!navigator.geolocation) {
+            setErrors({ ...errors, pin_address: "Geolocation is not supported by your browser." });
+            return;
+        }
+
+        if (!window.google || !window.google.maps || !window.google.maps.Geocoder) {
+            setErrors({ ...errors, pin_address: "Google Maps API is not loaded. Please refresh the page." });
+            return;
+        }
+
+        const newGettingLocation = [...gettingLocation];
+        newGettingLocation[offerIndex] = true;
+        setGettingLocation(newGettingLocation);
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+
+                try {
+                    const geocoder = new window.google.maps.Geocoder();
+                    const latlng = { lat: latitude, lng: longitude };
+
+                    geocoder.geocode({ location: latlng }, (results, status) => {
+                        const newOffers = [...offers];
+                        if (status === "OK" && results && results.length > 0) {
+                            newOffers[offerIndex] = {
+                                ...newOffers[offerIndex],
+                                pin_address: results[0].formatted_address,
+                                pin_latitude: latitude.toString(),
+                                pin_longitude: longitude.toString()
+                            };
+                        } else {
+                            newOffers[offerIndex] = {
+                                ...newOffers[offerIndex],
+                                pin_address: `${latitude}, ${longitude}`,
+                                pin_latitude: latitude.toString(),
+                                pin_longitude: longitude.toString()
+                            };
+                        }
+                        setOffers(newOffers);
+                        const newGetting = [...gettingLocation];
+                        newGetting[offerIndex] = false;
+                        setGettingLocation(newGetting);
+                    });
+                } catch (error) {
+                    console.error("Error reverse geocoding:", error);
+                    const newOffers = [...offers];
+                    newOffers[offerIndex] = {
+                        ...newOffers[offerIndex],
+                        pin_address: `${latitude}, ${longitude}`,
+                        pin_latitude: latitude.toString(),
+                        pin_longitude: longitude.toString()
+                    };
+                    setOffers(newOffers);
+                    const newGetting = [...gettingLocation];
+                    newGetting[offerIndex] = false;
+                    setGettingLocation(newGetting);
+                }
+            },
+            (error) => {
+                console.error("Error getting location:", error);
+                let errorMessage = "Unable to get your location.";
+                if (error.code === error.PERMISSION_DENIED) {
+                    errorMessage = "Location access denied. Please enable location permissions.";
+                }
+                setErrors({ ...errors, pin_address: errorMessage });
+                const newGetting = [...gettingLocation];
+                newGetting[offerIndex] = false;
+                setGettingLocation(newGetting);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
     };
 
     const updateOffer = (index, field, value) => {
@@ -154,48 +247,32 @@ export default function OnboardingHelper() {
         setOffers(newOffers);
     };
 
-    const handleLocationSelect = (location, offerIndex) => {
-        // Only allow selection if location has an id (actual location from database)
-        if (!location.id) {
-            setFieldErrors(prev => ({ ...prev, locationSelect: "Please select a specific location (area) from the list, not just a city." }));
-            setTimeout(() => setFieldErrors(prev => ({ ...prev, locationSelect: "" })), 5000);
-            return;
-        }
-        // Clear error when valid location is selected
-        setFieldErrors(prev => ({ ...prev, locationSelect: "" }));
-        // Check if location already exists
+    const handleCitySelect = (city, offerIndex) => {
         const newOffers = [...offers];
-        const exists = newOffers[offerIndex].selectedLocations.some(loc => loc.id === location.id);
-        if (!exists) {
-            newOffers[offerIndex].selectedLocations.push({
-                id: location.id,
-                display_text: location.display_text,
-                city_name: location.city_name,
-                area: location.area || "",
-            });
-            setOffers(newOffers);
-        }
-        const newQueries = [...locationQueries];
-        newQueries[offerIndex] = "";
-        setLocationQueries(newQueries);
-        const newShow = [...showLocationSuggestions];
+        newOffers[offerIndex].city_id = city.id;
+        setOffers(newOffers);
+        const newSearches = [...citySearches];
+        newSearches[offerIndex] = city.name;
+        setCitySearches(newSearches);
+        const newShow = [...showCityDropdowns];
         newShow[offerIndex] = false;
-        setShowLocationSuggestions(newShow);
+        setShowCityDropdowns(newShow);
     };
 
-    const removeLocationFromOffer = (offerIndex, locationId) => {
-        const newOffers = [...offers];
-        newOffers[offerIndex].selectedLocations = newOffers[offerIndex].selectedLocations.filter(loc => loc.id !== locationId);
-        setOffers(newOffers);
+    const getFilteredCities = (searchTerm) => {
+        if (!searchTerm) return cities;
+        return cities.filter(city =>
+            city.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
     };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            locationRefs.current.forEach((ref, index) => {
+            cityRefs.current.forEach((ref, index) => {
                 if (ref && !ref.contains(event.target)) {
-                    const newShow = [...showLocationSuggestions];
+                    const newShow = [...showCityDropdowns];
                     newShow[index] = false;
-                    setShowLocationSuggestions(newShow);
+                    setShowCityDropdowns(newShow);
                 }
             });
         };
@@ -214,8 +291,8 @@ export default function OnboardingHelper() {
             if (!offer.selectedServiceTypes.length) {
                 validationErrors.serviceTypes = "Please select at least one service type.";
             }
-            if (!offer.selectedLocations.length) {
-                validationErrors.locations = "Please select at least one location.";
+            if (!offer.pin_address) {
+                validationErrors.pin_address = "Please enter your address.";
             }
             if (!offer.work_type) {
                 validationErrors.workType = "Please select a work type.";
@@ -257,7 +334,10 @@ export default function OnboardingHelper() {
         // Prepare FormData for service listing
         const formData = new FormData();
         formData.append("services", JSON.stringify(offer.selectedServiceTypes));
-        formData.append("locations", JSON.stringify(offer.selectedLocations.map(loc => loc.id)));
+        formData.append("city_id", profileData.city_id || "");
+        formData.append("pin_address", offer.pin_address);
+        if (offer.pin_latitude) formData.append("pin_latitude", offer.pin_latitude);
+        if (offer.pin_longitude) formData.append("pin_longitude", offer.pin_longitude);
         formData.append("work_type", offer.work_type);
         if (offer.monthly_rate) {
             formData.append("monthly_rate", parseFloat(offer.monthly_rate));
@@ -355,7 +435,10 @@ export default function OnboardingHelper() {
         // Prepare FormData for final submission (verification documents and profile updates)
         const formData = new FormData();
         formData.append("services", JSON.stringify(offer.selectedServiceTypes));
-        formData.append("locations", JSON.stringify(offer.selectedLocations.map(loc => loc.id)));
+        formData.append("city_id", profileData.city_id || "");
+        formData.append("pin_address", offer.pin_address);
+        if (offer.pin_latitude) formData.append("pin_latitude", offer.pin_latitude);
+        if (offer.pin_longitude) formData.append("pin_longitude", offer.pin_longitude);
         formData.append("work_type", offer.work_type);
         if (offer.monthly_rate) {
             formData.append("monthly_rate", parseFloat(offer.monthly_rate));
@@ -679,18 +762,18 @@ export default function OnboardingHelper() {
                                     {offer.selectedServiceTypes.length > 0 && (
                                         <div className="mb-4">
                                             <div className="flex flex-wrap gap-2">
-                                                {offer.selectedServiceTypes.map((serviceType) => {
-                                                    const service = serviceTypes.find(st => st.value === serviceType);
+                                                {offer.selectedServiceTypes.map((serviceTypeId) => {
+                                                    const service = serviceTypes.find(st => st.id === serviceTypeId);
                                                     return (
                                                         <span
-                                                            key={serviceType}
+                                                            key={serviceTypeId}
                                                             className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold border-2 border-indigo-200 dark:border-indigo-700"
                                                         >
                                                             <span>{service?.icon}</span>
                                                             <span>{service?.label}</span>
                                                             <button
                                                                 type="button"
-                                                                onClick={() => removeServiceTypeFromOffer(offerIndex, serviceType)}
+                                                                onClick={() => removeServiceTypeFromOffer(offerIndex, serviceTypeId)}
                                                                 className="ml-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-bold"
                                                             >
                                                                 ×
@@ -706,11 +789,11 @@ export default function OnboardingHelper() {
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                         {serviceTypes.map((service) => (
                                             <button
-                                                key={service.value}
+                                                key={service.id}
                                                 type="button"
-                                                onClick={() => addServiceTypeToOffer(offerIndex, service.value)}
-                                                disabled={offer.selectedServiceTypes.includes(service.value)}
-                                                className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${offer.selectedServiceTypes.includes(service.value)
+                                                onClick={() => addServiceTypeToOffer(offerIndex, service.id)}
+                                                disabled={offer.selectedServiceTypes.includes(service.id)}
+                                                className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${offer.selectedServiceTypes.includes(service.id)
                                                     ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
                                                     : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
                                                     }`}
@@ -722,80 +805,47 @@ export default function OnboardingHelper() {
                                     </div>
                                 </div>
 
-                                {/* Locations Selection */}
-                                <div className="mb-8" data-error-field={fieldErrors.locations || fieldErrors.locationSelect ? "true" : undefined}>
-                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Select Locations *</h3>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Add locations for this offer. You can add multiple locations.</p>
-                                    {fieldErrors.locations && (
-                                        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
-                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.locations}</p>
-                                        </div>
-                                    )}
-                                    {fieldErrors.locationSelect && (
-                                        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
-                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.locationSelect}</p>
-                                        </div>
-                                    )}
 
-                                    {/* Selected Locations as Tags */}
-                                    {offer.selectedLocations.length > 0 && (
-                                        <div className="mb-4">
-                                            <div className="flex flex-wrap gap-2">
-                                                {offer.selectedLocations.map((location) => (
-                                                    <span
-                                                        key={location.id}
-                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-semibold border-2 border-green-200 dark:border-green-700"
-                                                    >
-                                                        <span>📍</span>
-                                                        <span>{location.display_text}</span>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeLocationFromOffer(offerIndex, location.id)}
-                                                            className="ml-1 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 font-bold"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </span>
-                                                ))}
-                                            </div>
+                                {/* Pin Address */}
+                                <div className="mb-8" data-error-field={fieldErrors.pin_address ? "true" : undefined}>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">
+                                        <span className="mr-2">📍</span>
+                                        Your Address *
+                                    </h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Enter the address where you provide services, or click the button to get your current location.</p>
+                                    {fieldErrors.pin_address && (
+                                        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
+                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.pin_address}</p>
                                         </div>
                                     )}
-
-                                    {/* Location Search */}
-                                    <div className="relative" ref={el => locationRefs.current[offerIndex] = el}>
+                                    <div className="flex gap-2">
                                         <input
+                                            ref={el => pinAddressInputRefs.current[offerIndex] = el}
                                             type="text"
-                                            value={locationQueries[offerIndex]}
-                                            onChange={(e) => {
-                                                const newQueries = [...locationQueries];
-                                                newQueries[offerIndex] = e.target.value;
-                                                setLocationQueries(newQueries);
-                                            }}
-                                            onFocus={() => {
-                                                if (locationSuggestions[offerIndex]?.length > 0) {
-                                                    const newShow = [...showLocationSuggestions];
-                                                    newShow[offerIndex] = true;
-                                                    setShowLocationSuggestions(newShow);
-                                                }
-                                            }}
-                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3 shadow-sm"
-                                            placeholder="Search location (e.g., Karachi, Clifton or type area name)..."
+                                            value={offer.pin_address}
+                                            readOnly
+                                            className="flex-1 border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3 shadow-sm cursor-pointer"
+                                            placeholder="Click to search or use Get Location button"
+                                            onClick={() => pinAddressInputRefs.current[offerIndex]?.focus()}
                                         />
-                                        {showLocationSuggestions[offerIndex] && locationSuggestions[offerIndex]?.length > 0 && (
-                                            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-auto">
-                                                {locationSuggestions[offerIndex]
-                                                    ?.filter(suggestion => suggestion.id && !offer.selectedLocations.some(loc => loc.id === suggestion.id))
-                                                    .map((suggestion, idx) => (
-                                                        <div
-                                                            key={idx}
-                                                            onClick={() => handleLocationSelect(suggestion, offerIndex)}
-                                                            className="px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
-                                                        >
-                                                            {suggestion.display_text}
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleGetCurrentLocation(offerIndex)}
+                                            disabled={gettingLocation[offerIndex]}
+                                            className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+                                        >
+                                            {gettingLocation[offerIndex] ? (
+                                                <>
+                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                    <span>Getting...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span>📍</span>
+                                                    <span>Get Location</span>
+                                                </>
+                                            )}
+                                        </button>
                                     </div>
                                 </div>
 
@@ -853,20 +903,20 @@ export default function OnboardingHelper() {
                                 </div>
 
                                 {/* Preview for this offer */}
-                                {offer.selectedServiceTypes.length > 0 && offer.selectedLocations.length > 0 && offer.work_type && (
+                                {offer.selectedServiceTypes.length > 0 && offer.pin_address && offer.work_type && (
                                     <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-700">
                                         <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-300 mb-2">
                                             This offer will create 1 service listing with:
                                         </p>
                                         <div className="text-xs text-indigo-700 dark:text-indigo-400 space-y-1">
                                             <div>
-                                                <span className="font-semibold">{offer.selectedServiceTypes.length}</span> service type(s): {offer.selectedServiceTypes.map((st) => {
-                                                    const service = serviceTypes.find(s => s.value === st);
+                                                <span className="font-semibold">{offer.selectedServiceTypes.length}</span> service type(s): {offer.selectedServiceTypes.map((stId) => {
+                                                    const service = serviceTypes.find(s => s.id === stId);
                                                     return service?.label;
                                                 }).join(", ")}
                                             </div>
                                             <div>
-                                                <span className="font-semibold">{offer.selectedLocations.length}</span> location(s): {offer.selectedLocations.map(loc => loc.display_text).join(", ")}
+                                                <span className="font-semibold">📍 Location:</span> {offer.pin_address}
                                             </div>
                                         </div>
                                     </div>
@@ -1002,6 +1052,23 @@ export default function OnboardingHelper() {
                                                 <option value="christian">Christian</option>
                                             </select>
                                             {errors.religion && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.religion}</div>}
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">City</label>
+                                            <select
+                                                value={profileData.city_id}
+                                                onChange={(e) => setProfileData({ ...profileData, city_id: e.target.value })}
+                                                className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
+                                            >
+                                                <option value="">Select City</option>
+                                                {cities.map((city) => (
+                                                    <option key={city.id} value={city.id}>
+                                                        {city.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            {errors.city_id && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.city_id}</div>}
                                         </div>
                                     </div>
 

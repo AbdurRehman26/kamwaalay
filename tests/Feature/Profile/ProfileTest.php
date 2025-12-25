@@ -30,7 +30,6 @@ test('users can view their profile', function () {
 test('users can update their profile', function () {
     $user = User::factory()->create([
         'name' => 'Old Name',
-        'email' => 'old@example.com',
     ]);
     $user->assignRole('user');
     
@@ -46,8 +45,6 @@ test('users can update their profile', function () {
     $response->assertStatus(200);
     $user->refresh();
     expect($user->name)->toBe('New Name');
-    // Email should remain unchanged as it's no longer part of profile updates
-    expect($user->email)->toBe('old@example.com');
 });
 
 test('users can delete their account', function () {
@@ -97,7 +94,6 @@ test('users must provide correct password to delete account', function () {
 
 test('email verification is not reset when profile is updated', function () {
     $user = User::factory()->create([
-        'email' => 'old@example.com',
         'phone_verified_at' => now(),
     ]);
     $user->assignRole('user');
@@ -113,7 +109,7 @@ test('email verification is not reset when profile is updated', function () {
 
     $response->assertStatus(200);
     $user->refresh();
-    // Email verification should remain unchanged as email is not part of profile updates
+    $user->refresh();
     expect($user->phone_verified_at)->not->toBeNull();
 });
 

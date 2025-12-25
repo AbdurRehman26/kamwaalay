@@ -66,7 +66,6 @@ test('users can create service requests', function () {
         'Accept' => 'application/json',
     ])->postJson('/api/job-posts', [
         'name' => 'John Doe',
-        'email' => 'john@example.com',
         'phone' => '03001234567',
         'service_type' => 'maid',
         'work_type' => 'full_time',
@@ -87,7 +86,6 @@ test('users can create service requests', function () {
 test('logged in users have name email and phone prefilled', function () {
     $user = User::factory()->create([
         'name' => 'John Doe',
-        'email' => 'john@example.com',
         'phone' => '03001234567',
     ]);
     $user->assignRole('user');
@@ -109,7 +107,6 @@ test('logged in users have name email and phone prefilled', function () {
     $response->assertStatus(200);
     $response->assertJsonStructure(['user', 'prefill']);
     $response->assertJsonPath('user.name', 'John Doe');
-    $response->assertJsonPath('user.email', 'john@example.com');
     $response->assertJsonPath('user.phone', '03001234567');
 });
 

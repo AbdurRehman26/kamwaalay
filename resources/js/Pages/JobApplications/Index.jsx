@@ -14,13 +14,10 @@ export default function JobApplicationsIndex() {
     const [filters, setFilters] = useState({});
     const [loading, setLoading] = useState(true);
     const [serviceType, setServiceType] = useState("");
-    const [locationId, setLocationId] = useState("");
-    const [locationDisplay, setLocationDisplay] = useState("");
-    const [locationFilterQuery, setLocationFilterQuery] = useState("");
-    const [locationFilterSuggestions, setLocationFilterSuggestions] = useState([]);
-    const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
-    const locationFilterRef = useRef(null);
-    const searchTimeoutRef = useRef(null);
+    const [latitude, setLatitude] = useState("");
+    const [longitude, setLongitude] = useState("");
+    const [cityId, setCityId] = useState("");
+    const [cities, setCities] = useState([]);
 
     // Fetch service types from API
     const { serviceTypes: fetchedServiceTypes } = useServiceTypes();
@@ -29,62 +26,50 @@ export default function JobApplicationsIndex() {
         ...fetchedServiceTypes,
     ];
 
-    // Fetch location suggestions for filter
+    // Fetch cities on mount
     useEffect(() => {
-        if (locationFilterQuery.length >= 2) {
-            if (searchTimeoutRef.current) {
-                clearTimeout(searchTimeoutRef.current);
-            }
-            searchTimeoutRef.current = setTimeout(() => {
-                api
-                    .get("/locations/search", {
-                        params: { q: locationFilterQuery },
-                    })
-                    .then((response) => {
-                        setLocationFilterSuggestions(response.data);
-                        setShowLocationSuggestions(true);
-                    })
-                    .catch((error) => {
-                        console.error("Error fetching locations:", error);
-                        setLocationFilterSuggestions([]);
-                    });
-            }, 300);
-        } else {
-            setLocationFilterSuggestions([]);
-            setShowLocationSuggestions(false);
-        }
-        return () => {
-            if (searchTimeoutRef.current) {
-                clearTimeout(searchTimeoutRef.current);
-            }
-        };
-    }, [locationFilterQuery]);
-
-    // Handle outside click
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (locationFilterRef.current && !locationFilterRef.current.contains(event.target)) {
-                setShowLocationSuggestions(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
+        api.get("/cities")
+            .then((response) => {
+                setCities(response.data.cities || response.data || []);
+            })
+            .catch((error) => {
+                console.error("Error fetching cities:", error);
+            });
     }, []);
 
-    const handleLocationSelect = (location) => {
-        setLocationId(location.id || "");
-        setLocationDisplay(location.display_text);
-        setLocationFilterQuery(location.display_text);
-        setShowLocationSuggestions(false);
+    // Handle Near Me - get user's geolocation, or clear if already set
+    const handleNearMe = () => {
+        // If already has location, clear it (toggle off)
+        if (latitude && longitude) {
+            setLatitude(null);
+            setLongitude(null);
+            return;
+        }
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    setLatitude(latitude);
+                    setLongitude(longitude);
+                },
+                (error) => {
+                    console.error("Error getting location:", error);
+                    alert("Unable to retrieve your location. Please ensure location services are enabled.");
+                }
+            );
+        } else {
+            alert("Geolocation is not supported by your browser.");
+        }
     };
 
     // Fetch bookings from API
     useEffect(() => {
         const params = {
             service_type: serviceType || undefined,
-            location_id: locationId || undefined,
+            city_id: cityId || undefined,
+            latitude: latitude || undefined,
+            longitude: longitude || undefined,
         };
 
         // Remove undefined values
@@ -101,7 +86,7 @@ export default function JobApplicationsIndex() {
                 console.error("Error fetching bookings:", error);
                 setLoading(false);
             });
-    }, [serviceType, locationId]);
+    }, [serviceType, cityId, latitude, longitude]);
 
     const handleFilter = () => {
         // Filters are applied via useEffect above
@@ -121,15 +106,6 @@ export default function JobApplicationsIndex() {
                     <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Browse Jobs</h1>
                     <p className="text-xl text-indigo-100/90 max-w-2xl mx-auto leading-relaxed">
                         Discover job opportunities in your area and apply to provide your services.
-                    </p>
-                </div>
-            </div>
-
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
-                    <p className="text-sm text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
-                        <span className="text-lg">📍</span>
-                        <strong>Note:</strong> We are currently serving Karachi, Lahore, and Islamabad. More cities coming soon!
                     </p>
                 </div>
             </div>
@@ -157,39 +133,33 @@ export default function JobApplicationsIndex() {
                                     ))}
                                 </select>
                             </div>
-                            <div className="relative" ref={locationFilterRef}>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Location</label>
-                                <input
-                                    type="text"
-                                    value={locationFilterQuery || locationDisplay}
-                                    onChange={(e) => {
-                                        setLocationFilterQuery(e.target.value);
-                                        if (!e.target.value) {
-                                            setLocationId("");
-                                            setLocationDisplay("");
-                                        }
-                                    }}
-                                    onFocus={() => {
-                                        if (locationFilterSuggestions.length > 0) {
-                                            setShowLocationSuggestions(true);
-                                        }
-                                    }}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 shadow-sm transition-colors"
-                                    placeholder="Search location..."
-                                />
-                                {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
-                                    <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-2xl max-h-60 overflow-auto">
-                                        {locationFilterSuggestions.map((suggestion, index) => (
-                                            <div
-                                                key={index}
-                                                onClick={() => handleLocationSelect(suggestion)}
-                                                className="px-4 py-3 hover:bg-indigo-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700/50 last:border-b-0 text-gray-800 dark:text-gray-200"
-                                            >
-                                                {suggestion.display_text}
-                                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">City</label>
+                                <div className="flex gap-2">
+                                    <select
+                                        value={cityId}
+                                        onChange={(e) => setCityId(e.target.value)}
+                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 shadow-sm transition-colors"
+                                    >
+                                        <option value="">All Cities</option>
+                                        {cities.map((city) => (
+                                            <option key={city.id} value={city.id}>
+                                                {city.name}
+                                            </option>
                                         ))}
-                                    </div>
-                                )}
+                                    </select>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleNearMe()}
+                                        className={`px-3 py-3 border rounded-xl transition-colors ${latitude && longitude ? "bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700" : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-600"}`}
+                                        title={latitude && longitude ? "Clear Near Me Filter" : "Search Near Me"}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                             <div className="flex items-end">
                                 <button
@@ -382,9 +352,9 @@ export default function JobApplicationsIndex() {
                             <button
                                 onClick={() => {
                                     setServiceType("");
-                                    setLocationId("");
-                                    setLocationDisplay("");
-                                    setLocationFilterQuery("");
+                                    setCityId("");
+                                    setLatitude("");
+                                    setLongitude("");
                                 }}
                                 className="mt-8 px-6 py-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 font-bold rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                             >

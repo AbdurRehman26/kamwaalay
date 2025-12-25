@@ -24,6 +24,7 @@ export const serviceTypesService = {
             .then((response) => {
                 // Transform to match frontend format
                 const serviceTypes = response.data.map((st) => ({
+                    id: st.id,
                     value: st.slug,
                     label: st.name,
                     icon: st.icon || "",

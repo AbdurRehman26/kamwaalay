@@ -6,43 +6,34 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('users can authenticate using phone number', function () {
-    // Note: LoginRequest currently requires email, so phone-only users get placeholder emails
-    // During registration, phone-only users get email like {phone}@phone.kamwaalay.local
     $user = User::factory()->create([
         'phone' => '03001234567',
-        'email' => '03001234567@phone.kamwaalay.local', // Phone-only users get placeholder email
         'password' => bcrypt('password'),
-        'phone_verified_at' => null, // Ensure phone is unverified
+        'phone_verified_at' => now(),
     ]);
 
     $response = $this->postJson('/api/login', [
-        'email' => '03001234567@phone.kamwaalay.local',
+        'phone' => '03001234567',
         'password' => 'password',
     ]);
 
     $response->assertStatus(200);
-    // If user is verified, they get token directly, otherwise they get verification info
-    if ($response->json('token')) {
-        $response->assertJsonStructure(['message', 'user', 'token']);
-    } else {
-        $response->assertJsonStructure(['message', 'verification_method', 'verification_token']);
-    }
-    // Note: User needs to verify OTP before getting authenticated if unverified
+    $response->assertJsonStructure(['message', 'user', 'token']);
 });
 
 test('users cannot authenticate with invalid password', function () {
     $user = User::factory()->create([
-        'email' => 'test@example.com',
+        'phone' => '03001234567',
         'password' => bcrypt('password'),
     ]);
 
     $response = $this->postJson('/api/login', [
-        'email' => 'test@example.com',
+        'phone' => '03001234567',
         'password' => 'wrong-password',
     ]);
 
     $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['email']);
+    $response->assertJsonValidationErrors(['phone']);
 });
 
 test('users can logout', function () {

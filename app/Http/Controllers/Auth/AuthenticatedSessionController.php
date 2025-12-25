@@ -174,18 +174,14 @@ class AuthenticatedSessionController extends Controller
      */
     private function handlePasswordLogin(LoginRequest $request): JsonResponse
     {
-        // Verify credentials (email/phone + password)
         $user = $request->verifyCredentials();
 
-        // Determine which login method was used (email or phone)
-        $loginMethod = $request->filled('email') ? 'email' : 'phone';
-        $isVerified = false;
+        $loginMethod = 'phone';
 
         // Check if the account is verified
         $user->refresh();
 
-        // Check if verified_at is set (OTP was verified at least once)
-        $isVerified = $user->verified_at !== null && $user->verified_at instanceof \Carbon\Carbon;
+        $isVerified = $user->phone_verified_at !== null && $user->phone_verified_at instanceof \Carbon\Carbon;
 
         // Log for debugging
         Log::info('Password login verification check', [

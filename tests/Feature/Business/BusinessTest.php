@@ -83,7 +83,6 @@ test('businesses can create a worker', function () {
         'Accept' => 'application/json',
     ])->postJson('/api/business/workers', [
         'name' => 'Worker Name',
-        'email' => 'worker@example.com',
         'phone' => '03001234567',
         'service_types' => ['maid'],
         'locations' => [
@@ -101,11 +100,11 @@ test('businesses can create a worker', function () {
 
     $response->assertStatus(200);
     $this->assertDatabaseHas('users', [
-        'email' => 'worker@example.com',
+        'phone' => '03001234567',
         'name' => 'Worker Name',
     ]);
 
-    $helper = User::where('email', 'worker@example.com')->first();
+    $helper = User::where('phone', '03001234567')->first();
     expect($business->helpers()->where('users.id', $helper->id)->exists())->toBeTrue();
 });
 

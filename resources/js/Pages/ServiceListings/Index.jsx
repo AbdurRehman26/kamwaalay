@@ -215,20 +215,11 @@ export default function ServiceListingsIndex() {
                 </div>
             </div>
 
-            {/* Notice */}
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                        <strong>Note:</strong> We are currently serving Karachi, Lahore, and Islamabad. More cities coming soon!
-                    </p>
-                </div>
-            </div>
-
             <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
                 {/* Filters */}
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-12">
                     <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Filter Services</h2>
-                    <div className="grid md:grid-cols-5 gap-6">
+                    <div className="grid md:grid-cols-3 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Service Type</label>
                             <select
@@ -257,46 +248,23 @@ export default function ServiceListingsIndex() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">City</label>
-                            <select
-                                value={cityId}
-                                onChange={(e) => setCityId(e.target.value)}
-                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
-                            >
-                                <option value="">All Cities</option>
-                                {cities.map((city) => (
-                                    <option key={city.id} value={city.id}>
-                                        {city.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="relative" ref={locationFilterRef}>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Location</label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value={locationFilterQuery || locationDisplay}
-                                    onChange={(e) => {
-                                        setLocationFilterQuery(e.target.value);
-                                        if (!e.target.value) {
-                                            setLocationId("");
-                                            setLocationDisplay("");
-                                            setLatitude("");
-                                            setLongitude("");
-                                        }
-                                    }}
-                                    onFocus={() => {
-                                        if (locationFilterSuggestions.length > 0) {
-                                            setShowLocationSuggestions(true);
-                                        }
-                                    }}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm pr-10"
-                                    placeholder="Search location..."
-                                />
+                            <div className="flex gap-2">
+                                <select
+                                    value={cityId}
+                                    onChange={(e) => setCityId(e.target.value)}
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                                >
+                                    <option value="">All Cities</option>
+                                    {cities.map((city) => (
+                                        <option key={city.id} value={city.id}>
+                                            {city.name}
+                                        </option>
+                                    ))}
+                                </select>
                                 <button
                                     type="button"
                                     onClick={() => handleNearMe()}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                    className="px-3 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors"
                                     title="Search Near Me"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -305,31 +273,6 @@ export default function ServiceListingsIndex() {
                                     </svg>
                                 </button>
                             </div>
-                            {showLocationSuggestions && locationFilterSuggestions.length > 0 && (
-                                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
-                                    {locationFilterSuggestions.map((suggestion, index) => (
-                                        <div
-                                            key={index}
-                                            onClick={() => handleLocationSelect(suggestion)}
-                                            className="px-4 py-2 hover:bg-primary-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200"
-                                        >
-                                            {suggestion.display_text}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Sort By</label>
-                            <select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
-                            >
-                                <option value="created_at">Newest</option>
-                                <option value="rate_low">Rate: Low to High</option>
-                                <option value="rate_high">Rate: High to Low</option>
-                            </select>
                         </div>
                         <div className="flex items-end">
                             <button

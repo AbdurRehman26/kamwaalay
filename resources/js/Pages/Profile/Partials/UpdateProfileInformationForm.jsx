@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { profileService } from "@/services/profile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguages } from "@/hooks/useLanguages";
+import axios from "axios";
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -15,10 +16,12 @@ export default function UpdateProfileInformation({
 }) {
     const { user, updateUser } = useAuth();
     const { languages, loading: languagesLoading } = useLanguages();
+    const [cities, setCities] = useState([]);
 
     const [data, setData] = useState({
         name: user?.name || "",
         phone: user?.phone || "",
+        city_id: user?.city_id || "",
         age: user?.age || "",
         gender: user?.gender || "",
         religion: user?.religion?.value || user?.religion || "",
@@ -28,12 +31,24 @@ export default function UpdateProfileInformation({
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
 
+    // Fetch cities on mount
+    useEffect(() => {
+        axios.get("/api/cities")
+            .then((response) => {
+                setCities(response.data.data || response.data || []);
+            })
+            .catch((error) => {
+                console.error("Error fetching cities:", error);
+            });
+    }, []);
+
     // Update form data when user changes
     useEffect(() => {
         if (user) {
             setData({
                 name: user.name || "",
                 phone: user.phone || "",
+                city_id: user.city_id || "",
                 age: user.age || "",
                 gender: user.gender || "",
                 religion: user.religion?.value || user.religion || "",
@@ -52,6 +67,7 @@ export default function UpdateProfileInformation({
             // Prepare data - convert empty strings to null for optional fields
             const submitData = {
                 name: data.name,
+                city_id: data.city_id ? parseInt(data.city_id) : null,
                 age: data.age ? parseInt(data.age) : null,
                 gender: data.gender || null,
                 religion: data.religion || null,
@@ -132,6 +148,26 @@ export default function UpdateProfileInformation({
                     />
 
                     <InputError className="mt-2" message={errors.phone} />
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="city_id" value="City" />
+
+                    <select
+                        id="city_id"
+                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        value={data.city_id}
+                        onChange={(e) => setData({ ...data, city_id: e.target.value })}
+                    >
+                        <option value="">Select City</option>
+                        {cities.map((city) => (
+                            <option key={city.id} value={city.id}>
+                                {city.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <InputError className="mt-2" message={errors.city_id} />
                 </div>
 
                 {/* Only show age, gender, religion, and languages for helper users */}

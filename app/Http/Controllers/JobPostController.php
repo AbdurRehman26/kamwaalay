@@ -301,7 +301,7 @@ class JobPostController extends Controller
     #[OA\Get(
         path: "/api/job-posts/browse",
         summary: "Browse available job posts",
-        description: "Browse all available pending job posts (public access). Shows only pending posts that haven't been assigned yet. If user is authenticated and is a helper/business, excludes job posts they already applied to.",
+        description: "Browse all available pending job posts (public access). Shows only pending posts that haven't been assigned yet. If user is authenticated and is a helper/business, excludes job posts they already applied to. When latitude/longitude are provided, results are sorted by distance (nearest first).",
         tags: ["JobPosts"],
         parameters: [
             new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
@@ -309,6 +309,9 @@ class JobPostController extends Controller
             new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "City name to filter by"),
             new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Area name to filter by (partial match)"),
             new OA\Parameter(name: "work_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["full_time", "part_time"])),
+            new OA\Parameter(name: "latitude", in: "query", required: false, schema: new OA\Schema(type: "number", format: "float"), description: "User's latitude for proximity search"),
+            new OA\Parameter(name: "longitude", in: "query", required: false, schema: new OA\Schema(type: "number", format: "float"), description: "User's longitude for proximity search"),
+            new OA\Parameter(name: "radius_km", in: "query", required: false, schema: new OA\Schema(type: "number", format: "float", default: 50), description: "Maximum distance in kilometers (default: 50km)"),
         ],
         responses: [
             new OA\Response(
@@ -339,6 +342,8 @@ class JobPostController extends Controller
                                 new OA\Property(property: "area", type: "string", nullable: true),
                                 new OA\Property(property: "work_type", type: "string", nullable: true),
                                 new OA\Property(property: "location_display", type: "string", nullable: true),
+                                new OA\Property(property: "latitude", type: "number", nullable: true),
+                                new OA\Property(property: "longitude", type: "number", nullable: true),
                             ]
                         ),
                     ]
@@ -364,7 +369,7 @@ class JobPostController extends Controller
         // Filter by city name
         $locationDisplay = '';
         if ($request->has('city_name') && $request->city_name) {
-            $query->whereHas('city', function ($q) use ($request) {
+            $query->whereHas('cityRelation', function ($q) use ($request) {
                 $q->where('name', $request->city_name);
             });
             $locationDisplay = $request->city_name;
@@ -385,11 +390,41 @@ class JobPostController extends Controller
             }
         }
 
-        $jobPosts = $query->orderBy('created_at', 'desc')->paginate(12);
+        // Location-based filtering using latitude and longitude
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+        
+        if ($latitude && $longitude) {
+            $lat = (float) $latitude;
+            $lng = (float) $longitude;
+            $radiusKm = (float) ($request->input('radius_km', 50)); // Default 50km radius
+            
+            // Haversine formula for distance calculation in kilometers
+            // 6371 is Earth's radius in km
+            $haversine = "(6371 * acos(cos(radians($lat)) * cos(radians(latitude)) * cos(radians(longitude) - radians($lng)) + sin(radians($lat)) * sin(radians(latitude))))";
+            
+            // Only include job posts that have coordinates
+            $query->whereNotNull('latitude')
+                  ->whereNotNull('longitude')
+                  ->selectRaw("*, $haversine AS distance")
+                  ->having('distance', '<=', $radiusKm)
+                  ->orderBy('distance', 'asc');
+        } else {
+            // Default ordering by created_at
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $jobPosts = $query->paginate(12);
 
         $filters = $request->only(['service_type', 'city_name', 'work_type']);
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
+        }
+        if ($latitude) {
+            $filters['latitude'] = $latitude;
+        }
+        if ($longitude) {
+            $filters['longitude'] = $longitude;
         }
 
         return response()->json([

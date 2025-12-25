@@ -153,9 +153,8 @@ class VerificationController extends Controller
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
                                 new OA\Property(property: "name", type: "string", example: "John Doe"),
-                                new OA\Property(property: "email", type: "string", nullable: true, example: "user@example.com"),
                                 new OA\Property(property: "phone", type: "string", nullable: true, example: "+923001234567"),
-                                new OA\Property(property: "verified_at", type: "string", format: "date-time", nullable: true),
+                                new OA\Property(property: "phone_verified_at", type: "string", format: "date-time", nullable: true),
                                 new OA\Property(property: "onboarding_complete", type: "boolean", example: true, description: "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)"),
                             ]
                         ),
@@ -243,7 +242,7 @@ class VerificationController extends Controller
         if ($request->has('phone') && $request->phone) {
             // Format phone number to +92xxxxx format
             $formattedPhone = $this->formatPhoneNumber($request->phone);
-            
+
             // Find user by phone (try both formatted and original)
             $user = User::where('phone', $formattedPhone)
                 ->orWhere('phone', $request->phone)
@@ -345,20 +344,20 @@ class VerificationController extends Controller
 
         if (!$isDemoCode) {
             // Find OTP record (using phone column to store email)
-            $emailOtp = PhoneOtp::where('phone', $email)
+            $phoneOtp = PhoneOtp::where('phone', $email)
                 ->where('otp', $request->otp)
                 ->where('verified', false)
                 ->latest()
                 ->first();
 
-            if (!$emailOtp) {
+            if (!$phoneOtp) {
                 return response()->json([
                     'message' => 'Invalid or expired OTP. Please try again.',
                     'errors' => ['otp' => ['Invalid or expired OTP.']]
                 ], 422);
             }
 
-            if ($emailOtp->isExpired()) {
+            if ($phoneOtp->isExpired()) {
                 return response()->json([
                     'message' => 'OTP has expired. Please request a new one.',
                     'errors' => ['otp' => ['OTP has expired.']]
@@ -366,13 +365,13 @@ class VerificationController extends Controller
             }
 
             // Mark OTP as verified
-            $emailOtp->markAsVerified();
+            $phoneOtp->markAsVerified();
         }
 
         if ($isLogin) {
             // Login flow - mark as verified since OTP was successful (first time verification)
-            if (!$user->verified_at) {
-                $user->verified_at = Carbon::now();
+            if (!$user->phone_verified_at) {
+                $user->phone_verified_at = Carbon::now();
                 $user->save();
             }
 
@@ -424,7 +423,6 @@ class VerificationController extends Controller
             return response()->json($response);
         } else {
             // Registration flow - mark as verified and fire Registered event (first time verification)
-            $user->verified_at = Carbon::now();
             $user->save();
 
             // Fire Registered event now that user is verified
@@ -508,8 +506,8 @@ class VerificationController extends Controller
 
         if ($isLogin) {
             // Login flow - mark as verified since OTP was successful (first time verification)
-            if (!$user->verified_at) {
-                $user->verified_at = Carbon::now();
+            if (!$user->phone_verified_at) {
+                $user->phone_verified_at = Carbon::now();
                 $user->save();
             }
 
@@ -561,7 +559,6 @@ class VerificationController extends Controller
             return response()->json($response);
         } else {
             // Registration flow - mark as verified and fire Registered event (first time verification)
-            $user->verified_at = Carbon::now();
             $user->save();
 
             // Fire Registered event now that user is verified
@@ -946,10 +943,10 @@ class VerificationController extends Controller
     {
         // Remove all non-numeric characters except +
         $phone = preg_replace('/[^0-9+]/', '', $phone);
-        
+
         // Remove leading + if present (we'll add it back at the end)
         $phone = ltrim($phone, '+');
-        
+
         // Handle different input formats
         if (strpos($phone, '0092') === 0) {
             // Format: 0092xxxxxxxxx -> +92xxxxxxxxx
@@ -970,12 +967,12 @@ class VerificationController extends Controller
                 $phone = '92' . $phone;
             }
         }
-        
+
         // Ensure it starts with +
         if (strpos($phone, '+') !== 0) {
             $phone = '+' . $phone;
         }
-        
+
         return $phone;
     }
 
