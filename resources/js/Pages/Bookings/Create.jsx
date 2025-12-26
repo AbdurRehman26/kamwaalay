@@ -354,7 +354,7 @@ export default function BookingCreate() {
                                 </div>
                             </div>
 
-                            <div className="pt-6 border-t border-gray-200 dark:border-gray-700 flex gap-4">
+                            <div className="pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row gap-4">
                                 <button
                                     type="submit"
                                     disabled={processing}
