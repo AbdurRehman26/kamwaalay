@@ -190,10 +190,10 @@ class JobApplicationController extends Controller
             ->where('user_id', Auth::id())
             ->exists();
 
-        $jobPost->load('user.profile');
+        $jobPost->load(['user.profile', 'cityRelation', 'serviceType']);
 
         return response()->json([
-            'job_post' => $jobPost,
+            'job_post' => new \App\Http\Resources\JobPostResource($jobPost),
             'has_applied' => $hasApplied,
         ]);
     }
@@ -358,13 +358,13 @@ class JobApplicationController extends Controller
             abort(403);
         }
 
-        $applications = JobApplication::with(['jobPost.user'])
+        $applications = JobApplication::with(['jobPost.user', 'jobPost.serviceType', 'jobPost.cityRelation'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
         return response()->json([
-            'applications' => $applications,
+            'applications' => \App\Http\Resources\JobApplicationResource::collection($applications)->response()->getData(true),
         ]);
     }
 

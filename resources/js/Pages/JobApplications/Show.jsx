@@ -309,7 +309,7 @@ export default function JobApplicationShow() {
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Location</p>
                                     <p className="text-gray-900 dark:text-white font-semibold">
-                                        {jobPost?.city || "N/A"}{jobPost?.area ? `, ${jobPost.area}` : ""}
+                                        {jobPost?.city_name || jobPost?.city?.name || jobPost?.city || "N/A"}{jobPost?.area ? `, ${jobPost.area}` : ""}
                                     </p>
                                     {jobPost?.address && (
                                         <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">{jobPost.address}</p>

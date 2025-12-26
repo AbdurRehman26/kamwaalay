@@ -148,7 +148,7 @@ export default function JobApplicationCreate() {
                                     <span className="text-2xl">📋</span>
                                     <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Job Details</h2>
                                 </div>
-                                
+
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-5 border border-indigo-100 dark:border-indigo-800">
                                         <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-2">Service Type</h3>
@@ -160,7 +160,7 @@ export default function JobApplicationCreate() {
                                     </div>
                                     <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-5 border border-indigo-100 dark:border-indigo-800">
                                         <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-2">📍 Location</h3>
-                                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{booking.city}, {booking.area}</p>
+                                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{booking.city_name || booking.city?.name || booking.city}, {booking.area}</p>
                                     </div>
                                     {booking.special_requirements && (
                                         <div className="md:col-span-2 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-5 border border-indigo-100 dark:border-indigo-800">
@@ -173,80 +173,80 @@ export default function JobApplicationCreate() {
 
                             {/* Application Form */}
                             {!hasApplied ? (
-                            <form onSubmit={submit} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-                                <div className="flex items-center gap-3 mb-8">
-                                    <span className="text-2xl">✍️</span>
-                                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Your Application</h2>
-                                </div>
-
-                                <div className="mb-8">
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">
-                                        Application Message <span className="text-red-500">*</span>
-                                    </label>
-                                    <textarea
-                                        value={data.message}
-                                        onChange={(e) => setData(prev => ({ ...prev, message: e.target.value }))}
-                                        rows={8}
-                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-4 px-5 shadow-sm transition-all duration-300 text-gray-900 dark:text-gray-100"
-                                        placeholder="Tell the client why you're perfect for this job. Mention your experience, skills, and availability..."
-                                    />
-                                    {errors.message && (
-                                        <div className="mt-2 text-red-500 dark:text-red-400 text-sm font-medium flex items-center gap-1">
-                                            <span>⚠️</span> {errors.message}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="mb-8">
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">
-                                        Proposed Monthly Rate (PKR) <span className="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
-                                    </label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        value={data.proposed_rate}
-                                        onChange={(e) => setData(prev => ({ ...prev, proposed_rate: e.target.value }))}
-                                        className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-4 px-5 shadow-sm transition-all duration-300 text-gray-900 dark:text-gray-100"
-                                        placeholder="e.g., 50000"
-                                    />
-                                    {errors.proposed_rate && (
-                                        <div className="mt-2 text-red-500 dark:text-red-400 text-sm font-medium flex items-center gap-1">
-                                            <span>⚠️</span> {errors.proposed_rate}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                                    <button
-                                        type="submit"
-                                        disabled={processing}
-                                        className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {processing ? (
-                                            <span className="flex items-center justify-center gap-2">
-                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                                Submitting...
-                                            </span>
-                                        ) : (
-                                            "Submit Application"
-                                        )}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => navigate(route("job-applications.index"))}
-                                        className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-8 py-4 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 font-bold text-lg border-2 border-gray-300 dark:border-gray-600"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                                {errors.submit && (
-                                    <div className="mt-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 rounded-xl">
-                                        <p className="text-sm text-red-800 dark:text-red-300 font-medium flex items-center gap-2">
-                                            <span>⚠️</span> {errors.submit[0]}
-                                        </p>
+                                <form onSubmit={submit} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+                                    <div className="flex items-center gap-3 mb-8">
+                                        <span className="text-2xl">✍️</span>
+                                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Your Application</h2>
                                     </div>
-                                )}
-                            </form>
+
+                                    <div className="mb-8">
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">
+                                            Application Message <span className="text-red-500">*</span>
+                                        </label>
+                                        <textarea
+                                            value={data.message}
+                                            onChange={(e) => setData(prev => ({ ...prev, message: e.target.value }))}
+                                            rows={8}
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-4 px-5 shadow-sm transition-all duration-300 text-gray-900 dark:text-gray-100"
+                                            placeholder="Tell the client why you're perfect for this job. Mention your experience, skills, and availability..."
+                                        />
+                                        {errors.message && (
+                                            <div className="mt-2 text-red-500 dark:text-red-400 text-sm font-medium flex items-center gap-1">
+                                                <span>⚠️</span> {errors.message}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="mb-8">
+                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">
+                                            Proposed Monthly Rate (PKR) <span className="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={data.proposed_rate}
+                                            onChange={(e) => setData(prev => ({ ...prev, proposed_rate: e.target.value }))}
+                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-4 px-5 shadow-sm transition-all duration-300 text-gray-900 dark:text-gray-100"
+                                            placeholder="e.g., 50000"
+                                        />
+                                        {errors.proposed_rate && (
+                                            <div className="mt-2 text-red-500 dark:text-red-400 text-sm font-medium flex items-center gap-1">
+                                                <span>⚠️</span> {errors.proposed_rate}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                                        <button
+                                            type="submit"
+                                            disabled={processing}
+                                            className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {processing ? (
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                                    Submitting...
+                                                </span>
+                                            ) : (
+                                                "Submit Application"
+                                            )}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate(route("job-applications.index"))}
+                                            className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-8 py-4 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 font-bold text-lg border-2 border-gray-300 dark:border-gray-600"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                    {errors.submit && (
+                                        <div className="mt-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 rounded-xl">
+                                            <p className="text-sm text-red-800 dark:text-red-300 font-medium flex items-center gap-2">
+                                                <span>⚠️</span> {errors.submit[0]}
+                                            </p>
+                                        </div>
+                                    )}
+                                </form>
                             ) : (
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
                                     <div className="text-center py-12">

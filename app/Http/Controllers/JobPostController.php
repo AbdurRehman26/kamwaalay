@@ -242,6 +242,11 @@ class JobPostController extends Controller
     public function show(JobPost $jobPost)
     {
         // Allow public viewing of job posts
+        // Manually handle optional authentication for privacy checks
+        if ($user = \Illuminate\Support\Facades\Auth::guard('sanctum')->user()) {
+            \Illuminate\Support\Facades\Auth::setUser($user);
+        }
+
         // Load job applications with user profile details
         $jobPost->load([
             'user', 

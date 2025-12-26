@@ -84,7 +84,7 @@ export default function MyApplications() {
                                             </span>
                                         </div>
                                         <p className="text-gray-600 dark:text-gray-400 mb-2 capitalize text-sm">
-                                            {(application.job_post || application.booking)?.work_type?.replace("_", " ") || "N/A"} • {(application.job_post || application.booking)?.city || "N/A"}, {(application.job_post || application.booking)?.area || "N/A"}
+                                            {(application.job_post || application.booking)?.work_type?.replace("_", " ") || "N/A"} • {(application.job_post || application.booking)?.city_name || (application.job_post || application.booking)?.city?.name || (application.job_post || application.booking)?.city || "N/A"}, {(application.job_post || application.booking)?.area || "N/A"}
                                         </p>
                                         <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
                                             Requested by: <span className="font-semibold text-gray-700 dark:text-gray-300">{(application.job_post || application.booking)?.user?.name}</span>
@@ -137,8 +137,8 @@ export default function MyApplications() {
                                             to={link.url || "#"}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${link.active
-                                                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
-                                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700"
+                                                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+                                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700"
                                                 } ${!link.url && "cursor-not-allowed opacity-50"}`}
                                         />
                                     ))}

@@ -139,7 +139,14 @@ export default function MyServiceListings() {
                                                     </span>
                                                 </div>
                                                 {/* Locations */}
-                                                {listing.location_details && listing.location_details.length > 0 ? (
+                                                {listing.pin_address ? (
+                                                    <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400 text-sm">
+                                                        <span className="text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">📍</span>
+                                                        <span className="break-words line-clamp-2" title={listing.pin_address}>
+                                                            {listing.pin_address}
+                                                        </span>
+                                                    </div>
+                                                ) : listing.location_details && listing.location_details.length > 0 ? (
                                                     <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400 text-sm">
                                                         <span className="text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">📍</span>
                                                         <div className="flex-1">

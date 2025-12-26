@@ -577,7 +577,7 @@ class ServiceListingController extends Controller
 
         // Get service listings for this profile
         $listings = ServiceListing::where('profile_id', $profile->id)
-            ->with(['serviceTypes'])
+            ->with(['serviceTypes', 'profile'])
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
