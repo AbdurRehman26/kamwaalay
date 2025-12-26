@@ -85,12 +85,9 @@ test('businesses can create a worker', function () {
         'name' => 'Worker Name',
         'phone' => '03001234567',
         'service_types' => ['maid'],
-        'locations' => [
-            [
-                'city' => 'Karachi',
-                'area' => 'Saddar',
-            ],
-        ],
+        'pin_address' => 'Saddar, Karachi, Pakistan',
+        'pin_latitude' => '24.8607',
+        'pin_longitude' => '67.0011',
         'experience_years' => 5,
         'availability' => 'full_time',
         'bio' => 'Experienced worker',
@@ -128,13 +125,9 @@ test('businesses can update their worker', function () {
         'name' => 'New Name',
         'phone' => $helper->phone ?? '03001234567',
         'service_types' => ['cook'],
-        'locations' => [
-            [
-                'city' => 'Karachi',
-                'area' => 'PECHS',
-            ],
-        ],
-        'skills' => 'Cooking',
+        'pin_address' => 'PECHS, Karachi, Pakistan',
+        'pin_latitude' => '24.8650',
+        'pin_longitude' => '67.0650',
         'experience_years' => 8,
         'availability' => 'part_time',
         'bio' => 'Updated bio',

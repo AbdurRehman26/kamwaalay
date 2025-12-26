@@ -178,7 +178,11 @@ class User extends Authenticatable implements FilamentUser
      */
     public function hasCompletedOnboarding(): bool
     {
-        if ($this->hasRole('helper') || $this->hasRole('business')) {
+        if ($this->hasRole('business')) {
+            return $this->helpers()->exists();
+        }
+
+        if ($this->hasRole('helper')) {
             // Check if user has a profile with service listings
             $profile = $this->profile;
 

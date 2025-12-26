@@ -326,12 +326,17 @@ class BusinessController extends Controller
             'photo' => 'nullable|image|max:2048',
             'service_types' => 'required|array|min:1',
             'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
-            'locations' => 'required|array|min:1',
-            'locations.*.city' => 'required|string|max:255',
-            'locations.*.area' => 'required|string|max:255',
+            'pin_address' => 'required|string|max:500',
+            'pin_latitude' => 'nullable|numeric',
+            'pin_longitude' => 'nullable|numeric',
             'experience_years' => 'required|integer|min:0',
             'availability' => 'required|in:full_time,part_time,available',
             'bio' => 'nullable|string',
+            'monthly_rate' => 'nullable|numeric|min:0',
+            'age' => 'nullable|integer|min:18|max:100',
+            'gender' => 'nullable|in:male,female,other',
+            'religion' => 'nullable|string',
+            'languages' => 'nullable|string', // JSON string of language IDs
         ]);
 
         // Create user account for the worker
@@ -355,18 +360,20 @@ class BusinessController extends Controller
         $helper = User::create($userData);
         $helper->assignRole('helper');
 
-        $primaryLocation = $validated['locations'][0];
-        
-        // Find city to get ID
-        $city = \App\Models\City::where('name', $primaryLocation['city'])->first();
+        // Try to extract city from pin_address or use default
+        $pinAddress = $validated['pin_address'];
+        $city = \App\Models\City::where('name', 'like', '%Karachi%')->first();
         $cityId = $city ? $city->id : 1; // Default to 1 if not found
 
         // Create profile for the worker
         $profileData = [
             'experience_years' => $validated['experience_years'],
-            'city' => $primaryLocation['city'],
+            'city_id' => $cityId,
             'availability' => $validated['availability'],
             'bio' => $validated['bio'] ?? null,
+            'age' => $validated['age'] ?? null,
+            'gender' => $validated['gender'] ?? null,
+            'religion' => $validated['religion'] ?? null,
             'is_active' => true,
             'verification_status' => 'pending', // Default status
         ];
@@ -377,13 +384,24 @@ class BusinessController extends Controller
 
         $profile = $helper->profile()->create($profileData);
 
+        // Sync languages to profile_language table
+        if (!empty($validated['languages'])) {
+            $languageIds = json_decode($validated['languages'], true);
+            if (is_array($languageIds) && count($languageIds) > 0) {
+                $profile->languages()->sync($languageIds);
+            }
+        }
+
         $listing = \App\Models\ServiceListing::create([
             'user_id' => $helper->id,
             'profile_id' => $profile->id,
             'work_type' => $validated['availability'], // Map availability to work_type
             'description' => $validated['bio'],
             'city_id' => $cityId,
-            'pin_address' => $primaryLocation['area'] . ', ' . $primaryLocation['city'], // Construct address
+            'pin_address' => $pinAddress,
+            'pin_latitude' => $validated['pin_latitude'] ?? null,
+            'pin_longitude' => $validated['pin_longitude'] ?? null,
+            'monthly_rate' => $validated['monthly_rate'] ?? null,
             'is_active' => true,
             'status' => 'active',
         ]);
@@ -440,8 +458,11 @@ class BusinessController extends Controller
             abort(404);
         }
 
+        // Load profile with languages for the edit form
+        $helper->load(['roles', 'profile.languages', 'serviceListings']);
+
         return response()->json([
-            'helper' => new UserResource($helper->load(['roles', 'serviceListings'])),
+            'helper' => new UserResource($helper),
         ]);
     }
 
@@ -552,12 +573,17 @@ class BusinessController extends Controller
             'photo' => 'nullable|image|max:2048',
             'service_types' => 'required|array|min:1',
             'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
-            'locations' => 'required|array|min:1',
-            'locations.*.city' => 'required|string|max:255',
-            'locations.*.area' => 'required|string|max:255',
+            'pin_address' => 'required|string|max:500',
+            'pin_latitude' => 'nullable|numeric',
+            'pin_longitude' => 'nullable|numeric',
             'experience_years' => 'required|integer|min:0',
             'availability' => 'required|in:full_time,part_time,available',
             'bio' => 'nullable|string',
+            'monthly_rate' => 'nullable|numeric|min:0',
+            'age' => 'nullable|integer|min:18|max:100',
+            'gender' => 'nullable|in:male,female,other',
+            'religion' => 'nullable|string',
+            'languages' => 'nullable|string', // JSON string of language IDs
             'is_active' => 'boolean',
         ])->validate();
 
@@ -581,6 +607,9 @@ class BusinessController extends Controller
             'experience_years' => $validated['experience_years'],
             'availability' => $validated['availability'],
             'bio' => $validated['bio'] ?? null,
+            'age' => $validated['age'] ?? null,
+            'gender' => $validated['gender'] ?? null,
+            'religion' => $validated['religion'] ?? null,
             'is_active' => $validated['is_active'] ?? true,
         ];
 
@@ -594,14 +623,23 @@ class BusinessController extends Controller
 
         $profile->update($profileData);
 
+        // Sync languages to profile_language table
+        if (!empty($validated['languages'])) {
+            $languageIds = json_decode($validated['languages'], true);
+            if (is_array($languageIds)) {
+                $profile->languages()->sync($languageIds);
+            }
+        } else {
+            // Clear languages if empty
+            $profile->languages()->detach();
+        }
+
         // Update service listings - delete old ones and create new ones
         $profile->serviceListings()->delete();
 
-        // Get primary location from validated data
-        $primaryLocation = $validated['locations'][0];
-        
-        // Find city to get ID
-        $city = \App\Models\City::where('name', $primaryLocation['city'])->first();
+        // Try to extract city or use default
+        $pinAddress = $validated['pin_address'];
+        $city = \App\Models\City::where('name', 'like', '%Karachi%')->first();
         $cityId = $city ? $city->id : 1; // Default to 1 if not found
 
         $listing = \App\Models\ServiceListing::create([
@@ -610,7 +648,10 @@ class BusinessController extends Controller
             'work_type' => $validated['availability'], // Map availability to work_type
             'description' => $validated['bio'],
             'city_id' => $cityId,
-            'pin_address' => $primaryLocation['area'] . ', ' . $primaryLocation['city'], // Construct address
+            'pin_address' => $pinAddress,
+            'pin_latitude' => $validated['pin_latitude'] ?? null,
+            'pin_longitude' => $validated['pin_longitude'] ?? null,
+            'monthly_rate' => $validated['monthly_rate'] ?? null,
             'is_active' => true,
             'status' => 'active',
         ]);

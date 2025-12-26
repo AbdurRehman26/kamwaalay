@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Enums\Religion;
 use App\Http\Resources\UserResource;
 use App\Models\ServiceListing;
+use App\Models\ServiceType;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Onboarding", description: "User onboarding endpoints")]
@@ -352,76 +356,59 @@ class OnboardingController extends Controller
      */
     public function completeBusiness(Request $request)
     {
-        $user = Auth::user();
+        $business = Auth::user();
 
-        if (!$user->hasRole('business')) {
+        if (!$business->hasRole('business')) {
             abort(403);
         }
 
-        // Handle services and locations if sent as JSON string (from FormData)
-        $servicesData = $request->input('services');
-        $decodedServices = $servicesData;
-        if (is_string($servicesData)) {
-            $decoded = json_decode($servicesData, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return response()->json([
-                    'message' => 'Invalid services data format.',
-                    'errors' => ['services' => ['Invalid services data format.']]
-                ], 422);
+        // Handle arrays from FormData (JSON strings)
+        $arrayFields = ['service_types', 'locations', 'languages'];
+        $decodedData = [];
+        
+        foreach ($arrayFields as $field) {
+            $value = $request->input($field);
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+                // If it's a valid JSON string, use the decoded value
+                // otherwise use the original value (it might be sent as array by some clients)
+                $decodedData[$field] = (json_last_error() === JSON_ERROR_NONE) ? $decoded : $value;
+            } else {
+                $decodedData[$field] = $value;
             }
-            $decodedServices = $decoded;
         }
 
-        $locationsData = $request->input('locations');
-        $decodedLocations = $locationsData;
-        if (is_string($locationsData)) {
-            $decoded = json_decode($locationsData, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return response()->json([
-                    'message' => 'Invalid locations data format.',
-                    'errors' => ['locations' => ['Invalid locations data format.']]
-                ], 422);
-            }
-            $decodedLocations = $decoded;
-        }
-
+        // Merge decoded data back into request for validation
         $dataToValidate = $request->all();
-        $dataToValidate['services'] = $decodedServices;
-        $dataToValidate['locations'] = $decodedLocations;
-
-        // Handle languages if sent as JSON string (from FormData)
-        $languagesData = $request->input('languages');
-        $decodedLanguages = $languagesData;
-        if (is_string($languagesData)) {
-            $decoded = json_decode($languagesData, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $decodedLanguages = $decoded;
-            }
-        }
-        $dataToValidate['languages'] = $decodedLanguages;
-
-        // Sanitize nullable fields that might come as strings "null" or "" from FormData
-        $nullableFields = ['age', 'gender', 'religion', 'bio', 'city', 'area', 'nic_number', 'monthly_rate', 'description'];
-        foreach ($nullableFields as $field) {
-            if (isset($dataToValidate[$field]) && ($dataToValidate[$field] === 'null' || $dataToValidate[$field] === '')) {
-                $dataToValidate[$field] = null;
-            }
+        foreach ($decodedData as $key => $val) {
+            $dataToValidate[$key] = $val;
         }
 
+        // Custom validation logic
         $validator = Validator::make($dataToValidate, [
-            'services' => 'required|array|min:1',
-            'services.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
-            'locations' => 'required|array|min:1',
-            'locations.*' => 'required|integer|exists:locations,id',
-            'work_type' => 'required|in:full_time,part_time',
-            'monthly_rate' => 'nullable|numeric|min:0',
-            'description' => 'nullable|string|max:2000',
+            // Business Profile Fields (for the logged-in user)
             'nic' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:5120',
             'nic_number' => 'nullable|string|max:255',
-            'photo' => 'nullable|image|max:2048',
-            'bio' => 'nullable|string',
-            'city' => 'nullable|string|max:255',
-            'area' => 'nullable|string|max:255',
+            
+            // Worker Fields (to create a new worker)
+            'name' => 'required|string|max:255', // Worker Name
+            'phone' => 'nullable|string|max:20', // Worker Phone
+            'photo' => 'nullable|image|max:2048', // Worker Photo
+            'service_types' => 'required|array|min:1',
+            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
+            'service_types' => 'required|array|min:1',
+            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
+            
+            // Location (Pin Address)
+            'pin_address' => 'required|string',
+            'pin_latitude' => 'nullable|numeric',
+            'pin_longitude' => 'nullable|numeric',
+            
+            'experience_years' => 'required|integer|min:0',
+            'availability' => 'required|in:full_time,part_time,available',
+            'bio' => 'nullable|string', // Worker Bio
+            
+            // Optional worker fields
             'age' => 'nullable|integer|min:18|max:100',
             'gender' => 'nullable|in:male,female,other',
             'religion' => 'nullable|in:' . Religion::validationString(),
@@ -435,90 +422,104 @@ class OnboardingController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
+
         $validated = $validator->validated();
 
-        // Update user profile if provided
-        $profileData = [];
-        if ($request->hasFile('photo')) {
-            $profileData['photo'] = $request->file('photo')->store('businesses/photos', 'public');
-        }
-        if ($request->has('bio')) {
-            $profileData['bio'] = $validated['bio'];
-        }
-        if ($request->has('city')) {
-            $profileData['city'] = $validated['city'];
-        }
-        if ($request->has('area')) {
-            $profileData['area'] = $validated['area'];
-        }
-        if ($request->has('age')) {
-            $profileData['age'] = $validated['age'];
-        }
-        if ($request->has('gender')) {
-            $profileData['gender'] = $validated['gender'];
-        }
-        if ($request->has('religion')) {
-            $profileData['religion'] = $validated['religion'];
-        }
-        if (!empty($profileData)) {
-            $profile = $user->profile()->updateOrCreate(
-                ['profileable_id' => $user->id, 'profileable_type' => 'App\Models\User'],
-                $profileData
-            );
-        } else {
-            $profile = $user->profile;
-            if (!$profile) {
-                $profile = $user->profile()->create([]);
-            }
-        }
-
-        // Sync languages if provided
-        if ($request->has('languages') && is_array($validated['languages'])) {
-            $profile->languages()->sync($validated['languages']);
-        }
-
-        // Store NIC document (if provided)
+        // 1. Update Business Profile (NIC)
         if ($request->hasFile('nic')) {
             $nicPath = $request->file('nic')->store('documents/nic', 'public');
             \App\Models\Document::create([
-                'user_id' => $user->id,
+                'user_id' => $business->id,
                 'document_type' => 'nic',
                 'document_number' => $validated['nic_number'] ?? null,
                 'file_path' => $nicPath,
                 'status' => 'pending',
             ]);
         }
-
-        // Get or create profile
-        $profile = $user->profile;
-        if (!$profile) {
-            $profile = $user->profile()->create([]);
+        
+        // Also update nic_number in profile if provided
+        if (!empty($validated['nic_number'])) {
+             // Create or update profile
+             $businessProfile = $business->profile;
+             if (!$businessProfile) {
+                 $businessProfile = $business->profile()->create([]);
+             }
+             // Assuming we might store nic_number in profile too? Or just Document?
+             // Existing code didn't obscurely put it in profile but let's leave it as Document focused.
         }
 
-        // Create service listing
-        $listing = ServiceListing::create([
-            'profile_id' => $profile->id,
-            'work_type' => $validated['work_type'],
-            'monthly_rate' => $validated['monthly_rate'] ?? null,
-            'description' => $validated['description'] ?? null,
+        // 2. Create Worker (User)
+        $password = Str::random(16); // Random password for worker
+        
+        $workerData = [
+            'name' => $validated['name'],
+            'phone' => $validated['phone'] ?? null,
+            'password' => Hash::make($password),
             'is_active' => true,
-            'status' => 'active',
+            'phone_verified_at' => now(), // Auto-verify worker phone since business added them?
+        ];
+
+        $worker = User::create($workerData);
+        $worker->assignRole('helper');
+
+        // 3. Create Worker Profile
+        // Since we are using pin_address now (no explicit city), we default to the first city (e.g. Karachi) 
+        // or we could try to parse it from address string later. For now, default to Karachi.
+        $city = \App\Models\City::where('name', 'Karachi')->first() ?? \App\Models\City::first();
+        $cityId = $city ? $city->id : 1;
+
+        $profileData = [
+            'experience_years' => $validated['experience_years'],
+            'city_id' => $cityId,
+            'availability' => $validated['availability'], // 'full_time', 'part_time', 'available'
+            'bio' => $validated['bio'] ?? null,
+            'is_active' => true,
+            'verification_status' => 'pending',
+            'age' => $validated['age'] ?? null,
+            'gender' => $validated['gender'] ?? null,
+            'religion' => $validated['religion'] ?? null,
+        ];
+
+        if ($request->hasFile('photo')) {
+            $profileData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
+        }
+
+        $workerProfile = $worker->profile()->create($profileData);
+
+        // Sync languages
+        if (!empty($validated['languages'])) {
+            $workerProfile->languages()->sync($validated['languages']);
+        }
+
+        // 4. Create Service Listing
+        // No locations array anymore, just use pin_address
+        
+        $serviceListing = \App\Models\ServiceListing::create([
+            'profile_id' => $workerProfile->id,
+            'description' => $validated['bio'] ?? null,
+            'work_type' => $validated['work_type'] ?? ($validated['availability'] ?? 'full_time'),
+            'monthly_rate' => 0, // Default or add to form? AddWorker usually has rate
+            'is_active' => true,
+            'pin_address' => $validated['pin_address'],
+            'pin_latitude' => $validated['pin_latitude'] ?? null,
+            'pin_longitude' => $validated['pin_longitude'] ?? null,
         ]);
 
-        // Sync service types (convert slugs to IDs)
-        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $validated['services'])
+        // Sync Service Types
+        $serviceTypeIds = ServiceType::whereIn('slug', $validated['service_types'])
             ->pluck('id')
             ->toArray();
-        $listing->serviceTypes()->sync($serviceTypeIds);
+        $serviceListing->serviceTypes()->sync($serviceTypeIds);
 
-        // Sync locations (if provided)
-        if (!empty($validated['locations'])) {
-            $listing->locations()->sync($validated['locations']);
-        }
+        // 5. Link Worker to Business
+        $business->helpers()->attach($worker->id, [
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
 
         return response()->json([
-            'message' => 'Welcome! Your business profile has been set up successfully.',
-            'user' => new UserResource($user->load('roles')),
+            'message' => 'Welcome! Your business profile has been set up and your first worker added.',
+            'user' => new UserResource($business->load('roles')),
         ]);
     }
 }
