@@ -106,6 +106,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create']);
     Route::post('/reset-password', [NewPasswordController::class, 'store']);
+
+
 });
 
 // Authenticated routes (require Sanctum token)

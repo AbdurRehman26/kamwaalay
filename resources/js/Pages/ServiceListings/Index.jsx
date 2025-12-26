@@ -94,6 +94,28 @@ export default function ServiceListingsIndex() {
             });
     }, []);
 
+    // Read URL params on mount to persist filters
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCityId = urlParams.get("city_id");
+        const urlServiceType = urlParams.get("service_type");
+        const urlWorkType = urlParams.get("work_type");
+        const urlLatitude = urlParams.get("latitude");
+        const urlLongitude = urlParams.get("longitude");
+        const urlSortBy = urlParams.get("sort_by");
+
+        if (urlCityId) setCityId(urlCityId);
+        if (urlServiceType) setServiceType(urlServiceType);
+        if (urlWorkType) setWorkType(urlWorkType);
+        if (urlLatitude && urlLongitude) {
+            setLatitude(urlLatitude);
+            setLongitude(urlLongitude);
+            setLocationDisplay("Near Me");
+            setLocationFilterQuery("Near Me");
+        }
+        if (urlSortBy) setSortBy(urlSortBy);
+    }, []);
+
     // Fetch location suggestions for filter
     useEffect(() => {
         // Skip if the query is "Near Me" - that's handled by geolocation
@@ -163,6 +185,11 @@ export default function ServiceListingsIndex() {
                     setLocationId("");
                     setLocationDisplay("Near Me");
                     setLocationFilterQuery("Near Me");
+                    // Update URL with lat/lng
+                    const urlParams = new URLSearchParams(window.location.search);
+                    urlParams.set("latitude", latitude);
+                    urlParams.set("longitude", longitude);
+                    window.history.pushState({}, "", `${route("service-listings.index")}?${urlParams.toString()}`);
                 },
                 (error) => {
                     console.error("Error getting location:", error);
@@ -219,7 +246,7 @@ export default function ServiceListingsIndex() {
                 {/* Filters */}
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-12">
                     <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Filter Services</h2>
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid md:grid-cols-4 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Service Type</label>
                             <select
@@ -248,39 +275,84 @@ export default function ServiceListingsIndex() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">City</label>
-                            <div className="flex gap-2">
-                                <select
-                                    value={cityId}
-                                    onChange={(e) => setCityId(e.target.value)}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
-                                >
-                                    <option value="">All Cities</option>
-                                    {cities.map((city) => (
-                                        <option key={city.id} value={city.id}>
-                                            {city.name}
-                                        </option>
-                                    ))}
-                                </select>
+                            <select
+                                value={cityId}
+                                onChange={(e) => {
+                                    const newCityId = e.target.value;
+                                    setCityId(newCityId);
+                                    // Update URL immediately
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    if (newCityId) {
+                                        urlParams.set("city_id", newCityId);
+                                    } else {
+                                        urlParams.delete("city_id");
+                                    }
+                                    window.history.pushState({}, "", `${route("service-listings.index")}${urlParams.toString() ? "?" + urlParams.toString() : ""}`);
+                                }}
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
+                            >
+                                <option value="">All Cities</option>
+                                {cities.map((city) => (
+                                    <option key={city.id} value={city.id}>
+                                        {city.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        {/* Near Me & Clear Filters - rightmost column */}
+                        <div className="flex items-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    // Toggle behavior: if already using near me, clear it
+                                    if (latitude && longitude && locationDisplay === "Near Me") {
+                                        setLatitude("");
+                                        setLongitude("");
+                                        setLocationDisplay("");
+                                        setLocationFilterQuery("");
+                                        // Update URL to remove lat/lng
+                                        const urlParams = new URLSearchParams(window.location.search);
+                                        urlParams.delete("latitude");
+                                        urlParams.delete("longitude");
+                                        window.history.pushState({}, "", `${route("service-listings.index")}${urlParams.toString() ? "?" + urlParams.toString() : ""}`);
+                                    } else {
+                                        handleNearMe();
+                                    }
+                                }}
+                                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 border rounded-lg font-medium transition-colors ${latitude && longitude && locationDisplay === "Near Me"
+                                    ? "bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700"
+                                    : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-600"
+                                    }`}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                </svg>
+                                <span>Near Me</span>
+                            </button>
+                            {(cityId || serviceType || workType || (latitude && longitude)) && (
                                 <button
                                     type="button"
-                                    onClick={() => handleNearMe()}
-                                    className="px-3 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors"
-                                    title="Search Near Me"
+                                    onClick={() => {
+                                        // Clear all filters
+                                        setCityId("");
+                                        setServiceType("");
+                                        setWorkType("");
+                                        setLatitude("");
+                                        setLongitude("");
+                                        setLocationDisplay("");
+                                        setLocationFilterQuery("");
+                                        // Clear URL
+                                        window.history.pushState({}, "", route("service-listings.index"));
+                                    }}
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 font-medium transition-colors"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
+                                    <span>Clear</span>
                                 </button>
-                            </div>
-                        </div>
-                        <div className="flex items-end">
-                            <button
-                                onClick={handleFilter}
-                                className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
-                            >
-                                Apply Filters
-                            </button>
+                            )}
                         </div>
                     </div>
                 </div>

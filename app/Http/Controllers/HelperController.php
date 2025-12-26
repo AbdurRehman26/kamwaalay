@@ -95,6 +95,15 @@ class HelperController extends Controller
             });
             
             $locationDisplay = 'Near Me';
+        } elseif ($request->has('city_id') && $request->city_id) {
+            // Filter by city ID - find listings with pin location in that city
+            $city = City::find($request->city_id);
+            if ($city) {
+                $query->whereHas('profile.serviceListings', function ($q) use ($city) {
+                    $q->where('city_id', $city->id);
+                });
+                $locationDisplay = $city->name;
+            }
         } elseif ($request->has('city_name') && $request->city_name) {
             // If city name provided, filter by city
             $query->whereHas('profile', function ($q) use ($request) {
@@ -133,7 +142,7 @@ class HelperController extends Controller
                   ->where('service_listings.status', 'active');
         }])->paginate(12);
 
-        $filters = $request->only(['service_type', 'location_id', 'city_name', 'area', 'min_experience', 'sort_by', 'user_type', 'latitude', 'longitude']);
+        $filters = $request->only(['service_type', 'location_id', 'city_id', 'city_name', 'area', 'min_experience', 'sort_by', 'user_type', 'latitude', 'longitude']);
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
         }

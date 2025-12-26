@@ -19,6 +19,11 @@
         <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 
         <!-- Scripts -->
+        <script>
+            window.Laravel = {
+                app_debug: {{ config('app.debug') ? 'true' : 'false' }}
+            };
+        </script>
         @viteReactRefresh
         @vite(['resources/js/app.jsx'])
     </head>

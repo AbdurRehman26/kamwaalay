@@ -117,44 +117,58 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): JsonResponse
     {
-        // Demo phone number check - automatically log in first user with helper or business role
-        $demoPhoneNumber = '+929876543210';
-        $normalizedPhone = $request->filled('phone') ? $this->formatPhoneNumber($request->input('phone')) : null;
+        // Demo/Test Login Logic (Debug Mode Only)
+        if (config('app.debug')) {
+            $demoNumbers = [
+                '+929876543210' => 'business',
+                '+929876543211' => 'helper',
+                '+929876543212' => 'user',
+            ];
+            
+            $normalizedPhone = $request->filled('phone') ? $this->formatPhoneNumber($request->input('phone')) : null;
 
+            foreach ($demoNumbers as $demoPhone => $role) {
+                if ($normalizedPhone === $demoPhone || $normalizedPhone === '+' . $demoPhone) {
+                    // Find user with ONLY this specific role (strict check)
+                    $user = User::has('roles', '=', 1) // Ensure user has exactly one role
+                        ->whereHas('roles', function ($q) use ($role) {
+                            $q->where('name', $role);
+                        })->first();
 
-        if ($normalizedPhone === $demoPhoneNumber || $normalizedPhone === '+' . $demoPhoneNumber) {
-            // Find first user with ONLY business role
-            $user = User::find(6);
+                    if (!$user) {
+                        return response()->json([
+                            'message' => "No test user found with role: {$role}. Please seed the database.",
+                            'errors' => ['phone' => ["No test user found with role: {$role}."]]
+                        ], 404);
+                    }
 
+                    // Create Sanctum token for API authentication
+                    $tokenResult = $user->createToken('api-token');
+                    $token = $tokenResult->plainTextToken;
 
-            if (!$user) {
-                // Fallback: Try to find any business user if strict check fails, or return error
-                // For strict compliance with "only business", we'll return error if no exclusive business user found
-                return response()->json([
-                    'message' => 'No exclusive business users found in database.',
-                    'errors' => ['phone' => ['No exclusive business users found in database.']]
-                ], 422);
-            }
+                    // Record user session
+                    UserSession::createFromRequest($request, $user->id, $tokenResult->accessToken->id);
 
-            // Log for debugging
-            Log::info('Demo phone login', [
-                'demo_phone' => $demoPhoneNumber,
-                'user_id' => $user->id,
-                'user_email' => $user->email,
-            ]);
-
-            // Create Sanctum token for API authentication
-            $tokenResult = $user->createToken('api-token');
-            $token = $tokenResult->plainTextToken;
-
-            // Record user session
-            UserSession::createFromRequest($request, $user->id, $tokenResult->accessToken->id);
+                    // Determine redirection
+                    $redirectInfo = null;
+                    if (!$user->hasCompletedOnboarding()) {
+                         if ($user->hasRole('helper')) {
+                            $redirectInfo = ['route' => 'onboarding.helper'];
+                        } elseif ($user->hasRole('business')) {
+                            $redirectInfo = ['route' => 'onboarding.business'];
+                        } else {
+                            $redirectInfo = ['route' => 'profile.edit'];
+                        }
+                    }
 
                     return response()->json([
-                        'message' => 'Login successful! (Demo mode)',
+                        'message' => "Logged in as test {$role}",
                         'user' => new UserResource($user->load('roles')),
                         'token' => $token,
+                        'redirect' => $redirectInfo,
                     ]);
+                }
+            }
         }
 
         // Check if password is provided
@@ -460,5 +474,9 @@ class AuthenticatedSessionController extends Controller
 
         return substr($phone, 0, 2) . str_repeat('*', strlen($phone) - 4) . substr($phone, -2);
     }
+
+    /**
+     * Login as a test user (Debug mode only)
+     */
 
 }

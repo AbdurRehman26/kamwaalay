@@ -63,9 +63,25 @@ class ServiceListingController extends Controller
             $query->byServiceType($request->service_type);
         }
 
-        // Filter by city name (from profile)
+        // Filter by location
         $locationDisplay = '';
-        if ($request->has('city_name') && $request->city_name) {
+        if ($request->has('latitude') && $request->has('longitude')) {
+            $lat = $request->latitude;
+            $lng = $request->longitude;
+            
+            // Filter service listings near the location using pin_latitude and pin_longitude
+            $query->nearLocation($lat, $lng);
+            
+            $locationDisplay = 'Near Me';
+        } elseif ($request->has('city_id') && $request->city_id) {
+            // Filter by city ID
+            $city = \App\Models\City::find($request->city_id);
+            if ($city) {
+                $query->where('city_id', $city->id);
+                $locationDisplay = $city->name;
+            }
+        } elseif ($request->has('city_name') && $request->city_name) {
+            // Filter by city name (from profile - legacy)
             $query->whereHas('profile', function ($q) use ($request) {
                 $q->where('city', $request->city_name);
             });
@@ -89,7 +105,7 @@ class ServiceListingController extends Controller
 
         $listings = $query->paginate(12);
 
-        $filters = $request->only(['service_type', 'city_name', 'work_type', 'sort_by']);
+        $filters = $request->only(['service_type', 'city_id', 'city_name', 'work_type', 'sort_by', 'latitude', 'longitude']);
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
         }
