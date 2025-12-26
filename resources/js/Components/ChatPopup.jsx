@@ -52,23 +52,22 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
             setError("");
 
             try {
-                // First, try to get existing conversations to find if one exists with this recipient
-                const conversationsData = await messagesService.getConversations();
-                const conversations = conversationsData.conversations || [];
+                // Create or get existing conversation directly
+                const conversationData = await messagesService.createConversation(recipientId);
+                const conversation = conversationData.conversation;
 
-                const existingConversation = conversations.find(
-                    (conv) => conv.other_user?.id === recipientId
-                );
-
-                if (existingConversation) {
-                    conversationIdRef.current = existingConversation.id;
+                if (conversation) {
+                    conversationIdRef.current = conversation.id;
                     // Load messages for existing conversation
-                    const messagesData = await messagesService.getMessages(existingConversation.id);
+                    const messagesData = await messagesService.getMessages(conversation.id);
                     setMessages(messagesData.messages?.data || []);
 
                     // Subscribe to conversation channel
                     if (pusherRef.current) {
-                        const channelName = `conversation.${existingConversation.id}`;
+                        const channelName = `conversation.${conversation.id}`;
+                        if (channelRef.current) {
+                            pusherRef.current.unsubscribe(channelRef.current.name);
+                        }
                         channelRef.current = pusherRef.current.subscribe(channelName);
 
                         channelRef.current.bind("message.sent", (data) => {
@@ -77,13 +76,11 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
                             }
                         });
                     }
-                } else {
-                    // No existing conversation, start with empty messages
-                    setMessages([]);
                 }
             } catch (error) {
                 console.error("Error loading conversation:", error);
-                setError("Failed to load conversation");
+                const errorMessage = error.response?.data?.message || "Failed to load chat. Please try again.";
+                setError(errorMessage);
             } finally {
                 setLoading(false);
             }
@@ -205,8 +202,8 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
                                     >
                                         <div
                                             className={`max-w-[75%] rounded-lg px-4 py-2 ${isOwnMessage
-                                                    ? "bg-primary-600 text-white"
-                                                    : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700"
+                                                ? "bg-primary-600 text-white"
+                                                : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700"
                                                 }`}
                                         >
                                             <p className="text-sm">{message.message}</p>

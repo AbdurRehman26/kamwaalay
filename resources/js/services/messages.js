@@ -10,6 +10,16 @@ export const messagesService = {
     },
 
     /**
+     * Create or get existing conversation
+     */
+    async createConversation(recipientId) {
+        const response = await api.post("/conversations", {
+            recipient_id: recipientId
+        });
+        return response.data;
+    },
+
+    /**
      * Get messages for a conversation
      */
     async getMessages(conversationId, page = 1) {

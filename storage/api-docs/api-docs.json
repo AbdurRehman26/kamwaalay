@@ -913,7 +913,7 @@
                     "Authentication"
                 ],
                 "summary": "Register new user",
-                "description": "Register a new user account. Requires OTP verification after registration. Either email or phone must be provided.",
+                "description": "Register a new user account. Users are auto-verified upon registration.",
                 "operationId": "18235ea6963e661c49bf381065779d6a",
                 "requestBody": {
                     "required": true,
@@ -929,13 +929,6 @@
                                     "name": {
                                         "type": "string",
                                         "maxLength": 255
-                                    },
-                                    "email": {
-                                        "description": "Either email or phone is required",
-                                        "type": "string",
-                                        "format": "email",
-                                        "maxLength": 255,
-                                        "nullable": true
                                     },
                                     "phone": {
                                         "description": "Either email or phone is required",
@@ -973,27 +966,19 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Registration successful - OTP verification required",
+                        "description": "Registration successful",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Registration successful! Please check your email for the verification code."
+                                            "example": "Registration successful!"
                                         },
-                                        "user_id": {
-                                            "type": "integer"
+                                        "user": {
+                                            "type": "object"
                                         },
-                                        "verification_method": {
-                                            "type": "string",
-                                            "enum": [
-                                                "email",
-                                                "phone"
-                                            ]
-                                        },
-                                        "identifier": {
-                                            "description": "Email or masked phone number",
+                                        "token": {
                                             "type": "string"
                                         }
                                     },
@@ -1163,17 +1148,12 @@
                                                     "type": "string",
                                                     "example": "John Doe"
                                                 },
-                                                "email": {
-                                                    "type": "string",
-                                                    "example": "user@example.com",
-                                                    "nullable": true
-                                                },
                                                 "phone": {
                                                     "type": "string",
                                                     "example": "+923001234567",
                                                     "nullable": true
                                                 },
-                                                "verified_at": {
+                                                "phone_verified_at": {
                                                     "type": "string",
                                                     "format": "date-time",
                                                     "nullable": true
@@ -1574,10 +1554,6 @@
                                             "type": "object"
                                         }
                                     },
-                                    "skills": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
                                     "experience_years": {
                                         "type": "integer",
                                         "minimum": 0
@@ -1765,10 +1741,6 @@
                                             "driver",
                                             "security_guard"
                                         ]
-                                    },
-                                    "skills": {
-                                        "type": "string",
-                                        "nullable": true
                                     },
                                     "experience_years": {
                                         "type": "integer",
@@ -2032,10 +2004,6 @@
                                             "security_guard"
                                         ]
                                     },
-                                    "skills": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
                                     "experience_years": {
                                         "type": "integer",
                                         "minimum": 0
@@ -2189,10 +2157,6 @@
                                             "driver",
                                             "security_guard"
                                         ]
-                                    },
-                                    "skills": {
-                                        "type": "string",
-                                        "nullable": true
                                     },
                                     "experience_years": {
                                         "type": "integer",
@@ -2384,7 +2348,7 @@
                     "Job Applications"
                 ],
                 "summary": "Browse available service requests",
-                "description": "Browse available service requests for helpers/businesses to apply. Requires completed onboarding.",
+                "description": "Browse available service requests for helpers/businesses to apply. When latitude/longitude are provided, results are sorted by distance (nearest first).",
                 "operationId": "e294577b13f1f0968b3c0ad7227b462d",
                 "parameters": [
                     {
@@ -2414,6 +2378,14 @@
                         }
                     },
                     {
+                        "name": "city_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
                         "name": "city_name",
                         "in": "query",
                         "required": false,
@@ -2427,6 +2399,26 @@
                         "required": false,
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "description": "User's latitude for proximity search",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "description": "User's longitude for proximity search",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
                         }
                     }
                 ],
@@ -2479,7 +2471,6 @@
                                 "required": [
                                     "service_type",
                                     "work_type",
-                                    "area",
                                     "name",
                                     "phone"
                                 ],
@@ -2503,10 +2494,6 @@
                                             "full_time",
                                             "part_time"
                                         ]
-                                    },
-                                    "area": {
-                                        "type": "string",
-                                        "maxLength": 255
                                     },
                                     "start_date": {
                                         "type": "string",
@@ -2535,6 +2522,16 @@
                                     },
                                     "address": {
                                         "type": "string",
+                                        "nullable": true
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
                                         "nullable": true
                                     },
                                     "special_requirements": {
@@ -2581,8 +2578,15 @@
                                                     "type": "string",
                                                     "example": "Karachi"
                                                 },
-                                                "area": {
-                                                    "type": "string"
+                                                "latitude": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "nullable": true
+                                                },
+                                                "longitude": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "nullable": true
                                                 },
                                                 "status": {
                                                     "type": "string",
@@ -3443,6 +3447,16 @@
                                         "type": "string",
                                         "nullable": true
                                     },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    },
                                     "special_requirements": {
                                         "type": "string",
                                         "nullable": true
@@ -3498,6 +3512,16 @@
                                                 },
                                                 "area": {
                                                     "type": "string"
+                                                },
+                                                "latitude": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "nullable": true
+                                                },
+                                                "longitude": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "nullable": true
                                                 },
                                                 "status": {
                                                     "type": "string"
@@ -3592,7 +3616,7 @@
                     "JobPosts"
                 ],
                 "summary": "Browse available job posts",
-                "description": "Browse all available pending job posts (public access). Shows only pending posts that haven't been assigned yet. If user is authenticated and is a helper/business, excludes job posts they already applied to.",
+                "description": "Browse all available pending job posts (public access). Shows only pending posts that haven't been assigned yet. If user is authenticated and is a helper/business, excludes job posts they already applied to. When latitude/longitude are provided, results are sorted by distance (nearest first).",
                 "operationId": "f7b399064012f2f734a045ac074992ff",
                 "parameters": [
                     {
@@ -3650,6 +3674,37 @@
                                 "full_time",
                                 "part_time"
                             ]
+                        }
+                    },
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "description": "User's latitude for proximity search",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "description": "User's longitude for proximity search",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "radius_km",
+                        "in": "query",
+                        "description": "Maximum distance in kilometers (default: 50km)",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "default": 50
                         }
                     }
                 ],
@@ -3709,6 +3764,14 @@
                                                 },
                                                 "location_display": {
                                                     "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "latitude": {
+                                                    "type": "number",
+                                                    "nullable": true
+                                                },
+                                                "longitude": {
+                                                    "type": "number",
                                                     "nullable": true
                                                 }
                                             },
@@ -3929,6 +3992,85 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Create or get existing conversation",
+                "description": "Get an existing conversation with a user or create a new one if it doesn't exist.",
+                "operationId": "5152b64c9b1adf8e8e06dc605b111af5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "recipient_id"
+                                ],
+                                "properties": {
+                                    "recipient_id": {
+                                        "description": "ID of the recipient user",
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Conversation retrieved or created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "conversation": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "other_user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "John Doe"
+                                                        },
+                                                        "photo": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -4231,6 +4373,112 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/messages/{message}": {
+            "delete": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Delete a message",
+                "description": "Delete a specific message. Only the sender can delete their message.",
+                "operationId": "d01b8decfd3b83d1ee41c826c2ade618",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "description": "Message ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Message deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized - Only sender can delete"
+                    },
+                    "404": {
+                        "description": "Message not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/conversations/{conversation}": {
+            "delete": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Delete a conversation for current user",
+                "description": "Delete a conversation for the current user only. The other participant will still see the conversation. If the other participant sends a new message, this user will see the conversation again with only messages from the deletion time onwards.",
+                "operationId": "12f7f247ae8ef3b047ab2b729bd8b26f",
+                "parameters": [
+                    {
+                        "name": "conversation",
+                        "in": "path",
+                        "description": "Conversation ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conversation deleted for current user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Conversation deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized - Not a participant"
+                    },
+                    "404": {
+                        "description": "Conversation not found"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -5193,6 +5441,11 @@
                                         "maxLength": 255,
                                         "nullable": true
                                     },
+                                    "photo": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "nullable": true
+                                    },
                                     "bio": {
                                         "type": "string",
                                         "nullable": true
@@ -5496,105 +5749,6 @@
                 }
             }
         },
-        "/api/karachi-locations/search": {
-            "get": {
-                "tags": [
-                    "Pages"
-                ],
-                "summary": "Search Karachi locations",
-                "description": "Search Karachi locations for autocomplete (deprecated - use /api/locations/search)",
-                "operationId": "c6e0e23a605d007c33278f5051a31b06",
-                "parameters": [
-                    {
-                        "name": "q",
-                        "in": "query",
-                        "description": "Search query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of matching location areas",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/locations/search": {
-            "get": {
-                "tags": [
-                    "Pages"
-                ],
-                "summary": "Search locations",
-                "description": "Search locations (cities and areas) for autocomplete",
-                "operationId": "3c49906883564f8c5c4b2391f2fb197b",
-                "parameters": [
-                    {
-                        "name": "q",
-                        "in": "query",
-                        "description": "Search query (minimum 2 characters)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "minLength": 2
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of matching locations",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer"
-                                            },
-                                            "city_id": {
-                                                "type": "integer"
-                                            },
-                                            "city_name": {
-                                                "type": "string"
-                                            },
-                                            "area": {
-                                                "type": "string",
-                                                "nullable": true
-                                            },
-                                            "display_text": {
-                                                "type": "string"
-                                            },
-                                            "latitude": {
-                                                "type": "number",
-                                                "nullable": true
-                                            },
-                                            "longitude": {
-                                                "type": "number",
-                                                "nullable": true
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/service-types": {
             "get": {
                 "tags": [
@@ -5677,6 +5831,42 @@
                 }
             }
         },
+        "/api/cities": {
+            "get": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Get cities",
+                "description": "Get a list of all active cities",
+                "operationId": "61809a89f69348ca73c579bd9cf21b03",
+                "responses": {
+                    "200": {
+                        "description": "List of cities",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "code": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/profile": {
             "get": {
                 "tags": [
@@ -5710,6 +5900,12 @@
                                                 "phone": {
                                                     "type": "string",
                                                     "example": "+923001234567",
+                                                    "nullable": true
+                                                },
+                                                "photo": {
+                                                    "description": "Profile photo path",
+                                                    "type": "string",
+                                                    "example": "profiles/photos/abc123.jpg",
                                                     "nullable": true
                                                 },
                                                 "onboarding_complete": {
@@ -5930,6 +6126,12 @@
                                                     "example": "+923001234567",
                                                     "nullable": true
                                                 },
+                                                "photo": {
+                                                    "description": "Profile photo path",
+                                                    "type": "string",
+                                                    "example": "profiles/photos/abc123.jpg",
+                                                    "nullable": true
+                                                },
                                                 "onboarding_complete": {
                                                     "description": "Whether the user has completed onboarding (helper/business: has service listings, normal user: has updated profile)",
                                                     "type": "boolean",
@@ -6034,6 +6236,12 @@
                                         "phone": {
                                             "type": "string",
                                             "example": "+923001234567",
+                                            "nullable": true
+                                        },
+                                        "photo": {
+                                            "description": "Profile photo path",
+                                            "type": "string",
+                                            "example": "profiles/photos/abc123.jpg",
                                             "nullable": true
                                         },
                                         "onboarding_complete": {
@@ -6557,23 +6765,7 @@
                         }
                     },
                     {
-                        "name": "location_id",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
                         "name": "city_name",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "area",
                         "in": "query",
                         "required": false,
                         "schema": {
@@ -6645,73 +6837,22 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "listings": {
-                                        "description": "Array of listings (new format) - creates ONE listing with multiple service types and locations",
+                                    "service_types": {
+                                        "description": "Array of service types",
                                         "type": "array",
                                         "items": {
-                                            "required": [
-                                                "service_type",
-                                                "work_type",
-                                                "city",
-                                                "area"
-                                            ],
-                                            "properties": {
-                                                "service_type": {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "maid",
-                                                        "cook",
-                                                        "babysitter",
-                                                        "caregiver",
-                                                        "cleaner",
-                                                        "domestic_helper",
-                                                        "driver",
-                                                        "security_guard"
-                                                    ]
-                                                },
-                                                "work_type": {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "full_time",
-                                                        "part_time"
-                                                    ]
-                                                },
-                                                "city": {
-                                                    "type": "string",
-                                                    "maxLength": 255
-                                                },
-                                                "area": {
-                                                    "type": "string",
-                                                    "maxLength": 255
-                                                },
-                                                "monthly_rate": {
-                                                    "type": "number",
-                                                    "minimum": 0,
-                                                    "nullable": true
-                                                },
-                                                "description": {
-                                                    "type": "string",
-                                                    "maxLength": 2000,
-                                                    "nullable": true
-                                                }
-                                            },
-                                            "type": "object"
+                                            "type": "string",
+                                            "enum": [
+                                                "maid",
+                                                "cook",
+                                                "babysitter",
+                                                "caregiver",
+                                                "cleaner",
+                                                "domestic_helper",
+                                                "driver",
+                                                "security_guard"
+                                            ]
                                         },
-                                        "nullable": true
-                                    },
-                                    "service_type": {
-                                        "description": "Single listing format (backward compatibility)",
-                                        "type": "string",
-                                        "enum": [
-                                            "maid",
-                                            "cook",
-                                            "babysitter",
-                                            "caregiver",
-                                            "cleaner",
-                                            "domestic_helper",
-                                            "driver",
-                                            "security_guard"
-                                        ],
                                         "nullable": true
                                     },
                                     "work_type": {
@@ -6722,16 +6863,6 @@
                                         ],
                                         "nullable": true
                                     },
-                                    "city": {
-                                        "type": "string",
-                                        "maxLength": 255,
-                                        "nullable": true
-                                    },
-                                    "area": {
-                                        "type": "string",
-                                        "maxLength": 255,
-                                        "nullable": true
-                                    },
                                     "monthly_rate": {
                                         "type": "number",
                                         "minimum": 0,
@@ -6740,6 +6871,23 @@
                                     "description": {
                                         "type": "string",
                                         "maxLength": 2000,
+                                        "nullable": true
+                                    },
+                                    "pin_address": {
+                                        "description": "Exact pin address/location",
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "pin_latitude": {
+                                        "description": "Latitude coordinate (-90 to 90)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    },
+                                    "pin_longitude": {
+                                        "description": "Longitude coordinate (-180 to 180)",
+                                        "type": "number",
+                                        "format": "float",
                                         "nullable": true
                                     }
                                 },
@@ -6899,8 +7047,8 @@
                             "schema": {
                                 "required": [
                                     "service_types",
-                                    "locations",
                                     "work_type",
+                                    "pin_address",
                                     "status"
                                 ],
                                 "properties": {
@@ -6920,26 +7068,6 @@
                                             ]
                                         }
                                     },
-                                    "locations": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "city",
-                                                "area"
-                                            ],
-                                            "properties": {
-                                                "city": {
-                                                    "type": "string",
-                                                    "maxLength": 255
-                                                },
-                                                "area": {
-                                                    "type": "string",
-                                                    "maxLength": 255
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
                                     "work_type": {
                                         "type": "string",
                                         "enum": [
@@ -6955,6 +7083,23 @@
                                     "description": {
                                         "type": "string",
                                         "maxLength": 2000,
+                                        "nullable": true
+                                    },
+                                    "pin_address": {
+                                        "description": "Exact pin address/location",
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "pin_latitude": {
+                                        "description": "Latitude coordinate (-90 to 90)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    },
+                                    "pin_longitude": {
+                                        "description": "Longitude coordinate (-180 to 180)",
+                                        "type": "number",
+                                        "format": "float",
                                         "nullable": true
                                     },
                                     "status": {

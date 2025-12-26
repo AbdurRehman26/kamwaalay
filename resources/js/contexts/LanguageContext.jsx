@@ -17,7 +17,7 @@ export const LanguageProvider = ({ children }) => {
         // Set HTML attributes
         const html = document.documentElement;
         html.setAttribute("lang", savedLocale);
-        html.setAttribute("dir", savedLocale === "ur" ? "rtl" : "ltr");
+        html.setAttribute("dir", "ltr");
     }, []);
 
     const loadTranslations = async (loc) => {
@@ -46,7 +46,7 @@ export const LanguageProvider = ({ children }) => {
             // Update HTML attributes
             const html = document.documentElement;
             html.setAttribute("lang", newLocale);
-            html.setAttribute("dir", newLocale === "ur" ? "rtl" : "ltr");
+            html.setAttribute("dir", "ltr");
         } catch (error) {
             console.error("Error switching language:", error);
         }
@@ -56,7 +56,7 @@ export const LanguageProvider = ({ children }) => {
         // Support nested keys like 'common.home' or 'navigation.about'
         const keys = key.split(".");
         let translation = translations;
-        
+
         // Navigate through nested translation object
         for (const k of keys) {
             if (translation && typeof translation === "object" && k in translation) {
@@ -66,19 +66,19 @@ export const LanguageProvider = ({ children }) => {
                 return key;
             }
         }
-        
+
         // If translation is not a string, return the key
         if (typeof translation !== "string") {
             return key;
         }
-        
+
         // Replace parameters (support both :param and {param} syntax)
         let result = translation;
         Object.keys(params).forEach((param) => {
             result = result.replace(new RegExp(`:${param}`, "g"), params[param]);
             result = result.replace(new RegExp(`\\{${param}\\}`, "g"), params[param]);
         });
-        
+
         return result;
     };
 

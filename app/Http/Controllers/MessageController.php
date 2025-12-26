@@ -30,6 +30,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: "Messages", description: "Chat messaging endpoints with real-time broadcasting via Pusher")]
 class MessageController extends Controller
 {
+
     #[OA\Get(
         path: "/api/conversations",
         summary: "Get user's conversations",
@@ -144,6 +145,84 @@ class MessageController extends Controller
 
         return response()->json([
             'conversations' => $conversations,
+        ]);
+    }
+
+    #[OA\Post(
+        path: "/api/conversations",
+        summary: "Create or get existing conversation",
+        description: "Get an existing conversation with a user or create a new one if it doesn't exist.",
+        tags: ["Messages"],
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["recipient_id"],
+                properties: [
+                    new OA\Property(
+                        property: "recipient_id",
+                        type: "integer",
+                        description: "ID of the recipient user",
+                        example: 2
+                    ),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Conversation retrieved or created successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: "conversation",
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(
+                                    property: "other_user",
+                                    type: "object",
+                                    properties: [
+                                        new OA\Property(property: "id", type: "integer", example: 2),
+                                        new OA\Property(property: "name", type: "string", example: "John Doe"),
+                                        new OA\Property(property: "photo", type: "string", nullable: true),
+                                    ]
+                                ),
+                            ]
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: "Validation error"),
+            new OA\Response(response: 401, description: "Unauthenticated"),
+        ]
+    )]
+    public function store(Request $request): JsonResponse
+    {
+        $request->validate([
+            'recipient_id' => 'required|exists:users,id',
+        ]);
+
+        $user = Auth::user();
+        $recipientId = $request->recipient_id;
+
+        if ($user->id === $recipientId) {
+            return response()->json(['message' => 'Cannot start conversation with yourself'], 422);
+        }
+
+        // Get or create conversation
+        $conversation = Conversation::getOrCreate($user->id, $recipientId);
+        $otherUser = $conversation->getOtherUser($user->id);
+
+        return response()->json([
+            'conversation' => [
+                'id' => $conversation->id,
+                'other_user' => [
+                    'id' => $otherUser->id,
+                    'name' => $otherUser->name,
+                    'photo' => $otherUser->photo,
+                ],
+            ]
         ]);
     }
 

@@ -258,6 +258,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Messages/Chat routes
     Route::get('/conversations', [MessageController::class, 'getConversations']);
+    Route::post('/conversations', [MessageController::class, 'store']);
     Route::get('/conversations/{conversation}/messages', [MessageController::class, 'getMessages']);
     Route::post('/messages', [MessageController::class, 'sendMessage']);
     Route::delete('/messages/{message}', [MessageController::class, 'deleteMessage']);

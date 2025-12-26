@@ -8,15 +8,16 @@ export default function PublicLayout({ children }) {
     const { locale } = useLanguage();
 
     // Handle RTL for Urdu
+    // Handle RTL for Urdu
     useEffect(() => {
         const html = document.documentElement;
         if (locale === "ur") {
-            html.setAttribute("dir", "rtl");
             html.setAttribute("lang", "ur");
         } else {
-            html.setAttribute("dir", "ltr");
             html.setAttribute("lang", "en");
         }
+        // Force LTR for all languages
+        html.setAttribute("dir", "ltr");
     }, [locale]);
 
     return (

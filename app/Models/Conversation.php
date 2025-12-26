@@ -119,10 +119,21 @@ class Conversation extends Model
             ->first();
 
         if (!$conversation) {
-            $conversation = self::create([
-                'user_one_id' => $userIds[0],
-                'user_two_id' => $userIds[1],
-            ]);
+            try {
+                $conversation = self::create([
+                    'user_one_id' => $userIds[0],
+                    'user_two_id' => $userIds[1],
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                // If duplicate entry error (race condition), just fetch the existing one
+                if ($e->errorInfo[1] === 1062) {
+                    $conversation = self::where('user_one_id', $userIds[0])
+                        ->where('user_two_id', $userIds[1])
+                        ->first();
+                } else {
+                    throw $e;
+                }
+            }
         }
 
         return $conversation;
