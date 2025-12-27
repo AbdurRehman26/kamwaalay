@@ -6,7 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { route } from "@/utils/routes";
 import NotificationDropdown from "@/Components/NotificationDropdown";
 import LogoutModal from "@/Components/LogoutModal";
-import { isHelperOrBusiness, isHelperOrBusinessOrGuest, isUser, isUserOrGuest } from "@/utils/permissions";
+import { isHelper, isHelperOrBusiness, isHelperOrBusinessOrGuest, isUser, isUserOrGuest } from "@/utils/permissions";
 import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
@@ -138,7 +138,7 @@ export default function Navbar() {
                                     >
                                         {t ? t("common.dashboard") : "Dashboard"}
                                     </Link>
-                                    {isHelperOrBusiness(user) && (
+                                    {isHelper(user) && (
                                         <Link
                                             to={route("service-listings.create")}
                                             className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-5 py-2.5 rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 font-semibold"
@@ -278,7 +278,7 @@ export default function Navbar() {
                                     >
                                         {t ? t("common.dashboard") : "Dashboard"}
                                     </Link>
-                                    {isHelperOrBusiness(user) && (
+                                    {isHelper(user) && (
                                         <Link
                                             to={route("service-listings.create")}
                                             onClick={() => setMobileMenuOpen(false)}

@@ -173,13 +173,18 @@ class User extends Authenticatable implements FilamentUser
 
     /**
      * Check if user has completed onboarding
-     * - Helper/Business: completed when they have at least one service listing
+     * - Business: completed when they have uploaded NIC document AND added NIC number
+     * - Helper: completed when they have at least one service listing
      * - Normal user: completed when they have updated their profile for the first time
      */
     public function hasCompletedOnboarding(): bool
     {
         if ($this->hasRole('business')) {
-            return $this->helpers()->exists();
+            // Business onboarding is complete when they have a NIC document with a document number
+            return $this->documents()
+                ->where('document_type', 'nic')
+                ->whereNotNull('document_number')
+                ->exists();
         }
 
         if ($this->hasRole('helper')) {

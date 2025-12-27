@@ -354,6 +354,9 @@ class OnboardingController extends Controller
     /**
      * Complete business onboarding
      */
+    /**
+     * Complete business onboarding
+     */
     public function completeBusiness(Request $request)
     {
         $business = Auth::user();
@@ -362,58 +365,13 @@ class OnboardingController extends Controller
             abort(403);
         }
 
-        // Handle arrays from FormData (JSON strings)
-        $arrayFields = ['service_types', 'locations', 'languages'];
-        $decodedData = [];
-        
-        foreach ($arrayFields as $field) {
-            $value = $request->input($field);
-            if (is_string($value)) {
-                $decoded = json_decode($value, true);
-                // If it's a valid JSON string, use the decoded value
-                // otherwise use the original value (it might be sent as array by some clients)
-                $decodedData[$field] = (json_last_error() === JSON_ERROR_NONE) ? $decoded : $value;
-            } else {
-                $decodedData[$field] = $value;
-            }
-        }
-
-        // Merge decoded data back into request for validation
-        $dataToValidate = $request->all();
-        foreach ($decodedData as $key => $val) {
-            $dataToValidate[$key] = $val;
-        }
-
-        // Custom validation logic
-        $validator = Validator::make($dataToValidate, [
-            // Business Profile Fields (for the logged-in user)
-            'nic' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:5120',
-            'nic_number' => 'nullable|string|max:255',
-            
-            // Worker Fields (to create a new worker)
-            'name' => 'required|string|max:255', // Worker Name
-            'phone' => 'nullable|string|max:20', // Worker Phone
-            'photo' => 'nullable|image|max:2048', // Worker Photo
-            'service_types' => 'required|array|min:1',
-            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
-            'service_types' => 'required|array|min:1',
-            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
-            
-            // Location (Pin Address)
-            'pin_address' => 'required|string',
-            'pin_latitude' => 'nullable|numeric',
-            'pin_longitude' => 'nullable|numeric',
-            
-            'experience_years' => 'required|integer|min:0',
-            'availability' => 'required|in:full_time,part_time,available',
-            'bio' => 'nullable|string', // Worker Bio
-            
-            // Optional worker fields
-            'age' => 'nullable|integer|min:18|max:100',
-            'gender' => 'nullable|in:male,female,other',
-            'religion' => 'nullable|in:' . Religion::validationString(),
-            'languages' => 'nullable|array',
-            'languages.*' => 'required|integer|exists:languages,id',
+        // Simplified validation - only NIC document and number required
+        $validator = Validator::make($request->all(), [
+            'nic' => 'required|file|mimes:jpeg,jpg,png,pdf|max:5120',
+            'nic_number' => 'required|string|max:255',
+        ], [
+            'nic.required' => 'NIC document is required to verify your business.',
+            'nic_number.required' => 'NIC number is required to complete onboarding.',
         ]);
 
         if ($validator->fails()) {
@@ -425,100 +383,24 @@ class OnboardingController extends Controller
 
         $validated = $validator->validated();
 
-        // 1. Update Business Profile (NIC)
-        if ($request->hasFile('nic')) {
-            $nicPath = $request->file('nic')->store('documents/nic', 'public');
-            \App\Models\Document::create([
-                'user_id' => $business->id,
-                'document_type' => 'nic',
-                'document_number' => $validated['nic_number'] ?? null,
-                'file_path' => $nicPath,
-                'status' => 'pending',
-            ]);
-        }
-        
-        // Also update nic_number in profile if provided
-        if (!empty($validated['nic_number'])) {
-             // Create or update profile
-             $businessProfile = $business->profile;
-             if (!$businessProfile) {
-                 $businessProfile = $business->profile()->create([]);
-             }
-             // Assuming we might store nic_number in profile too? Or just Document?
-             // Existing code didn't obscurely put it in profile but let's leave it as Document focused.
-        }
-
-        // 2. Create Worker (User)
-        $password = Str::random(16); // Random password for worker
-        
-        $workerData = [
-            'name' => $validated['name'],
-            'phone' => $validated['phone'] ?? null,
-            'password' => Hash::make($password),
-            'is_active' => true,
-            'phone_verified_at' => now(), // Auto-verify worker phone since business added them?
-        ];
-
-        $worker = User::create($workerData);
-        $worker->assignRole('helper');
-
-        // 3. Create Worker Profile
-        // Since we are using pin_address now (no explicit city), we default to the first city (e.g. Karachi) 
-        // or we could try to parse it from address string later. For now, default to Karachi.
-        $city = \App\Models\City::where('name', 'Karachi')->first() ?? \App\Models\City::first();
-        $cityId = $city ? $city->id : 1;
-
-        $profileData = [
-            'experience_years' => $validated['experience_years'],
-            'city_id' => $cityId,
-            'availability' => $validated['availability'], // 'full_time', 'part_time', 'available'
-            'bio' => $validated['bio'] ?? null,
-            'is_active' => true,
-            'verification_status' => 'pending',
-            'age' => $validated['age'] ?? null,
-            'gender' => $validated['gender'] ?? null,
-            'religion' => $validated['religion'] ?? null,
-        ];
-
-        if ($request->hasFile('photo')) {
-            $profileData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
-        }
-
-        $workerProfile = $worker->profile()->create($profileData);
-
-        // Sync languages
-        if (!empty($validated['languages'])) {
-            $workerProfile->languages()->sync($validated['languages']);
-        }
-
-        // 4. Create Service Listing
-        // No locations array anymore, just use pin_address
-        
-        $serviceListing = \App\Models\ServiceListing::create([
-            'profile_id' => $workerProfile->id,
-            'description' => $validated['bio'] ?? null,
-            'work_type' => $validated['work_type'] ?? ($validated['availability'] ?? 'full_time'),
-            'monthly_rate' => 0, // Default or add to form? AddWorker usually has rate
-            'is_active' => true,
-            'pin_address' => $validated['pin_address'],
-            'pin_latitude' => $validated['pin_latitude'] ?? null,
-            'pin_longitude' => $validated['pin_longitude'] ?? null,
+        // Save NIC document
+        $nicPath = $request->file('nic')->store('documents/nic', 'public');
+        \App\Models\Document::create([
+            'user_id' => $business->id,
+            'document_type' => 'nic',
+            'document_number' => $validated['nic_number'],
+            'file_path' => $nicPath,
+            'status' => 'pending',
         ]);
 
-        // Sync Service Types
-        $serviceTypeIds = ServiceType::whereIn('slug', $validated['service_types'])
-            ->pluck('id')
-            ->toArray();
-        $serviceListing->serviceTypes()->sync($serviceTypeIds);
-
-        // 5. Link Worker to Business
-        $business->helpers()->attach($worker->id, [
-            'status' => 'active',
-            'joined_at' => now(),
-        ]);
+        // Create business profile if it doesn't exist
+        $businessProfile = $business->profile;
+        if (!$businessProfile) {
+            $business->profile()->create([]);
+        }
 
         return response()->json([
-            'message' => 'Welcome! Your business profile has been set up and your first worker added.',
+            'message' => 'Welcome! Your business verification has been submitted. You can now add workers to your profile.',
             'user' => new UserResource($business->load('roles')),
         ]);
     }

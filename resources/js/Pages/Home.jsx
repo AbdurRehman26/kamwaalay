@@ -8,7 +8,10 @@ import { route } from "@/utils/routes";
 import {
     isUser,
     isUserOrGuest,
-    isHelperOrBusiness, isHelperOrBusinessOrGuest
+    isHelper,
+    isBusiness,
+    isHelperOrBusiness,
+    isHelperOrBusinessOrGuest
 } from "@/utils/permissions";
 import ChatPopup from "@/Components/ChatPopup";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
@@ -211,7 +214,7 @@ export default function Home() {
                                         Post a Job
                                     </Link>
                                 )}
-                                {isHelperOrBusiness(user) && (
+                                {isHelper(user) && (
                                     <Link
                                         to={route("service-listings.create")}
                                         className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-bold text-lg hover:bg-white/20 transition-all duration-300 flex items-center justify-center"
@@ -806,14 +809,23 @@ export default function Home() {
 
                             {user && (
                                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                    {isHelperOrBusiness(user) ? (
+                                    {isHelper(user) && (
                                         <Link
                                             to={route("service-listings.create")}
                                             className="inline-block px-8 py-4 bg-white text-indigo-600 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg"
                                         >
                                             Offer Service
                                         </Link>
-                                    ) : (
+                                    )}
+                                    {isBusiness(user) && (
+                                        <Link
+                                            to={route("business.workers.create")}
+                                            className="inline-block px-8 py-4 bg-white text-indigo-600 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg"
+                                        >
+                                            Add Worker
+                                        </Link>
+                                    )}
+                                    {isUser(user) && (
                                         <Link
                                             to={route("job-posts.create")}
                                             className="inline-block px-8 py-4 bg-white text-indigo-600 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg"

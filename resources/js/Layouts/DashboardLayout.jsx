@@ -55,22 +55,32 @@ export default function DashboardLayout({ children }) {
             );
         }
 
-        if (user?.role === "helper" || user?.role === "business") {
+        if (user?.role === "helper") {
             items.push(
                 {
                     name: "My Service Listings",
                     path: route("service-listings.my-listings"),
                     icon: "📝",
-                    roles: ["helper", "business"]
+                    roles: ["helper"]
                 },
                 {
                     name: "Documents",
                     path: "/dashboard/documents",
                     icon: "📄",
-                    roles: ["helper", "business"]
+                    roles: ["helper"]
                 },
             );
+        }
 
+        if (user?.role === "business") {
+            items.push(
+                {
+                    name: "Documents",
+                    path: "/dashboard/documents",
+                    icon: "📄",
+                    roles: ["business"]
+                },
+            );
         }
 
         if (user?.role === "business") {
