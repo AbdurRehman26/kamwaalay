@@ -349,7 +349,12 @@ export default function BusinessShow() {
                                                         <h3 className="font-bold text-gray-900 dark:text-white">{worker.name}</h3>
                                                         {worker.service_listings && worker.service_listings.length > 0 && worker.service_listings[0].service_types && worker.service_listings[0].service_types.length > 0 && (
                                                             <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
-                                                                {worker.service_listings?.[0]?.service_types?.[0]?.service_type?.replace("_", " ") || "No service type"}
+                                                                {(() => {
+                                                                    const firstType = worker.service_listings[0].service_types[0];
+                                                                    return typeof firstType === "string"
+                                                                        ? firstType.replace("_", " ")
+                                                                        : (firstType?.service_type?.replace("_", " ") || firstType?.name || "Service");
+                                                                })()}
                                                             </p>
                                                         )}
                                                     </div>
@@ -367,18 +372,30 @@ export default function BusinessShow() {
                                                         <div className="text-xs font-semibold text-gray-500 mb-1">Services</div>
                                                         <div className="flex flex-wrap gap-1">
                                                             {worker.service_listings.flatMap(listing =>
-                                                                listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
+                                                                listing.service_types?.map(st => {
+                                                                    return typeof st === "string"
+                                                                        ? st.replace("_", " ")
+                                                                        : (st?.service_type?.replace("_", " ") || st?.name);
+                                                                }) || []
                                                             ).filter(Boolean).slice(0, 3).map((type, idx) => (
                                                                 <span key={idx} className="bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 text-xs px-2 py-1 rounded-md font-medium capitalize">
                                                                     {type}
                                                                 </span>
                                                             ))}
                                                             {worker.service_listings.flatMap(listing =>
-                                                                listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
+                                                                listing.service_types?.map(st => {
+                                                                    return typeof st === "string"
+                                                                        ? st.replace("_", " ")
+                                                                        : (st?.service_type?.replace("_", " ") || st?.name);
+                                                                }) || []
                                                             ).filter(Boolean).length > 3 && (
                                                                     <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md font-medium">
                                                                         +{worker.service_listings.flatMap(listing =>
-                                                                            listing.service_types?.map(st => st.service_type?.replace("_", " ")) || []
+                                                                            listing.service_types?.map(st => {
+                                                                                return typeof st === "string"
+                                                                                    ? st.replace("_", " ")
+                                                                                    : (st?.service_type?.replace("_", " ") || st?.name);
+                                                                            }) || []
                                                                         ).filter(Boolean).length - 3}
                                                                     </span>
                                                                 )}

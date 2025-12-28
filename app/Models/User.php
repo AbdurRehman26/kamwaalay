@@ -250,8 +250,8 @@ class User extends Authenticatable implements FilamentUser
     public function scopeByServiceType($query, ?string $serviceType)
     {
         if ($serviceType) {
-            return $query->whereHas('profile', function ($q) use ($serviceType) {
-                $q->where('service_type', $serviceType);
+            return $query->whereHas('profile.serviceListings.serviceTypes', function ($q) use ($serviceType) {
+                $q->where('slug', $serviceType);
             });
         }
         return $query;

@@ -251,7 +251,18 @@ export default function ServiceListingsIndex() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Service Type</label>
                             <select
                                 value={serviceType}
-                                onChange={(e) => setServiceType(e.target.value)}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setServiceType(value);
+                                    // Update URL
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    if (value) {
+                                        urlParams.set("service_type", value);
+                                    } else {
+                                        urlParams.delete("service_type");
+                                    }
+                                    window.history.pushState({}, "", `${route("service-listings.index")}${urlParams.toString() ? "?" + urlParams.toString() : ""}`);
+                                }}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 {serviceTypes.map((type) => (
@@ -265,7 +276,18 @@ export default function ServiceListingsIndex() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Work Type</label>
                             <select
                                 value={workType}
-                                onChange={(e) => setWorkType(e.target.value)}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setWorkType(value);
+                                    // Update URL
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    if (value) {
+                                        urlParams.set("work_type", value);
+                                    } else {
+                                        urlParams.delete("work_type");
+                                    }
+                                    window.history.pushState({}, "", `${route("service-listings.index")}${urlParams.toString() ? "?" + urlParams.toString() : ""}`);
+                                }}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 <option value="">All Types</option>
@@ -463,8 +485,12 @@ export default function ServiceListingsIndex() {
                                                 </div>
                                             </div>
 
-                                            {/* Multiple Locations */}
-                                            {listing.location_details && listing.location_details.length > 0 ? (
+                                            {/* Location Display */}
+                                            {listing.address ? (
+                                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 capitalize line-clamp-2">
+                                                    📍 {listing.address}
+                                                </p>
+                                            ) : listing.location_details && listing.location_details.length > 0 ? (
                                                 <div className="text-sm text-gray-600 dark:text-gray-300 mb-3 space-y-1">
                                                     {listing.location_details.slice(0, 2).map((location, idx) => (
                                                         <p key={idx} className="capitalize">

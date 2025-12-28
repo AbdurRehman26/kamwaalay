@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
 import api from "@/services/api";
 import { jobApplicationsService } from "@/services/jobApplications";
@@ -10,14 +10,30 @@ import { useServiceTypes } from "@/hooks/useServiceTypes";
 export default function JobApplicationsIndex() {
     const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const [bookings, setBookings] = useState({ data: [], links: [], meta: {} });
     const [filters, setFilters] = useState({});
     const [loading, setLoading] = useState(true);
-    const [serviceType, setServiceType] = useState("");
-    const [latitude, setLatitude] = useState("");
-    const [longitude, setLongitude] = useState("");
-    const [cityId, setCityId] = useState("");
     const [cities, setCities] = useState([]);
+
+    // Read filter values from URL params (with defaults)
+    const serviceType = searchParams.get("service_type") || "";
+    const cityId = searchParams.get("city_id") || "";
+    const latitude = searchParams.get("latitude") || "";
+    const longitude = searchParams.get("longitude") || "";
+
+    // Update URL params when filters change
+    const updateFilters = useCallback((newFilters) => {
+        const params = new URLSearchParams();
+
+        if (newFilters.service_type) params.set("service_type", newFilters.service_type);
+        if (newFilters.city_id) params.set("city_id", newFilters.city_id);
+        if (newFilters.latitude) params.set("latitude", newFilters.latitude);
+        if (newFilters.longitude) params.set("longitude", newFilters.longitude);
+
+        setSearchParams(params, { replace: true });
+    }, [setSearchParams]);
 
     // Fetch service types from API
     const { serviceTypes: fetchedServiceTypes } = useServiceTypes();
@@ -41,17 +57,20 @@ export default function JobApplicationsIndex() {
     const handleNearMe = () => {
         // If already has location, clear it (toggle off)
         if (latitude && longitude) {
-            setLatitude(null);
-            setLongitude(null);
+            updateFilters({ service_type: serviceType, city_id: cityId });
             return;
         }
 
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    const { latitude, longitude } = position.coords;
-                    setLatitude(latitude);
-                    setLongitude(longitude);
+                    const { latitude: lat, longitude: lng } = position.coords;
+                    updateFilters({
+                        service_type: serviceType,
+                        city_id: cityId,
+                        latitude: lat.toString(),
+                        longitude: lng.toString()
+                    });
                 },
                 (error) => {
                     console.error("Error getting location:", error);
@@ -63,7 +82,7 @@ export default function JobApplicationsIndex() {
         }
     };
 
-    // Fetch bookings from API
+    // Fetch bookings from API when URL params change
     useEffect(() => {
         const params = {
             service_type: serviceType || undefined,
@@ -87,10 +106,6 @@ export default function JobApplicationsIndex() {
                 setLoading(false);
             });
     }, [serviceType, cityId, latitude, longitude]);
-
-    const handleFilter = () => {
-        // Filters are applied via useEffect above
-    };
 
     return (
         <PublicLayout>
@@ -123,7 +138,7 @@ export default function JobApplicationsIndex() {
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Service Type</label>
                                 <select
                                     value={serviceType}
-                                    onChange={(e) => setServiceType(e.target.value)}
+                                    onChange={(e) => updateFilters({ service_type: e.target.value, city_id: cityId, latitude, longitude })}
                                     className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 shadow-sm transition-colors"
                                 >
                                     {serviceTypes.map((type) => (
@@ -138,7 +153,7 @@ export default function JobApplicationsIndex() {
                                 <div className="flex gap-2">
                                     <select
                                         value={cityId}
-                                        onChange={(e) => setCityId(e.target.value)}
+                                        onChange={(e) => updateFilters({ service_type: serviceType, city_id: e.target.value, latitude, longitude })}
                                         className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 shadow-sm transition-colors"
                                     >
                                         <option value="">All Cities</option>
@@ -163,10 +178,10 @@ export default function JobApplicationsIndex() {
                             </div>
                             <div className="flex items-end">
                                 <button
-                                    onClick={handleFilter}
-                                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 font-bold"
+                                    onClick={() => updateFilters({})}
+                                    className="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-300 shadow-lg font-bold"
                                 >
-                                    Apply Filters
+                                    Clear Filters
                                 </button>
                             </div>
                         </div>
@@ -350,12 +365,7 @@ export default function JobApplicationsIndex() {
                                 We couldn't find any job requests matching your filters. Try adjusting your search criteria.
                             </p>
                             <button
-                                onClick={() => {
-                                    setServiceType("");
-                                    setCityId("");
-                                    setLatitude("");
-                                    setLongitude("");
-                                }}
+                                onClick={() => updateFilters({})}
                                 className="mt-8 px-6 py-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 font-bold rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                             >
                                 Clear All Filters

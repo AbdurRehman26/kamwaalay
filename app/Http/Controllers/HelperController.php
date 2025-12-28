@@ -76,10 +76,15 @@ class HelperController extends Controller
             }
         });
 
-        // Filter by service type (from profile)
+        // Filter by service type (via service listings)
         if ($request->has('service_type') && $request->service_type) {
-            $query->whereHas('profile', function ($q) use ($request) {
-                $q->where('service_type', $request->service_type);
+            $serviceType = $request->service_type;
+            $query->whereHas('profile.serviceListings.serviceTypes', function ($q) use ($serviceType) {
+                if (is_numeric($serviceType)) {
+                    $q->where('service_types.id', $serviceType);
+                } else {
+                    $q->where('slug', $serviceType);
+                }
             });
         }
 
@@ -137,7 +142,7 @@ class HelperController extends Controller
             ->select('users.*');
         }
 
-        $helpers = $query->with(['roles', 'profile', 'serviceListings' => function ($query) {
+        $helpers = $query->with(['roles', 'profile', 'businesses', 'helpers.profile', 'helpers.serviceListings.serviceTypes', 'serviceListings' => function ($query) {
             $query->where('service_listings.is_active', true)
                   ->where('service_listings.status', 'active');
         }])->paginate(12);
@@ -145,6 +150,9 @@ class HelperController extends Controller
         $filters = $request->only(['service_type', 'location_id', 'city_id', 'city_name', 'area', 'min_experience', 'sort_by', 'user_type', 'latitude', 'longitude']);
         if ($locationDisplay) {
             $filters['location_display'] = $locationDisplay;
+        }
+        if (isset($city) && $city) {
+            $filters['city'] = $city;
         }
 
         return response()->json([
@@ -180,7 +188,7 @@ class HelperController extends Controller
             abort(404);
         }
 
-        $helper->load(['roles', 'profile', 'helperReviews.user', 'documents', 'serviceListings' => function ($query) {
+        $helper->load(['roles', 'profile.languages', 'helperReviews.user', 'documents', 'serviceListings' => function ($query) {
             $query->where('service_listings.is_active', true)
                   ->where('service_listings.status', 'active');
         }]);

@@ -81,9 +81,9 @@ class UserResource extends JsonResource
             'role' => $this->getRoleAttribute(),
             'roles' => $this->getRolesArray(),
             // Profile fields (from profile - works for both helpers and businesses)
-            'photo' => $this->when($this->profile, $this->photo),
-            'service_type' => $this->when($this->profile, $this->service_type),
-            'experience_years' => $this->when($this->profile, $this->experience_years),
+            'photo' => $this->when($this->profile, $this->profile?->photo),
+            'service_type' => $this->when($this->profile, $this->profile?->service_type),
+            'experience_years' => $this->when($this->profile, $this->profile?->experience_years),
             'age' => $this->when($this->profile, $this->profile?->age),
             'gender' => $this->when($this->profile, $this->profile?->gender ? (string) $this->profile->gender : null),
             'religion' => $this->when($this->profile, $this->profile?->religion ? [
@@ -91,10 +91,9 @@ class UserResource extends JsonResource
                 'label' => $this->profile->religion instanceof \App\Enums\Religion ? $this->profile->religion->label() : str_replace('_', ' ', $this->profile->religion),
             ] : null),
             'city_id' => $this->when($this->profile, $this->profile?->city_id),
-            'city' => $this->when($this->profile, $this->city),
-            'area' => $this->when($this->profile, $this->area),
-            'availability' => $this->when($this->profile, $this->availability),
-            'bio' => $this->when($this->profile, $this->bio),
+            'city' => $this->when($this->profile, $this->profile?->city),
+            'availability' => $this->when($this->profile, $this->profile?->availability),
+            'bio' => $this->when($this->profile, $this->profile?->bio),
             'languages' => $this->when($this->profile && $this->profile->relationLoaded('languages'), function () {
                 return $this->profile->languages->map(function ($language) {
                     return [
@@ -104,11 +103,11 @@ class UserResource extends JsonResource
                     ];
                 });
             }),
-            'verification_status' => $this->when($this->profile, $this->verification_status),
-            'police_verified' => $this->when($this->profile, $this->police_verified),
+            'verification_status' => $this->when($this->profile, $this->profile?->verification_status),
+            'police_verified' => $this->when($this->profile, $this->profile?->police_verified),
             'is_active' => $this->when(isset($this->is_active), $this->is_active),
-            'rating' => $this->when($this->profile, $this->rating),
-            'total_reviews' => $this->when($this->profile, $this->total_reviews),
+            'rating' => $this->when($this->profile, $this->profile?->rating),
+            'total_reviews' => $this->when($this->profile, $this->profile?->total_reviews),
             'profile' => $this->when($this->profile, function () {
                 return [
                     'id' => $this->profile->id,
@@ -133,6 +132,20 @@ class UserResource extends JsonResource
                             'name' => $review->user->name,
                         ] : null,
                     ];
+                });
+            }),
+            // Business info for agency workers
+            'business' => $this->when($this->relationLoaded('businesses') && $this->businesses->isNotEmpty(), function () {
+                $business = $this->businesses->first();
+                return [
+                    'id' => $business->id,
+                    'name' => $business->name,
+                ];
+            }),
+            // Helpers (workers) list for businesses
+            'helpers' => $this->when($this->relationLoaded('helpers'), function () {
+                return $this->helpers->map(function ($helper) {
+                    return (new UserResource($helper))->toArray(request());
                 });
             }),
         ];

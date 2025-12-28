@@ -354,13 +354,69 @@ class DummyUsersSeeder extends Seeder
                         'bio' => 'Leading agency providing verified domestic help services.',
                         'is_active' => true,
                     ],
-                    // Multiple service listings
-                    'services' => [
-                        ['service_type' => 'maid', 'work_type' => 'full_time', 'monthly_rate' => 15000, 'description' => 'Professional maid services'],
-                        ['service_type' => 'cook', 'work_type' => 'full_time', 'monthly_rate' => 21000, 'description' => 'Experienced cooking services'],
-                        ['service_type' => 'babysitter', 'work_type' => 'part_time', 'monthly_rate' => 18000, 'description' => 'Reliable babysitting'],
-                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'monthly_rate' => 24000, 'description' => 'Elderly care services'],
-                    ],
+                    // Agency Workers
+                    'workers' => [
+                        [
+                            'name' => 'Agency Maid 1',
+                            'password' => Hash::make('password'),
+                            'phone' => '03001234901',
+                            'address' => 'Worker Colony, Karachi',
+                            'is_active' => true,
+                            'profile' => [
+                                'age' => 25,
+                                'gender' => 'female',
+                                'religion' => 'christian',
+                                'experience_years' => 3,
+                                'bio' => 'Verified agency maid.',
+                                'verification_status' => 'verified',
+                                'police_verified' => true,
+                                'is_active' => true,
+                            ],
+                            'services' => [
+                                ['service_type' => 'maid', 'work_type' => 'full_time', 'monthly_rate' => 16000, 'description' => 'Agency trained maid'],
+                            ]
+                        ],
+                        [
+                            'name' => 'Agency Cook 1',
+                            'password' => Hash::make('password'),
+                            'phone' => '03001234902',
+                            'address' => 'Worker Colony, Karachi',
+                            'is_active' => true,
+                            'profile' => [
+                                'age' => 40,
+                                'gender' => 'male',
+                                'religion' => 'sunni_no_nazar_niyaz',
+                                'experience_years' => 10,
+                                'bio' => 'Expert agency cook.',
+                                'verification_status' => 'verified',
+                                'police_verified' => true,
+                                'is_active' => true,
+                            ],
+                            'services' => [
+                                ['service_type' => 'cook', 'work_type' => 'full_time', 'monthly_rate' => 25000, 'description' => 'Premium cooking service'],
+                            ]
+                        ],
+                        [
+                            'name' => 'Agency Driver 1',
+                            'password' => Hash::make('password'),
+                            'phone' => '03001234904',
+                            'address' => 'Baldia Town, Karachi',
+                            'is_active' => true,
+                            'profile' => [
+                                'age' => 35,
+                                'gender' => 'male',
+                                'religion' => 'sunni_no_nazar_niyaz',
+                                'experience_years' => 8,
+                                'bio' => 'Professional driver with valid license.',
+                                'verification_status' => 'verified',
+                                'police_verified' => true,
+                                'is_active' => true,
+                            ],
+                            'services' => [
+                                ['service_type' => 'driver', 'work_type' => 'full_time', 'monthly_rate' => 22000, 'description' => 'Full time driver'],
+                            ]
+                        ]
+                    ]
                 ],
                 [
                     'name' => 'Care Services Pvt Ltd',
@@ -373,19 +429,56 @@ class DummyUsersSeeder extends Seeder
                         'bio' => 'Reliable and professional care services for homes and businesses.',
                         'is_active' => true,
                     ],
-                    // Multiple service listings
-                    'services' => [
-                        ['service_type' => 'all_rounder', 'work_type' => 'full_time', 'monthly_rate' => 21000, 'description' => 'Complete household management'],
-                        ['service_type' => 'cleaner', 'work_type' => 'part_time', 'monthly_rate' => 15000, 'description' => 'Professional cleaning'],
-                        ['service_type' => 'caregiver', 'work_type' => 'full_time', 'monthly_rate' => 25500, 'description' => 'Medical assistance and care'],
-                    ],
+                    // Agency Workers
+                    'workers' => [
+                        [
+                            'name' => 'Care Nurse 1',
+                            'password' => Hash::make('password'),
+                            'phone' => '03001234903',
+                            'address' => 'Clifton, Karachi',
+                            'is_active' => true,
+                            'profile' => [
+                                'age' => 30,
+                                'gender' => 'female',
+                                'religion' => 'sunni_nazar_niyaz',
+                                'experience_years' => 6,
+                                'bio' => 'Certified nursing assistant.',
+                                'verification_status' => 'verified',
+                                'police_verified' => true,
+                                'is_active' => true,
+                            ],
+                            'services' => [
+                                ['service_type' => 'caregiver', 'work_type' => 'full_time', 'monthly_rate' => 30000, 'description' => 'Professional patient care'],
+                            ]
+                        ],
+                        [
+                            'name' => 'Care Maid 2',
+                            'password' => Hash::make('password'),
+                            'phone' => '03001234905',
+                            'address' => 'Saddar, Karachi',
+                            'is_active' => true,
+                            'profile' => [
+                                'age' => 26,
+                                'gender' => 'female',
+                                'religion' => 'christian',
+                                'experience_years' => 4,
+                                'bio' => 'Experienced house cleaner.',
+                                'verification_status' => 'verified',
+                                'police_verified' => true,
+                                'is_active' => true,
+                            ],
+                            'services' => [
+                                ['service_type' => 'maid', 'work_type' => 'part_time', 'monthly_rate' => 14000, 'description' => 'Part-time cleaning'],
+                            ]
+                        ]
+                    ]
                 ],
             ];
 
             foreach ($businesses as $businessData) {
-                // Extract services if present
-                $services = $businessData['services'] ?? [];
-                unset($businessData['services']);
+                // Extract workers if present
+                $workers = $businessData['workers'] ?? [];
+                unset($businessData['workers']);
 
                 $profileData = $businessData['profile'] ?? [];
                 unset($businessData['profile']);
@@ -407,62 +500,86 @@ class DummyUsersSeeder extends Seeder
                     ['profileable_id' => $business->id, 'profileable_type' => User::class],
                     $profileData
                 );
+                
+                $this->command->info("Created business: {$business->phone}");
 
-                // Create service listings if provided
-                if (!empty($services)) {
-                    // Group services by common fields (work_type, monthly_rate, description)
-                    $groupedServices = [];
-                    foreach ($services as $serviceData) {
-                        $key = md5(serialize([
-                            $serviceData['work_type'] ?? 'full_time',
-                            $serviceData['monthly_rate'] ?? null,
-                            $serviceData['description'] ?? null,
-                        ]));
+                // Create/Attach Workers
+                foreach ($workers as $workerData) {
+                    $workerServices = $workerData['services'] ?? [];
+                    unset($workerData['services']);
+                    
+                    $workerProfile = $workerData['profile'] ?? [];
+                    unset($workerData['profile']);
 
-                        if (!isset($groupedServices[$key])) {
-                            $groupedServices[$key] = [
-                                'common' => [
-                                    'profile_id' => $business->profile->id, // Link to profile
-                                    'work_type' => $serviceData['work_type'] ?? 'full_time',
-                                    'monthly_rate' => $serviceData['monthly_rate'] ?? null,
-                                    'description' => $serviceData['description'] ?? null,
-                                    'is_active' => true,
-                                    'status' => 'active',
-                                ],
-                                'service_types' => [],
-                                'locations' => [],
-                            ];
-                        }
-
-                        // Add service type
-                        if (!in_array($serviceData['service_type'], $groupedServices[$key]['service_types'])) {
-                            $groupedServices[$key]['service_types'][] = $serviceData['service_type'];
-                        }
+                    $worker = User::firstOrCreate(
+                        ['phone' => $workerData['phone']],
+                        $workerData
+                    );
+                    
+                    if (!$worker->hasRole('helper')) {
+                        $worker->assignRole('helper');
                     }
 
-                    // Create service listings for each group
-                    foreach ($groupedServices as $group) {
-                        // Create the listing without service_types and locations
-                        $listing = \App\Models\ServiceListing::create($group['common']);
+                    // Create/Update Worker Profile
+                    $worker->profile()->updateOrCreate(
+                        ['profileable_id' => $worker->id, 'profileable_type' => User::class],
+                        $workerProfile
+                    );
+                    
+                    $this->command->info("  - Created worker: {$worker->phone} for business {$business->phone}");
 
-                        // Sync service types (convert slugs to IDs)
-                        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $group['service_types'])
-                            ->pluck('id')
-                            ->toArray();
-                        if (!empty($serviceTypeIds)) {
-                            $listing->serviceTypes()->sync($serviceTypeIds);
-                        }
-
-                        // Sync locations
-                        if (!empty($group['locations'])) {
-                            $listing->locations()->sync($group['locations']);
-                        }
+                    // Attach to Business
+                    if (!$business->helpers()->where('user_id', $worker->id)->exists()) {
+                        $business->helpers()->attach($worker->id, [
+                            'status' => 'approved',
+                            'joined_at' => now(),
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]);
                     }
 
-                    $listingCount = count($groupedServices);
-                    $this->command->info("Created business: {$business->phone} with " . $listingCount . " service listing(s)");
-                } else {
-                    $this->command->info("Created business: {$business->phone}");
+                    // Create Service Listings for Worker
+                    if (!empty($workerServices)) {
+                        // Group services logic (same as helper seeding)
+                        $groupedServices = [];
+                        foreach ($workerServices as $serviceData) {
+                            $key = md5(serialize([
+                                $serviceData['work_type'] ?? 'full_time',
+                                $serviceData['monthly_rate'] ?? null,
+                                $serviceData['description'] ?? null,
+                            ]));
+
+                            if (!isset($groupedServices[$key])) {
+                                $groupedServices[$key] = [
+                                    'common' => [
+                                        'profile_id' => $worker->profile->id,
+                                        'work_type' => $serviceData['work_type'] ?? 'full_time',
+                                        'monthly_rate' => $serviceData['monthly_rate'] ?? null,
+                                        'description' => $serviceData['description'] ?? null,
+                                        'is_active' => true,
+                                        'status' => 'active',
+                                    ],
+                                    'service_types' => [],
+                                    'locations' => [],
+                                ];
+                            }
+
+                            if (!in_array($serviceData['service_type'], $groupedServices[$key]['service_types'])) {
+                                $groupedServices[$key]['service_types'][] = $serviceData['service_type'];
+                            }
+                        }
+
+                        foreach ($groupedServices as $group) {
+                            $listing = \App\Models\ServiceListing::create($group['common']);
+                            
+                            $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $group['service_types'])
+                                ->pluck('id')
+                                ->toArray();
+                            if (!empty($serviceTypeIds)) {
+                                $listing->serviceTypes()->sync($serviceTypeIds);
+                            }
+                        }
+                    }
                 }
             }
         }

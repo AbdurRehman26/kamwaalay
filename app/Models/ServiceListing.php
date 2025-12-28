@@ -81,10 +81,14 @@ class ServiceListing extends Model
     /**
      * Scope for service type (using relationship)
      */
-    public function scopeByServiceType($query, $serviceTypeSlug)
+    public function scopeByServiceType($query, $serviceType)
     {
-        return $query->whereHas('serviceTypes', function ($q) use ($serviceTypeSlug) {
-            $q->where('slug', $serviceTypeSlug);
+        return $query->whereHas('serviceTypes', function ($q) use ($serviceType) {
+            if (is_numeric($serviceType)) {
+                $q->where('service_types.id', $serviceType);
+            } else {
+                $q->where('slug', $serviceType);
+            }
         });
     }
 

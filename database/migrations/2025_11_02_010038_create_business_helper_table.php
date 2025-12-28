@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('business_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['active', 'inactive', 'pending'])->default('active');
+            $table->string('status')->default('active');
             $table->timestamp('joined_at')->useCurrent();
             $table->timestamps();
 

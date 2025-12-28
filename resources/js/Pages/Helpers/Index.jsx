@@ -70,26 +70,24 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         return cleaned;
     };
 
-    // Get city initial for display
-    const getCityInitial = (helper) => {
+    // Get city name for display
+    const getCityName = (helper) => {
         let cityName = "";
 
-        // Get city from service_listings location_details
-        if (helper.service_listings && helper.service_listings.length > 0) {
+        // Check helper.city first (new field)
+        if (helper.city) {
+            // detailed city object or string content
+            cityName = typeof helper.city === "object" ? helper.city.name : helper.city;
+        }
+        // Fallback: Get city from service_listings location_details
+        else if (helper.service_listings && helper.service_listings.length > 0) {
             const firstListing = helper.service_listings[0];
             if (firstListing.location_details && firstListing.location_details.length > 0) {
                 cityName = firstListing.location_details[0].city_name;
             }
         }
 
-        if (!cityName) return null;
-
-        const lowerCity = cityName.toLowerCase();
-        if (lowerCity === "karachi") return "Khi";
-        if (lowerCity === "islamabad") return "Isb";
-        if (lowerCity === "lahore") return "Lahore";
-
-        return cityName.substring(0, 3); // First 3 chars as fallback
+        return cityName || null;
     };
 
     // Fetch service types from API
@@ -446,7 +444,18 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Type</label>
                             <select
                                 value={userType}
-                                onChange={(e) => setUserType(e.target.value)}
+                                onChange={(e) => {
+                                    const newUserType = e.target.value;
+                                    setUserType(newUserType);
+                                    // Update URL immediately
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    if (newUserType && newUserType !== "all") {
+                                        urlParams.set("user_type", newUserType);
+                                    } else {
+                                        urlParams.delete("user_type");
+                                    }
+                                    window.history.pushState({}, "", `${route("helpers.index")}${urlParams.toString() ? "?" + urlParams.toString() : ""}`);
+                                }}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 <option value="all">All</option>
@@ -458,7 +467,18 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Service Type</label>
                             <select
                                 value={serviceType}
-                                onChange={(e) => setServiceType(e.target.value)}
+                                onChange={(e) => {
+                                    const newServiceType = e.target.value;
+                                    setServiceType(newServiceType);
+                                    // Update URL immediately
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    if (newServiceType) {
+                                        urlParams.set("service_type", newServiceType);
+                                    } else {
+                                        urlParams.delete("service_type");
+                                    }
+                                    window.history.pushState({}, "", `${route("helpers.index")}${urlParams.toString() ? "?" + urlParams.toString() : ""}`);
+                                }}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
                             >
                                 {serviceTypes.map((type) => (
@@ -775,12 +795,26 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                 const profileRoute = isBusiness ? route("businesses.show", helper.id) : route("helpers.show", helper.id);
 
                                 // Get all unique service types from service listings
-                                const allServiceTypes = helper.service_listings?.flatMap(listing =>
-                                    listing.service_types?.map(st => {
-                                        const serviceType = typeof st === "string" ? st : st?.service_type;
-                                        return serviceType?.replace(/_/g, " ") || null;
-                                    }) || []
-                                ).filter(Boolean) || [];
+                                let allServiceTypes = [];
+                                if (isBusiness && helper.helpers) {
+                                    // Aggregate services from all workers
+                                    allServiceTypes = helper.helpers.flatMap(worker =>
+                                        worker.service_listings?.flatMap(listing =>
+                                            listing.service_types?.map(st => {
+                                                const serviceType = typeof st === "string" ? st : st?.service_type;
+                                                return serviceType?.replace(/_/g, " ") || null;
+                                            }) || []
+                                        ) || []
+                                    ).filter(Boolean);
+                                } else {
+                                    // Helper's own services
+                                    allServiceTypes = helper.service_listings?.flatMap(listing =>
+                                        listing.service_types?.map(st => {
+                                            const serviceType = typeof st === "string" ? st : st?.service_type;
+                                            return serviceType?.replace(/_/g, " ") || null;
+                                        }) || []
+                                    ).filter(Boolean) || [];
+                                }
                                 const uniqueServiceTypes = [...new Set(allServiceTypes)];
                                 const primaryServiceType = uniqueServiceTypes[0] || "Helper";
 
@@ -800,7 +834,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                         onClick={() => navigate(profileRoute)}
                                         className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
                                     >
-                                        <div className="h-48 relative bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                                        <div className="h-40 relative bg-gray-100 dark:bg-gray-700 overflow-hidden">
                                             {isBusiness ? (
                                                 <div className="w-full h-full flex items-center justify-center bg-indigo-50 dark:bg-indigo-900/20">
                                                     <span className="text-6xl text-indigo-300 dark:text-indigo-600">🏢</span>
@@ -831,23 +865,33 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="p-8 relative">
-                                            {/* City Badge - Top Right of Details */}
-                                            {getCityInitial(helper) && (
-                                                <div className="absolute top-4 right-4">
-                                                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 text-xs font-bold rounded-lg uppercase tracking-wider shadow-sm border border-gray-200 dark:border-gray-600">
-                                                        {getCityInitial(helper)}
-                                                    </span>
-                                                </div>
-                                            )}
+                                        <div className="p-5 relative">
+
                                             <div className="mb-4">
-                                                <span className="inline-block px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-semibold uppercase tracking-wide">
-                                                    {primaryServiceType}
-                                                </span>
+                                                <h3 className="text-2xl font-bold mb-1 text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                                    {helper.name}
+                                                </h3>
+                                                {helper.business && (
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide">
+                                                            Agency
+                                                        </span>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                            By <span className="font-medium text-gray-900 dark:text-white">{helper.business.name}</span>
+                                                        </p>
+                                                    </div>
+                                                )}
+                                                {isBusiness && helper.helpers && (
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <span className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide">
+                                                            {helper.helpers.length} Workers
+                                                        </span>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                            Registered
+                                                        </p>
+                                                    </div>
+                                                )}
                                             </div>
-                                            <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                                {helper.name}
-                                            </h3>
                                             {/* Services */}
                                             {uniqueServiceTypes.length > 0 && (
                                                 <div className="mb-4">
@@ -869,24 +913,36 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                 </div>
                                             )}
                                             {/* Locations */}
-                                            {uniqueLocations.length > 0 ? (
+                                            {(helper.city || helper.address || uniqueLocations.length > 0) ? (
                                                 <div className="mb-6">
                                                     <div className="flex items-start gap-2">
                                                         <span className="text-gray-500 dark:text-gray-400 mt-0.5">📍</span>
                                                         <div className="flex flex-wrap gap-1.5 flex-1">
-                                                            {uniqueLocations.slice(0, 2).map((location, idx) => (
+                                                            {/* Display direct address if available */}
+                                                            {(helper.address) ? (
                                                                 <span
-                                                                    key={idx}
                                                                     className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
-                                                                    title={location.area || location.display_text}
                                                                 >
-                                                                    {location.area || location.display_text}
+                                                                    {helper.address}
                                                                 </span>
-                                                            ))}
-                                                            {uniqueLocations.length > 2 && (
-                                                                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md">
-                                                                    +{uniqueLocations.length - 2} more
-                                                                </span>
+                                                            ) : (
+                                                                // Fallback to service listing locations
+                                                                <>
+                                                                    {uniqueLocations.slice(0, 2).map((location, idx) => (
+                                                                        <span
+                                                                            key={idx}
+                                                                            className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
+                                                                            title={location.area || location.display_text}
+                                                                        >
+                                                                            {location.area || location.display_text}
+                                                                        </span>
+                                                                    ))}
+                                                                    {uniqueLocations.length > 2 && (
+                                                                        <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md">
+                                                                            +{uniqueLocations.length - 2} more
+                                                                        </span>
+                                                                    )}
+                                                                </>
                                                             )}
                                                         </div>
                                                     </div>

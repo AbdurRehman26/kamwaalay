@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('religion', ['sunni_nazar_niyaz', 'sunni_no_nazar_niyaz', 'shia', 'christian'])->nullable();
             $table->text('skills')->nullable();
             $table->integer('experience_years')->nullable()->default(0);
-            $table->string('city_id')->nullable();
+            $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete();
             $table->enum('availability', ['full_time', 'part_time', 'available'])->nullable();
             $table->text('bio')->nullable();
             $table->enum('verification_status', ['pending', 'verified', 'rejected'])->nullable()->default('pending');

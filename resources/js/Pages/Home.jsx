@@ -260,7 +260,7 @@ export default function Home() {
             </section>
 
             {/* Stats Bar */}
-            <div className="transform -translate-y-1/2 max-w-7xl mx-auto px-6 lg:px-8 relative z-20">
+            <div className="mt-24 lg:mt-0 transform -translate-y-1/2 max-w-7xl mx-auto px-6 lg:px-8 relative z-20">
                 <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 lg:p-12 grid grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
                     <div className="text-center">
                         <div className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-2">

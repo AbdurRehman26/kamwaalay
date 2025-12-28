@@ -125,8 +125,40 @@ export default function DashboardDocuments() {
 
                             return (
                                 <div key={document.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-900/50 transition-all duration-300">
-                                    <div className="flex gap-4">
-                                        {/* Image Preview */}
+                                    <div className="flex items-center justify-between gap-4 overflow-hidden">
+                                        {/* Document Info */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                                                    {document.document_type_label || document.document_type}
+                                                </h3>
+                                                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${document.status === "verified"
+                                                    ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                                                    : document.status === "rejected"
+                                                        ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
+                                                        : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300"
+                                                    }`}>
+                                                    {document.status.charAt(0).toUpperCase() + document.status.slice(1)}
+                                                </span>
+                                            </div>
+                                            {document.document_number && (
+                                                <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">
+                                                    <span className="font-semibold">Number:</span> {document.document_number}
+                                                </p>
+                                            )}
+                                            {document.admin_notes && (
+                                                <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border-l-4 border-indigo-500">
+                                                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                                                        <span className="font-semibold">Admin Note:</span> {document.admin_notes}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+                                                Uploaded: {new Date(document.created_at).toLocaleDateString()}
+                                            </p>
+                                        </div>
+
+                                        {/* Image Preview - Right Side */}
                                         {filePath && (
                                             <div className="flex-shrink-0">
                                                 {isImage ? (
@@ -139,16 +171,15 @@ export default function DashboardDocuments() {
                                                         <img
                                                             src={filePath}
                                                             alt={document.document_type_label || document.document_type}
-                                                            className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors cursor-pointer"
+                                                            className="w-10 h-10 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors cursor-pointer"
                                                             onError={(e) => {
-                                                                // Fallback if image fails to load
                                                                 e.target.style.display = "none";
                                                                 const fallback = e.target.parentElement.querySelector(".image-fallback");
                                                                 if (fallback) fallback.style.display = "flex";
                                                             }}
                                                         />
-                                                        <div className="w-32 h-32 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center image-fallback hidden absolute top-0 left-0">
-                                                            <span className="text-4xl">📄</span>
+                                                        <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center image-fallback hidden absolute top-0 left-0">
+                                                            <span className="text-lg">📄</span>
                                                         </div>
                                                     </a>
                                                 ) : isPdf ? (
@@ -158,9 +189,8 @@ export default function DashboardDocuments() {
                                                         rel="noopener noreferrer"
                                                         className="block"
                                                     >
-                                                        <div className="w-32 h-32 bg-red-50 dark:bg-red-900/20 rounded-lg border-2 border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 transition-colors flex flex-col items-center justify-center cursor-pointer">
-                                                            <span className="text-5xl mb-2">📕</span>
-                                                            <span className="text-xs text-red-700 dark:text-red-400 font-semibold">PDF</span>
+                                                        <div className="w-10 h-10 bg-red-50 dark:bg-red-900/20 rounded-lg border-2 border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 transition-colors flex flex-col items-center justify-center cursor-pointer">
+                                                            <span className="text-xl">📕</span>
                                                         </div>
                                                     </a>
                                                 ) : (
@@ -170,60 +200,30 @@ export default function DashboardDocuments() {
                                                         rel="noopener noreferrer"
                                                         className="block"
                                                     >
-                                                        <div className="w-32 h-32 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors flex items-center justify-center cursor-pointer">
-                                                            <span className="text-4xl">📄</span>
+                                                        <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors flex items-center justify-center cursor-pointer">
+                                                            <span className="text-lg">📄</span>
                                                         </div>
                                                     </a>
                                                 )}
                                             </div>
                                         )}
-
-                                        {/* Document Info */}
-                                        <div className="flex-1 flex flex-col">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                                                    {document.document_type_label || document.document_type}
-                                                </h3>
-                                                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${document.status === "verified"
-                                                        ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
-                                                        : document.status === "rejected"
-                                                            ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
-                                                            : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300"
-                                                    }`}>
-                                                    {document.status.charAt(0).toUpperCase() + document.status.slice(1)}
-                                                </span>
-                                            </div>
-                                            {document.document_number && (
-                                                <p className="text-gray-600 dark:text-gray-400 mb-2">
-                                                    <span className="font-semibold">Number:</span> {document.document_number}
-                                                </p>
-                                            )}
-                                            {document.admin_notes && (
-                                                <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border-l-4 border-indigo-500">
-                                                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                                                        <span className="font-semibold">Admin Note:</span> {document.admin_notes}
-                                                    </p>
-                                                </div>
-                                            )}
-                                            <p className="text-gray-500 dark:text-gray-400 text-sm mt-auto">
-                                                Uploaded: {new Date(document.created_at).toLocaleDateString()}
-                                            </p>
-                                        </div>
-
-                                        {/* View Button */}
-                                        {filePath && (
-                                            <div className="flex-shrink-0 flex items-start">
-                                                <a
-                                                    href={filePath}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition duration-300 font-bold text-sm"
-                                                >
-                                                    View Full
-                                                </a>
-                                            </div>
-                                        )}
                                     </div>
+
+                                    {/* Download Button */}
+                                    {filePath && (
+                                        <div className="flex-shrink-0">
+                                            <a
+                                                href={filePath}
+                                                download
+                                                className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all text-gray-500 dark:text-gray-400"
+                                                title="Download Document"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}

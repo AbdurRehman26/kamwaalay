@@ -39,6 +39,7 @@ class ServiceListingResource extends JsonResource
             'monthly_rate' => $this->monthly_rate,
             'description' => $this->description,
             'pin_address' => $this->pin_address,
+            'address' => $this->pin_address,
             'pin_latitude' => $this->pin_latitude,
             'pin_longitude' => $this->pin_longitude,
             'is_active' => $this->is_active,
