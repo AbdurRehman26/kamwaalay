@@ -104,7 +104,8 @@ class HelperController extends Controller
             // Filter by city ID - find listings with pin location in that city
             $city = City::find($request->city_id);
             if ($city) {
-                $query->whereHas('profile.serviceListings', function ($q) use ($city) {
+                // Filter by profile city directly as listings don't have city_id
+                $query->whereHas('profile', function ($q) use ($city) {
                     $q->where('city_id', $city->id);
                 });
                 $locationDisplay = $city->name;

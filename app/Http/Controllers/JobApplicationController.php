@@ -58,7 +58,14 @@ class JobApplicationController extends Controller
 
         // Filter by service type
         if ($request->has('service_type') && $request->service_type) {
-            $query->where('service_type', $request->service_type);
+            $serviceType = $request->service_type;
+            if (is_numeric($serviceType)) {
+                $query->where('service_type_id', $serviceType);
+            } else {
+                $query->whereHas('serviceType', function ($q) use ($serviceType) {
+                    $q->where('slug', $serviceType);
+                });
+            }
         }
 
         // Filter by city ID

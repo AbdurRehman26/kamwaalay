@@ -166,13 +166,14 @@ export default function JobApplicationsIndex() {
                                     <button
                                         type="button"
                                         onClick={() => handleNearMe()}
-                                        className={`px-3 py-3 border rounded-xl transition-colors ${latitude && longitude ? "bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700" : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-600"}`}
+                                        className={`px-4 py-3 border rounded-xl transition-colors flex items-center gap-2 font-medium ${latitude && longitude ? "bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700" : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-600"}`}
                                         title={latitude && longitude ? "Clear Near Me Filter" : "Search Near Me"}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                                         </svg>
+                                        <span>Near Me</span>
                                     </button>
                                 </div>
                             </div>

@@ -77,7 +77,9 @@ class ServiceListingController extends Controller
             // Filter by city ID
             $city = \App\Models\City::find($request->city_id);
             if ($city) {
-                $query->where('city_id', $city->id);
+                $query->whereHas('profile', function ($q) use ($city) {
+                    $q->where('city_id', $city->id);
+                });
                 $locationDisplay = $city->name;
             }
         } elseif ($request->has('city_name') && $request->city_name) {
