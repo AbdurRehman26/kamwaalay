@@ -98,110 +98,112 @@ export default function MyServiceListings() {
                     <>
                         <div className="grid md:grid-cols-2 gap-6 mb-6">
                             {listings.data.map((listing) => (
-                                <div key={listing.id} className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-900/50 transition-all duration-300">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-                                                    <span className="text-xl">📋</span>
+                                <div key={listing.id} className="group flex flex-col h-full bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-900/50 transition-all duration-300">
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+                                                        <span className="text-xl">📋</span>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        {/* Services */}
+                                                        {listing.service_types && listing.service_types.length > 0 ? (
+                                                            <div className="mb-1">
+                                                                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                                                                    {listing.service_types.slice(0, 2).map((st, idx) => (
+                                                                        <span key={idx}>
+                                                                            {typeof st === "string" ? toTitleCase(st) : toTitleCase(st?.service_type || "Service")}
+                                                                            {idx < Math.min(listing.service_types.length, 2) - 1 && ", "}
+                                                                        </span>
+                                                                    ))}
+                                                                    {listing.service_types.length > 2 && (
+                                                                        <span className="text-gray-600 dark:text-gray-400 font-normal">
+                                                                            {" "}+{listing.service_types.length - 2} more
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                        ) : (
+                                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{toTitleCase(listing.service_type_label) || "Service"}</h3>
+                                                        )}
+                                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${getStatusColor(listing.status)}`}>
+                                                            {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex-1">
-                                                    {/* Services */}
-                                                    {listing.service_types && listing.service_types.length > 0 ? (
-                                                        <div className="mb-1">
-                                                            <span className="text-lg font-bold text-gray-900 dark:text-white">
-                                                                {listing.service_types.slice(0, 2).map((st, idx) => (
-                                                                    <span key={idx}>
-                                                                        {typeof st === "string" ? toTitleCase(st) : toTitleCase(st?.service_type || "Service")}
-                                                                        {idx < Math.min(listing.service_types.length, 2) - 1 && ", "}
-                                                                    </span>
-                                                                ))}
-                                                                {listing.service_types.length > 2 && (
-                                                                    <span className="text-gray-600 dark:text-gray-400 font-normal">
-                                                                        {" "}+{listing.service_types.length - 2} more
-                                                                    </span>
-                                                                )}
+                                                <div className="space-y-2 mb-3">
+                                                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
+                                                        <span className="text-indigo-600 dark:text-indigo-400 font-bold">💼</span>
+                                                        <span className="capitalize">
+                                                            {listing.work_type?.replace("_", " ") || "N/A"}
+                                                        </span>
+                                                    </div>
+                                                    {/* Locations */}
+                                                    {listing.pin_address ? (
+                                                        <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400 text-sm">
+                                                            <span className="text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">📍</span>
+                                                            <span className="break-words line-clamp-2" title={listing.pin_address}>
+                                                                {listing.pin_address}
                                                             </span>
+                                                        </div>
+                                                    ) : listing.location_details && listing.location_details.length > 0 ? (
+                                                        <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400 text-sm">
+                                                            <span className="text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">📍</span>
+                                                            <div className="flex-1">
+                                                                <span>
+                                                                    {listing.location_details.slice(0, 2).map((loc, idx) => (
+                                                                        <span key={idx}>
+                                                                            {loc.area || loc.city_name}
+                                                                            {idx < Math.min(listing.location_details.length, 2) - 1 && ", "}
+                                                                        </span>
+                                                                    ))}
+                                                                    {listing.location_details.length > 2 && (
+                                                                        <span className="text-gray-500 dark:text-gray-500">
+                                                                            {" "}+{listing.location_details.length - 2} more
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ) : listing.area ? (
+                                                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
+                                                            <span className="text-indigo-600 dark:text-indigo-400 font-bold">📍</span>
+                                                            <span>{listing.area}</span>
                                                         </div>
                                                     ) : (
-                                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{toTitleCase(listing.service_type_label) || "Service"}</h3>
+                                                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-500 text-sm">
+                                                            <span className="text-indigo-600 dark:text-indigo-400 font-bold">📍</span>
+                                                            <span>Location not specified</span>
+                                                        </div>
                                                     )}
-                                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${getStatusColor(listing.status)}`}>
-                                                        {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2 mb-3">
-                                                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
-                                                    <span className="text-indigo-600 dark:text-indigo-400 font-bold">💼</span>
-                                                    <span className="capitalize">
-                                                        {listing.work_type?.replace("_", " ") || "N/A"}
-                                                    </span>
-                                                </div>
-                                                {/* Locations */}
-                                                {listing.pin_address ? (
-                                                    <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400 text-sm">
-                                                        <span className="text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">📍</span>
-                                                        <span className="break-words line-clamp-2" title={listing.pin_address}>
-                                                            {listing.pin_address}
-                                                        </span>
-                                                    </div>
-                                                ) : listing.location_details && listing.location_details.length > 0 ? (
-                                                    <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400 text-sm">
-                                                        <span className="text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">📍</span>
-                                                        <div className="flex-1">
-                                                            <span>
-                                                                {listing.location_details.slice(0, 2).map((loc, idx) => (
-                                                                    <span key={idx}>
-                                                                        {loc.area || loc.city_name}
-                                                                        {idx < Math.min(listing.location_details.length, 2) - 1 && ", "}
-                                                                    </span>
-                                                                ))}
-                                                                {listing.location_details.length > 2 && (
-                                                                    <span className="text-gray-500 dark:text-gray-500">
-                                                                        {" "}+{listing.location_details.length - 2} more
-                                                                    </span>
-                                                                )}
+                                                    {listing.monthly_rate && (
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-indigo-600 dark:text-indigo-400 font-bold">💰</span>
+                                                            <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                                                                PKR {listing.monthly_rate.toLocaleString()}/month
                                                             </span>
                                                         </div>
-                                                    </div>
-                                                ) : listing.area ? (
-                                                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
-                                                        <span className="text-indigo-600 dark:text-indigo-400 font-bold">📍</span>
-                                                        <span>{listing.area}</span>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-500 text-sm">
-                                                        <span className="text-indigo-600 dark:text-indigo-400 font-bold">📍</span>
-                                                        <span>Location not specified</span>
-                                                    </div>
-                                                )}
-                                                {listing.monthly_rate && (
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-indigo-600 dark:text-indigo-400 font-bold">💰</span>
-                                                        <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                                                            PKR {listing.monthly_rate.toLocaleString()}/month
-                                                        </span>
+                                                    )}
+                                                </div>
+                                                {listing.description && (
+                                                    <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border-l-4 border-indigo-500">
+                                                        <p className="text-gray-700 dark:text-gray-300 text-xs line-clamp-3">{listing.description}</p>
                                                     </div>
                                                 )}
                                             </div>
-                                            {listing.description && (
-                                                <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border-l-4 border-indigo-500">
-                                                    <p className="text-gray-700 dark:text-gray-300 text-xs line-clamp-3">{listing.description}</p>
+
+                                            {/* City Badge */}
+                                            {getCityDisplayName(listing) && (
+                                                <div className="ml-2 flex-shrink-0">
+                                                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 text-xs font-bold rounded-lg uppercase tracking-wider shadow-sm border border-gray-200 dark:border-gray-600">
+                                                        {getCityDisplayName(listing)}
+                                                    </span>
                                                 </div>
                                             )}
                                         </div>
-
-                                        {/* City Badge */}
-                                        {getCityDisplayName(listing) && (
-                                            <div className="ml-2 flex-shrink-0">
-                                                <span className="inline-block px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 text-xs font-bold rounded-lg uppercase tracking-wider shadow-sm border border-gray-200 dark:border-gray-600">
-                                                    {getCityDisplayName(listing)}
-                                                </span>
-                                            </div>
-                                        )}
                                     </div>
-                                    <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                    <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-gray-700 mt-auto">
                                         <Link
                                             to={route("service-listings.edit", listing.id)}
                                             className="w-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all duration-300 font-bold text-sm text-center"

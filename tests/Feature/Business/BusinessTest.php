@@ -36,6 +36,9 @@ beforeEach(function () {
             'is_active' => true,
         ]);
     }
+
+    // Seed service types
+    (new \Database\Seeders\ServiceTypeSeeder())->run();
 });
 
 test('businesses can view their dashboard', function () {
@@ -78,13 +81,15 @@ test('businesses can create a worker', function () {
 
     $token = $business->createToken('test-token')->plainTextToken;
 
+    $maidId = \App\Models\ServiceType::where('slug', 'maid')->first()->id;
+
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->postJson('/api/business/workers', [
         'name' => 'Worker Name',
         'phone' => '03001234567',
-        'service_types' => ['maid'],
+        'service_types' => [$maidId],
         'pin_address' => 'Saddar, Karachi, Pakistan',
         'pin_latitude' => '24.8607',
         'pin_longitude' => '67.0011',
@@ -118,13 +123,15 @@ test('businesses can update their worker', function () {
 
     $token = $business->createToken('test-token')->plainTextToken;
 
+    $cookId = \App\Models\ServiceType::where('slug', 'cook')->first()->id;
+
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->putJson("/api/business/workers/{$helper->id}", [
         'name' => 'New Name',
         'phone' => $helper->phone ?? '03001234567',
-        'service_types' => ['cook'],
+        'service_types' => [$cookId],
         'pin_address' => 'PECHS, Karachi, Pakistan',
         'pin_latitude' => '24.8650',
         'pin_longitude' => '67.0650',
@@ -174,13 +181,15 @@ test('only business owner can manage their workers', function () {
 
     $token = $business2->createToken('test-token')->plainTextToken;
 
+    $maidId = \App\Models\ServiceType::where('slug', 'maid')->first()->id;
+
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->putJson("/api/business/workers/{$helper->id}", [
         'name' => 'Hacked Name',
         'phone' => $helper->phone ?? '03001234567',
-        'service_types' => ['maid'],
+        'service_types' => [$maidId],
         'locations' => [
             [
                 'city' => 'Karachi',

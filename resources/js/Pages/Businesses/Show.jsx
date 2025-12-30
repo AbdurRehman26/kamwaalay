@@ -329,7 +329,7 @@ export default function BusinessShow() {
                                             <Link
                                                 key={worker.id}
                                                 to={route("helpers.show", worker.id)}
-                                                className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-primary-300 dark:hover:border-primary-700"
+                                                className="flex flex-col h-full bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-primary-300 dark:hover:border-primary-700"
                                             >
                                                 <div className="flex items-center gap-4 mb-4">
                                                     {worker.photo ? (
@@ -364,57 +364,97 @@ export default function BusinessShow() {
                                                         </span>
                                                     </div>
                                                 )}
-                                                {/* Services */}
+
+                                                {/* Age & Gender */}
+                                                {(worker.age || worker.gender) && (
+                                                    <div className="mb-3 flex gap-2 flex-wrap">
+                                                        {worker.age && (
+                                                            <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs px-2 py-1 rounded-md font-medium">
+                                                                {worker.age} years
+                                                            </span>
+                                                        )}
+                                                        {worker.gender && (
+                                                            <span className="bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs px-2 py-1 rounded-md font-medium capitalize">
+                                                                {worker.gender}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Services - Show all */}
                                                 {worker.service_listings && worker.service_listings.length > 0 && (
                                                     <div className="mb-3">
-                                                        <div className="text-xs font-semibold text-gray-500 mb-1">Services</div>
+                                                        <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Services</div>
                                                         <div className="flex flex-wrap gap-1">
-                                                            {worker.service_listings.flatMap(listing =>
-                                                                listing.service_types?.map(st => {
-                                                                    return typeof st === "string"
-                                                                        ? st.replace("_", " ")
-                                                                        : (st?.service_type?.replace("_", " ") || st?.name);
-                                                                }) || []
-                                                            ).filter(Boolean).slice(0, 3).map((type, idx) => (
-                                                                <span key={idx} className="bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 text-xs px-2 py-1 rounded-md font-medium capitalize">
-                                                                    {type}
+                                                            {(() => {
+                                                                const allServices = worker.service_listings.flatMap(listing =>
+                                                                    listing.service_types?.map(st => {
+                                                                        if (typeof st === "object" && st.id) {
+                                                                            return { id: st.id, name: st.name, icon: st.icon };
+                                                                        }
+                                                                        return typeof st === "string"
+                                                                            ? { name: st.replace("_", " ") }
+                                                                            : { name: st?.service_type?.replace("_", " ") || st?.name };
+                                                                    }) || []
+                                                                ).filter(Boolean);
+
+                                                                // Remove duplicates by id or name
+                                                                const uniqueServices = Array.from(
+                                                                    new Map(allServices.map(s => [s.id || s.name, s])).values()
+                                                                );
+
+                                                                return uniqueServices.map((service, idx) => (
+                                                                    <span key={idx} className="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs px-2 py-1 rounded-md font-medium">
+                                                                        {service.icon && <span>{service.icon}</span>}
+                                                                        <span className="capitalize">{service.name}</span>
+                                                                    </span>
+                                                                ));
+                                                            })()}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Location from Profile */}
+                                                {worker.profile?.pin_address && (
+                                                    <div className="mb-3">
+                                                        <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Location</div>
+                                                        <div className="flex items-start gap-1 text-sm text-gray-600 dark:text-gray-400">
+                                                            <span>📍</span>
+                                                            <span className="line-clamp-2">{worker.profile.pin_address}</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Religion */}
+                                                {worker.religion && (
+                                                    <div className="mb-3">
+                                                        <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Religion</div>
+                                                        <span className="bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs px-2 py-1 rounded-md font-medium capitalize">
+                                                            {typeof worker.religion === "object" ? worker.religion.label : worker.religion.replace(/_/g, " ")}
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                {/* Languages */}
+                                                {worker.languages && worker.languages.length > 0 && (
+                                                    <div className="mb-3">
+                                                        <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Languages</div>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {worker.languages.map((lang, idx) => (
+                                                                <span key={idx} className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs px-2 py-1 rounded-md font-medium">
+                                                                    {lang.name}
                                                                 </span>
                                                             ))}
-                                                            {worker.service_listings.flatMap(listing =>
-                                                                listing.service_types?.map(st => {
-                                                                    return typeof st === "string"
-                                                                        ? st.replace("_", " ")
-                                                                        : (st?.service_type?.replace("_", " ") || st?.name);
-                                                                }) || []
-                                                            ).filter(Boolean).length > 3 && (
-                                                                    <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md font-medium">
-                                                                        +{worker.service_listings.flatMap(listing =>
-                                                                            listing.service_types?.map(st => {
-                                                                                return typeof st === "string"
-                                                                                    ? st.replace("_", " ")
-                                                                                    : (st?.service_type?.replace("_", " ") || st?.name);
-                                                                            }) || []
-                                                                        ).filter(Boolean).length - 3}
-                                                                    </span>
-                                                                )}
                                                         </div>
                                                     </div>
                                                 )}
-                                                {/* Location */}
-                                                {(worker.city || worker.area) && (
-                                                    <div className="mb-3">
-                                                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                                                            <span className="mr-2">📍</span>
-                                                            <span>{[worker.city, worker.area].filter(Boolean).join(", ")}</span>
-                                                        </div>
-                                                    </div>
-                                                )}
+
                                                 {worker.experience_years && (
                                                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                                                         💼 {worker.experience_years} years experience
                                                     </p>
                                                 )}
-                                                <span className="text-primary-600 dark:text-primary-400 font-semibold text-sm mt-2 block">View Profile →</span>
+                                                <span className="text-primary-600 dark:text-primary-400 font-semibold text-sm mt-auto block">View Profile →</span>
                                             </Link>
                                         );
                                     })}

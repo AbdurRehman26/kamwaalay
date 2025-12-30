@@ -51,14 +51,20 @@ export default function OnboardingBusiness() {
 
         try {
             await onboardingService.completeBusiness(formData);
-            navigate(route("business.workers"));
+
+            // Show success state
+            setErrors({ success: "Verification submitted successfully! Redirecting to workers page..." });
+
+            // Redirect after 2 seconds with full page reload
+            setTimeout(() => {
+                window.location.href = route("business.workers.index");
+            }, 2000);
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
                 setErrors({ submit: error.response?.data?.message || "Failed to complete onboarding" });
             }
-        } finally {
             setProcessing(false);
         }
     };
@@ -106,6 +112,12 @@ export default function OnboardingBusiness() {
             <div className="bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-2xl mx-auto">
                     <form onSubmit={submit} className="space-y-6">
+                        {errors.success && (
+                            <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 p-4 rounded-xl flex items-center gap-3">
+                                <span className="text-2xl">✓</span>
+                                <span className="font-medium">{errors.success}</span>
+                            </div>
+                        )}
                         {errors.submit && (
                             <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl">{errors.submit}</div>
                         )}

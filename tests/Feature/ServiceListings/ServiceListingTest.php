@@ -37,6 +37,9 @@ beforeEach(function () {
             'is_active' => true,
         ]);
     }
+
+    // Seed service types
+    (new \Database\Seeders\ServiceTypeSeeder())->run();
 });
 
 test('helpers can create service listings', function () {
@@ -53,15 +56,17 @@ test('helpers can create service listings', function () {
     
     $token = $helper->createToken('test-token')->plainTextToken;
 
+    $maidId = \App\Models\ServiceType::where('slug', 'maid')->first()->id;
+    $cleanerId = \App\Models\ServiceType::where('slug', 'cleaner')->first()->id;
+
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->postJson('/api/service-listings', [
-        'service_types' => ['maid', 'cleaner'],
+        'service_types' => [$maidId, $cleanerId],
         'work_type' => 'full_time',
         'monthly_rate' => 15000,
         'description' => 'Professional maid service',
-        // pin_address removed - location now on profile
     ]);
 
     $response->assertStatus(200);
@@ -80,10 +85,8 @@ test('guests can view service listings', function () {
     $helper->assignRole('helper');
 
     $profile = $helper->profile()->create([]);
-    $listing = ServiceListing::factory()->create([
+    ServiceListing::factory()->create([
         'profile_id' => $profile->id,
-        'is_active' => true,
-        'status' => 'active',
         'is_active' => true,
         'status' => 'active',
     ]);
@@ -105,8 +108,6 @@ test('users and businesses cannot view service listings', function () {
         'Accept' => 'application/json',
     ])->getJson('/api/service-listings');
 
-    // Service listings are public, so this might not be 403
-    // Let's check if it's accessible or not based on the actual implementation
     if ($response->status() === 403) {
         $response->assertStatus(403);
     } else {
@@ -121,7 +122,6 @@ test('helpers can view their own listings', function () {
     $profile = $helper->profile()->create([]);
     $listing = ServiceListing::factory()->create([
         'profile_id' => $profile->id,
-        'profile_id' => $profile->id,
     ]);
 
     $response = $this->getJson("/api/service-listings/{$listing->id}");
@@ -135,36 +135,39 @@ test('helpers can update their service listings', function () {
     $helper->assignRole('helper');
 
     $profile = $helper->profile()->create([]);
-    $listing = ServiceListing::factory()->create([
+    $listingToUpdate = ServiceListing::factory()->create([
         'profile_id' => $profile->id,
     ]);
     
     $token = $helper->createToken('test-token')->plainTextToken;
 
-    $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
-        'Accept' => 'application/json',
-    ])->putJson("/api/service-listings/{$listing->id}", [
-        'service_types' => ['cook'],
+    $cookType = \App\Models\ServiceType::where('slug', 'cook')->first();
+    $cookId = $cookType->id;
+
+    $updateData = [
+        'service_types' => [$cookId],
         'work_type' => 'part_time',
         'monthly_rate' => 20000,
         'description' => 'Updated description',
-        // pin_address removed - location now on profile
         'status' => 'active',
         'is_active' => true,
-    ]);
+    ];
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+        'Accept' => 'application/json',
+    ])->putJson("/api/service-listings/{$listingToUpdate->id}", $updateData);
 
     $response->assertStatus(200);
-    $listing->refresh();
-    expect($listing->serviceTypes()->count())->toBe(1);
-    expect($listing->serviceTypes()->first()->slug)->toBe('cook');
+    $listingToUpdate->refresh();
+    expect($listingToUpdate->serviceTypes()->count())->toBe(1);
+    expect($listingToUpdate->serviceTypes()->first()->slug)->toBe('cook');
 });
 
 test('service listings require service types', function () {
     $helper = User::factory()->create();
     $helper->assignRole('helper');
 
-    // Helper needs to complete onboarding (have service listings)
     $profile = $helper->profile()->create([]);
     ServiceListing::factory()->create([
         'profile_id' => $profile->id,
@@ -179,11 +182,8 @@ test('service listings require service types', function () {
         'work_type' => 'full_time',
         'monthly_rate' => 15000,
         'description' => 'Professional service',
-        // pin_address not needed - location now on profile
     ]);
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors(['service_types']);
 });
-
-// pin_address validation test removed - location is now stored on profile, not service listing

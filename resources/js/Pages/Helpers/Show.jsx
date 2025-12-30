@@ -104,11 +104,14 @@ export default function HelperShow() {
                             <h1 className="text-4xl font-bold mb-2">{helper.name}</h1>
                             <p className="text-xl text-white/90 mb-4">{helper.bio || "Professional helper"}</p>
                             <div className="flex items-center gap-4">
-                                <div className="flex items-center">
-                                    <span className="text-yellow-300 text-2xl mr-2">⭐</span>
-                                    <span className="text-2xl font-bold">{helper.rating || 0}</span>
-                                    <span className="text-white/80 ml-2">({helper.total_reviews || 0} reviews)</span>
-                                </div>
+                                {/* Rating - Hidden */}
+                                {false && (
+                                    <div className="flex items-center">
+                                        <span className="text-yellow-300 text-2xl mr-2">⭐</span>
+                                        <span className="text-2xl font-bold">{helper.rating || 0}</span>
+                                        <span className="text-white/80 ml-2">({helper.total_reviews || 0} reviews)</span>
+                                    </div>
+                                )}
                                 {helper.verification_status === "verified" && (
                                     <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                                         ✓ Verified
@@ -135,8 +138,11 @@ export default function HelperShow() {
                                     <p className="text-sm text-white/80 mb-2">Services Offered:</p>
                                     <div className="flex flex-wrap gap-2">
                                         {helper.service_listings[0].service_types.slice(0, 3).map((serviceType, idx) => (
-                                            <span key={idx} className="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm capitalize">
-                                                {typeof serviceType === "string" ? serviceType.replace("_", " ") : (serviceType?.service_type?.replace("_", " ") || "Service")}
+                                            <span key={idx} className="inline-flex items-center gap-1 bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
+                                                {typeof serviceType === "object" && serviceType.icon && <span>{serviceType.icon}</span>}
+                                                <span className="capitalize">
+                                                    {typeof serviceType === "object" && serviceType.name ? serviceType.name : (typeof serviceType === "string" ? serviceType.replace("_", " ") : (serviceType?.service_type?.replace("_", " ") || "Service"))}
+                                                </span>
                                             </span>
                                         ))}
                                         {helper.service_listings[0].service_types.length > 3 && (
@@ -171,8 +177,11 @@ export default function HelperShow() {
                                                     {listing.service_types && listing.service_types.length > 0 ? (
                                                         <>
                                                             {listing.service_types.slice(0, 2).map((serviceType, idx) => (
-                                                                <span key={idx} className="bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
-                                                                    {typeof serviceType === "string" ? serviceType.replace("_", " ") : (serviceType?.service_type?.replace("_", " ") || "Service")}
+                                                                <span key={idx} className="inline-flex items-center gap-1 bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold">
+                                                                    {typeof serviceType === "object" && serviceType.icon && <span>{serviceType.icon}</span>}
+                                                                    <span className="capitalize">
+                                                                        {typeof serviceType === "object" && serviceType.name ? serviceType.name : (typeof serviceType === "string" ? serviceType.replace("_", " ") : (serviceType?.service_type?.replace("_", " ") || "Service"))}
+                                                                    </span>
                                                                 </span>
                                                             ))}
                                                             {listing.service_types.length > 2 && (
@@ -258,8 +267,9 @@ export default function HelperShow() {
                             </div>
                         )}
 
-                        {/* Reviews Section */}
-                        {reviews && reviews.length > 0 && (
+
+                        {/* Reviews Section - Hidden */}
+                        {false && reviews && reviews.length > 0 && (
                             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
                                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Reviews & Ratings</h2>
                                 <div className="space-y-6">

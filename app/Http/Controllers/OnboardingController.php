@@ -69,18 +69,15 @@ class OnboardingController extends Controller
                         new OA\Property(
                             property: "services",
                             type: "array",
-                            items: new OA\Items(
-                                type: "object",
-                                required: ["service_type", "work_type", "location_id"],
-                                properties: [
-                                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
-                                    new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
-                                    new OA\Property(property: "location_id", type: "integer"),
-                                    new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
-                                    new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
-                                ]
-                            )
+                            items: new OA\Items(type: "integer"),
+                            description: "Array of service type IDs"
                         ),
+                        new OA\Property(property: "pin_address", type: "string", description: "Full address"),
+                        new OA\Property(property: "pin_latitude", type: "number", format: "float", nullable: true),
+                        new OA\Property(property: "pin_longitude", type: "number", format: "float", nullable: true),
+                        new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
+                        new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
+                        new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
                         new OA\Property(property: "nic", type: "string", format: "binary", nullable: true, description: "NIC document file (jpeg, jpg, png, pdf, max 5MB) - optional"),
                         new OA\Property(property: "nic_number", type: "string", nullable: true, maxLength: 255),
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
@@ -309,19 +306,12 @@ class OnboardingController extends Controller
             content: new OA\MediaType(
                 mediaType: "multipart/form-data",
                 schema: new OA\Schema(
-                    required: ["services", "locations", "work_type"],
+                    required: ["nic", "nic_number"],
                     properties: [
-                        new OA\Property(property: "services", type: "array", description: "Array of service type slugs (can be sent as JSON string in FormData)", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
-                        new OA\Property(property: "locations", type: "array", description: "Array of location IDs (can be sent as JSON string in FormData)", items: new OA\Items(type: "integer")),
-                        new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
-                        new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
-                        new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
-                        new OA\Property(property: "nic", type: "string", format: "binary", nullable: true, description: "NIC document file (jpeg, jpg, png, pdf, max 5MB) - optional"),
-                        new OA\Property(property: "nic_number", type: "string", nullable: true, maxLength: 255),
+                        new OA\Property(property: "nic", type: "string", format: "binary", description: "NIC document file (jpeg, jpg, png, pdf, max 5MB)"),
+                        new OA\Property(property: "nic_number", type: "string", maxLength: 255),
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
                         new OA\Property(property: "bio", type: "string", nullable: true),
-                        new OA\Property(property: "city", type: "string", nullable: true, maxLength: 255),
-                        new OA\Property(property: "area", type: "string", nullable: true, maxLength: 255),
                         new OA\Property(property: "age", type: "integer", nullable: true, minimum: 18, maximum: 100, description: "Age"),
                         new OA\Property(property: "gender", type: "string", nullable: true, enum: ["male", "female", "other"], description: "Gender"),
                         new OA\Property(property: "religion", type: "string", nullable: true, enum: ["sunni_nazar_niyaz", "sunni_no_nazar_niyaz", "shia", "christian"], description: "Religion"),
@@ -377,15 +367,36 @@ class OnboardingController extends Controller
 
         $validated = $validator->validated();
 
-        // Save NIC document
+        // Check if NIC document already exists for this user
+        $existingDocument = \App\Models\Document::where('user_id', $business->id)
+            ->where('document_type', 'nic')
+            ->first();
+
+        // Store new NIC file
         $nicPath = $request->file('nic')->store('documents/nic', 'public');
-        \App\Models\Document::create([
-            'user_id' => $business->id,
-            'document_type' => 'nic',
-            'document_number' => $validated['nic_number'],
-            'file_path' => $nicPath,
-            'status' => 'pending',
-        ]);
+
+        if ($existingDocument) {
+            // Delete old file if it exists
+            if ($existingDocument->file_path && \Storage::disk('public')->exists($existingDocument->file_path)) {
+                \Storage::disk('public')->delete($existingDocument->file_path);
+            }
+
+            // Update existing document
+            $existingDocument->update([
+                'document_number' => $validated['nic_number'],
+                'file_path' => $nicPath,
+                'status' => 'pending', // Reset to pending for re-verification
+            ]);
+        } else {
+            // Create new document
+            \App\Models\Document::create([
+                'user_id' => $business->id,
+                'document_type' => 'nic',
+                'document_number' => $validated['nic_number'],
+                'file_path' => $nicPath,
+                'status' => 'pending',
+            ]);
+        }
 
         // Create business profile if it doesn't exist
         $businessProfile = $business->profile;

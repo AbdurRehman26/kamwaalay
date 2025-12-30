@@ -282,7 +282,7 @@ class BusinessController extends Controller
                         new OA\Property(property: "name", type: "string", maxLength: 255),
                         new OA\Property(property: "phone", type: "string", maxLength: 20, nullable: true),
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
-                        new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
+                        new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "integer")),
                         new OA\Property(property: "locations", type: "array", items: new OA\Items(
                             type: "object",
                             properties: [
@@ -325,7 +325,7 @@ class BusinessController extends Controller
             'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|max:2048',
             'service_types' => 'required|array|min:1',
-            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
+            'service_types.*' => 'required|exists:service_types,id',
             'pin_address' => 'required|string|max:500',
             'pin_latitude' => 'nullable|numeric',
             'pin_longitude' => 'nullable|numeric',
@@ -365,7 +365,7 @@ class BusinessController extends Controller
         $city = \App\Models\City::where('name', 'like', '%Karachi%')->first();
         $cityId = $city ? $city->id : 1; // Default to 1 if not found
 
-        // Create profile for the worker
+        // Create profile for the worker (including pin location)
         $profileData = [
             'experience_years' => $validated['experience_years'],
             'city_id' => $cityId,
@@ -376,6 +376,9 @@ class BusinessController extends Controller
             'religion' => $validated['religion'] ?? null,
             'is_active' => true,
             'verification_status' => 'pending', // Default status
+            'pin_address' => $validated['pin_address'],
+            'pin_latitude' => $validated['pin_latitude'] ?? null,
+            'pin_longitude' => $validated['pin_longitude'] ?? null,
         ];
 
         if ($request->hasFile('photo')) {
@@ -398,19 +401,13 @@ class BusinessController extends Controller
             'work_type' => $validated['availability'], // Map availability to work_type
             'description' => $validated['bio'],
             'city_id' => $cityId,
-            'pin_address' => $pinAddress,
-            'pin_latitude' => $validated['pin_latitude'] ?? null,
-            'pin_longitude' => $validated['pin_longitude'] ?? null,
             'monthly_rate' => $validated['monthly_rate'] ?? null,
             'is_active' => true,
             'status' => 'active',
         ]);
 
-        // Sync service types (convert slugs to IDs)
-        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $validated['service_types'])
-            ->pluck('id')
-            ->toArray();
-        $listing->serviceTypes()->sync($serviceTypeIds);
+        // Sync service types
+        $listing->serviceTypes()->sync($validated['service_types']);
 
         // Attach to business via pivot table
         $business->helpers()->attach($helper->id, [
@@ -458,8 +455,13 @@ class BusinessController extends Controller
             abort(404);
         }
 
-        // Load profile with languages for the edit form
-        $helper->load(['roles', 'profile.languages', 'serviceListings']);
+        // Load profile with languages and service listings with service types for the edit form
+        // Using hasManyThrough relationship: user -> serviceListings (through profile) -> serviceTypes
+        $helper->load([
+            'roles',
+            'profile.languages',
+            'serviceListings.serviceTypes'
+        ]);
 
         return response()->json([
             'helper' => new UserResource($helper),
@@ -483,7 +485,7 @@ class BusinessController extends Controller
                     required: ["service_type", "experience_years", "city", "area", "availability"],
                     properties: [
                         new OA\Property(property: "photo", type: "string", format: "binary", nullable: true),
-                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
+                        new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "integer")),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
                         new OA\Property(property: "city", type: "string", maxLength: 255),
                         new OA\Property(property: "area", type: "string", maxLength: 255),
@@ -572,7 +574,7 @@ class BusinessController extends Controller
             'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|max:2048',
             'service_types' => 'required|array|min:1',
-            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
+            'service_types.*' => 'required|exists:service_types,id',
             'pin_address' => 'required|string|max:500',
             'pin_latitude' => 'nullable|numeric',
             'pin_longitude' => 'nullable|numeric',
@@ -602,7 +604,7 @@ class BusinessController extends Controller
             $profile = $helper->profile()->create([]);
         }
 
-        // Update profile data
+        // Update profile data (including pin location)
         $profileData = [
             'experience_years' => $validated['experience_years'],
             'availability' => $validated['availability'],
@@ -611,6 +613,9 @@ class BusinessController extends Controller
             'gender' => $validated['gender'] ?? null,
             'religion' => $validated['religion'] ?? null,
             'is_active' => $validated['is_active'] ?? true,
+            'pin_address' => $validated['pin_address'],
+            'pin_latitude' => $validated['pin_latitude'] ?? null,
+            'pin_longitude' => $validated['pin_longitude'] ?? null,
         ];
 
         if ($request->hasFile('photo')) {
@@ -638,7 +643,6 @@ class BusinessController extends Controller
         $profile->serviceListings()->delete();
 
         // Try to extract city or use default
-        $pinAddress = $validated['pin_address'];
         $city = \App\Models\City::where('name', 'like', '%Karachi%')->first();
         $cityId = $city ? $city->id : 1; // Default to 1 if not found
 
@@ -648,19 +652,13 @@ class BusinessController extends Controller
             'work_type' => $validated['availability'], // Map availability to work_type
             'description' => $validated['bio'],
             'city_id' => $cityId,
-            'pin_address' => $pinAddress,
-            'pin_latitude' => $validated['pin_latitude'] ?? null,
-            'pin_longitude' => $validated['pin_longitude'] ?? null,
             'monthly_rate' => $validated['monthly_rate'] ?? null,
             'is_active' => true,
             'status' => 'active',
         ]);
 
-        // Sync service types (convert slugs to IDs)
-        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $validated['service_types'])
-            ->pluck('id')
-            ->toArray();
-        $listing->serviceTypes()->sync($serviceTypeIds);
+        // Sync service types
+        $listing->serviceTypes()->sync($validated['service_types']);
 
         return response()->json([
             'message' => 'Worker updated successfully!',

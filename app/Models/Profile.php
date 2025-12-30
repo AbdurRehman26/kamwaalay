@@ -80,6 +80,7 @@ class Profile extends Model
         return $this->hasMany(ServiceListing::class);
     }
 
+
     /**
      * Get languages for this profile
      */

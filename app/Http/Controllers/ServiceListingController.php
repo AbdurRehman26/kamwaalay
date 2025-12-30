@@ -68,10 +68,10 @@ class ServiceListingController extends Controller
         if ($request->has('latitude') && $request->has('longitude')) {
             $lat = $request->latitude;
             $lng = $request->longitude;
-            
+
             // Filter service listings near the location using pin_latitude and pin_longitude
             $query->nearLocation($lat, $lng);
-            
+
             $locationDisplay = 'Near Me';
         } elseif ($request->has('city_id') && $request->city_id) {
             // Filter by city ID
@@ -171,7 +171,7 @@ class ServiceListingController extends Controller
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(property: "service_types", type: "array", nullable: true, items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]), description: "Array of service types"),
+                    new OA\Property(property: "service_types", type: "array", nullable: true, items: new OA\Items(type: "integer"), description: "Array of service type IDs"),
                     new OA\Property(property: "work_type", type: "string", nullable: true, enum: ["full_time", "part_time"]),
                     new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
                     new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
@@ -234,7 +234,7 @@ class ServiceListingController extends Controller
 
         $validator = Validator::make($dataToValidate, [
             'service_types' => 'required|array|min:1',
-            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
+            'service_types.*' => 'required|exists:service_types,id',
             'work_type' => 'required|in:full_time,part_time',
             'monthly_rate' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:2000',
@@ -267,12 +267,8 @@ class ServiceListingController extends Controller
             'status' => $validated['status'] ?? 'active',
         ]);
 
-        // Sync service types (convert slugs to IDs)
-        $serviceTypeSlugs = $validated['service_types'];
-        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $serviceTypeSlugs)
-            ->pluck('id')
-            ->toArray();
-        $listing->serviceTypes()->sync($serviceTypeIds);
+        // Sync service types
+        $listing->serviceTypes()->sync($validated['service_types']);
 
         return response()->json([
             'message' => 'Service listing created successfully!',
@@ -412,7 +408,7 @@ class ServiceListingController extends Controller
             content: new OA\JsonContent(
                 required: ["service_types", "work_type", "pin_address", "status"],
                 properties: [
-                    new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"])),
+                    new OA\Property(property: "service_types", type: "array", items: new OA\Items(type: "integer")),
                     new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
                     new OA\Property(property: "monthly_rate", type: "number", nullable: true, minimum: 0),
                     new OA\Property(property: "description", type: "string", nullable: true, maxLength: 2000),
@@ -453,7 +449,7 @@ class ServiceListingController extends Controller
 
         $validated = $request->validate([
             'service_types' => 'required|array|min:1',
-            'service_types.*' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
+            'service_types.*' => 'required|exists:service_types,id',
             'work_type' => 'required|in:full_time,part_time',
             'monthly_rate' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:2000',
@@ -470,12 +466,8 @@ class ServiceListingController extends Controller
             'is_active' => $validated['is_active'] ?? true,
         ]);
 
-        // Sync service types (convert slugs to IDs)
-        $serviceTypeSlugs = $validated['service_types'];
-        $serviceTypeIds = \App\Models\ServiceType::whereIn('slug', $serviceTypeSlugs)
-            ->pluck('id')
-            ->toArray();
-        $serviceListing->serviceTypes()->sync($serviceTypeIds);
+        // Sync service types
+        $serviceListing->serviceTypes()->sync($validated['service_types']);
 
         return response()->json([
             'message' => 'Service listing updated successfully!',

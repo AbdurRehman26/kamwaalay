@@ -58,7 +58,7 @@ export default function EditWorker() {
     };
 
     // Fetch service types and languages from API
-    const { serviceTypes } = useServiceTypes();
+    const { serviceTypes, loading: serviceTypesLoading } = useServiceTypes();
     const { languages } = useLanguages();
 
     const availabilityOptions = [
@@ -95,17 +95,20 @@ export default function EditWorker() {
 
                         // Load service types from service listings
                         if (worker.service_listings && worker.service_listings.length > 0) {
-                            const allServiceTypes = new Set();
+                            const allServiceTypeIds = new Set();
                             worker.service_listings.forEach(listing => {
                                 if (listing.service_types && Array.isArray(listing.service_types)) {
                                     listing.service_types.forEach(st => {
-                                        if (typeof st === "string") {
-                                            allServiceTypes.add(st);
+                                        // Service types can come as objects with id, or as integers
+                                        if (typeof st === "object" && st.id) {
+                                            allServiceTypeIds.add(st.id);
+                                        } else if (typeof st === "number") {
+                                            allServiceTypeIds.add(st);
                                         }
                                     });
                                 }
                             });
-                            setSelectedServiceTypes(Array.from(allServiceTypes));
+                            setSelectedServiceTypes(Array.from(allServiceTypeIds));
 
                             // Load pin location from first service listing
                             const firstListing = worker.service_listings[0];
@@ -306,7 +309,7 @@ export default function EditWorker() {
         }
     };
 
-    if (loading) {
+    if (loading || serviceTypesLoading) {
         return (
             <DashboardLayout>
                 <div className="py-12">
@@ -529,18 +532,18 @@ export default function EditWorker() {
                         {selectedServiceTypes.length > 0 && (
                             <div className="mb-6">
                                 <div className="flex flex-wrap gap-2">
-                                    {selectedServiceTypes.map((serviceType) => {
-                                        const service = serviceTypes.find(st => st.value === serviceType);
+                                    {selectedServiceTypes.map((serviceTypeId) => {
+                                        const service = serviceTypes.find(st => st.id === serviceTypeId);
                                         return (
                                             <span
-                                                key={serviceType}
+                                                key={serviceTypeId}
                                                 className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold border-2 border-indigo-200 dark:border-indigo-700"
                                             >
                                                 <span>{service?.icon}</span>
                                                 <span>{service?.label}</span>
                                                 <button
                                                     type="button"
-                                                    onClick={() => removeServiceType(serviceType)}
+                                                    onClick={() => removeServiceType(serviceTypeId)}
                                                     className="ml-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-bold"
                                                 >
                                                     ×
@@ -556,11 +559,11 @@ export default function EditWorker() {
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {serviceTypes.map((service) => (
                                 <button
-                                    key={service.value}
+                                    key={service.id}
                                     type="button"
-                                    onClick={() => addServiceType(service.value)}
-                                    disabled={selectedServiceTypes.includes(service.value)}
-                                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${selectedServiceTypes.includes(service.value)
+                                    onClick={() => addServiceType(service.id)}
+                                    disabled={selectedServiceTypes.includes(service.id)}
+                                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${selectedServiceTypes.includes(service.id)
                                         ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-50 cursor-not-allowed"
                                         : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer bg-white dark:bg-gray-700"
                                         }`}

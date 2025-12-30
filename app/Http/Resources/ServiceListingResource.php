@@ -16,13 +16,31 @@ class ServiceListingResource extends JsonResource
     {
         // Get service types from relationship
         $serviceTypes = [];
+        $serviceTypesObjects = [];
         $firstServiceType = null;
         if ($this->relationLoaded('serviceTypes')) {
+            $serviceTypesObjects = $this->serviceTypes->map(function ($st) {
+                return [
+                    'id' => $st->id,
+                    'name' => $st->name,
+                    'slug' => $st->slug,
+                    'icon' => $st->icon ?? '',
+                ];
+            })->toArray();
             $serviceTypes = $this->serviceTypes->pluck('slug')->toArray();
             $firstServiceType = $serviceTypes[0] ?? null;
         } else {
             // Fallback: load if not already loaded
-            $serviceTypes = $this->serviceTypes()->pluck('slug')->toArray();
+            $loadedTypes = $this->serviceTypes()->get();
+            $serviceTypesObjects = $loadedTypes->map(function ($st) {
+                return [
+                    'id' => $st->id,
+                    'name' => $st->name,
+                    'slug' => $st->slug,
+                    'icon' => $st->icon ?? '',
+                ];
+            })->toArray();
+            $serviceTypes = $loadedTypes->pluck('slug')->toArray();
             $firstServiceType = $serviceTypes[0] ?? null;
         }
         
@@ -50,7 +68,8 @@ class ServiceListingResource extends JsonResource
             'pin_longitude' => $pinLongitude,
             'is_active' => $this->is_active,
             'status' => $this->status,
-            'service_types' => $serviceTypes,
+            'service_types' => $serviceTypesObjects, // Full objects with id, name, slug, icon
+            'service_types_slugs' => $serviceTypes, // Backward compatibility - just slugs
             'service_type' => $firstServiceType,
             'service_type_label' => $this->service_type_label,
             'city' => $city,

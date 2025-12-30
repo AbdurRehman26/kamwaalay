@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\City;
+use App\Models\ServiceType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,7 @@ class HelperController extends Controller
         tags: ["Helpers"],
         parameters: [
             new OA\Parameter(name: "user_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["all", "helper", "business"]), description: "Filter by user type"),
-            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]), description: "Filter by service type"),
+            new OA\Parameter(name: "service_type", in: "query", required: false, schema: new OA\Schema(type: "integer"), description: "Filter by service type ID or slug"),
             new OA\Parameter(name: "location_id", in: "query", required: false, schema: new OA\Schema(type: "integer"), description: "Filter by location ID"),
             new OA\Parameter(name: "city_name", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Filter by city name"),
             new OA\Parameter(name: "area", in: "query", required: false, schema: new OA\Schema(type: "string"), description: "Filter by area"),
@@ -132,6 +133,7 @@ class HelperController extends Controller
                 $join->on('users.id', '=', 'profiles.profileable_id')
                      ->where('profiles.profileable_type', '=', 'App\Models\User');
             })
+            ->orderBy('users.created_at', 'desc')
             ->orderBy('profiles.experience_years', 'desc')
             ->select('users.*');
         } else {
@@ -139,6 +141,7 @@ class HelperController extends Controller
                 $join->on('users.id', '=', 'profiles.profileable_id')
                      ->where('profiles.profileable_type', '=', 'App\Models\User');
             })
+            ->orderBy('users.created_at', 'desc')
             ->orderBy('profiles.rating', 'desc')
             ->select('users.*');
         }
@@ -236,7 +239,7 @@ class HelperController extends Controller
                     required: ["service_type", "experience_years", "city", "area", "availability"],
                     properties: [
                         new OA\Property(property: "photo", type: "string", format: "binary", description: "Helper profile photo"),
-                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
+                        new OA\Property(property: "service_type", type: "integer", description: "Service type ID"),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
                         new OA\Property(property: "city", type: "string", maxLength: 255),
                         new OA\Property(property: "area", type: "string", maxLength: 255),
@@ -265,7 +268,7 @@ class HelperController extends Controller
     {
         $validated = $request->validate([
             'photo' => 'nullable|image|max:2048',
-            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
+            'service_type' => 'required|exists:service_types,id',
             'experience_years' => 'required|integer|min:0',
             'city' => 'required|string|max:255',
             'area' => 'required|string|max:255',
@@ -278,6 +281,10 @@ class HelperController extends Controller
         if (!$user->hasRole('helper')) {
             abort(403);
         }
+
+        // Map service_type ID to slug for Profile model
+        $serviceType = ServiceType::findOrFail($validated['service_type']);
+        $validated['service_type'] = $serviceType->slug;
 
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('helpers/photos', 'public');
@@ -351,7 +358,7 @@ class HelperController extends Controller
                     required: ["service_type", "experience_years", "city", "area", "availability"],
                     properties: [
                         new OA\Property(property: "photo", type: "string", format: "binary", description: "Helper profile photo"),
-                        new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
+                        new OA\Property(property: "service_type", type: "integer", description: "Service type ID"),
                         new OA\Property(property: "experience_years", type: "integer", minimum: 0),
                         new OA\Property(property: "city", type: "string", maxLength: 255),
                         new OA\Property(property: "area", type: "string", maxLength: 255),
@@ -390,13 +397,17 @@ class HelperController extends Controller
 
         $validated = $request->validate([
             'photo' => 'nullable|image|max:2048',
-            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
+            'service_type' => 'required|exists:service_types,id',
             'experience_years' => 'required|integer|min:0',
             'city' => 'required|string|max:255',
             'area' => 'required|string|max:255',
             'availability' => 'required|in:full_time,part_time,available',
             'bio' => 'nullable|string',
         ]);
+
+        // Map service_type ID to slug for Profile model
+        $serviceType = ServiceType::findOrFail($validated['service_type']);
+        $validated['service_type'] = $serviceType->slug;
 
         if ($request->hasFile('photo')) {
             // Delete old photo

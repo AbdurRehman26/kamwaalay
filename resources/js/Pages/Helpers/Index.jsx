@@ -783,6 +783,58 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         </div>
                     ) : helpers.data && helpers.data.length > 0 ? (
                         <>
+                            {/* Pagination - Top */}
+                            {((helpers.links && Array.isArray(helpers.links) && helpers.links.length > 0) ||
+                                (helpers.last_page && helpers.last_page > 1) ||
+                                (helpers.meta?.last_page && helpers.meta.last_page > 1)) && (
+                                    <div className="mb-8">
+                                        {/* Results Info */}
+                                        {helpers.meta && (helpers.meta.total !== undefined || helpers.total !== undefined) && (
+                                            <div className="text-center mb-6 text-gray-600 dark:text-gray-400">
+                                                <p className="text-sm">
+                                                    Showing {helpers.meta?.from || helpers.from || 0} to {helpers.meta?.to || helpers.to || 0} of {helpers.meta?.total || helpers.total || 0} results
+                                                </p>
+                                            </div>
+                                        )}
+                                        {helpers.links && Array.isArray(helpers.links) && helpers.links.length > 0 ? (
+                                            <div className="flex justify-center">
+                                                <div className="flex flex-wrap gap-2 justify-center">
+                                                    {helpers.links.map((link, index) => (
+                                                        <button
+                                                            key={index}
+                                                            onClick={() => handlePageChange(link.url)}
+                                                            disabled={!link.url || link.active}
+                                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                                            className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${link.active
+                                                                ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
+                                                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
+                                                                } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex justify-center">
+                                                <div className="flex flex-wrap gap-2 justify-center">
+                                                    {Array.from({ length: helpers.last_page || helpers.meta?.last_page || 1 }, (_, i) => i + 1).map((page) => (
+                                                        <button
+                                                            key={page}
+                                                            onClick={() => setCurrentPage(page)}
+                                                            disabled={currentPage === page}
+                                                            className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${currentPage === page
+                                                                ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
+                                                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md cursor-pointer"
+                                                                }`}
+                                                        >
+                                                            {page}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {helpers.data.map((helper) => {
                                     const isBusiness = helper.role === "business";
@@ -848,8 +900,8 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                         <span className="text-6xl text-indigo-300 dark:text-indigo-600">👤</span>
                                                     </div>
                                                 )}
-                                                {/* Rating Badge */}
-                                                {helper.rating && parseFloat(helper.rating) > 0 && (
+                                                {/* Rating Badge - Hidden */}
+                                                {false && helper.rating && parseFloat(helper.rating) > 0 && (
                                                     <div className="absolute top-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
                                                         <span className="text-yellow-500 text-sm">⭐</span>
                                                         <span className="font-bold text-gray-900 dark:text-white text-sm">{parseFloat(helper.rating).toFixed(1)}</span>
@@ -1102,34 +1154,56 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             </div>
 
                             {/* Pagination */}
-                            {helpers.links && Array.isArray(helpers.links) && helpers.links.length > 0 && (
-                                <div className="mt-12">
-                                    {/* Results Info */}
-                                    {helpers.meta && (helpers.meta.total !== undefined || helpers.total !== undefined) && (
-                                        <div className="text-center mb-6 text-gray-600 dark:text-gray-400">
-                                            <p className="text-sm">
-                                                Showing {helpers.meta?.from || helpers.from || 0} to {helpers.meta?.to || helpers.to || 0} of {helpers.meta?.total || helpers.total || 0} results
-                                            </p>
-                                        </div>
-                                    )}
-                                    <div className="flex justify-center">
-                                        <div className="flex flex-wrap gap-2 justify-center">
-                                            {helpers.links.map((link, index) => (
-                                                <button
-                                                    key={index}
-                                                    onClick={() => handlePageChange(link.url)}
-                                                    disabled={!link.url || link.active}
-                                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${link.active
-                                                        ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
-                                                        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
-                                                        } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
-                                                />
-                                            ))}
-                                        </div>
+                            {((helpers.links && Array.isArray(helpers.links) && helpers.links.length > 0) ||
+                                (helpers.last_page && helpers.last_page > 1) ||
+                                (helpers.meta?.last_page && helpers.meta.last_page > 1)) && (
+                                    <div className="mt-12">
+                                        {/* Results Info */}
+                                        {helpers.meta && (helpers.meta.total !== undefined || helpers.total !== undefined) && (
+                                            <div className="text-center mb-6 text-gray-600 dark:text-gray-400">
+                                                <p className="text-sm">
+                                                    Showing {helpers.meta?.from || helpers.from || 0} to {helpers.meta?.to || helpers.to || 0} of {helpers.meta?.total || helpers.total || 0} results
+                                                </p>
+                                            </div>
+                                        )}
+                                        {helpers.links && Array.isArray(helpers.links) && helpers.links.length > 0 ? (
+                                            <div className="flex justify-center">
+                                                <div className="flex flex-wrap gap-2 justify-center">
+                                                    {helpers.links.map((link, index) => (
+                                                        <button
+                                                            key={index}
+                                                            onClick={() => handlePageChange(link.url)}
+                                                            disabled={!link.url || link.active}
+                                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                                            className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${link.active
+                                                                ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
+                                                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md"
+                                                                } ${!link.url ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex justify-center">
+                                                <div className="flex flex-wrap gap-2 justify-center">
+                                                    {Array.from({ length: helpers.last_page || helpers.meta?.last_page || 1 }, (_, i) => i + 1).map((page) => (
+                                                        <button
+                                                            key={page}
+                                                            onClick={() => setCurrentPage(page)}
+                                                            disabled={currentPage === page}
+                                                            className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${currentPage === page
+                                                                ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg cursor-default"
+                                                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md cursor-pointer"
+                                                                }`}
+                                                        >
+                                                            {page}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
-                            )}
+                                )}
                         </>
                     ) : (
                         <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
