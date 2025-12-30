@@ -237,10 +237,9 @@ export default function BusinessShow() {
                                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Services Offered</h2>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     {serviceListings.map((listing) => (
-                                        <Link
+                                        <div
                                             key={listing.id}
-                                            to={route("service-listings.show", listing.id)}
-                                            className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-primary-300 dark:hover:border-primary-700"
+                                            className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg p-6 border-2 border-transparent"
                                         >
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex flex-wrap gap-2">
@@ -303,9 +302,8 @@ export default function BusinessShow() {
                                                 <span className="text-xs text-gray-500 dark:text-gray-500 capitalize">
                                                     {listing.work_type?.replace("_", " ") || "N/A"}
                                                 </span>
-                                                <span className="text-primary-600 dark:text-primary-400 font-semibold text-sm">View Details →</span>
                                             </div>
-                                        </Link>
+                                        </div>
                                     ))}
                                 </div>
                                 {serviceListings.length > 1 && (

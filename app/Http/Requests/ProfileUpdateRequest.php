@@ -17,6 +17,9 @@ class ProfileUpdateRequest extends FormRequest
             'religion' => ['nullable', 'in:' . Religion::validationString()],
             'languages' => ['nullable', 'array'],
             'languages.*' => ['required', 'integer', 'exists:languages,id'],
+            'pin_address' => ['nullable', 'string', 'max:500'],
+            'pin_latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'pin_longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];
     }
 }

@@ -91,9 +91,6 @@ export default function BookingShow() {
                             <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 px-4 py-2 rounded-full font-semibold capitalize">
                                 {booking.service_type?.replace("_", " ") || "N/A"}
                             </span>
-                            <span className={`px-4 py-2 rounded-full font-semibold ${getStatusColor(booking.status)}`}>
-                                {booking.status?.replace("_", " ") || "N/A"}
-                            </span>
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -247,10 +244,10 @@ export default function BookingShow() {
                         {user ? (
                             <>
                                 <Link
-                                    to={route("job-posts.index")}
+                                    to={route("job-applications.index")}
                                     className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold text-center"
                                 >
-                                    Back to My Requests
+                                    Back to Jobs
                                 </Link>
                                 {isOwner && (
                                     <Link
@@ -265,14 +262,14 @@ export default function BookingShow() {
                                         to={route("job-applications.create", booking.id)}
                                         className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-700 dark:to-primary-800 text-white px-6 py-3 rounded-lg hover:from-primary-700 hover:to-primary-800 dark:hover:from-primary-600 dark:hover:to-primary-700 transition-all duration-300 shadow-lg font-semibold text-center"
                                     >
-                                        Apply to This Request
+                                        Apply
                                     </Link>
                                 )}
                             </>
                         ) : (
                             <>
                                 <Link
-                                    to={route("job-posts.index")}
+                                    to={route("job-applications.index")}
                                     className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold text-center"
                                 >
                                     Back to Search Jobs

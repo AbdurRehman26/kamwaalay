@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -16,8 +16,6 @@ export default function Navbar() {
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const [browseDropdownOpen, setBrowseDropdownOpen] = useState(false);
-    const browseDropdownRef = useRef(null);
 
     const handleLogout = async () => {
         try {
@@ -28,19 +26,6 @@ export default function Navbar() {
             navigate("/login");
         }
     };
-
-    // Handle click outside dropdown
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (browseDropdownRef.current && !browseDropdownRef.current.contains(event.target)) {
-                setBrowseDropdownOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
 
     return (
         <>
@@ -89,46 +74,12 @@ export default function Navbar() {
                                 </Link>
                             )}
                             {isUserOrGuest(user) && (
-                                <div className="relative" ref={browseDropdownRef}>
-                                    <button
-                                        onClick={() => setBrowseDropdownOpen(!browseDropdownOpen)}
-                                        className="text-gray-700 dark:text-gray-300 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 font-semibold transition-all duration-300 flex items-center gap-1"
-                                    >
-                                        Browse
-                                        <svg
-                                            className={`w-4 h-4 transition-transform ${browseDropdownOpen ? "rotate-180" : ""}`}
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </button>
-                                    {browseDropdownOpen && (
-                                        <div className="absolute top-full left-0 mt-2 w-56 bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 py-2 z-50 overflow-hidden">
-                                            <Link
-                                                to={route("helpers.index")}
-                                                onClick={() => setBrowseDropdownOpen(false)}
-                                                className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 font-medium"
-                                            >
-                                                <span className="flex items-center gap-2">
-                                                    <span className="text-lg">👥</span>
-                                                    Browse Helpers
-                                                </span>
-                                            </Link>
-                                            <Link
-                                                to={route("service-listings.index")}
-                                                onClick={() => setBrowseDropdownOpen(false)}
-                                                className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 font-medium"
-                                            >
-                                                <span className="flex items-center gap-2">
-                                                    <span className="text-lg">🛠️</span>
-                                                    Browse Services
-                                                </span>
-                                            </Link>
-                                        </div>
-                                    )}
-                                </div>
+                                <Link
+                                    to={route("helpers.index")}
+                                    className="text-gray-700 dark:text-gray-300 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 font-semibold transition-all duration-300"
+                                >
+                                    Find Helpers
+                                </Link>
                             )}
                             {user ? (
                                 <>
@@ -246,28 +197,16 @@ export default function Navbar() {
                                 </Link>
                             )}
                             {isUserOrGuest(user) && (
-                                <>
-                                    <Link
-                                        to={route("helpers.index")}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="block py-3 px-4 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 rounded-xl transition-all duration-300 font-medium"
-                                    >
-                                        <span className="flex items-center gap-2">
-                                            <span>👥</span>
-                                            Browse Helpers
-                                        </span>
-                                    </Link>
-                                    <Link
-                                        to={route("service-listings.index")}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="block py-3 px-4 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 rounded-xl transition-all duration-300 font-medium"
-                                    >
-                                        <span className="flex items-center gap-2">
-                                            <span>🛠️</span>
-                                            Browse Services
-                                        </span>
-                                    </Link>
-                                </>
+                                <Link
+                                    to={route("helpers.index")}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="block py-3 px-4 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 rounded-xl transition-all duration-300 font-medium"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <span>👥</span>
+                                        Find Helpers
+                                    </span>
+                                </Link>
                             )}
                             {user ? (
                                 <>

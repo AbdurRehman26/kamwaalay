@@ -28,9 +28,6 @@ class ServiceListing extends Model
         'work_type',
         'monthly_rate',
         'description',
-        'pin_address',
-        'pin_latitude',
-        'pin_longitude',
         'is_active',
         'status',
     ];
@@ -39,8 +36,6 @@ class ServiceListing extends Model
     {
         return [
             'monthly_rate' => 'decimal:2',
-            'pin_latitude' => 'decimal:8',
-            'pin_longitude' => 'decimal:8',
             'is_active' => 'boolean',
         ];
     }
@@ -125,13 +120,39 @@ class ServiceListing extends Model
 
     /**
      * Scope to filter by distance from a point (Haversine formula)
+     * Uses the profile's location for proximity filtering
      */
     public function scopeNearLocation($query, $latitude, $longitude, $radius = 20)
     {
-        $haversine = "(6371 * acos(cos(radians($latitude)) * cos(radians(pin_latitude)) * cos(radians(pin_longitude) - radians($longitude)) + sin(radians($latitude)) * sin(radians(pin_latitude))))";
+        $haversine = "(6371 * acos(cos(radians(profiles.pin_latitude)) * cos(radians(profiles.pin_longitude) - radians($longitude)) * cos(radians($latitude)) + sin(radians($latitude)) * sin(radians(profiles.pin_latitude))))";
 
-        return $query->select('*') // Select all columns
+        return $query->join('profiles', 'service_listings.profile_id', '=', 'profiles.id')
+                     ->select('service_listings.*')
                      ->selectRaw("{$haversine} AS distance")
                      ->whereRaw("{$haversine} < ?", [$radius]);
+    }
+
+    /**
+     * Get pin_address from profile (for backward compatibility)
+     */
+    public function getPinAddressAttribute()
+    {
+        return $this->profile?->pin_address;
+    }
+
+    /**
+     * Get pin_latitude from profile (for backward compatibility)
+     */
+    public function getPinLatitudeAttribute()
+    {
+        return $this->profile?->pin_latitude;
+    }
+
+    /**
+     * Get pin_longitude from profile (for backward compatibility)
+     */
+    public function getPinLongitudeAttribute()
+    {
+        return $this->profile?->pin_longitude;
     }
 }

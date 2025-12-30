@@ -193,7 +193,11 @@ class OnboardingController extends Controller
         $validated = $validator->validated();
 
         // Update user profile if provided
-        $profileData = [];
+        $profileData = [
+            'pin_address' => $validated['pin_address'] ?? null,
+            'pin_latitude' => $validated['pin_latitude'] ?? null,
+            'pin_longitude' => $validated['pin_longitude'] ?? null,
+        ];
         if ($request->hasFile('photo')) {
             $profileData['photo'] = $request->file('photo')->store('helpers/photos', 'public');
         }
@@ -212,17 +216,10 @@ class OnboardingController extends Controller
         if ($request->has('religion')) {
             $profileData['religion'] = $validated['religion'];
         }
-        if (!empty($profileData)) {
-            $profile = $user->profile()->updateOrCreate(
-                ['profileable_id' => $user->id, 'profileable_type' => 'App\Models\User'],
-                $profileData
-            );
-        } else {
-            $profile = $user->profile;
-            if (!$profile) {
-                $profile = $user->profile()->create([]);
-            }
-        }
+        $profile = $user->profile()->updateOrCreate(
+            ['profileable_id' => $user->id, 'profileable_type' => 'App\Models\User'],
+            $profileData
+        );
 
         // Sync languages if provided
         if ($request->has('languages') && is_array($validated['languages'])) {
@@ -247,12 +244,9 @@ class OnboardingController extends Controller
             $profile = $user->profile()->create([]);
         }
 
-        // Create service listing
+        // Create service listing (location is now on profile)
         $listing = ServiceListing::create([
             'profile_id' => $profile->id,
-            'pin_address' => $validated['pin_address'] ?? null,
-            'pin_latitude' => $validated['pin_latitude'] ?? null,
-            'pin_longitude' => $validated['pin_longitude'] ?? null,
             'work_type' => $validated['work_type'],
             'monthly_rate' => $validated['monthly_rate'] ?? null,
             'description' => $validated['description'] ?? null,

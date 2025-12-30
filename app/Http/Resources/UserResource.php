@@ -111,6 +111,9 @@ class UserResource extends JsonResource
             'profile' => $this->when($this->profile, function () {
                 return [
                     'id' => $this->profile->id,
+                    'pin_address' => $this->profile->pin_address,
+                    'pin_latitude' => $this->profile->pin_latitude,
+                    'pin_longitude' => $this->profile->pin_longitude,
                 ];
             }),
             // Service listings (if loaded) - use ServiceListingResource for consistency

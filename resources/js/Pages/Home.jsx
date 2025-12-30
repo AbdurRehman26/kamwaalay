@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout.jsx";
 import { homeService } from "@/services/home";
@@ -22,10 +22,6 @@ export default function Home() {
     const [jobs, setJobs] = useState([]);
     const [stats, setStats] = useState({});
     const [loading, setLoading] = useState(true);
-    const [browseDropdownOpen, setBrowseDropdownOpen] = useState(false);
-    const [browseDropdownOpenCTA, setBrowseDropdownOpenCTA] = useState(false);
-    const browseDropdownRef = useRef(null);
-    const browseDropdownRefCTA = useRef(null);
     const [chatOpen, setChatOpen] = useState(false);
     const [selectedHelper, setSelectedHelper] = useState(null);
 
@@ -70,22 +66,6 @@ export default function Home() {
                 });
         }
     }, [user]);
-
-    // Handle click outside dropdown
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (browseDropdownRef.current && !browseDropdownRef.current.contains(event.target)) {
-                setBrowseDropdownOpen(false);
-            }
-            if (browseDropdownRefCTA.current && !browseDropdownRefCTA.current.contains(event.target)) {
-                setBrowseDropdownOpenCTA(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
 
     // Fetch service types from database
     const { serviceTypes } = useServiceTypes();
@@ -159,43 +139,12 @@ export default function Home() {
 
                             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                                 {isUserOrGuest(user) && (
-                                    <div className="relative" ref={browseDropdownRef}>
-                                        <button
-                                            onClick={() => setBrowseDropdownOpen(!browseDropdownOpen)}
-                                            className="w-full sm:w-auto px-8 py-4 bg-white text-indigo-900 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all duration-300 shadow-xl shadow-indigo-900/20 flex items-center justify-center gap-2"
-                                        >
-                                            Browse Now
-                                            <svg
-                                                className={`w-5 h-5 transition-transform ${browseDropdownOpen ? "rotate-180" : ""}`}
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </button>
-
-                                        {browseDropdownOpen && (
-                                            <div className="absolute top-full left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 py-2 z-50 overflow-hidden backdrop-blur-xl">
-                                                <Link
-                                                    to={route("helpers.index")}
-                                                    onClick={() => setBrowseDropdownOpen(false)}
-                                                    className="block px-6 py-4 text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium border-b border-gray-100 dark:border-gray-700/50 last:border-0"
-                                                >
-                                                    <span className="block text-sm text-gray-400 dark:text-gray-500 mb-1">Find a Helper</span>
-                                                    Browse Helpers
-                                                </Link>
-                                                <Link
-                                                    to={route("service-listings.index")}
-                                                    onClick={() => setBrowseDropdownOpen(false)}
-                                                    className="block px-6 py-4 text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium"
-                                                >
-                                                    <span className="block text-sm text-gray-400 dark:text-gray-500 mb-1">Explore Services</span>
-                                                    Browse Services
-                                                </Link>
-                                            </div>
-                                        )}
-                                    </div>
+                                    <Link
+                                        to={route("helpers.index")}
+                                        className="w-full sm:w-auto px-8 py-4 bg-white text-indigo-900 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all duration-300 shadow-xl shadow-indigo-900/20 flex items-center justify-center gap-2"
+                                    >
+                                        Find Helpers
+                                    </Link>
                                 )}
 
                                 {isHelperOrBusinessOrGuest(user) && (
@@ -802,7 +751,7 @@ export default function Home() {
                                         to={route("helpers.index")}
                                         className="inline-block px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl font-bold text-lg hover:bg-white/10 transition-colors"
                                     >
-                                        Browse Helpers
+                                        Find Helpers
                                     </Link>
                                 </div>
                             )}

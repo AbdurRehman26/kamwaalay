@@ -373,7 +373,7 @@ export default function BookingCreate() {
                                     to={route("helpers.index")}
                                     className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3.5 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 text-center shadow-md hover:shadow-lg"
                                 >
-                                    Browse Helpers First
+                                    Find Helpers First
                                 </Link>
                             </div>
                             {errors.submit && (

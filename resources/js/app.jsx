@@ -24,8 +24,6 @@ import BookingsIndex from "./Pages/Bookings/Index";
 import BookingsShow from "./Pages/Bookings/Show";
 import BookingsCreate from "./Pages/Bookings/Create";
 import BookingsEdit from "./Pages/Bookings/Edit";
-import ServiceListingsIndex from "./Pages/ServiceListings/Index";
-import ServiceListingsShow from "./Pages/ServiceListings/Show";
 import ServiceListingsCreate from "./Pages/ServiceListings/Create";
 import ServiceListingsEdit from "./Pages/ServiceListings/Edit";
 import ServiceListingsMyListings from "./Pages/ServiceListings/MyListings";
@@ -116,8 +114,7 @@ function AppRoutes() {
             <Route path="/helpers" element={<HelpersIndex />} />
             <Route path="/helpers/:helperId" element={<HelpersShow />} />
             <Route path="/businesses/:businessId" element={<BusinessesShow />} />
-            <Route path="/service-listings" element={<ServiceListingsIndex />} />
-            <Route path="/service-listings/:listingId" element={<ServiceListingsShow />} />
+            {/* Service listings browse removed - users can view helpers directly */}
             <Route path="/about" element={<PageAbout />} />
             <Route path="/contact" element={<PageContact />} />
             <Route path="/faq" element={<PageFAQ />} />

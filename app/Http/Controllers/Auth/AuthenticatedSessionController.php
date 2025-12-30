@@ -364,16 +364,17 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Send SMS using Twilio
+     * Send SMS using configured SMS Service
      */
     private function sendSms(string $phone, string $otp): void
     {
         try {
-            $twilioService = app(\App\Services\TwilioService::class);
-            $twilioService->sendOtp($phone, $otp, 'login');
+            $smsService = app(\App\Services\SMS\SmsServiceInterface::class);
+            $message = "Your kamwaalay login verification code is: {$otp}. Valid for 3 minutes.";
+            $smsService->send($phone, $message);
         } catch (\Exception $e) {
             // Log error but don't fail login - OTP is still logged for development
-            Log::error("Failed to send SMS via Twilio for {$phone}: " . $e->getMessage());
+            Log::error("Failed to send SMS via configured driver for {$phone}: " . $e->getMessage());
             Log::info("Login OTP for {$phone}: {$otp}");
         }
     }

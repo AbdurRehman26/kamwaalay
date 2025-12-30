@@ -175,7 +175,7 @@ class ProfileController extends Controller
 
         $user->save();
 
-        // Update or create profile with city_id, age, gender, religion
+        // Update or create profile with city_id, age, gender, religion, and location for helpers
         $profileData = [];
         if (isset($validated['city_id'])) {
             $profileData['city_id'] = $validated['city_id'];
@@ -188,6 +188,16 @@ class ProfileController extends Controller
         }
         if (isset($validated['religion'])) {
             $profileData['religion'] = $validated['religion'];
+        }
+        // Location fields for helpers
+        if (isset($validated['pin_address'])) {
+            $profileData['pin_address'] = $validated['pin_address'];
+        }
+        if (isset($validated['pin_latitude'])) {
+            $profileData['pin_latitude'] = $validated['pin_latitude'];
+        }
+        if (isset($validated['pin_longitude'])) {
+            $profileData['pin_longitude'] = $validated['pin_longitude'];
         }
 
         $profile = $user->profile;

@@ -28,8 +28,14 @@ class ServiceListingResource extends JsonResource
         
         // Get city from profile if available
         $city = null;
+        $pinAddress = null;
+        $pinLatitude = null;
+        $pinLongitude = null;
         if ($this->relationLoaded('profile') && $this->profile) {
             $city = $this->profile->city ?? null;
+            $pinAddress = $this->profile->pin_address ?? null;
+            $pinLatitude = $this->profile->pin_latitude ?? null;
+            $pinLongitude = $this->profile->pin_longitude ?? null;
         }
         
         return [
@@ -38,10 +44,10 @@ class ServiceListingResource extends JsonResource
             'work_type' => $this->work_type,
             'monthly_rate' => $this->monthly_rate,
             'description' => $this->description,
-            'pin_address' => $this->pin_address,
-            'address' => $this->pin_address,
-            'pin_latitude' => $this->pin_latitude,
-            'pin_longitude' => $this->pin_longitude,
+            'pin_address' => $pinAddress,
+            'address' => $pinAddress,
+            'pin_latitude' => $pinLatitude,
+            'pin_longitude' => $pinLongitude,
             'is_active' => $this->is_active,
             'status' => $this->status,
             'service_types' => $serviceTypes,

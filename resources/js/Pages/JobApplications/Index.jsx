@@ -19,6 +19,7 @@ export default function JobApplicationsIndex() {
 
     // Read filter values from URL params (with defaults)
     const serviceType = searchParams.get("service_type") || "";
+    const workType = searchParams.get("work_type") || "";
     const cityId = searchParams.get("city_id") || "";
     const latitude = searchParams.get("latitude") || "";
     const longitude = searchParams.get("longitude") || "";
@@ -28,6 +29,7 @@ export default function JobApplicationsIndex() {
         const params = new URLSearchParams();
 
         if (newFilters.service_type) params.set("service_type", newFilters.service_type);
+        if (newFilters.work_type) params.set("work_type", newFilters.work_type);
         if (newFilters.city_id) params.set("city_id", newFilters.city_id);
         if (newFilters.latitude) params.set("latitude", newFilters.latitude);
         if (newFilters.longitude) params.set("longitude", newFilters.longitude);
@@ -57,7 +59,7 @@ export default function JobApplicationsIndex() {
     const handleNearMe = () => {
         // If already has location, clear it (toggle off)
         if (latitude && longitude) {
-            updateFilters({ service_type: serviceType, city_id: cityId });
+            updateFilters({ service_type: serviceType, work_type: workType, city_id: cityId });
             return;
         }
 
@@ -67,6 +69,7 @@ export default function JobApplicationsIndex() {
                     const { latitude: lat, longitude: lng } = position.coords;
                     updateFilters({
                         service_type: serviceType,
+                        work_type: workType,
                         city_id: cityId,
                         latitude: lat.toString(),
                         longitude: lng.toString()
@@ -86,6 +89,7 @@ export default function JobApplicationsIndex() {
     useEffect(() => {
         const params = {
             service_type: serviceType || undefined,
+            work_type: workType || undefined,
             city_id: cityId || undefined,
             latitude: latitude || undefined,
             longitude: longitude || undefined,
@@ -110,7 +114,7 @@ export default function JobApplicationsIndex() {
     return (
         <PublicLayout>
             {/* Hero Section */}
-            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden py-16 md:py-24">
+            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden py-10 md:py-12">
                 {/* Abstract Background Shapes */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[100px] animate-pulse"></div>
@@ -118,9 +122,9 @@ export default function JobApplicationsIndex() {
                 </div>
 
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Browse Jobs</h1>
-                    <p className="text-xl text-indigo-100/90 max-w-2xl mx-auto leading-relaxed">
-                        Discover job opportunities in your area and apply to provide your services.
+                    <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Find Jobs</h1>
+                    <p className="text-lg text-indigo-100/90 max-w-2xl mx-auto leading-relaxed">
+                        Search for jobs near you and apply easily.
                     </p>
                 </div>
             </div>
@@ -133,12 +137,12 @@ export default function JobApplicationsIndex() {
                         <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
                             <span>🔍</span> Filter Requests
                         </h2>
-                        <div className="grid md:grid-cols-3 gap-6">
+                        <div className="grid md:grid-cols-4 gap-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Service Type</label>
                                 <select
                                     value={serviceType}
-                                    onChange={(e) => updateFilters({ service_type: e.target.value, city_id: cityId, latitude, longitude })}
+                                    onChange={(e) => updateFilters({ service_type: e.target.value, work_type: workType, city_id: cityId, latitude, longitude })}
                                     className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 shadow-sm transition-colors"
                                 >
                                     {serviceTypes.map((type) => (
@@ -149,41 +153,56 @@ export default function JobApplicationsIndex() {
                                 </select>
                             </div>
                             <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Work Type</label>
+                                <select
+                                    value={workType}
+                                    onChange={(e) => updateFilters({ service_type: serviceType, work_type: e.target.value, city_id: cityId, latitude, longitude })}
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 shadow-sm transition-colors"
+                                >
+                                    <option value="">All Types</option>
+                                    <option value="full_time">Full Time</option>
+                                    <option value="part_time">Part Time</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">City</label>
-                                <div className="flex gap-2">
-                                    <select
-                                        value={cityId}
-                                        onChange={(e) => updateFilters({ service_type: serviceType, city_id: e.target.value, latitude, longitude })}
-                                        className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 shadow-sm transition-colors"
-                                    >
-                                        <option value="">All Cities</option>
-                                        {cities.map((city) => (
-                                            <option key={city.id} value={city.id}>
-                                                {city.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                <select
+                                    value={cityId}
+                                    onChange={(e) => updateFilters({ service_type: serviceType, work_type: workType, city_id: e.target.value, latitude, longitude })}
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 shadow-sm transition-colors"
+                                >
+                                    <option value="">All Cities</option>
+                                    {cities.map((city) => (
+                                        <option key={city.id} value={city.id}>
+                                            {city.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex items-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => handleNearMe()}
+                                    className={`flex-1 px-5 py-3 border rounded-xl transition-colors flex items-center justify-center gap-2 font-medium whitespace-nowrap ${latitude && longitude ? "bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700" : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-600"}`}
+                                    title={latitude && longitude ? "Clear Near Me Filter" : "Search Near Me"}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                    </svg>
+                                    <span>Near Me</span>
+                                </button>
+                                {(serviceType || workType || cityId || (latitude && longitude)) && (
                                     <button
-                                        type="button"
-                                        onClick={() => handleNearMe()}
-                                        className={`px-4 py-3 border rounded-xl transition-colors flex items-center gap-2 font-medium ${latitude && longitude ? "bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700" : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-600"}`}
-                                        title={latitude && longitude ? "Clear Near Me Filter" : "Search Near Me"}
+                                        onClick={() => updateFilters({})}
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 font-medium transition-colors"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
-                                        <span>Near Me</span>
+                                        <span>Clear</span>
                                     </button>
-                                </div>
-                            </div>
-                            <div className="flex items-end">
-                                <button
-                                    onClick={() => updateFilters({})}
-                                    className="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-300 shadow-lg font-bold"
-                                >
-                                    Clear Filters
-                                </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -225,18 +244,13 @@ export default function JobApplicationsIndex() {
                                         <div
                                             key={job.id}
                                             onClick={handleCardClick}
-                                            className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 cursor-pointer"
+                                            className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 cursor-pointer flex flex-col"
                                         >
                                             {/* Header with gradient */}
                                             <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm">
-                                                        {job.service_type?.replace("_", " ") || "Service Request"}
-                                                    </span>
-                                                    <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase ${statusColors[job.status] || "bg-gray-100 text-gray-800"}`}>
-                                                        {job.status || "Pending"}
-                                                    </span>
-                                                </div>
+                                                <h3 className="text-white text-lg font-bold capitalize">
+                                                    {job.service_type?.replace("_", " ") || "Service Request"}
+                                                </h3>
                                             </div>
 
                                             {/* Already Applied Badge */}
@@ -251,7 +265,7 @@ export default function JobApplicationsIndex() {
                                                 </div>
                                             )}
 
-                                            <div className="p-6">
+                                            <div className="p-6 flex-1 flex flex-col">
                                                 {/* Customer Info */}
                                                 <div className="flex items-center mb-6">
                                                     <div className="w-12 h-12 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4 shadow-md">
@@ -324,7 +338,7 @@ export default function JobApplicationsIndex() {
                                                     </div>
                                                 )}
 
-                                                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                                                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700 mt-auto">
                                                     <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                                                         {job.job_applications?.length || 0} Applicants
                                                     </span>

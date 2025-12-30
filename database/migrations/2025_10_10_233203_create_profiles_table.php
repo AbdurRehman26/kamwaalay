@@ -28,6 +28,9 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->decimal('rating', 3, 2)->default(0.00);
             $table->integer('total_reviews')->default(0);
+            $table->text('pin_address')->nullable();
+            $table->decimal('pin_latitude', 10, 8)->nullable();
+            $table->decimal('pin_longitude', 11, 8)->nullable();
             $table->timestamps();
 
             // Ensure one profile per profileable

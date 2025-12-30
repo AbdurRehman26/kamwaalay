@@ -26,8 +26,7 @@ export const routes = {
         browse: () => "/job-posts/browse",
     },
     "service-listings": {
-        index: () => "/service-listings",
-        show: (id) => `/service-listings/${id}`,
+        // index and show removed - browse services feature removed
         create: () => "/service-listings/create",
         edit: (id) => `/service-listings/${id}/edit`,
         "my-listings": () => "/my-service-listings",

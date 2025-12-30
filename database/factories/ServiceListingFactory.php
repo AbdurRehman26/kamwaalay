@@ -23,7 +23,7 @@ class ServiceListingFactory extends Factory
             'work_type' => fake()->randomElement(['full_time', 'part_time']),
             'monthly_rate' => fake()->numberBetween(10000, 30000),
             'description' => fake()->sentence(),
-            'pin_address' => fake()->address(),
+            // pin_address removed - location is now on profile
             'is_active' => true,
             'status' => 'active',
         ];

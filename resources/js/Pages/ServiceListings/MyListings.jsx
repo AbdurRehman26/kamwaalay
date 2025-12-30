@@ -203,16 +203,10 @@ export default function MyServiceListings() {
                                     </div>
                                     <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
                                         <Link
-                                            to={route("service-listings.show", listing.id)}
-                                            className="flex-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all duration-300 font-bold text-sm text-center"
-                                        >
-                                            View Details
-                                        </Link>
-                                        <Link
                                             to={route("service-listings.edit", listing.id)}
-                                            className="flex-1 bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 font-bold text-sm text-center border-2 border-indigo-600 dark:border-indigo-500"
+                                            className="w-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all duration-300 font-bold text-sm text-center"
                                         >
-                                            Edit
+                                            Edit Listing
                                         </Link>
                                     </div>
                                 </div>

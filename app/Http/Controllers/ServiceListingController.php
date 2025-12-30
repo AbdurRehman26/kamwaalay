@@ -238,9 +238,6 @@ class ServiceListingController extends Controller
             'work_type' => 'required|in:full_time,part_time',
             'monthly_rate' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:2000',
-            'pin_address' => 'required|string|max:500',
-            'pin_latitude' => 'nullable|numeric|between:-90,90',
-            'pin_longitude' => 'nullable|numeric|between:-180,180',
             'status' => 'nullable|in:active,paused,closed',
             'is_active' => 'boolean',
         ]);
@@ -259,16 +256,13 @@ class ServiceListingController extends Controller
             $profile = $user->profile()->create([]);
         }
 
-        // Create service listing
+        // Create service listing (location is now on profile)
         $listing = ServiceListing::create([
             'user_id' => $user->id,
             'profile_id' => $profile->id,
             'work_type' => $validated['work_type'],
             'monthly_rate' => $validated['monthly_rate'] ?? null,
             'description' => $validated['description'] ?? null,
-            'pin_address' => $validated['pin_address'] ?? null,
-            'pin_latitude' => $validated['pin_latitude'] ?? null,
-            'pin_longitude' => $validated['pin_longitude'] ?? null,
             'is_active' => $validated['is_active'] ?? true,
             'status' => $validated['status'] ?? 'active',
         ]);
@@ -463,21 +457,15 @@ class ServiceListingController extends Controller
             'work_type' => 'required|in:full_time,part_time',
             'monthly_rate' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:2000',
-            'pin_address' => 'required|string|max:500',
-            'pin_latitude' => 'nullable|numeric|between:-90,90',
-            'pin_longitude' => 'nullable|numeric|between:-180,180',
             'status' => 'required|in:active,paused,closed',
             'is_active' => 'boolean',
         ]);
 
-        // Update main listing fields
+        // Update main listing fields (location is now on profile)
         $serviceListing->update([
             'work_type' => $validated['work_type'],
             'monthly_rate' => $validated['monthly_rate'] ?? null,
             'description' => $validated['description'] ?? null,
-            'pin_address' => $validated['pin_address'] ?? null,
-            'pin_latitude' => $validated['pin_latitude'] ?? null,
-            'pin_longitude' => $validated['pin_longitude'] ?? null,
             'status' => $validated['status'],
             'is_active' => $validated['is_active'] ?? true,
         ]);

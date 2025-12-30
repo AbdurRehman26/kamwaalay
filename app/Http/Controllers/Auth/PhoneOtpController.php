@@ -172,10 +172,10 @@ class PhoneOtpController extends Controller
     {
         // Remove all non-numeric characters except +
         $phone = preg_replace('/[^0-9+]/', '', $phone);
-        
+
         // Remove leading + if present (we'll add it back at the end)
         $phone = ltrim($phone, '+');
-        
+
         // Handle different input formats
         if (strpos($phone, '0092') === 0) {
             // Format: 0092xxxxxxxxx -> +92xxxxxxxxx
@@ -196,12 +196,12 @@ class PhoneOtpController extends Controller
                 $phone = '92' . $phone;
             }
         }
-        
+
         // Ensure it starts with +
         if (strpos($phone, '+') !== 0) {
             $phone = '+' . $phone;
         }
-        
+
         return $phone;
     }
 
@@ -217,16 +217,17 @@ class PhoneOtpController extends Controller
     }
 
     /**
-     * Send SMS using Twilio
+     * Send SMS using configured SMS Service
      */
     private function sendSms(string $phone, string $otp): void
     {
         try {
-            $twilioService = app(\App\Services\TwilioService::class);
-            $twilioService->sendOtp($phone, $otp, 'verification');
+            $smsService = app(\App\Services\SMS\SmsServiceInterface::class);
+            $message = "Your kamwaalay verification code is: {$otp}. Valid for 3 minutes.";
+            $smsService->send($phone, $message);
         } catch (\Exception $e) {
             // Log error but don't fail - OTP is still logged for development
-            Log::error("Failed to send SMS via Twilio for {$phone}: " . $e->getMessage());
+            Log::error("Failed to send SMS via configured driver for {$phone}: " . $e->getMessage());
             Log::info("OTP for {$phone}: {$otp}");
         }
     }

@@ -61,9 +61,7 @@ test('helpers can create service listings', function () {
         'work_type' => 'full_time',
         'monthly_rate' => 15000,
         'description' => 'Professional maid service',
-        'monthly_rate' => 15000,
-        'description' => 'Professional maid service',
-        'pin_address' => '123 Test St, Karachi',
+        // pin_address removed - location now on profile
     ]);
 
     $response->assertStatus(200);
@@ -151,9 +149,7 @@ test('helpers can update their service listings', function () {
         'work_type' => 'part_time',
         'monthly_rate' => 20000,
         'description' => 'Updated description',
-        'monthly_rate' => 20000,
-        'description' => 'Updated description',
-        'pin_address' => '456 Updated St, Karachi',
+        // pin_address removed - location now on profile
         'status' => 'active',
         'is_active' => true,
     ]);
@@ -183,37 +179,11 @@ test('service listings require service types', function () {
         'work_type' => 'full_time',
         'monthly_rate' => 15000,
         'description' => 'Professional service',
-        'monthly_rate' => 15000,
-        'description' => 'Professional service',
-        'pin_address' => '123 Test St, Karachi',
+        // pin_address not needed - location now on profile
     ]);
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors(['service_types']);
 });
 
-test('service listings require pin_address', function () {
-    $helper = User::factory()->create();
-    $helper->assignRole('helper');
-
-    // Helper needs to complete onboarding (have service listings)
-    $profile = $helper->profile()->create([]);
-    ServiceListing::factory()->create([
-        'profile_id' => $profile->id,
-    ]);
-    
-    $token = $helper->createToken('test-token')->plainTextToken;
-
-    $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
-        'Accept' => 'application/json',
-    ])->postJson('/api/service-listings', [
-        'service_types' => ['maid'],
-        'work_type' => 'full_time',
-        'monthly_rate' => 15000,
-        'description' => 'Professional service',
-    ]);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['pin_address']);
-});
+// pin_address validation test removed - location is now stored on profile, not service listing

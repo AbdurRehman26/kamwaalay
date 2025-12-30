@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import api from "@/services/api";
 import { serviceListingsService } from "@/services/serviceListings";
 import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
-import InputError from "@/Components/InputError";
 
 export default function ServiceListingEdit() {
     const { listingId } = useParams();
@@ -14,22 +13,17 @@ export default function ServiceListingEdit() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedServiceTypes, setSelectedServiceTypes] = useState([]);
-    const locationRef = useRef(null);
-    const searchTimeoutRef = useRef(null);
-    const pinAddressInputRef = useRef(null);
-    const autocompleteRef = useRef(null);
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
+    // Location fields removed - now managed at profile level
     const [data, setData] = useState({
         work_type: "",
         monthly_rate: "",
         description: "",
         city_id: "",
-        pin_address: "",
         status: "active",
         is_active: true,
     });
-    const [gettingLocation, setGettingLocation] = useState(false);
 
     // Fetch service types from API
     const { serviceTypes } = useServiceTypes();
@@ -104,14 +98,12 @@ export default function ServiceListingEdit() {
                             : []
                     );
 
+                    // Location fields removed - now on profile level
                     setData({
                         work_type: listingData.work_type || "",
                         monthly_rate: listingData.monthly_rate || "",
                         description: listingData.description || "",
                         city_id: listingData.city_id || "",
-                        pin_address: listingData.pin_address || "",
-                        pin_latitude: listingData.pin_latitude || "",
-                        pin_longitude: listingData.pin_longitude || "",
                         status: listingData.status || "active",
                         is_active: listingData.is_active ?? true,
                     });
@@ -124,147 +116,6 @@ export default function ServiceListingEdit() {
                 });
         }
     }, [listingId]);
-
-    // Initialize Google Places Autocomplete
-    // Note: Using deprecated Autocomplete API for now as PlaceAutocompleteElement has compatibility issues
-    useEffect(() => {
-        if (pinAddressInputRef.current && window.google && window.google.maps && window.google.maps.places) {
-            try {
-                // Use the deprecated Autocomplete API (still works and more stable)
-                const autocomplete = new window.google.maps.places.Autocomplete(
-                    pinAddressInputRef.current,
-                    {
-                        componentRestrictions: { country: "pk" },
-                        fields: ["formatted_address", "geometry", "name"],
-                        types: ["address"]
-                    }
-                );
-
-                autocompleteRef.current = autocomplete;
-
-                autocomplete.addListener("place_changed", () => {
-                    const place = autocomplete.getPlace();
-                    if (place.formatted_address) {
-                        const lat = place.geometry?.location?.lat();
-                        const lng = place.geometry?.location?.lng();
-                        setData(prev => ({
-                            ...prev,
-                            pin_address: place.formatted_address,
-                            pin_latitude: lat ? lat.toString() : "",
-                            pin_longitude: lng ? lng.toString() : ""
-                        }));
-                    }
-                });
-
-                return () => {
-                    if (autocompleteRef.current) {
-                        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
-                    }
-                };
-            } catch (error) {
-                console.error("Error initializing Google Places Autocomplete:", error);
-                // Silently fail - user can still type addresses manually
-            }
-        }
-    }, [data.pin_address]);
-
-    const handleGetCurrentLocation = () => {
-        if (!navigator.geolocation) {
-            setErrors({ ...errors, pin_address: "Geolocation is not supported by your browser." });
-            return;
-        }
-
-        // Check if we're in a secure context (HTTPS or localhost)
-        if (!window.isSecureContext && window.location.protocol !== "https:" && !window.location.hostname.includes("localhost") && !window.location.hostname.includes("127.0.0.1")) {
-            setErrors({
-                ...errors,
-                pin_address: "Geolocation requires HTTPS or localhost. Please access the site via https://localhost or manually enter your address. The address autocomplete will still work."
-            });
-            return;
-        }
-
-        if (!window.google || !window.google.maps || !window.google.maps.Geocoder) {
-            setErrors({ ...errors, pin_address: "Google Maps API is not loaded. Please refresh the page." });
-            return;
-        }
-
-        setGettingLocation(true);
-        setErrors({ ...errors, pin_address: null });
-
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const { latitude, longitude } = position.coords;
-
-                try {
-                    // Use Google Geocoding API for reverse geocoding
-                    const geocoder = new window.google.maps.Geocoder();
-                    const latlng = { lat: latitude, lng: longitude };
-
-                    geocoder.geocode({ location: latlng }, (results, status) => {
-                        if (status === "OK" && results && results.length > 0) {
-                            // Use the formatted address from Google
-                            const formattedAddress = results[0].formatted_address;
-                            setData(prev => ({
-                                ...prev,
-                                pin_address: formattedAddress,
-                                pin_latitude: latitude.toString(),
-                                pin_longitude: longitude.toString()
-                            }));
-                        } else {
-                            // Fallback to coordinates if geocoding fails
-                            setData(prev => ({
-                                ...prev,
-                                pin_address: `${latitude}, ${longitude}`,
-                                pin_latitude: latitude.toString(),
-                                pin_longitude: longitude.toString()
-                            }));
-                        }
-                        setGettingLocation(false);
-                    });
-                } catch (error) {
-                    console.error("Error reverse geocoding:", error);
-                    // Fallback to coordinates
-                    setData(prev => ({
-                        ...prev,
-                        pin_address: `${latitude}, ${longitude}`,
-                        pin_latitude: latitude.toString(),
-                        pin_longitude: longitude.toString()
-                    }));
-                    setGettingLocation(false);
-                }
-            },
-            (error) => {
-                console.error("Error getting location:", error);
-                let errorMessage = "Unable to get your location.";
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        errorMessage = "Location access denied. Please enable location permissions in your browser settings.";
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        errorMessage = "Location information unavailable.";
-                        break;
-                    case error.TIMEOUT:
-                        errorMessage = "Location request timed out. Please try again.";
-                        break;
-                    default:
-                        // Handle secure origin error (code 1)
-                        if (error.code === 1 || error.message?.includes("secure origins")) {
-                            errorMessage = "Geolocation requires HTTPS or localhost. Please use https://localhost or manually enter your address.";
-                        } else {
-                            errorMessage = `Unable to get your location: ${error.message || "Unknown error"}`;
-                        }
-                        break;
-                }
-                setErrors({ ...errors, pin_address: errorMessage });
-                setGettingLocation(false);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
-        );
-    };
 
     const submit = async (e) => {
         e.preventDefault();
@@ -284,22 +135,13 @@ export default function ServiceListingEdit() {
             return;
         }
 
-        if (!data.pin_address || data.pin_address.trim() === "") {
-            setErrors({ pin_address: "Pin address is required." });
-            setProcessing(false);
-            return;
-        }
-
-        // Prepare data for API
+        // Prepare data for API (location fields removed - now on profile)
         const apiData = {
             service_types: selectedServiceTypes,
             work_type: data.work_type,
             monthly_rate: data.monthly_rate || null,
             description: data.description || null,
             city_id: data.city_id,
-            pin_address: data.pin_address, // Required
-            pin_latitude: data.pin_latitude ? parseFloat(data.pin_latitude) : null,
-            pin_longitude: data.pin_longitude ? parseFloat(data.pin_longitude) : null,
             status: data.status,
             is_active: data.is_active,
         };
@@ -553,50 +395,6 @@ export default function ServiceListingEdit() {
                                     {errors.description && (
                                         <div className="mt-2 text-red-500 dark:text-red-400 text-sm font-medium flex items-center gap-1">
                                             <span>⚠️</span> {errors.description}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">
-                                        <span className="text-2xl mr-2">📍</span>
-                                        Exact Pin Address *
-                                    </label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            ref={pinAddressInputRef}
-                                            type="text"
-                                            value={data.pin_address}
-                                            onChange={(e) => setData({ ...data, pin_address: e.target.value })}
-                                            className="flex-1 border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3 shadow-sm transition-all duration-300"
-                                            placeholder="Start typing address or click button to get current location"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={handleGetCurrentLocation}
-                                            disabled={gettingLocation}
-                                            className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
-                                        >
-                                            {gettingLocation ? (
-                                                <>
-                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                                    <span>Getting...</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <span>📍</span>
-                                                    <span>Get Current Location</span>
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                        Enter the exact address where you provide services, or click the button to automatically detect your current location.
-                                    </p>
-                                    {errors.pin_address && (
-                                        <div className="mt-2 text-red-500 dark:text-red-400 text-sm font-medium flex items-center gap-1">
-                                            <span>⚠️</span> {errors.pin_address}
                                         </div>
                                     )}
                                 </div>

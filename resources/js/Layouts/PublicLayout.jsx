@@ -79,14 +79,6 @@ export default function PublicLayout({ children }) {
                                         Post Job
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link
-                                        to={route("service-listings.index")}
-                                        className="text-indigo-100 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block"
-                                    >
-                                        Browse Services
-                                    </Link>
-                                </li>
                             </ul>
                         </div>
                         <div>

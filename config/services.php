@@ -35,10 +35,14 @@ return [
         ],
     ],
 
-    'twilio' => [
-        'account_sid' => env('TWILIO_ACCOUNT_SID'),
-        'auth_token' => env('TWILIO_AUTH_TOKEN'),
-        'from_number' => env('TWILIO_FROM_NUMBER'),
+
+
+    'sms' => [
+        'default' => env('SMS_DRIVER', 'veevotech'),
+        'veevotech' => [
+            'url' => env('VEEVOTECH_URL', 'https://api.veevotech.com/v3/sendsms'),
+            'api_key' => env('VEEVOTECH_API_KEY'), // Some endpoints use key, others hash
+        ],
     ],
 
 ];

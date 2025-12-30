@@ -44,6 +44,9 @@ class Profile extends Model
         'is_active',
         'rating',
         'total_reviews',
+        'pin_address',
+        'pin_latitude',
+        'pin_longitude',
     ];
 
     protected function casts(): array
@@ -56,6 +59,8 @@ class Profile extends Model
             'is_active' => 'boolean',
             'rating' => 'decimal:2',
             'total_reviews' => 'integer',
+            'pin_latitude' => 'decimal:8',
+            'pin_longitude' => 'decimal:8',
         ];
     }
 
@@ -108,5 +113,17 @@ class Profile extends Model
             'security_guard' => 'Security Guard',
             default => ucfirst(str_replace('_', ' ', $this->service_type)),
         };
+    }
+
+    /**
+     * Scope to filter by distance from a point (Haversine formula)
+     */
+    public function scopeNearLocation($query, $latitude, $longitude, $radius = 20)
+    {
+        $haversine = "(6371 * acos(cos(radians($latitude)) * cos(radians(pin_latitude)) * cos(radians(pin_longitude) - radians($longitude)) + sin(radians($latitude)) * sin(radians(pin_latitude))))";
+
+        return $query->select('profiles.*')
+                     ->selectRaw("{$haversine} AS distance")
+                     ->whereRaw("{$haversine} < ?", [$radius]);
     }
 }

@@ -14,7 +14,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(\App\Services\SMS\SmsServiceInterface::class, function ($app) {
+            $driver = config('services.sms.default', 'veevotech');
+            
+            if ($driver === 'veevotech') {
+                return new \App\Services\SMS\Drivers\VeevoTechDriver();
+            }
+            
+            // Fallback or other drivers
+            return new \App\Services\SMS\Drivers\VeevoTechDriver();
+        });
     }
 
     /**

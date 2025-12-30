@@ -3,7 +3,7 @@ import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { Transition } from "@headlessui/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { profileService } from "@/services/profile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguages } from "@/hooks/useLanguages";
@@ -17,6 +17,9 @@ export default function UpdateProfileInformation({
     const { user, updateUser } = useAuth();
     const { languages, loading: languagesLoading } = useLanguages();
     const [cities, setCities] = useState([]);
+    const pinAddressInputRef = useRef(null);
+    const autocompleteRef = useRef(null);
+    const [gettingLocation, setGettingLocation] = useState(false);
 
     const [data, setData] = useState({
         name: user?.name || "",
@@ -26,6 +29,10 @@ export default function UpdateProfileInformation({
         gender: user?.gender || "",
         religion: user?.religion?.value || user?.religion || "",
         languages: user?.languages?.map(l => l.id) || [],
+        // Location fields for helpers
+        pin_address: user?.profile?.pin_address || "",
+        pin_latitude: user?.profile?.pin_latitude || "",
+        pin_longitude: user?.profile?.pin_longitude || "",
     });
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
@@ -53,9 +60,97 @@ export default function UpdateProfileInformation({
                 gender: user.gender || "",
                 religion: user.religion?.value || user.religion || "",
                 languages: user.languages?.map(l => l.id) || [],
+                pin_address: user.profile?.pin_address || "",
+                pin_latitude: user.profile?.pin_latitude || "",
+                pin_longitude: user.profile?.pin_longitude || "",
             });
         }
     }, [user]);
+
+    // Initialize Google Places Autocomplete for helper location
+    useEffect(() => {
+        const isHelper = user?.role === "helper" || user?.roles?.includes("helper");
+        if (isHelper && pinAddressInputRef.current && window.google?.maps?.places) {
+            try {
+                const autocomplete = new window.google.maps.places.Autocomplete(
+                    pinAddressInputRef.current,
+                    {
+                        componentRestrictions: { country: "pk" },
+                        fields: ["formatted_address", "geometry", "name"],
+                        types: ["address"]
+                    }
+                );
+                autocompleteRef.current = autocomplete;
+
+                autocomplete.addListener("place_changed", () => {
+                    const place = autocomplete.getPlace();
+                    if (place.formatted_address) {
+                        const lat = place.geometry?.location?.lat();
+                        const lng = place.geometry?.location?.lng();
+                        setData(prev => ({
+                            ...prev,
+                            pin_address: place.formatted_address,
+                            pin_latitude: lat ? lat.toString() : "",
+                            pin_longitude: lng ? lng.toString() : ""
+                        }));
+                    }
+                });
+
+                return () => {
+                    if (autocompleteRef.current) {
+                        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
+                    }
+                };
+            } catch (error) {
+                console.error("Error initializing Google Places Autocomplete:", error);
+            }
+        }
+    }, [user?.role]);
+
+    const handleGetCurrentLocation = () => {
+        if (!navigator.geolocation) {
+            setErrors({ ...errors, pin_address: "Geolocation is not supported by your browser." });
+            return;
+        }
+
+        if (!window.google?.maps?.Geocoder) {
+            setErrors({ ...errors, pin_address: "Google Maps API is not loaded. Please refresh the page." });
+            return;
+        }
+
+        setGettingLocation(true);
+        setErrors({ ...errors, pin_address: null });
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                const geocoder = new window.google.maps.Geocoder();
+                geocoder.geocode({ location: { lat: latitude, lng: longitude } }, (results, status) => {
+                    if (status === "OK" && results?.[0]) {
+                        setData(prev => ({
+                            ...prev,
+                            pin_address: results[0].formatted_address,
+                            pin_latitude: latitude.toString(),
+                            pin_longitude: longitude.toString()
+                        }));
+                    } else {
+                        setData(prev => ({
+                            ...prev,
+                            pin_address: `${latitude}, ${longitude}`,
+                            pin_latitude: latitude.toString(),
+                            pin_longitude: longitude.toString()
+                        }));
+                    }
+                    setGettingLocation(false);
+                });
+            },
+            (error) => {
+                setErrors({ ...errors, pin_address: "Unable to get your location. Please enter manually." });
+                setGettingLocation(false);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    };
 
     const submit = async (e) => {
         e.preventDefault();
@@ -72,6 +167,10 @@ export default function UpdateProfileInformation({
                 gender: data.gender || null,
                 religion: data.religion || null,
                 languages: data.languages.length > 0 ? data.languages : null,
+                // Include location for helpers
+                pin_address: data.pin_address || null,
+                pin_latitude: data.pin_latitude ? parseFloat(data.pin_latitude) : null,
+                pin_longitude: data.pin_longitude ? parseFloat(data.pin_longitude) : null,
             };
 
             const response = await profileService.updateProfile(submitData);
@@ -170,8 +269,8 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.city_id} />
                 </div>
 
-                {/* Only show age, gender, religion, and languages for helper users */}
-                {user?.role === "helper" && (
+                {/* Only show age, gender, religion, languages, and location for helper users */}
+                {(user?.role === "helper" || user?.roles?.includes("helper")) && (
                     <>
                         <div>
                             <InputLabel htmlFor="age" value="Age" />
@@ -280,6 +379,45 @@ export default function UpdateProfileInformation({
                             )}
 
                             <InputError className="mt-2" message={errors.languages} />
+                        </div>
+
+                        {/* Service Location for helpers */}
+                        <div>
+                            <InputLabel htmlFor="pin_address" value="Service Location" />
+                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                Enter the address where you provide services
+                            </p>
+
+                            <div className="mt-2 flex gap-2">
+                                <TextInput
+                                    ref={pinAddressInputRef}
+                                    id="pin_address"
+                                    className="flex-1"
+                                    value={data.pin_address}
+                                    onChange={(e) => setData({ ...data, pin_address: e.target.value })}
+                                    placeholder="Start typing address..."
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleGetCurrentLocation}
+                                    disabled={gettingLocation}
+                                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {gettingLocation ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                            <span>Getting...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>📍</span>
+                                            <span>Get Location</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+
+                            <InputError className="mt-2" message={errors.pin_address} />
                         </div>
                     </>
                 )}
