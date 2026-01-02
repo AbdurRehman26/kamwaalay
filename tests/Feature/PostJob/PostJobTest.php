@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Models\JobPost;
 use App\Models\City;
 use App\Models\Country;
+use App\Models\ServiceType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -21,6 +22,11 @@ beforeEach(function () {
     City::firstOrCreate(
         ['name' => 'Karachi'],
         ['is_active' => true, 'country_id' => $country->id]
+    );
+    // Create a service type for tests
+    ServiceType::firstOrCreate(
+        ['slug' => 'maid'],
+        ['name' => 'Maid', 'is_active' => true, 'sort_order' => 1]
     );
 });
 
@@ -61,13 +67,15 @@ test('users can create service requests', function () {
     $city = City::where('name', 'Karachi')->first();
     $token = $user->createToken('test-token')->plainTextToken;
 
+    $serviceType = ServiceType::where('slug', 'maid')->first();
+
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
     ])->postJson('/api/job-posts', [
         'name' => 'John Doe',
         'phone' => '03001234567',
-        'service_type' => 'maid',
+        'service_type' => $serviceType->id,
         'work_type' => 'full_time',
         'city_id' => $city->id,
         'area' => 'Saddar',

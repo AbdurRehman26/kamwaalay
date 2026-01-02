@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\ServiceListing;
+use App\Models\ServiceType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -96,11 +97,15 @@ test('guests can view service listings index', function () {
 });
 
 test('users and businesses can create service requests', function () {
-    // Create country and city first
+    // Create country, city, and service type first
     $country = \App\Models\Country::firstOrCreate(['name' => 'Pakistan', 'code' => 'PK']);
     $city = \App\Models\City::firstOrCreate(
         ['name' => 'Karachi'], 
         ['is_active' => true, 'country_id' => $country->id]
+    );
+    $serviceType = ServiceType::firstOrCreate(
+        ['slug' => 'maid'],
+        ['name' => 'Maid', 'is_active' => true, 'sort_order' => 1]
     );
 
     $user = User::factory()->create();
@@ -115,7 +120,7 @@ test('users and businesses can create service requests', function () {
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'phone' => '03001234567',
-        'service_type' => 'maid',
+        'service_type' => $serviceType->id,
         'work_type' => 'full_time',
         'city_id' => $city->id,
         'area' => 'Saddar',
@@ -127,6 +132,11 @@ test('users and businesses can create service requests', function () {
 });
 
 test('helpers cannot create service requests', function () {
+    $serviceType = ServiceType::firstOrCreate(
+        ['slug' => 'maid'],
+        ['name' => 'Maid', 'is_active' => true, 'sort_order' => 1]
+    );
+
     $helper = User::factory()->create();
     $helper->assignRole('helper');
     
@@ -139,7 +149,7 @@ test('helpers cannot create service requests', function () {
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'phone' => '03001234567',
-        'service_type' => 'maid',
+        'service_type' => $serviceType->id,
         'work_type' => 'full_time',
         'area' => 'Saddar',
         'address' => '123 Main Street',

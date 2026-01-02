@@ -26,7 +26,7 @@ test('users can view their bookings', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token,
         'Accept' => 'application/json',
-    ])->getJson('/api/job-posts');
+    ])->getJson('/api/my-job-posts');
 
     $response->assertStatus(200);
     $response->assertJsonStructure(['job_posts']);

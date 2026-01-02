@@ -66,9 +66,6 @@ Route::get('/service-listings/{serviceListing}', [ServiceListingController::clas
 Route::get('/job-posts/browse', [JobPostController::class, 'browse']);
 Route::get('/job-posts/{jobPost}', [JobPostController::class, 'show']);
 
-// Public job posts (browse/search jobs)
-Route::get('/job-posts', [JobApplicationController::class, 'index']);
-
 // Location search (already API-like)
 Route::get('/karachi-locations/search', [PageController::class, 'searchKarachiLocations']);
 Route::get('/locations/search', [PageController::class, 'searchLocations']);
@@ -128,6 +125,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit']);
     Route::patch('/profile', [ProfileController::class, 'update']);
     Route::delete('/profile', [ProfileController::class, 'destroy']);
+
+    // Set password (for OTP login users)
+    Route::post('/password/set', [App\Http\Controllers\Auth\SetPasswordController::class, 'store']);
     Route::get('/profile/documents', [ProfileController::class, 'documents']);
     Route::post('/profile/documents', [ProfileController::class, 'storeDocument']);
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto']);
@@ -209,7 +209,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/service-listings/{serviceListing}', [ServiceListingController::class, 'update'])->where('serviceListing', '[0-9]+');
     Route::delete('/service-listings/{serviceListing}', [ServiceListingController::class, 'destroy'])->where('serviceListing', '[0-9]+');
 
-    // Job Applications (apply and manage - requires authentication)
+    // Job Applications (browse and apply - requires authentication and helper/business role)
+    Route::get('/job-posts', [JobApplicationController::class, 'index']);
     Route::get('/job-posts/{jobPost}/apply', [JobApplicationController::class, 'create']);
     Route::post('/job-posts/{jobPost}/apply', [JobApplicationController::class, 'store']);
 

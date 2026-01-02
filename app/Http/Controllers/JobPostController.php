@@ -60,10 +60,11 @@ class JobPostController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["service_type", "work_type", "name", "phone"],
+                required: ["service_type", "work_type", "city_id", "name", "phone"],
                 properties: [
-                    new OA\Property(property: "service_type", type: "string", enum: ["maid", "cook", "babysitter", "caregiver", "cleaner", "domestic_helper", "driver", "security_guard"]),
+                    new OA\Property(property: "service_type", type: "integer", description: "Service type ID"),
                     new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
+                    new OA\Property(property: "city_id", type: "integer", description: "City ID"),
                     new OA\Property(property: "start_date", type: "string", format: "date", nullable: true),
                     new OA\Property(property: "start_time", type: "string", format: "time", nullable: true, example: "09:00"),
                     new OA\Property(property: "name", type: "string", maxLength: 255),
@@ -117,7 +118,7 @@ class JobPostController extends Controller
         }
 
         $validated = $request->validate([
-            'service_type' => 'required|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
+            'service_type' => 'required|exists:service_types,id',
             'work_type' => 'required|in:full_time,part_time',
             'city_id' => 'required|exists:cities,id',
             'start_date' => 'nullable|date',
@@ -138,9 +139,8 @@ class JobPostController extends Controller
         $validated['city'] = $city ? $city->name : 'Karachi';
         $validated['user_id'] = Auth::id();
 
-        // Map service_type string to ID
-        $serviceType = ServiceType::where('slug', $validated['service_type'])->firstOrFail();
-        $validated['service_type_id'] = $serviceType->id;
+        // service_type is already an ID (validated with exists:service_types,id)
+        $validated['service_type_id'] = $validated['service_type'];
         unset($validated['service_type']);
 
         $jobPost = JobPost::create($validated);

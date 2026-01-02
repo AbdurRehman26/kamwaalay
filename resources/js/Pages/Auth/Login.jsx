@@ -16,7 +16,7 @@ export default function Login() {
     const app_debug = window.Laravel?.app_debug;
 
     const { login, updateUser } = useAuth();
-    const [authMethod, setAuthMethod] = useState("otp"); // 'otp' or 'password'
+    const [authMethod, setAuthMethod] = useState("password"); // 'otp' or 'password'
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [remember, setRemember] = useState(false);
@@ -96,6 +96,9 @@ export default function Login() {
             if (response.verification_token) {
                 authService.setVerificationToken(response.verification_token);
             }
+            // Store phone number and method for OTP verification page
+            localStorage.setItem("verification_phone", phone);
+            localStorage.setItem("verification_method", response.verification_method);
             navigate("/verify-otp");
         } else if (response.token) {
             // Direct login success (account is verified)
@@ -245,6 +248,19 @@ export default function Login() {
                                 <button
                                     type="button"
                                     onClick={() => {
+                                        setAuthMethod("password");
+                                    }}
+                                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${authMethod === "password"
+                                        ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
+                                        : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
+                                        }`}
+                                >
+                                    <div className="text-2xl mb-1">🔒</div>
+                                    <h3 className={`font-bold text-sm ${authMethod === "password" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Password</h3>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
                                         setAuthMethod("otp");
                                         setPassword("");
                                     }}
@@ -255,19 +271,6 @@ export default function Login() {
                                 >
                                     <div className="text-2xl mb-1">💬</div>
                                     <h3 className={`font-bold text-sm ${authMethod === "otp" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>OTP</h3>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setAuthMethod("password");
-                                    }}
-                                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${authMethod === "password"
-                                        ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
-                                        : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
-                                        }`}
-                                >
-                                    <div className="text-2xl mb-1">🔒</div>
-                                    <h3 className={`font-bold text-sm ${authMethod === "password" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Password</h3>
                                 </button>
                             </div>
                         </div>
@@ -288,11 +291,25 @@ export default function Login() {
                                         className="flex-1 rounded-r-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5"
                                         autoComplete="tel"
                                         isFocused={true}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        placeholder="Enter your phone number"
+                                        onChange={(e) => {
+                                            let value = e.target.value;
+                                            // Remove any non-numeric characters
+                                            value = value.replace(/\D/g, "");
+                                            // Remove leading +92, 92, or 0 if present
+                                            if (value.startsWith("92")) {
+                                                value = value.substring(2);
+                                            } else if (value.startsWith("0")) {
+                                                value = value.substring(1);
+                                            }
+                                            setPhone(value);
+                                        }}
+                                        placeholder="3001234567"
                                         required
                                     />
                                 </div>
+                                <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                                    Enter your 10-digit mobile number without country code. Example: 3001234567
+                                </p>
                                 <InputError message={errors.phone} className="mt-1.5" />
                             </div>
 

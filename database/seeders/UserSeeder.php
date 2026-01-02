@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Super Admin',
                 'phone' => '+923202095051',
-                'password' => Hash::make('sydabdrehman@gmail.com'),
+                'password' => null,
             ]
         );
 

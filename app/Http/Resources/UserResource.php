@@ -80,6 +80,7 @@ class UserResource extends JsonResource
             'onboarding_complete' => $this->hasCompletedOnboarding(),
             'role' => $this->getRoleAttribute(),
             'roles' => $this->getRolesArray(),
+            'has_password' => !is_null($this->password) && strlen(trim($this->password)) > 0,
             // Profile fields (from profile - works for both helpers and businesses)
             'photo' => $this->when($this->profile, $this->profile?->photo),
             'service_type' => $this->when($this->profile, $this->profile?->service_type),

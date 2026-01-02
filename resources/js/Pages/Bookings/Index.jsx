@@ -82,9 +82,12 @@ export default function BookingsIndex() {
                                             <h3 className="text-xl font-bold text-gray-900 dark:text-white capitalize group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                                 {booking.service_type?.replace("_", " ") || "N/A"}
                                             </h3>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${getStatusColor(booking.status)}`}>
-                                                {booking.status?.replace("_", " ") || "N/A"}
-                                            </span>
+                                            {/* Status - Hidden */}
+                                            {false && (
+                                                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${getStatusColor(booking.status)}`}>
+                                                    {booking.status?.replace("_", " ") || "N/A"}
+                                                </span>
+                                            )}
                                         </div>
 
                                         <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4 gap-4 flex-wrap">

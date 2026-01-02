@@ -49,8 +49,11 @@ class JobApplicationController extends Controller
      */
     public function index(Request $request)
     {
-        // Allow guests and all users to browse job applications
-        // Only authenticated helpers/businesses with completed onboarding can apply
+        // Only helpers and businesses can browse job posts
+        $user = Auth::user();
+        if (!$user || !$user->hasRole(['helper', 'business'])) {
+            abort(403, 'Only helpers and businesses can browse job posts.');
+        }
 
         $query = JobPost::with(['user', 'jobApplications', 'cityRelation'])
             ->where('status', 'pending')

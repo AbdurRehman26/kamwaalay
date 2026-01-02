@@ -22,7 +22,7 @@ export default function Verify() {
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
     const [message, setMessage] = useState("");
-    const [timeLeft, setTimeLeft] = useState(180); // 3 minutes in seconds
+    const [timeLeft, setTimeLeft] = useState(60); // 1 minute in seconds
 
     // Fetch verification info from API
     useEffect(() => {
@@ -30,7 +30,7 @@ export default function Verify() {
         const tokenFromUrl = searchParams.get("verification_token");
         const tokenFromStorage = authService.getVerificationToken();
         const token = tokenFromUrl || tokenFromStorage;
-        
+
         if (token) {
             setVerificationToken(token);
             // Store it in localStorage for resend functionality
@@ -38,19 +38,19 @@ export default function Verify() {
                 authService.setVerificationToken(token);
             }
         }
-        
+
         // Check localStorage for verification info (from registration)
         const storedUserId = localStorage.getItem("verification_user_id");
         const storedMethod = localStorage.getItem("verification_method");
         const storedIdentifier = localStorage.getItem("verification_identifier");
-        
+
         if (storedUserId && storedMethod) {
             setUserId(storedUserId);
             setMethod(storedMethod);
             setIdentifier(storedIdentifier || "");
             setIsLogin(false); // This is registration flow
         }
-        
+
         // Try to get verification info from API
         if (token) {
             authService.getVerificationInfo(token)
@@ -97,10 +97,10 @@ export default function Verify() {
     const formatPhoneNumber = (phone) => {
         // Remove all non-numeric characters except +
         let formatted = phone.replace(/[^0-9+]/g, "");
-        
+
         // Remove leading + if present (we'll add it back)
         formatted = formatted.replace(/^\+/, "");
-        
+
         // Handle different formats
         if (formatted.startsWith("0092")) {
             // Format: 0092xxxxxxxxx -> +92xxxxxxxxx
@@ -121,12 +121,12 @@ export default function Verify() {
                 formatted = "92" + formatted;
             }
         }
-        
+
         // Ensure it starts with +
         if (!formatted.startsWith("+")) {
             formatted = "+" + formatted;
         }
-        
+
         return formatted;
     };
 
@@ -135,7 +135,7 @@ export default function Verify() {
         setProcessing(true);
         try {
             await authService.resendOtp(verificationToken);
-            setTimeLeft(180); // Reset timer
+            setTimeLeft(60); // Reset timer
             setOtp("");
             setMessage("Verification code has been resent.");
         } catch (error) {
@@ -156,16 +156,8 @@ export default function Verify() {
             const otpPayload = {
                 otp: otp,
             };
-            
-            // Add email or phone based on verification method
-            if (method === "email") {
-                // Get email from localStorage or identifier
-                const storedEmail = localStorage.getItem("verification_email");
-                const emailToUse = storedEmail || identifier;
-                if (emailToUse) {
-                    otpPayload.email = emailToUse.toLowerCase().trim();
-                }
-            } else if (method === "phone") {
+
+            if (method === "phone") {
                 // Get phone from localStorage or identifier
                 const storedPhone = localStorage.getItem("verification_phone");
                 const phoneToUse = storedPhone || identifier;
@@ -174,26 +166,37 @@ export default function Verify() {
                     otpPayload.phone = formatPhoneNumber(phoneToUse);
                 }
             }
-            
+
             // Add verification_token if available (for login flow)
             const response = await authService.verifyOtp(otpPayload, verificationToken);
 
             if (response.token) {
                 // Store token
                 authService.setToken(response.token);
-                
+
                 // Clean up verification info from localStorage
                 localStorage.removeItem("verification_user_id");
                 localStorage.removeItem("verification_method");
                 localStorage.removeItem("verification_identifier");
                 localStorage.removeItem("verification_email");
                 localStorage.removeItem("verification_phone");
-                
+
+                // Check if password reset is required FIRST (before updating user context)
+                // This avoids race condition with GuestRoute redirecting authenticated users
+                const needsPasswordReset = response.require_password_reset;
+
                 // Update user state in AuthContext
                 if (response.user) {
                     updateUser(response.user);
                 }
-                
+
+                // Handle password reset redirect
+                if (needsPasswordReset) {
+                    // OTP login - redirect to password reset without requiring old password
+                    navigate("/reset-password?otp_login=true");
+                    return;
+                }
+
                 // Redirect based on context
                 if (response.redirect) {
                     // If redirect is an object with route info, convert route name to path
@@ -241,21 +244,21 @@ export default function Verify() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-primary-100 to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full space-y-8">
                     <div>
-                        <h2 className="mt-6 text-center text-4xl font-extrabold text-gray-900">
+                        <h2 className="mt-6 text-center text-4xl font-extrabold text-gray-900 dark:text-white">
                             {is_login ? "Login Verification" : `Verify Your ${method === "email" ? "Email" : "Phone"}`}
                         </h2>
-                        <p className="mt-2 text-center text-sm text-gray-600">
-                            {is_login 
+                        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+                            {is_login
                                 ? `We've sent a 6-digit verification code to ${method === "email" ? "your email" : "your phone"}`
                                 : "We've sent a 6-digit verification code to"
                             }
                             {!is_login && identifier && (
                                 <>
                                     <br />
-                                    <span className="font-semibold text-primary-600">{identifier}</span>
+                                    <span className="font-semibold text-primary-600 dark:text-primary-400">{identifier}</span>
                                 </>
                             )}
                         </p>
@@ -263,7 +266,7 @@ export default function Verify() {
 
                     {/* Success Message */}
                     {message && (
-                        <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg">
+                        <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 dark:border-green-500 p-4 rounded-lg">
                             <div className="flex items-start">
                                 <div className="flex-shrink-0">
                                     <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
@@ -271,21 +274,21 @@ export default function Verify() {
                                     </svg>
                                 </div>
                                 <div className="ml-3">
-                                    <p className="text-sm font-medium text-green-800">{message}</p>
+                                    <p className="text-sm font-medium text-green-800 dark:text-green-300">{message}</p>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    <form className="mt-8 space-y-6 bg-white rounded-2xl shadow-xl p-8" onSubmit={submit}>
+                    <form className="mt-8 space-y-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700" onSubmit={submit}>
                         <div>
-                            <InputLabel htmlFor="otp" value="Verification Code" className="text-gray-700 font-medium" />
+                            <InputLabel htmlFor="otp" value="Verification Code" className="text-gray-700 dark:text-gray-300 font-medium" />
                             <TextInput
                                 id="otp"
                                 name="otp"
                                 type="text"
                                 value={otp}
-                                className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-center text-2xl tracking-widest font-bold"
+                                className="mt-2 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-center text-2xl tracking-widest font-bold dark:bg-gray-700 dark:text-white"
                                 placeholder="000000"
                                 maxLength={6}
                                 autoComplete="one-time-code"
@@ -298,7 +301,7 @@ export default function Verify() {
                                 required
                             />
                             <InputError message={errors.otp} className="mt-2" />
-                            <p className="mt-2 text-xs text-gray-500">
+                            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                                 Enter the 6-digit code sent to {method === "email" ? "your email" : "your phone"}
                             </p>
                         </div>
@@ -306,15 +309,15 @@ export default function Verify() {
                         {/* Timer */}
                         {timeLeft > 0 && (
                             <div className="text-center">
-                                <p className="text-sm text-gray-600">
-                                    Code expires in: <span className="font-semibold text-primary-600">{formatTime(timeLeft)}</span>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    Code expires in: <span className="font-semibold text-primary-600 dark:text-primary-400">{formatTime(timeLeft)}</span>
                                 </p>
                             </div>
                         )}
 
                         {timeLeft === 0 && (
-                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
-                                <p className="text-sm text-yellow-800">
+                            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-lg">
+                                <p className="text-sm text-yellow-800 dark:text-yellow-300">
                                     Your verification code has expired. Please request a new one.
                                 </p>
                             </div>
@@ -344,7 +347,7 @@ export default function Verify() {
                                 type="button"
                                 onClick={handleResend}
                                 disabled={timeLeft > 0 || processing}
-                                className="text-sm font-medium text-primary-600 hover:text-primary-500 disabled:text-gray-400 disabled:cursor-not-allowed"
+                                className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 disabled:text-gray-400 disabled:cursor-not-allowed"
                             >
                                 {timeLeft > 0 ? (
                                     <>Resend code in {formatTime(timeLeft)}</>
@@ -354,19 +357,19 @@ export default function Verify() {
                             </button>
                         </div>
 
-                        <div className="text-center pt-4 border-t border-gray-200">
-                            <p className="text-sm text-gray-600">
+                        <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                 {is_login ? (
                                     <Link
                                         to="/login"
-                                        className="font-medium text-primary-600 hover:text-primary-500"
+                                        className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
                                     >
                                         Back to login
                                     </Link>
                                 ) : (
                                     <Link
                                         to="/register"
-                                        className="font-medium text-primary-600 hover:text-primary-500"
+                                        className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
                                     >
                                         Back to registration
                                     </Link>

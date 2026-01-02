@@ -552,6 +552,9 @@ class VerificationController extends Controller
                 'token' => $token,
             ];
 
+            // Always require password update for OTP login (security measure)
+            $response['require_password_reset'] = true;
+
             if ($redirectInfo) {
                 $response['redirect'] = $redirectInfo;
             }

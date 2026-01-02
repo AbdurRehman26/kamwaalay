@@ -87,16 +87,14 @@ export default function BookingShow() {
             <div className="container mx-auto px-4 py-12">
                 <div className="max-w-4xl mx-auto">
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 p-8 mb-8">
-                        <div className="flex items-center gap-3 mb-6">
-                            <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 px-4 py-2 rounded-full font-semibold capitalize">
-                                {booking.service_type?.replace("_", " ") || "N/A"}
-                            </span>
-                        </div>
+                        {/* Service Type Badge at top - Removed */}
 
                         <div className="grid md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Service Type</h3>
-                                <p className="text-gray-900 dark:text-white capitalize">{booking.service_type?.replace("_", " ") || "N/A"}</p>
+                                <span className="inline-block bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 px-4 py-2 rounded-full font-semibold capitalize">
+                                    {booking.service_type?.replace("_", " ") || "N/A"}
+                                </span>
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Work Type</h3>
@@ -200,6 +198,56 @@ export default function BookingShow() {
                                                     </span>
                                                 </div>
                                             </div>
+
+                                            {/* Additional Applicant Details */}
+                                            <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                {application.user?.age && (
+                                                    <div className="bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-lg">
+                                                        <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">Age</p>
+                                                        <p className="text-sm text-gray-900 dark:text-white">{application.user.age} years</p>
+                                                    </div>
+                                                )}
+                                                {application.user?.gender && (
+                                                    <div className="bg-purple-50 dark:bg-purple-900/20 px-3 py-2 rounded-lg">
+                                                        <p className="text-xs text-purple-600 dark:text-purple-400 font-semibold">Gender</p>
+                                                        <p className="text-sm text-gray-900 dark:text-white capitalize">{application.user.gender}</p>
+                                                    </div>
+                                                )}
+                                                {application.user?.religion && (
+                                                    <div className="bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded-lg">
+                                                        <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">Religion</p>
+                                                        <p className="text-sm text-gray-900 dark:text-white capitalize">
+                                                            {typeof application.user.religion === "object" ? application.user.religion.label : application.user.religion.replace(/_/g, " ")}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Languages */}
+                                            {application.user?.languages && application.user.languages.length > 0 && (
+                                                <div className="mt-3">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold mb-2">Languages</p>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {application.user.languages.map((lang, idx) => (
+                                                            <span key={idx} className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-xs px-3 py-1 rounded-full font-medium">
+                                                                {typeof lang === "object" && lang?.name ? lang.name : lang}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Location from Profile */}
+                                            {application.user?.profile?.pin_address && (
+                                                <div className="mt-3 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold mb-1">Location</p>
+                                                    <div className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                                        <span>📍</span>
+                                                        <span className="line-clamp-2">{application.user.profile.pin_address}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             {application.message && (
                                                 <p className="mt-3 text-gray-600 dark:text-gray-300 text-sm bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
                                                     "{application.message}"
@@ -244,10 +292,10 @@ export default function BookingShow() {
                         {user ? (
                             <>
                                 <Link
-                                    to={route("job-applications.index")}
+                                    to={route(isHelper ? "job-applications.index" : "job-posts.index")}
                                     className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-300 font-semibold text-center"
                                 >
-                                    Back to Jobs
+                                    {isHelper ? "Back to Jobs" : "Back to My Job Posts"}
                                 </Link>
                                 {isOwner && (
                                     <Link

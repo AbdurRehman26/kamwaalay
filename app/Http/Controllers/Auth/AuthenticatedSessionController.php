@@ -124,7 +124,7 @@ class AuthenticatedSessionController extends Controller
                 '+929876543211' => 'helper',
                 '+929876543212' => 'user',
             ];
-            
+
             $normalizedPhone = $request->filled('phone') ? $this->formatPhoneNumber($request->input('phone')) : null;
 
             foreach ($demoNumbers as $demoPhone => $role) {
@@ -356,8 +356,10 @@ class AuthenticatedSessionController extends Controller
             'expires_at' => Carbon::now()->addMinutes(3), // OTP valid for 3 minutes
         ]);
 
-        // Send SMS (mock implementation - replace with actual SMS service)
-        $this->sendSms($phone, $otp);
+        if(config('app.env') == 'local') {
+            // Send SMS (mock implementation - replace with actual SMS service)
+            $this->sendSms($phone, $otp);
+        }
 
         // For development, log the OTP
         Log::info("Login Phone OTP for {$phone}: {$otp}");

@@ -14,6 +14,7 @@ import Home from "./Pages/Home";
 import Login from "./Pages/Auth/Login";
 import Register from "./Pages/Auth/Register";
 import Verify from "./Pages/Auth/Verify";
+import SetPassword from "./Pages/Auth/SetPassword";
 import Dashboard from "./Pages/Dashboard";
 import DashboardDocuments from "./Pages/Dashboard/Documents";
 import ProfileEdit from "./Pages/Profile/Edit";
@@ -48,7 +49,7 @@ import MessagesIndex from "./Pages/Messages/Index";
 // Routes Component (inside providers)
 function AppRoutes() {
     // Protected Route Component (has access to AuthProvider context)
-    const ProtectedRoute = ({ children }) => {
+    const ProtectedRoute = ({ children, requiredRoles = null }) => {
         const { user, loading } = useAuth();
         const location = useLocation();
         const isAuthenticated = authService.isAuthenticated();
@@ -78,20 +79,45 @@ function AppRoutes() {
 
         // If we have user, proceed with checks
         if (user) {
-            // Check if user is helper or business and hasn't completed onboarding
-            const isHelper = user.role === "helper";
-            const isBusiness = user.role === "business";
+            // Check role-based access if requiredRoles is specified
+            if (requiredRoles && requiredRoles.length > 0) {
+                const hasRequiredRole = requiredRoles.includes(user.role);
+                if (!hasRequiredRole) {
+                    // User doesn't have the required role - redirect to home
+                    return <Navigate to="/" replace />;
+                }
+            }
+
+            // Check if user needs to set a password (after OTP login)
+            // Allow access to reset-password page itself
+            const isOnPasswordResetPage = location.pathname === "/reset-password";
+
+            if (!user.has_password && !isOnPasswordResetPage) {
+                // User has no password - must set one before accessing any other protected route
+                return <Navigate to="/reset-password?otp_login=true" replace />;
+            }
+
+            // Check if user hasn't completed onboarding - applies to ALL users
             const onboardingIncomplete = !user.onboarding_complete;
 
-            // If user is on onboarding page, allow access
-            const isOnOnboardingPage = location.pathname === "/onboarding/helper" || location.pathname === "/onboarding/business";
+            if (onboardingIncomplete) {
+                const isHelper = user.role === "helper";
+                const isBusiness = user.role === "business";
 
-            // If helper/business hasn't completed onboarding and not on onboarding page, redirect
-            if ((isHelper || isBusiness) && onboardingIncomplete && !isOnOnboardingPage) {
+                // Determine the correct onboarding page based on role
+                let correctOnboardingPage = "/profile"; // Default for regular users
                 if (isHelper) {
-                    return <Navigate to="/onboarding/helper" replace />;
+                    correctOnboardingPage = "/onboarding/helper";
                 } else if (isBusiness) {
-                    return <Navigate to="/onboarding/business" replace />;
+                    correctOnboardingPage = "/onboarding/business";
+                }
+
+                // Check if user is on the correct onboarding page
+                const isOnCorrectOnboardingPage = location.pathname === correctOnboardingPage;
+
+                // If not on correct onboarding page AND not setting password, redirect to onboarding
+                if (!isOnCorrectOnboardingPage && !isOnPasswordResetPage) {
+                    return <Navigate to={correctOnboardingPage} replace />;
                 }
             }
         }
@@ -104,13 +130,38 @@ function AppRoutes() {
         return children;
     };
 
+    // Guest Route - Only allow unauthenticated users
+    const GuestRoute = ({ children }) => {
+        const { user } = useAuth();
+
+        // If user is authenticated, redirect to home
+        if (user) {
+            return <Navigate to="/" replace />;
+        }
+
+        return children;
+    };
+
     return (
         <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={
+                <GuestRoute>
+                    <Login />
+                </GuestRoute>
+            } />
+            <Route path="/register" element={
+                <GuestRoute>
+                    <Register />
+                </GuestRoute>
+            } />
             <Route path="/verify-otp" element={<Verify />} />
+            <Route path="/reset-password" element={
+                <ProtectedRoute>
+                    <SetPassword />
+                </ProtectedRoute>
+            } />
             <Route path="/helpers" element={<HelpersIndex />} />
             <Route path="/helpers/:helperId" element={<HelpersShow />} />
             <Route path="/businesses/:businessId" element={<BusinessesShow />} />
@@ -168,7 +219,11 @@ function AppRoutes() {
                     <ServiceListingsMyListings />
                 </ProtectedRoute>
             } />
-            <Route path="/job-posts" element={<JobApplicationsIndex />} />
+            <Route path="/job-posts" element={
+                <ProtectedRoute requiredRoles={["helper", "business"]}>
+                    <JobApplicationsIndex />
+                </ProtectedRoute>
+            } />
             <Route path="/job-posts/:bookingId/apply" element={
                 <ProtectedRoute>
                     <JobApplicationsCreate />

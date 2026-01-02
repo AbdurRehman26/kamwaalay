@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('profile_updated_at')->nullable();
             $table->decimal('hourly_rate', 8, 2)->nullable();
             $table->boolean('is_active')->default(true);
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
