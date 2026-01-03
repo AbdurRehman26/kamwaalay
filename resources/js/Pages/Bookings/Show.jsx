@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import { jobPostsService } from "@/services/jobPosts";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 
 export default function BookingShow() {
     const { bookingId } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { serviceTypes } = useServiceTypes();
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -92,7 +94,15 @@ export default function BookingShow() {
                         <div className="grid md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Service Type</h3>
-                                <span className="inline-block bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 px-4 py-2 rounded-full font-semibold capitalize">
+                                <span className="inline-block bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 px-4 py-2 rounded-full font-semibold capitalize flex items-center gap-2 w-fit">
+                                    <span>
+                                        {(serviceTypes.find(t =>
+                                            t.value === booking.service_type ||
+                                            t.value === booking.service_type_id ||
+                                            t.slug === booking.service_type ||
+                                            t.label === booking.service_type
+                                        )?.icon) || "💼"}
+                                    </span>
                                     {booking.service_type?.replace("_", " ") || "N/A"}
                                 </span>
                             </div>

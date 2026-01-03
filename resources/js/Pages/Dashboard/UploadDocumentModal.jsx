@@ -90,8 +90,8 @@ export default function UploadDocumentModal({ isOpen, onClose, onSuccess }) {
         <Modal show={isOpen} onClose={handleClose}>
             <form onSubmit={submit} className="p-6">
                 <div className="mb-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">Upload Document</h2>
-                    <p className="text-sm text-gray-600">Upload a verification document (NIC, Aadhaar, Police Verification, etc.)</p>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Upload Document</h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Upload a verification document (NIC, Aadhaar, Police Verification, etc.)</p>
                 </div>
 
                 <div className="space-y-4">
@@ -101,7 +101,7 @@ export default function UploadDocumentModal({ isOpen, onClose, onSuccess }) {
                             id="document_type"
                             value={data.document_type}
                             onChange={(e) => setData({ ...data, document_type: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
                         >
                             <option value="nic">National Identity Card (NIC)</option>
                             <option value="police_verification">Police Verification</option>
@@ -111,14 +111,15 @@ export default function UploadDocumentModal({ isOpen, onClose, onSuccess }) {
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="document_number" value="Document Number (Optional)" />
+                        <InputLabel htmlFor="document_number" value="Document Number *" />
                         <input
                             id="document_number"
                             type="text"
                             value={data.document_number}
                             onChange={(e) => setData({ ...data, document_number: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                            placeholder="Enter document number if applicable"
+                            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            placeholder="Enter document number"
+                            required
                         />
                         <InputError className="mt-2" message={errors.document_number} />
                     </div>
@@ -127,10 +128,10 @@ export default function UploadDocumentModal({ isOpen, onClose, onSuccess }) {
                         <InputLabel htmlFor="file" value="Document File" />
                         <div className="mt-2">
                             {file ? (
-                                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                                     <div className="flex-1">
-                                        <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                                        <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024).toFixed(2)} KB</p>
                                     </div>
                                     <button
                                         type="button"
@@ -147,17 +148,17 @@ export default function UploadDocumentModal({ isOpen, onClose, onSuccess }) {
                                     type="file"
                                     accept=".pdf,.jpg,.jpeg,.png"
                                     onChange={handleFileChange}
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+                                    className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-primary-900/30 file:text-primary-700 dark:file:text-primary-300 hover:file:bg-primary-100 dark:hover:file:bg-primary-900/50 cursor-pointer"
                                 />
                             )}
                         </div>
-                        <p className="mt-1 text-xs text-gray-500">PDF, JPG, or PNG up to 5MB</p>
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">PDF, JPG, or PNG up to 5MB</p>
                         <InputError className="mt-2" message={errors.file} />
                     </div>
 
                     {errors.submit && (
-                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                            <p className="text-sm text-red-600">{errors.submit}</p>
+                        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                            <p className="text-sm text-red-600 dark:text-red-400">{errors.submit}</p>
                         </div>
                     )}
                 </div>

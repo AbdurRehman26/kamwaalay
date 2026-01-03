@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
 import MapPicker from "@/Components/MapPicker";
+import toast from "react-hot-toast";
 
 export default function BookingCreate() {
     const navigate = useNavigate();
@@ -131,12 +132,14 @@ export default function BookingCreate() {
 
         try {
             const response = await jobPostsService.createBooking(submitData);
+            toast.success("Job post created successfully!");
             // Redirect to job postings index or show success message
             navigate(route("job-posts.index"));
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
+                toast.error(error.response?.data?.message || "Failed to create job post");
                 setErrors({ submit: [error.response?.data?.message || "Failed to create job post"] });
             }
         } finally {

@@ -60,7 +60,6 @@ class RegisteredUserController extends Controller
                     new OA\Property(property: "password", type: "string", format: "password", minLength: 8),
                     new OA\Property(property: "password_confirmation", type: "string", format: "password"),
                     new OA\Property(property: "role", type: "string", enum: ["user", "helper", "business"]),
-                    new OA\Property(property: "address", type: "string", nullable: true, maxLength: 255),
                 ]
             )
         ),
@@ -91,7 +90,7 @@ class RegisteredUserController extends Controller
             'phone' => 'nullable|string|max:20|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => 'required|in:user,helper,business',
-            'address' => 'nullable|string|max:255',
+
         ]);
 
         // Ensure at least one of email or phone is provided
@@ -109,7 +108,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'password' => Hash::make($request->password),
             'phone' => $phone,
-            'address' => $request->address,
+
         ]);
 
         // Assign role using Spatie Permission

@@ -1,11 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
+import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { jobApplicationsService } from "@/services/jobApplications";
 import { route } from "@/utils/routes";
+import toast from "react-hot-toast";
 
 export default function JobApplicationCreate() {
     const { bookingId } = useParams();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [booking, setBooking] = useState(null);
     const [hasApplied, setHasApplied] = useState(false);
@@ -64,12 +67,14 @@ export default function JobApplicationCreate() {
 
         try {
             const response = await jobApplicationsService.createApplication(bookingId, data);
-            // Redirect to applications index or show success message
-            navigate(route("job-applications.index")); // Use navigate instead of router.visit for React Router
+            toast.success("Application submitted successfully!");
+            // Redirect to my applications dashboard
+            navigate(route("job-applications.my-applications"));
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
+                toast.error(error.response?.data?.message || "Failed to submit application");
                 setErrors({ submit: [error.response?.data?.message || "Failed to create application"] });
             }
         } finally {
@@ -160,7 +165,14 @@ export default function JobApplicationCreate() {
                                     </div>
                                     <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-5 border border-indigo-100 dark:border-indigo-800">
                                         <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-2">📍 Location</h3>
-                                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{booking.city_name || booking.city?.name || booking.city}, {booking.area}</p>
+                                        {user && (user.role === "helper" || user.role === "business") ? (
+                                            <div>
+                                                <p className="text-lg font-semibold text-gray-900 dark:text-white">{booking.city_name || booking.city?.name || booking.city}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">Location will be visible once your application is accepted</p>
+                                            </div>
+                                        ) : (
+                                            <p className="text-lg font-semibold text-gray-900 dark:text-white">{booking.city_name || booking.city?.name || booking.city}, {booking.area}</p>
+                                        )}
                                     </div>
                                     {booking.special_requirements && (
                                         <div className="md:col-span-2 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-5 border border-indigo-100 dark:border-indigo-800">

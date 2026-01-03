@@ -301,6 +301,10 @@ export default function Login() {
                                             } else if (value.startsWith("0")) {
                                                 value = value.substring(1);
                                             }
+                                            // Enforce max length of 10 digits
+                                            if (value.length > 10) {
+                                                value = value.substring(0, 10);
+                                            }
                                             setPhone(value);
                                         }}
                                         placeholder="3001234567"

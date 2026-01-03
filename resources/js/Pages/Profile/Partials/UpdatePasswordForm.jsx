@@ -5,6 +5,7 @@ import TextInput from "@/Components/TextInput";
 import { Transition } from "@headlessui/react";
 import { useRef, useState } from "react";
 import { profileService } from "@/services/profile";
+import toast from "react-hot-toast";
 
 export default function UpdatePasswordForm({ className = "" }) {
     const passwordInput = useRef();
@@ -28,6 +29,7 @@ export default function UpdatePasswordForm({ className = "" }) {
         try {
             await profileService.updatePassword(data);
             setRecentlySuccessful(true);
+            toast.success("Password updated successfully!");
             // Reset form on success
             setData({
                 current_password: "",

@@ -5,6 +5,7 @@ import { Transition } from "@headlessui/react";
 import { useState, useEffect, useRef } from "react";
 import { profileService } from "@/services/profile";
 import { useAuth } from "@/contexts/AuthContext";
+import toast from "react-hot-toast";
 
 export default function UpdateProfilePhoto({ className = "" }) {
     const { user, updateUser } = useAuth();
@@ -73,6 +74,7 @@ export default function UpdateProfilePhoto({ className = "" }) {
 
             const response = await profileService.updatePhoto(formData);
             setRecentlySuccessful(true);
+            toast.success("Photo uploaded successfully!");
             // Update the user in AuthContext
             if (response.user) {
                 updateUser(response.user);

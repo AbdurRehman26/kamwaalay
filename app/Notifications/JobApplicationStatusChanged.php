@@ -44,15 +44,20 @@ class JobApplicationStatusChanged extends Notification
     {
         $jobPost = $this->application->jobPost;
         $jobPostOwner = $jobPost->user;
+        $applicant = $this->application->user;
 
-        $statusMessages = [
-            'accepted' => 'Your application has been accepted',
-            'rejected' => 'Your application has been rejected',
-            'withdrawn' => 'Your application has been withdrawn',
-        ];
-
-        $message = $statusMessages[$this->newStatus] ?? "Your application status has been changed to {$this->newStatus}";
-        $message .= " for the {$jobPost->service_type_label} job post.";
+        // For withdrawn status, the notification goes to the job poster, not the applicant
+        // So we need a different message
+        if ($this->newStatus === 'withdrawn') {
+            $message = "{$applicant->name} has withdrawn their application for the {$jobPost->service_type_label} job post.";
+        } else {
+            $statusMessages = [
+                'accepted' => 'Your application has been accepted',
+                'rejected' => 'Your application has been rejected',
+            ];
+            $message = $statusMessages[$this->newStatus] ?? "Your application status has been changed to {$this->newStatus}";
+            $message .= " for the {$jobPost->service_type_label} job post.";
+        }
 
         return [
             'type' => 'job_application_status_changed',

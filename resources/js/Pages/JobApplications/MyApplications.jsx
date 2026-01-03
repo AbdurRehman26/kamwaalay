@@ -4,10 +4,15 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { route } from "@/utils/routes";
 import { jobApplicationsService } from "@/services/jobApplications";
+import WithdrawApplicationModal from "@/Components/WithdrawApplicationModal";
+import toast from "react-hot-toast";
 
 export default function MyApplications() {
     const [applications, setApplications] = useState({ data: [], links: [], meta: {} });
     const [loading, setLoading] = useState(true);
+    const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+    const [applicationToWithdraw, setApplicationToWithdraw] = useState(null);
+    const [isWithdrawing, setIsWithdrawing] = useState(false);
 
     useEffect(() => {
         jobApplicationsService.getMyApplications()
@@ -20,6 +25,7 @@ export default function MyApplications() {
                 setLoading(false);
             });
     }, []);
+
     const getStatusColor = (status) => {
         switch (status) {
             case "pending":
@@ -33,6 +39,37 @@ export default function MyApplications() {
             default:
                 return "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300";
         }
+    };
+
+    const handleWithdrawClick = (application) => {
+        setApplicationToWithdraw(application);
+        setShowWithdrawModal(true);
+    };
+
+    const confirmWithdraw = async () => {
+        if (!applicationToWithdraw) return;
+
+        setIsWithdrawing(true);
+        try {
+            await jobApplicationsService.withdrawApplication(applicationToWithdraw.id);
+            // Refresh applications
+            const data = await jobApplicationsService.getMyApplications();
+            setApplications(data.applications || { data: [], links: [], meta: {} });
+            toast.success("Application withdrawn successfully");
+        } catch (error) {
+            console.error("Error withdrawing application:", error);
+            toast.error("Failed to withdraw application. Please try again.");
+        } finally {
+            setIsWithdrawing(false);
+            setShowWithdrawModal(false);
+            setApplicationToWithdraw(null);
+        }
+    };
+
+    const getJobTitle = (application) => {
+        return (application.job_post || application.booking)?.service_type_label ||
+            (application.job_post || application.booking)?.service_type?.replace("_", " ") ||
+            "Service Request";
     };
 
     return (
@@ -75,9 +112,7 @@ export default function MyApplications() {
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
                                             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                                                {(application.job_post || application.booking)?.service_type_label ||
-                                                    (application.job_post || application.booking)?.service_type?.replace("_", " ") ||
-                                                    "Service Request"}
+                                                {getJobTitle(application)}
                                             </h3>
                                             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${getStatusColor(application.status)}`}>
                                                 {application.status}
@@ -105,19 +140,7 @@ export default function MyApplications() {
                                         </Link>
                                         {application.status === "pending" && (
                                             <button
-                                                onClick={async () => {
-                                                    if (confirm("Are you sure you want to withdraw this application?")) {
-                                                        try {
-                                                            await jobApplicationsService.withdrawApplication(application.id);
-                                                            // Refresh applications
-                                                            const data = await jobApplicationsService.getMyApplications();
-                                                            setApplications(data.applications || { data: [], links: [], meta: {} });
-                                                        } catch (error) {
-                                                            console.error("Error withdrawing application:", error);
-                                                            alert("Failed to withdraw application. Please try again.");
-                                                        }
-                                                    }
-                                                }}
+                                                onClick={() => handleWithdrawClick(application)}
                                                 className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 font-bold text-sm"
                                             >
                                                 Withdraw
@@ -160,6 +183,18 @@ export default function MyApplications() {
                     </div>
                 )}
             </div>
+
+            {/* Withdraw Application Modal */}
+            <WithdrawApplicationModal
+                show={showWithdrawModal}
+                onClose={() => {
+                    setShowWithdrawModal(false);
+                    setApplicationToWithdraw(null);
+                }}
+                onConfirm={confirmWithdraw}
+                jobTitle={applicationToWithdraw ? getJobTitle(applicationToWithdraw) : ""}
+                isWithdrawing={isWithdrawing}
+            />
         </DashboardLayout>
     );
 }

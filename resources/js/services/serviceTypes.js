@@ -26,6 +26,7 @@ export const serviceTypesService = {
                 const serviceTypes = response.data.map((st) => ({
                     id: st.id,
                     value: st.id, // Use ID as value
+                    slug: st.slug, // Include slug for matching
                     label: st.name,
                     icon: st.icon || "",
                 }));

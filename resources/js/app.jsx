@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { authService } from "./services/auth";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { Toaster } from "react-hot-toast";
 // Pages
 import Home from "./Pages/Home";
 import Login from "./Pages/Auth/Login";
@@ -45,6 +46,7 @@ import PageFAQ from "./Pages/Pages/FAQ";
 import PageTerms from "./Pages/Pages/Terms";
 import PagePrivacy from "./Pages/Pages/Privacy";
 import MessagesIndex from "./Pages/Messages/Index";
+import NotificationsIndex from "./Pages/Notifications/Index";
 
 // Routes Component (inside providers)
 function AppRoutes() {
@@ -183,6 +185,11 @@ function AppRoutes() {
                     <DashboardDocuments />
                 </ProtectedRoute>
             } />
+            <Route path="/notifications" element={
+                <ProtectedRoute>
+                    <NotificationsIndex />
+                </ProtectedRoute>
+            } />
             <Route path="/profile" element={
                 <ProtectedRoute>
                     <ProfileEdit />
@@ -292,6 +299,28 @@ function App() {
         <ThemeProvider>
             <AuthProvider>
                 <LanguageProvider>
+                    <Toaster
+                        position="bottom-center"
+                        toastOptions={{
+                            duration: 3000,
+                            style: {
+                                background: "#333",
+                                color: "#fff",
+                            },
+                            success: {
+                                iconTheme: {
+                                    primary: "#10B981",
+                                    secondary: "#fff",
+                                },
+                            },
+                            error: {
+                                iconTheme: {
+                                    primary: "#EF4444",
+                                    secondary: "#fff",
+                                },
+                            },
+                        }}
+                    />
                     <AppRoutes />
                 </LanguageProvider>
             </AuthProvider>

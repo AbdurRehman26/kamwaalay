@@ -4,6 +4,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import { serviceListingsService } from "@/services/serviceListings";
 import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
+import toast from "react-hot-toast";
 
 export default function ServiceListingCreate() {
     const navigate = useNavigate();
@@ -59,6 +60,7 @@ export default function ServiceListingCreate() {
 
         serviceListingsService.createListing(apiData)
             .then(() => {
+                toast.success("Service listing created successfully!");
                 navigate(route("service-listings.my-listings"));
             })
             .catch((error) => {
@@ -66,6 +68,7 @@ export default function ServiceListingCreate() {
                     setErrors(error.response.data.errors);
                 } else {
                     console.error("Error creating listing:", error);
+                    toast.error(error.response?.data?.message || "Failed to create listing");
                     setErrors({ submit: [error.response?.data?.message || "Failed to create listing"] });
                 }
             })

@@ -9,6 +9,7 @@ import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
 import { useLanguages } from "@/hooks/useLanguages";
+import toast from "react-hot-toast";
 
 export default function EditWorker() {
     const navigate = useNavigate();
@@ -297,11 +298,13 @@ export default function EditWorker() {
 
         try {
             await businessesService.updateWorker(id, formData);
+            toast.success("Worker updated successfully!");
             navigate(route("business.workers.index"));
         } catch (error) {
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             } else {
+                toast.error(error.response?.data?.message || "Failed to update worker");
                 setErrors({ submit: [error.response?.data?.message || "Failed to update worker"] });
             }
         } finally {

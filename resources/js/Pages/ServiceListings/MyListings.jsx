@@ -49,10 +49,11 @@ export default function MyServiceListings() {
         if (listing.location_details && listing.location_details.length > 0) {
             cityName = listing.location_details[0].city_name;
         } else if (listing.city) { // Fallback
-            cityName = listing.city;
+            // city could be a string or an object with a name property
+            cityName = typeof listing.city === "string" ? listing.city : listing.city?.name || "";
         }
 
-        if (!cityName) return null;
+        if (!cityName || typeof cityName !== "string") return null;
 
         const lowerCity = cityName.toLowerCase();
         if (lowerCity === "karachi") return "Khi";
@@ -113,7 +114,7 @@ export default function MyServiceListings() {
                                                                 <span className="text-lg font-bold text-gray-900 dark:text-white">
                                                                     {listing.service_types.slice(0, 2).map((st, idx) => (
                                                                         <span key={idx}>
-                                                                            {typeof st === "string" ? toTitleCase(st) : toTitleCase(st?.service_type || "Service")}
+                                                                            {typeof st === "string" ? toTitleCase(st) : toTitleCase(st?.name || st?.slug || "Service")}
                                                                             {idx < Math.min(listing.service_types.length, 2) - 1 && ", "}
                                                                         </span>
                                                                     ))}

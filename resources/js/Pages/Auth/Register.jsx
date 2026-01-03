@@ -16,7 +16,6 @@ export default function Register() {
         password_confirmation: "",
         role: "user",
         phone: "",
-        address: "",
     });
     const [selectedRole, setSelectedRole] = useState("user");
     const [processing, setProcessing] = useState(false);
@@ -46,7 +45,7 @@ export default function Register() {
 
         try {
             const response = await authService.register(formData);
-            
+
             // After registration, always redirect to OTP verification
             // Store verification info for OTP verification
             if (response.verification_token) {
@@ -62,12 +61,12 @@ export default function Register() {
             if (response.identifier) {
                 localStorage.setItem("verification_identifier", response.identifier);
             }
-            
+
             // Store the actual phone used for signup (not masked)
             if (response.verification_method === "phone" && formData.phone) {
                 localStorage.setItem("verification_phone", formData.phone);
             }
-            
+
             // Always navigate to verify OTP after registration
             navigate("/verify-otp");
         } catch (error) {
@@ -146,11 +145,10 @@ export default function Register() {
                                 <button
                                     type="button"
                                     onClick={() => handleRoleChange("user")}
-                                    className={`p-6 rounded-xl border-2 transition-all duration-300 ${
-                                        selectedRole === "user"
-                                            ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
-                                            : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
-                                    }`}
+                                    className={`p-6 rounded-xl border-2 transition-all duration-300 ${selectedRole === "user"
+                                        ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
+                                        : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
+                                        }`}
                                 >
                                     <div className="text-4xl mb-3">👤</div>
                                     <h3 className={`font-bold text-lg mb-2 ${selectedRole === "user" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Find Help</h3>
@@ -159,11 +157,10 @@ export default function Register() {
                                 <button
                                     type="button"
                                     onClick={() => handleRoleChange("helper")}
-                                    className={`p-6 rounded-xl border-2 transition-all duration-300 ${
-                                        selectedRole === "helper"
-                                            ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
-                                            : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
-                                    }`}
+                                    className={`p-6 rounded-xl border-2 transition-all duration-300 ${selectedRole === "helper"
+                                        ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
+                                        : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
+                                        }`}
                                 >
                                     <div className="text-4xl mb-3">💼</div>
                                     <h3 className={`font-bold text-lg mb-2 ${selectedRole === "helper" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Work as Helper</h3>
@@ -172,11 +169,10 @@ export default function Register() {
                                 <button
                                     type="button"
                                     onClick={() => handleRoleChange("business")}
-                                    className={`p-6 rounded-xl border-2 transition-all duration-300 ${
-                                        selectedRole === "business"
-                                            ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
-                                            : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
-                                    }`}
+                                    className={`p-6 rounded-xl border-2 transition-all duration-300 ${selectedRole === "business"
+                                        ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
+                                        : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
+                                        }`}
                                 >
                                     <div className="text-4xl mb-3">🏢</div>
                                     <h3 className={`font-bold text-lg mb-2 ${selectedRole === "business" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Agency/Business</h3>
@@ -205,10 +201,10 @@ export default function Register() {
                             <div>
                                 <InputLabel htmlFor="phone" value="Phone Number" className="text-gray-700 dark:text-gray-300 font-bold uppercase tracking-wide" />
                                 <div className="mt-2 flex items-center gap-2">
-                                    <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-l-xl">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-l-xl">
                                         <span className="text-2xl">🇵🇰</span>
                                         <span className="text-sm font-bold text-gray-700 dark:text-gray-300">+92</span>
-                                        <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </div>
@@ -217,30 +213,35 @@ export default function Register() {
                                         type="tel"
                                         name="phone"
                                         value={formData.phone}
-                                        className="flex-1 rounded-r-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                        className="flex-1 rounded-r-xl border-2 py-3 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                         autoComplete="tel"
-                                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                                        placeholder="Enter your phone number"
+                                        onChange={(e) => {
+                                            let value = e.target.value;
+                                            // Remove any non-numeric characters
+                                            value = value.replace(/\D/g, "");
+                                            // Remove leading +92, 92, or 0 if present
+                                            if (value.startsWith("92")) {
+                                                value = value.substring(2);
+                                            } else if (value.startsWith("0")) {
+                                                value = value.substring(1);
+                                            }
+                                            // Enforce max length of 10 digits
+                                            if (value.length > 10) {
+                                                value = value.substring(0, 10);
+                                            }
+                                            handleInputChange("phone", value);
+                                        }}
+                                        placeholder="3001234567"
                                         required
                                     />
                                 </div>
+                                <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                                    Enter your 10-digit mobile number without country code. Example: 3001234567
+                                </p>
                                 <InputError message={errors.phone} className="mt-2" />
                             </div>
 
-                            <div>
-                                <InputLabel htmlFor="address" value="Address" className="text-gray-700 dark:text-gray-300 font-bold uppercase tracking-wide" />
-                                <TextInput
-                                    id="address"
-                                    type="text"
-                                    name="address"
-                                    value={formData.address}
-                                    className="mt-2 block w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                                    autoComplete="street-address"
-                                    onChange={(e) => handleInputChange("address", e.target.value)}
-                                    placeholder="Your address (optional)"
-                                />
-                                <InputError message={errors.address} className="mt-2" />
-                            </div>
+
 
                             <div>
                                 <InputLabel htmlFor="password" value="Password" className="text-gray-700 dark:text-gray-300 font-bold uppercase tracking-wide" />
@@ -294,7 +295,7 @@ export default function Register() {
                                     "Create Account"
                                 )}
                             </PrimaryButton>
-                            
+
                             {/* Show processing state */}
                             {processing && (
                                 <div className="mt-4 text-center">

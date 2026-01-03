@@ -966,7 +966,7 @@ export default function OnboardingHelper() {
 
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
-                                            NIC Number <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
+                                            NIC Number *
                                         </label>
                                         <input
                                             type="text"
@@ -974,6 +974,7 @@ export default function OnboardingHelper() {
                                             onChange={(e) => setProfileData({ ...profileData, nic_number: e.target.value })}
                                             className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
                                             placeholder="e.g., 42101-1234567-1"
+                                            required
                                         />
                                         {errors.nic_number && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.nic_number}</div>}
                                     </div>

@@ -5,6 +5,7 @@ import api from "@/services/api";
 import { serviceListingsService } from "@/services/serviceListings";
 import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
+import toast from "react-hot-toast";
 
 export default function ServiceListingEdit() {
     const { listingId } = useParams();
@@ -20,9 +21,7 @@ export default function ServiceListingEdit() {
         work_type: "",
         monthly_rate: "",
         description: "",
-        city_id: "",
         status: "active",
-        is_active: true,
     });
 
     // Fetch service types from API
@@ -38,49 +37,7 @@ export default function ServiceListingEdit() {
         setSelectedServiceTypes(selectedServiceTypes.filter(st => st !== serviceType));
     };
 
-    // Cities logic
-    const [cities, setCities] = useState([]);
-    const [filteredCities, setFilteredCities] = useState([]);
-    const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
-    const [citySearch, setCitySearch] = useState("");
 
-    // Fetch cities and prefill search if listing loaded
-    useEffect(() => {
-        api.get("/cities")
-            .then(response => {
-                setCities(response.data);
-                setFilteredCities(response.data);
-
-                // If listing is already loaded and has city_id, set search text
-                if (data.city_id) {
-                    const defaultCity = response.data.find(c => c.id == data.city_id);
-                    if (defaultCity) {
-                        setCitySearch(defaultCity.name);
-                    }
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching cities:", error);
-            });
-    }, [data.city_id]); // Re-run when data.city_id (from listing loading) changes
-
-    // Filter cities when search changes
-    useEffect(() => {
-        if (citySearch) {
-            const filtered = cities.filter(city =>
-                city.name.toLowerCase().includes(citySearch.toLowerCase())
-            );
-            setFilteredCities(filtered);
-        } else {
-            setFilteredCities(cities);
-        }
-    }, [citySearch, cities]);
-
-    const handleCitySelect = (city) => {
-        setData(prev => ({ ...prev, city_id: city.id }));
-        setCitySearch(city.name);
-        setIsCityDropdownOpen(false);
-    };
 
     // Fetch listing from API
     useEffect(() => {
@@ -91,10 +48,11 @@ export default function ServiceListingEdit() {
                     const listingData = response.data.listing;
                     setListing(listingData);
 
-                    // service_types is now an array of strings
+                    // service_types is an array of objects with {id, name, slug, icon}
+                    // Extract just the IDs for selectedServiceTypes (API expects IDs)
                     setSelectedServiceTypes(
                         listingData.service_types && listingData.service_types.length > 0
-                            ? listingData.service_types
+                            ? listingData.service_types.map(st => typeof st === "number" ? st : st.id)
                             : []
                     );
 
@@ -103,9 +61,7 @@ export default function ServiceListingEdit() {
                         work_type: listingData.work_type || "",
                         monthly_rate: listingData.monthly_rate || "",
                         description: listingData.description || "",
-                        city_id: listingData.city_id || "",
                         status: listingData.status || "active",
-                        is_active: listingData.is_active ?? true,
                     });
                     setLoading(false);
                 })
@@ -129,31 +85,27 @@ export default function ServiceListingEdit() {
             return;
         }
 
-        if (!data.city_id) {
-            setErrors({ city_id: "Please select a city." });
-            setProcessing(false);
-            return;
-        }
 
-        // Prepare data for API (location fields removed - now on profile)
+
+        // Prepare data for API (city/location fields removed - now on profile)
         const apiData = {
             service_types: selectedServiceTypes,
             work_type: data.work_type,
             monthly_rate: data.monthly_rate || null,
             description: data.description || null,
-            city_id: data.city_id,
             status: data.status,
-            is_active: data.is_active,
         };
 
         try {
             await serviceListingsService.updateListing(listingId, apiData);
+            toast.success("Service listing updated successfully!");
             // Redirect to my listings
             navigate(route("service-listings.my-listings"));
         } catch (error) {
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             } else {
+                toast.error(error.response?.data?.message || "Failed to update listing");
                 setErrors({ submit: [error.response?.data?.message || "Failed to update listing"] });
             }
         } finally {
@@ -283,43 +235,6 @@ export default function ServiceListingEdit() {
 
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">
-                                        City
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            value={citySearch}
-                                            onChange={(e) => {
-                                                setCitySearch(e.target.value);
-                                                setIsCityDropdownOpen(true);
-                                            }}
-                                            onFocus={() => setIsCityDropdownOpen(true)}
-                                            placeholder="Search city..."
-                                            className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3 shadow-sm transition-all duration-300"
-                                        />
-                                        {isCityDropdownOpen && filteredCities.length > 0 && (
-                                            <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-xl max-h-60 rounded-xl py-2 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                                {filteredCities.map((city) => (
-                                                    <div
-                                                        key={city.id}
-                                                        className="cursor-pointer select-none relative py-3 pl-4 pr-9 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-gray-900 dark:text-gray-300 transition-colors"
-                                                        onClick={() => handleCitySelect(city)}
-                                                    >
-                                                        {city.name}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                    {errors.city_id && (
-                                        <div className="mt-2 text-red-500 dark:text-red-400 text-sm font-medium flex items-center gap-1">
-                                            <span>⚠️</span> {errors.city_id}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div>
                                     <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">Work Type *</label>
                                     <select
                                         value={data.work_type}
@@ -373,15 +288,7 @@ export default function ServiceListingEdit() {
                                     )}
                                 </div>
 
-                                <div className="flex items-center pt-8">
-                                    <input
-                                        type="checkbox"
-                                        checked={data.is_active}
-                                        onChange={(e) => setData({ ...data, is_active: e.target.checked })}
-                                        className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded"
-                                    />
-                                    <label className="ml-3 block text-sm font-semibold text-gray-700 dark:text-gray-300">Active Listing</label>
-                                </div>
+
 
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">Description</label>

@@ -10,6 +10,7 @@ import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
 import { useLanguages } from "@/hooks/useLanguages";
+import toast from "react-hot-toast";
 
 export default function CreateWorker() {
     const navigate = useNavigate();
@@ -223,12 +224,14 @@ export default function CreateWorker() {
 
         try {
             await businessesService.createWorker(formData);
+            toast.success("Worker added successfully!");
             navigate(route("business.workers.index"));
         } catch (error) {
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             } else {
                 console.error("Error creating worker:", error);
+                toast.error(error.response?.data?.message || "Failed to add worker");
             }
         } finally {
             setProcessing(false);

@@ -1,4 +1,4 @@
-import PublicLayout from "@/Layouts/PublicLayout";
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { route } from "@/utils/routes";
@@ -31,7 +31,7 @@ export default function NotificationsIndex() {
             await notificationsService.markAsRead(notificationId);
             setNotifications(prev => ({
                 ...prev,
-                data: prev.data.map(n => 
+                data: prev.data.map(n =>
                     n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
                 ),
             }));
@@ -108,7 +108,7 @@ export default function NotificationsIndex() {
     };
 
     return (
-        <PublicLayout>
+        <DashboardLayout>
             <div className="py-12">
                 <div className="mx-auto max-w-4xl sm:px-6 lg:px-8">
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 sm:p-8">
@@ -150,32 +150,28 @@ export default function NotificationsIndex() {
                                                         handleMarkAsRead(notification.id);
                                                     }
                                                 }}
-                                                className={`block p-4 rounded-lg border-2 transition-all ${
-                                                    isUnread 
-                                                        ? "border-primary-300 dark:border-primary-600 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30" 
-                                                        : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 opacity-90"
-                                                }`}
+                                                className={`block p-4 rounded-lg border-2 transition-all ${isUnread
+                                                    ? "border-primary-300 dark:border-primary-600 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30"
+                                                    : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 opacity-90"
+                                                    }`}
                                             >
                                                 <div className="flex items-start gap-4">
-                                                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${colorClass} ${
-                                                        !isUnread ? "opacity-70" : ""
-                                                    }`}>
+                                                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${colorClass} ${!isUnread ? "opacity-70" : ""
+                                                        }`}>
                                                         {icon}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center justify-between mb-1">
-                                                            <h3 className={`text-base font-bold ${
-                                                                isUnread ? "text-gray-900 dark:text-white" : "text-gray-600 dark:text-gray-400"
-                                                            }`}>
+                                                            <h3 className={`text-base font-bold ${isUnread ? "text-gray-900 dark:text-white" : "text-gray-600 dark:text-gray-400"
+                                                                }`}>
                                                                 {notification.data?.title || "Notification"}
                                                             </h3>
                                                             {isUnread && (
                                                                 <span className="w-2 h-2 bg-primary-600 dark:bg-primary-400 rounded-full flex-shrink-0"></span>
                                                             )}
                                                         </div>
-                                                        <p className={`text-sm mb-2 ${
-                                                            isUnread ? "text-gray-600 dark:text-gray-300" : "text-gray-500 dark:text-gray-400"
-                                                        }`}>
+                                                        <p className={`text-sm mb-2 ${isUnread ? "text-gray-600 dark:text-gray-300" : "text-gray-500 dark:text-gray-400"
+                                                            }`}>
                                                             {notification.data?.message || ""}
                                                         </p>
                                                         <div className="flex items-center justify-between">
@@ -214,11 +210,10 @@ export default function NotificationsIndex() {
                                                 <button
                                                     key={index}
                                                     onClick={() => page && handlePageChange(page)}
-                                                    className={`px-4 py-2 rounded-lg border transition-colors ${
-                                                        isActive
-                                                            ? "bg-primary-600 text-white border-primary-600"
-                                                            : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
-                                                    }`}
+                                                    className={`px-4 py-2 rounded-lg border transition-colors ${isActive
+                                                        ? "bg-primary-600 text-white border-primary-600"
+                                                        : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                                        }`}
                                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                                 />
                                             );
@@ -242,7 +237,7 @@ export default function NotificationsIndex() {
                     </div>
                 </div>
             </div>
-        </PublicLayout>
+        </DashboardLayout>
     );
 }
 

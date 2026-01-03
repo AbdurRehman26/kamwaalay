@@ -567,63 +567,76 @@ export default function Home() {
                         </div>
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {jobs.map((job) => (
-                                <Link
-                                    key={job.id}
-                                    to={route("job-posts.show", job.id)}
-                                    className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300 transform hover:-translate-y-1"
-                                >
-                                    <div className="p-6">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                                    {job.user?.name?.charAt(0) || "C"}
+                            {jobs.map((job) => {
+                                // Find the service type object to get its icon
+                                const serviceTypeObj = serviceTypes.find(t =>
+                                    t.value === job.service_type ||
+                                    t.value === job.service_type_id ||
+                                    t.slug === job.service_type ||
+                                    t.label === job.service_type
+                                );
+                                const serviceIcon = serviceTypeObj?.icon || "💼";
+
+                                return (
+                                    <Link
+                                        key={job.id}
+                                        to={route("job-posts.show", job.id)}
+                                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300 transform hover:-translate-y-1"
+                                    >
+                                        <div className="p-6">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                                                        {job.user?.name?.charAt(0) || "C"}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-bold text-gray-900 dark:text-white text-base">{job.user?.name || "Customer"}</h4>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                                            {new Date(job.created_at).toLocaleDateString()}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <h4 className="font-bold text-gray-900 dark:text-white text-base">{job.user?.name || "Customer"}</h4>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                                                        {new Date(job.created_at).toLocaleDateString()}
-                                                    </p>
+                                                <span className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold uppercase tracking-wide">
+                                                    {job.status}
+                                                </span>
+                                            </div>
+
+                                            <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors capitalize leading-tight flex items-center gap-2">
+                                                <span>{serviceIcon}</span>
+                                                {job.service_type?.replace("_", " ")}
+                                            </h3>
+
+                                            <div className="space-y-2.5 mb-6">
+                                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                                    <span className="text-base">💼</span>
+                                                    <span className="font-semibold capitalize">{job.work_type?.replace("_", " ")}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                                    <span className="text-base">📍</span>
+                                                    <span className="font-semibold truncate">
+                                                        {job.city_name || job.city?.name || (typeof job.city === "string" ? job.city : null) || "Location not specified"}
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <span className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold uppercase tracking-wide">
-                                                {job.status}
-                                            </span>
-                                        </div>
 
-                                        <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors capitalize leading-tight">
-                                            {job.service_type?.replace("_", " ")}
-                                        </h3>
-
-                                        <div className="space-y-2.5 mb-6">
-                                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                                                <span className="text-base">💼</span>
-                                                <span className="font-semibold capitalize">{job.work_type?.replace("_", " ")}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                                                <span className="text-base">📍</span>
-                                                <span className="font-semibold truncate">
-                                                    {job.city_name || job.city?.name || (typeof job.city === "string" ? job.city : null) || "Location not specified"}
+                                            <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                                                <span className="text-sm font-bold text-gray-500 dark:text-gray-400">
+                                                    {job.job_applications?.length || 0} Applicants
+                                                </span>
+                                                <span className="text-sm font-extrabold text-indigo-600 dark:text-indigo-400 group-hover:underline flex items-center gap-1">
+                                                    Apply Now
+                                                    <span className="text-lg">→</span>
                                                 </span>
                                             </div>
                                         </div>
-
-                                        <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
-                                            <span className="text-sm font-bold text-gray-500 dark:text-gray-400">
-                                                {job.job_applications?.length || 0} Applicants
-                                            </span>
-                                            <span className="text-sm font-extrabold text-indigo-600 dark:text-indigo-400 group-hover:underline flex items-center gap-1">
-                                                Apply Now
-                                                <span className="text-lg">→</span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </div>
                 </section>
-            )}
+            )
+            }
 
             {/* How It Works */}
             <section className="py-12 bg-white dark:bg-gray-900 relative">
@@ -789,18 +802,20 @@ export default function Home() {
                 </div>
             </section>
             {/* Chat Popup */}
-            {selectedHelper && (
-                <ChatPopup
-                    recipientId={selectedHelper.id}
-                    recipientName={selectedHelper.name}
-                    recipientPhoto={selectedHelper.photo}
-                    isOpen={chatOpen}
-                    onClose={() => {
-                        setChatOpen(false);
-                        setSelectedHelper(null);
-                    }}
-                />
-            )}
-        </PublicLayout>
+            {
+                selectedHelper && (
+                    <ChatPopup
+                        recipientId={selectedHelper.id}
+                        recipientName={selectedHelper.name}
+                        recipientPhoto={selectedHelper.photo}
+                        isOpen={chatOpen}
+                        onClose={() => {
+                            setChatOpen(false);
+                            setSelectedHelper(null);
+                        }}
+                    />
+                )
+            }
+        </PublicLayout >
     );
 }

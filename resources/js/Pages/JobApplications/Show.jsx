@@ -4,13 +4,16 @@ import { useState, useEffect } from "react";
 import { jobApplicationsService } from "@/services/jobApplications";
 import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 import ChatPopup from "@/Components/ChatPopup";
 import Modal from "@/Components/Modal";
+import toast from "react-hot-toast";
 
 export default function JobApplicationShow() {
     const { applicationId } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { serviceTypes } = useServiceTypes();
     const [application, setApplication] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -18,6 +21,7 @@ export default function JobApplicationShow() {
     const [selectedRecipient, setSelectedRecipient] = useState(null);
     const [showAcceptModal, setShowAcceptModal] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
+    const [showWithdrawModal, setShowWithdrawModal] = useState(false);
     const [processing, setProcessing] = useState(false);
 
     useEffect(() => {
@@ -78,9 +82,10 @@ export default function JobApplicationShow() {
             const data = await jobApplicationsService.getApplication(application.id);
             setApplication(data.application);
             setShowAcceptModal(false);
+            toast.success("Application accepted successfully!");
         } catch (error) {
             console.error("Error accepting application:", error);
-            alert("Failed to accept application. Please try again.");
+            toast.error("Failed to accept application. Please try again.");
         } finally {
             setProcessing(false);
         }
@@ -93,27 +98,28 @@ export default function JobApplicationShow() {
             const data = await jobApplicationsService.getApplication(application.id);
             setApplication(data.application);
             setShowRejectModal(false);
+            toast.success("Application rejected.");
         } catch (error) {
             console.error("Error rejecting application:", error);
-            alert("Failed to reject application. Please try again.");
+            toast.error("Failed to reject application. Please try again.");
         } finally {
             setProcessing(false);
         }
     };
 
     const handleWithdraw = async () => {
-        if (confirm("Are you sure you want to withdraw this application?")) {
-            setProcessing(true);
-            try {
-                await jobApplicationsService.withdrawApplication(application.id);
-                const data = await jobApplicationsService.getApplication(application.id);
-                setApplication(data.application);
-            } catch (error) {
-                console.error("Error withdrawing application:", error);
-                alert("Failed to withdraw application. Please try again.");
-            } finally {
-                setProcessing(false);
-            }
+        setProcessing(true);
+        try {
+            await jobApplicationsService.withdrawApplication(application.id);
+            const data = await jobApplicationsService.getApplication(application.id);
+            setApplication(data.application);
+            setShowWithdrawModal(false);
+            toast.success("Application withdrawn successfully.");
+        } catch (error) {
+            console.error("Error withdrawing application:", error);
+            toast.error("Failed to withdraw application. Please try again.");
+        } finally {
+            setProcessing(false);
         }
     };
 
@@ -193,7 +199,7 @@ export default function JobApplicationShow() {
                             </div>
                             {isApplicant && application.status === "pending" && (
                                 <button
-                                    onClick={handleWithdraw}
+                                    onClick={() => setShowWithdrawModal(true)}
                                     disabled={processing}
                                     className="bg-gray-600 dark:bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition duration-300 font-semibold disabled:opacity-50"
                                 >
@@ -294,7 +300,15 @@ export default function JobApplicationShow() {
                             <div className="space-y-3">
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Service Type</p>
-                                    <p className="text-gray-900 dark:text-white font-semibold capitalize">
+                                    <p className="text-gray-900 dark:text-white font-semibold capitalize flex items-center gap-2">
+                                        <span>
+                                            {(serviceTypes.find(t =>
+                                                t.value === jobPost?.service_type ||
+                                                t.value === jobPost?.service_type_id ||
+                                                t.slug === jobPost?.service_type ||
+                                                t.label === jobPost?.service_type
+                                            )?.icon) || "💼"}
+                                        </span>
                                         {jobPost?.service_type?.replace("_", " ") || "N/A"}
                                     </p>
                                 </div>
@@ -537,6 +551,48 @@ export default function JobApplicationShow() {
                             className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 transition-colors"
                         >
                             {processing ? "Rejecting..." : "Reject Application"}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Withdraw Modal */}
+            <Modal show={showWithdrawModal} onClose={() => !processing && setShowWithdrawModal(false)} maxWidth="md">
+                <div className="p-6">
+                    <div className="flex items-center mb-4">
+                        <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-700">
+                            <svg className="h-6 w-6 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                            </svg>
+                        </div>
+                        <h2 className="ml-4 text-xl font-semibold text-gray-900 dark:text-white">
+                            Withdraw Application
+                        </h2>
+                    </div>
+
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
+                        Are you sure you want to withdraw your application for this job?
+                        This action cannot be undone.
+                    </p>
+
+                    <div className="flex justify-end space-x-3">
+                        <button
+                            onClick={() => {
+                                if (!processing) {
+                                    setShowWithdrawModal(false);
+                                }
+                            }}
+                            disabled={processing}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleWithdraw}
+                            disabled={processing}
+                            className="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 transition-colors"
+                        >
+                            {processing ? "Withdrawing..." : "Withdraw Application"}
                         </button>
                     </div>
                 </div>

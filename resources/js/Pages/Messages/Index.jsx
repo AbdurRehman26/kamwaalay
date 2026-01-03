@@ -5,6 +5,7 @@ import { authService } from "@/services/auth";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import DeleteChatModal from "@/Components/DeleteChatModal";
 import Pusher from "pusher-js";
+import toast from "react-hot-toast";
 
 export default function MessagesIndex() {
     const { user } = useAuth();
@@ -177,6 +178,7 @@ export default function MessagesIndex() {
                 setSelectedConversation(null);
                 setMessages([]);
             }
+            toast.success("Chat deleted successfully");
         } catch (error) {
             console.error("Error deleting conversation:", error);
             setError("Failed to delete conversation");
@@ -209,9 +211,10 @@ export default function MessagesIndex() {
                     return c;
                 })
             );
+            toast.success("Message deleted");
         } catch (error) {
             console.error("Error deleting message:", error);
-            alert("Failed to delete message");
+            toast.error("Failed to delete message");
         }
     };
 

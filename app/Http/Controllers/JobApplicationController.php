@@ -116,12 +116,13 @@ class JobApplicationController extends Controller
 
         $jobPosts = $query->paginate(12);
 
-        // Get user's applications for the job posts to check if they've applied and get application IDs
+        // Get user's active applications (not withdrawn) for the job posts
         // Only check if user is authenticated
         $userApplications = [];
         if (Auth::check()) {
             $userApplications = \App\Models\JobApplication::where('user_id', Auth::id())
                 ->whereIn('job_post_id', $jobPosts->pluck('id'))
+                ->where('status', '!=', 'withdrawn') // Exclude withdrawn applications
                 ->get()
                 ->keyBy('job_post_id');
         }
@@ -195,9 +196,10 @@ class JobApplicationController extends Controller
             ], 422);
         }
 
-        // Check if already applied
+        // Check if already applied (exclude withdrawn applications)
         $hasApplied = JobApplication::where('job_post_id', $jobPost->id)
             ->where('user_id', Auth::id())
+            ->where('status', '!=', 'withdrawn')
             ->exists();
 
         $jobPost->load(['user.profile', 'cityRelation', 'serviceType']);
@@ -261,10 +263,13 @@ class JobApplicationController extends Controller
             ], 422);
         }
 
-        // Check if already applied
-        if (JobApplication::where('job_post_id', $jobPost->id)
+        // Check if already applied (exclude withdrawn applications - user can reapply after withdrawing)
+        $existingApplication = JobApplication::where('job_post_id', $jobPost->id)
             ->where('user_id', Auth::id())
-            ->exists()) {
+            ->where('status', '!=', 'withdrawn')
+            ->first();
+
+        if ($existingApplication) {
             return response()->json([
                 'message' => 'You have already applied to this job post.',
                 'errors' => ['application' => ['You have already applied to this job post.']]
@@ -401,7 +406,13 @@ class JobApplicationController extends Controller
      */
     public function myRequestApplications()
     {
-        $applications = JobApplication::with(['user', 'jobPost.user'])
+        $applications = JobApplication::with([
+            'user.profile', 
+            'user.serviceListings.serviceTypes',
+            'jobPost.user', 
+            'jobPost.serviceType',
+            'jobPost.cityRelation'
+        ])
             ->whereHas('jobPost', function ($query) {
                 $query->where('user_id', Auth::id());
             })
@@ -409,7 +420,7 @@ class JobApplicationController extends Controller
             ->paginate(12);
 
         return response()->json([
-            'applications' => $applications,
+            'applications' => \App\Http\Resources\JobApplicationResource::collection($applications)->response()->getData(true),
         ]);
     }
 

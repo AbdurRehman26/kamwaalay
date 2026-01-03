@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
 import MapPicker from "@/Components/MapPicker";
+import toast from "react-hot-toast";
 
 export default function BookingEdit() {
     const { bookingId } = useParams();
@@ -94,11 +95,13 @@ export default function BookingEdit() {
 
         try {
             await jobPostsService.updateBooking(bookingId, submitData);
+            toast.success("Job post updated successfully!");
             navigate(route("job-posts.index"));
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else {
+                toast.error(error.response?.data?.message || "Failed to update job post");
                 setErrors({ submit: [error.response?.data?.message || "Failed to update service request"] });
             }
         } finally {

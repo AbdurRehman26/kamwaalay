@@ -8,6 +8,7 @@ import { profileService } from "@/services/profile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguages } from "@/hooks/useLanguages";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -175,6 +176,7 @@ export default function UpdateProfileInformation({
 
             const response = await profileService.updateProfile(submitData);
             setRecentlySuccessful(true);
+            toast.success("Profile updated successfully!");
             // Update the user in AuthContext
             if (response.user) {
                 updateUser(response.user);

@@ -365,23 +365,44 @@ class ProfileController extends Controller
     {
         $request->validate([
             'document_type' => ['required', 'in:nic,police_verification,other'],
-            'document_number' => ['nullable', 'string', 'max:255'],
+            'document_number' => ['required', 'string', 'max:255'],
             'file' => ['required', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:5120'], // 5MB max
         ]);
 
         $user = $request->user();
 
-        // Store the file
+        // Check if a document of this type already exists
+        $existingDocument = Document::where('user_id', $user->id)
+            ->where('document_type', $request->document_type)
+            ->first();
+
+        // Store the new file
         $filePath = $request->file('file')->store('documents', 'public');
 
-        // Create document record
-        $document = Document::create([
-            'user_id' => $user->id,
-            'document_type' => $request->document_type,
-            'document_number' => $request->document_number,
-            'file_path' => $filePath,
-            'status' => 'pending',
-        ]);
+        if ($existingDocument) {
+            // Delete old file from storage
+            if ($existingDocument->file_path) {
+                Storage::disk('public')->delete($existingDocument->file_path);
+            }
+
+            // Update existing document
+            $existingDocument->update([
+                'document_number' => $request->document_number,
+                'file_path' => $filePath,
+                'status' => 'pending', // Reset status to pending for re-verification
+            ]);
+
+            $document = $existingDocument;
+        } else {
+            // Create new document record
+            $document = Document::create([
+                'user_id' => $user->id,
+                'document_type' => $request->document_type,
+                'document_number' => $request->document_number,
+                'file_path' => $filePath,
+                'status' => 'pending',
+            ]);
+        }
 
         return response()->json([
             'message' => 'Document uploaded successfully.',

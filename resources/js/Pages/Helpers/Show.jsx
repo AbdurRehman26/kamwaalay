@@ -146,8 +146,18 @@ export default function HelperShow() {
                                             </span>
                                         ))}
                                         {helper.service_listings[0].service_types.length > 3 && (
-                                            <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
+                                            <span className="relative group cursor-pointer bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
                                                 +{helper.service_listings[0].service_types.length - 3} more
+                                                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                                    <p className="text-gray-900 dark:text-white font-bold mb-2 text-xs border-b border-gray-100 dark:border-gray-700 pb-1">All Services</p>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {helper.service_listings[0].service_types.map((type, i) => (
+                                                            <span key={i} className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded capitalize">
+                                                                {typeof type === "object" && type.name ? type.name : (typeof type === "string" ? type.replace("_", " ") : (type?.service_type?.replace("_", " ") || "Service"))}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             </span>
                                         )}
                                     </div>
@@ -163,109 +173,124 @@ export default function HelperShow() {
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Service Listings */}
-                        {serviceListings && serviceListings.length > 0 && (
-                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-                                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Services Offered</h2>
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    {serviceListings.map((listing) => (
-                                        <div
-                                            key={listing.id}
-                                            className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg p-6 border-2 border-transparent"
-                                        >
-                                            <div className="flex items-center justify-between mb-4">
-                                                <div className="flex flex-wrap gap-2">
-                                                    {listing.service_types && listing.service_types.length > 0 ? (
-                                                        <>
-                                                            {listing.service_types.slice(0, 2).map((serviceType, idx) => (
-                                                                <span key={idx} className="inline-flex items-center gap-1 bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold">
-                                                                    {typeof serviceType === "object" && serviceType.icon && <span>{serviceType.icon}</span>}
-                                                                    <span className="capitalize">
-                                                                        {typeof serviceType === "object" && serviceType.name ? serviceType.name : (typeof serviceType === "string" ? serviceType.replace("_", " ") : (serviceType?.service_type?.replace("_", " ") || "Service"))}
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Services Offered</h2>
+                            {serviceListings && serviceListings.length > 0 ? (
+                                <>
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        {serviceListings.map((listing) => (
+                                            <div
+                                                key={listing.id}
+                                                className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg p-6 border-2 border-transparent"
+                                            >
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {listing.service_types && listing.service_types.length > 0 ? (
+                                                            <>
+                                                                {listing.service_types.slice(0, 2).map((serviceType, idx) => (
+                                                                    <span key={idx} className="inline-flex items-center gap-1 bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold">
+                                                                        {typeof serviceType === "object" && serviceType.icon && <span>{serviceType.icon}</span>}
+                                                                        <span className="capitalize">
+                                                                            {typeof serviceType === "object" && serviceType.name ? serviceType.name : (typeof serviceType === "string" ? serviceType.replace("_", " ") : (serviceType?.service_type?.replace("_", " ") || "Service"))}
+                                                                        </span>
                                                                     </span>
-                                                                </span>
-                                                            ))}
-                                                            {listing.service_types.length > 2 && (
-                                                                <span className="bg-primary-500 text-white text-sm px-3 py-1 rounded-full font-semibold">
-                                                                    +{listing.service_types.length - 2}
-                                                                </span>
-                                                            )}
-                                                        </>
-                                                    ) : (
-                                                        <span className="bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
-                                                            Service
+                                                                ))}
+                                                                {listing.service_types.length > 2 && (
+                                                                    <span className="relative group cursor-pointer bg-primary-500 text-white text-sm px-3 py-1 rounded-full font-semibold">
+                                                                        +{listing.service_types.length - 2}
+                                                                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                                                            <div className="flex flex-wrap gap-1">
+                                                                                {listing.service_types.map((type, i) => (
+                                                                                    <span key={i} className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded capitalize whitespace-nowrap">
+                                                                                        {typeof type === "object" && type.name ? type.name : (typeof type === "string" ? type.replace("_", " ") : (type?.service_type?.replace("_", " ") || "Service"))}
+                                                                                    </span>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    </span>
+                                                                )}
+                                                            </>
+                                                        ) : (
+                                                            <span className="bg-primary-600 text-white text-sm px-3 py-1 rounded-full font-semibold capitalize">
+                                                                Service
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    {listing.monthly_rate && (
+                                                        <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                                                            PKR {listing.monthly_rate}/month
                                                         </span>
                                                     )}
                                                 </div>
-                                                {listing.monthly_rate && (
-                                                    <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                                                        PKR {listing.monthly_rate}/month
+
+                                                {/* Work Type */}
+                                                <div className="mb-3">
+                                                    <span className="inline-block bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-3 py-1 rounded-full font-medium capitalize">
+                                                        {listing.work_type?.replace("_", " ") || "Service"}
                                                     </span>
+                                                </div>
+
+                                                {/* Locations */}
+                                                {listing.location_details && listing.location_details.length > 0 ? (
+                                                    <div className="text-sm text-gray-600 dark:text-gray-300 mb-3 space-y-1">
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Locations:</p>
+                                                        {listing.location_details.slice(0, 2).map((location, idx) => (
+                                                            <p key={idx} className="flex items-center">
+                                                                <span className="mr-2">📍</span>
+                                                                <span>{location.city_name}{location.area ? ", " + location.area : ""}</span>
+                                                            </p>
+                                                        ))}
+                                                        {listing.location_details.length > 2 && (
+                                                            <p className="text-gray-500 dark:text-gray-400 font-medium text-xs mt-1">
+                                                                +{listing.location_details.length - 2} more location{listing.location_details.length - 2 !== 1 ? "s" : ""}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                ) : listing.area ? (
+                                                    <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                                        <p className="flex items-center">
+                                                            <span className="mr-2">📍</span>
+                                                            <span>{listing.area}</span>
+                                                        </p>
+                                                    </div>
+                                                ) : null}
+
+                                                {/* Description */}
+                                                {listing.description && (
+                                                    <div className="mb-3">
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Description:</p>
+                                                        <p className="text-gray-700 dark:text-gray-300 text-sm line-clamp-3">
+                                                            {listing.description}
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {/* Status Badge */}
+                                                {listing.status && (
+                                                    <div className="mb-3">
+                                                        <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${listing.status === "active"
+                                                            ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                                                            : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
+                                                            }`}>
+                                                            {listing.status === "active" ? "✓ Active" : listing.status}
+                                                        </span>
+                                                    </div>
                                                 )}
                                             </div>
-
-                                            {/* Work Type */}
-                                            <div className="mb-3">
-                                                <span className="inline-block bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-3 py-1 rounded-full font-medium capitalize">
-                                                    {listing.work_type?.replace("_", " ") || "Service"}
-                                                </span>
-                                            </div>
-
-                                            {/* Locations */}
-                                            {listing.location_details && listing.location_details.length > 0 ? (
-                                                <div className="text-sm text-gray-600 dark:text-gray-300 mb-3 space-y-1">
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Locations:</p>
-                                                    {listing.location_details.slice(0, 2).map((location, idx) => (
-                                                        <p key={idx} className="flex items-center">
-                                                            <span className="mr-2">📍</span>
-                                                            <span>{location.city_name}{location.area ? ", " + location.area : ""}</span>
-                                                        </p>
-                                                    ))}
-                                                    {listing.location_details.length > 2 && (
-                                                        <p className="text-gray-500 dark:text-gray-400 font-medium text-xs mt-1">
-                                                            +{listing.location_details.length - 2} more location{listing.location_details.length - 2 !== 1 ? "s" : ""}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            ) : listing.area ? (
-                                                <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                                                    <p className="flex items-center">
-                                                        <span className="mr-2">📍</span>
-                                                        <span>{listing.area}</span>
-                                                    </p>
-                                                </div>
-                                            ) : null}
-
-                                            {/* Description */}
-                                            {listing.description && (
-                                                <div className="mb-3">
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Description:</p>
-                                                    <p className="text-gray-700 dark:text-gray-300 text-sm line-clamp-3">
-                                                        {listing.description}
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            {/* Status Badge */}
-                                            {listing.status && (
-                                                <div className="mb-3">
-                                                    <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${listing.status === "active"
-                                                        ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
-                                                        : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
-                                                        }`}>
-                                                        {listing.status === "active" ? "✓ Active" : listing.status}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
+                                    {serviceListings.length > 1 && (
+                                        <p className="mt-4 text-sm text-gray-600 dark:text-gray-400 text-center">
+                                            {helper.name} offers {serviceListings.length} different service{serviceListings.length !== 1 ? "s" : ""} across multiple locations
+                                        </p>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="text-center py-8 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-dashed border-gray-200 dark:border-gray-700">
+                                    <p className="text-gray-500 dark:text-gray-400">No services added yet.</p>
                                 </div>
-                                {serviceListings.length > 1 && (
-                                    <p className="mt-4 text-sm text-gray-600 dark:text-gray-400 text-center">
-                                        {helper.name} offers {serviceListings.length} different service{serviceListings.length !== 1 ? "s" : ""} across multiple locations
-                                    </p>
-                                )}
-                            </div>
-                        )}
+                            )}
+                        </div>
 
 
                         {/* Reviews Section - Hidden */}
@@ -355,10 +380,14 @@ export default function HelperShow() {
                                         </div>
                                     </div>
                                 )}
-                                {helper.city && (
+                                {(helper.address || helper.city) && (
                                     <div>
                                         <p className="text-sm text-gray-600 dark:text-gray-400">Location</p>
-                                        <p className="font-semibold text-gray-900 dark:text-white">{helper.city}, {helper.area || "N/A"}</p>
+                                        <p className="font-semibold text-gray-900 dark:text-white">
+                                            {helper.address ||
+                                                `${typeof helper.city === "object" ? helper.city?.name : helper.city}, ${helper.area || "N/A"}`
+                                            }
+                                        </p>
                                     </div>
                                 )}
                                 {helper.availability && (
