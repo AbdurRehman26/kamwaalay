@@ -16,6 +16,7 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 use OpenApi\Attributes as OA;
+use App\Models\Profile;
 
 #[OA\Tag(name: "Authentication", description: "User authentication endpoints")]
 class RegisteredUserController extends Controller
@@ -53,13 +54,14 @@ class RegisteredUserController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["name", "password", "role"],
+                required: ["name", "password", "role", "city_id"],
                 properties: [
                     new OA\Property(property: "name", type: "string", maxLength: 255),
                     new OA\Property(property: "phone", type: "string", nullable: true, maxLength: 20, description: "Either email or phone is required"),
                     new OA\Property(property: "password", type: "string", format: "password", minLength: 8),
                     new OA\Property(property: "password_confirmation", type: "string", format: "password"),
                     new OA\Property(property: "role", type: "string", enum: ["user", "helper", "business"]),
+                    new OA\Property(property: "city_id", type: "integer", description: "City ID"),
                 ]
             )
         ),
@@ -85,23 +87,20 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:user,helper,business',
-
-        ]);
-
-        // Ensure at least one of email or phone is provided
-        if (empty($request->phone)) {
-            throw ValidationException::withMessages([
-                'phone' => ['Phone number is required.'],
-            ]);
+        // Format phone number before validation to ensure uniqueness check works on formatted number
+        if ($request->has('phone')) {
+            $request->merge(['phone' => $this->formatPhoneNumber($request->phone)]);
         }
 
-        // Normalize and format phone number if provided
-        $phone = $request->phone ? $this->formatPhoneNumber($request->phone) : null;
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20|unique:'.User::class,
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => 'required|in:user,helper,business',
+            'city_id' => 'required|exists:cities,id',
+        ]);
+
+        $phone = $request->phone;
 
         // Create user and auto-verify (simplified flow without OTP)
         $user = User::create([
@@ -114,12 +113,52 @@ class RegisteredUserController extends Controller
         // Assign role using Spatie Permission
         $user->assignRole($request->role);
 
+        // Create Profile
+        Profile::create([
+            'profileable_type' => User::class,
+            'profileable_id' => $user->id,
+            'city_id' => $request->city_id,
+            'is_active' => true,
+        ]);
+
         // Fire Registered event
         event(new Registered($user));
+
+        // Generate OTP
+        $otp = PhoneOtp::generateOtp();
+
+        // Store OTP
+        PhoneOtp::create([
+            'phone' => $phone,
+            'otp' => $otp,
+            'role' => $request->role,
+            'expires_at' => Carbon::now()->addMinutes(10),
+        ]);
+
+        // Generate Verification Token
+        $verificationToken = encrypt([
+            'user_id' => $user->id,
+            'method' => 'phone',
+            'identifier' => $phone,
+            'is_login' => false,
+            'expires_at' => Carbon::now()->addMinutes(30),
+        ]);
+
+        // Send OTP via SMS
+        try {
+            $smsService = app(\App\Services\SMS\SmsServiceInterface::class);
+            $smsService->send($phone, "Your verification code is: {$otp}");
+            Log::info("SMS sent successfully to {$phone}");
+        } catch (\Exception $e) {
+            Log::error("Failed to send SMS to {$phone}: " . $e->getMessage());
+            // Continue with registration even if SMS fails (user can resend)
+        }
 
         return response()->json([
             'message' => 'Registration successful! Please check your phone for the verification code.',
             'user_id' => $user->id,
+            'verification_token' => $verificationToken,
+            'expires_at' => Carbon::now()->addMinutes(1),
             'verification_method' => 'phone',
             'identifier' => $this->maskPhone($phone),
         ]);

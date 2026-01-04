@@ -70,26 +70,6 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         return cleaned;
     };
 
-    // Get city name for display
-    const getCityName = (helper) => {
-        let cityName = "";
-
-        // Check helper.city first (new field)
-        if (helper.city) {
-            // detailed city object or string content
-            cityName = typeof helper.city === "object" ? helper.city.name : helper.city;
-        }
-        // Fallback: Get city from service_listings location_details
-        else if (helper.service_listings && helper.service_listings.length > 0) {
-            const firstListing = helper.service_listings[0];
-            if (firstListing.location_details && firstListing.location_details.length > 0) {
-                cityName = firstListing.location_details[0].city_name;
-            }
-        }
-
-        return cityName || null;
-    };
-
     // Fetch service types from API
     const { serviceTypes: fetchedServiceTypes } = useServiceTypes();
     const serviceTypes = [
@@ -256,7 +236,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                     if (userType) urlParams.append("user_type", userType);
                     window.history.pushState({}, "", `${route("helpers.index")}?${urlParams.toString()}`);
 
-                    // Trigger fetch (via useEffect dependency, or setFilters manually if useEffect depends on props/url only? 
+                    // Trigger fetch (via useEffect dependency, or setFilters manually if useEffect depends on props/url only?
                     // Actually useEffect depends on states, so setting states above will trigger it)
                 },
                 (error) => {
@@ -857,11 +837,14 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                             ) || []
                                         ).filter(Boolean);
                                     } else {
-                                        // Helper's own services
-                                        allServiceTypes = helper.service_listings?.flatMap(listing =>
+                                        // Get all unique service types from service listings
+                                        const allServiceTypes = helper.service_listings?.flatMap(listing =>
                                             listing.service_types?.map(st => {
-                                                const serviceType = typeof st === "string" ? st : st?.service_type;
-                                                return serviceType?.replace(/_/g, " ") || null;
+                                                // Handle both string (slug) and object (with slug/name/service_type) formats
+                                                const typeValue = typeof st === "string"
+                                                    ? st
+                                                    : (st?.slug || st?.name || st?.service_type || "");
+                                                return typeValue ? typeValue.replace(/_/g, " ") : null;
                                             }) || []
                                         ).filter(Boolean) || [];
                                     }

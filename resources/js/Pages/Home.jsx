@@ -251,17 +251,17 @@ export default function Home() {
 
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                         {serviceTypes.slice(0, 6).map((service) => (
-                            <Link
+                            <a
                                 key={service.value}
-                                to={route("helpers.index") + `?service_type=${service.value}`}
-                                className="group relative bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center border border-gray-100 dark:border-gray-700/50 overflow-hidden"
+                                href={route("helpers.index") + `?service_type=${service.value}`}
+                                className="group relative bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
                             >
                                 <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${service.color || "from-indigo-500 to-purple-600"}`}></div>
                                 <div className="text-6xl mb-6 transform group-hover:scale-110 transition-transform duration-300 filter drop-shadow-sm">{service.icon}</div>
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                     {service.label}
                                 </h3>
-                            </Link>
+                            </a>
                         ))}
                     </div>
 

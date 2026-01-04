@@ -19,7 +19,6 @@ export default function BookingCreate() {
         service_type: "",
         work_type: "",
         estimated_salary: "",
-        city_id: "",
         start_date: "",
         start_time: "",
         name: user?.name || "",
@@ -32,12 +31,6 @@ export default function BookingCreate() {
     });
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
-    const [cities, setCities] = useState([]);
-
-    // City search state
-    const [citySearch, setCitySearch] = useState("");
-    const [showCityDropdown, setShowCityDropdown] = useState(false);
-    const cityDropdownRef = useRef(null);
 
     // Fetch prefill data from API
     useEffect(() => {
@@ -49,19 +42,12 @@ export default function BookingCreate() {
                         ...prev,
                         service_type: response.prefill.service_type || prev.service_type,
                         work_type: response.prefill.work_type || prev.work_type,
-                        city: response.prefill.city || prev.city,
                         name: response.prefill.name || prev.name || user?.name || "",
                         phone: response.prefill.phone || prev.phone || user?.phone || "",
                         address: response.prefill.address || prev.address || user?.address || "",
                         latitude: response.prefill.latitude || prev.latitude || null,
                         longitude: response.prefill.longitude || prev.longitude || null,
                     }));
-                    // Set city search text if city prefilled (assuming we can get city name, but here response.prefill.city is likely an ID or object?
-                    // Usually API returns city_id in prefill response for job posts?
-                    // The original code used response.prefill.city. If it's the ID, we need to match name after cities load.
-                    // Let's defer setting citySearch until cities are loaded if we only have ID.
-                    // But looking at existing code: city: response.prefill.city
-
                 }
                 if (response.user) {
                     setData(prev => ({
@@ -79,27 +65,7 @@ export default function BookingCreate() {
             });
     }, [user]);
 
-    // Fetch active cities
-    useEffect(() => {
-        axios.get("/api/cities")
-            .then((response) => {
-                setCities(response.data || []);
-            })
-            .catch((error) => {
-                console.error("Error fetching cities:", error);
-            });
-    }, []);
 
-    // Sync city search text when city_id changes (e.g. from prefill)
-    useEffect(() => {
-        if (data.city_id && cities.length > 0) {
-            // Use == for loose equality in case one is string and other is number
-            const city = cities.find(c => c.id == data.city_id);
-            if (city) {
-                setCitySearch(city.name);
-            }
-        }
-    }, [data.city_id, cities]);
 
     // Fetch service types from API
     const { serviceTypes } = useServiceTypes();
@@ -109,9 +75,6 @@ export default function BookingCreate() {
         const handleClickOutside = (event) => {
             if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
                 setShowSuggestions(false);
-            }
-            if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target)) {
-                setShowCityDropdown(false);
             }
         };
 
@@ -218,63 +181,6 @@ export default function BookingCreate() {
                                     />
                                     {errors.estimated_salary && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.estimated_salary}</div>}
                                 </div>
-
-                                <div>
-                                    <div className="relative" ref={cityDropdownRef}>
-                                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">City *</label>
-                                        <div
-                                            className="relative"
-                                        >
-                                            <input
-                                                type="text"
-                                                value={citySearch}
-                                                onChange={(e) => {
-                                                    setCitySearch(e.target.value);
-                                                    setShowCityDropdown(true);
-                                                    // Clear ID if user changes text manually, forcing re-selection
-                                                    if (data.city_id) {
-                                                        setData(prev => ({ ...prev, city_id: "" }));
-                                                    }
-                                                }}
-                                                onFocus={() => setShowCityDropdown(true)}
-                                                className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                                placeholder="Search or select city..."
-                                                required={!data.city_id} // Required if no ID selected
-                                            />
-                                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </div>
-                                        </div>
-
-                                        {showCityDropdown && (
-                                            <div className="absolute z-20 w-full mt-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-auto">
-                                                {cities.filter(city => city.name.toLowerCase().includes(citySearch.toLowerCase())).length > 0 ? (
-                                                    cities
-                                                        .filter(city => city.name.toLowerCase().includes(citySearch.toLowerCase()))
-                                                        .map((city) => (
-                                                            <div
-                                                                key={city.id}
-                                                                onClick={() => {
-                                                                    setData(prev => ({ ...prev, city_id: city.id }));
-                                                                    setCitySearch(city.name);
-                                                                    setShowCityDropdown(false);
-                                                                    setSearchQuery("");
-                                                                }}
-                                                                className={`px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0 text-gray-900 dark:text-gray-200 ${data.city_id === city.id ? "bg-indigo-50 dark:bg-gray-600 font-medium" : ""}`}
-                                                            >
-                                                                {city.name}
-                                                            </div>
-                                                        ))
-                                                ) : (
-                                                    <div className="px-4 py-2 text-gray-500 dark:text-gray-400">No cities found</div>
-                                                )}
-                                            </div>
-                                        )}
-                                        {errors.city_id && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.city_id}</div>}
-                                    </div>
-                                </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Your Name *</label>
                                     <input
@@ -312,10 +218,75 @@ export default function BookingCreate() {
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Location & Address</label>
 
-                                    <div className="mb-4">
+                                    <div className="flex gap-2 mb-4">
+                                        <div className="flex-grow">
+                                            <input
+                                                type="text"
+                                                value={data.address || ""}
+                                                readOnly
+                                                className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-xl py-2.5 px-4 shadow-sm bg-gray-50 focus:outline-none cursor-default"
+                                                placeholder="No location selected"
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (navigator.geolocation) {
+                                                    const loadingToast = toast.loading("Getting your location...");
+                                                    navigator.geolocation.getCurrentPosition(
+                                                        (pos) => {
+                                                            const { latitude, longitude } = pos.coords;
+
+                                                            // Update coordinates
+                                                            setData(prev => ({
+                                                                ...prev,
+                                                                latitude: latitude,
+                                                                longitude: longitude
+                                                            }));
+
+                                                            // Reverse geocode
+                                                            if (window.google && window.google.maps) {
+                                                                const geocoder = new window.google.maps.Geocoder();
+                                                                geocoder.geocode({ location: { lat: latitude, lng: longitude } }, (results, status) => {
+                                                                    if (status === "OK" && results[0]) {
+                                                                        setData(prev => ({
+                                                                            ...prev,
+                                                                            address: results[0].formatted_address
+                                                                        }));
+                                                                        toast.success("Location updated", { id: loadingToast });
+                                                                    } else {
+                                                                        toast.dismiss(loadingToast);
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                toast.success("Location updated (Address fetch pending)", { id: loadingToast });
+                                                            }
+                                                        },
+                                                        (error) => {
+                                                            console.error("Error getting location:", error);
+                                                            toast.error("Could not get your location", { id: loadingToast });
+                                                        }
+                                                    );
+                                                } else {
+                                                    toast.error("Geolocation is not supported by this browser.");
+                                                }
+                                            }}
+                                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-medium shadow-sm transition-colors duration-200 flex items-center gap-2"
+                                            title="Use Current Location"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <span className="hidden sm:inline">Locate Me</span>
+                                        </button>
+                                    </div>
+
+                                    <div className="h-[300px] w-full bg-gray-100 rounded-xl overflow-hidden mb-4 border-2 border-gray-200 dark:border-gray-600">
                                         <MapPicker
                                             latitude={data.latitude}
                                             longitude={data.longitude}
+                                            height="100%"
                                             onChange={(lat, lng, address) => setData(prev => ({
                                                 ...prev,
                                                 latitude: lat,
@@ -323,16 +294,6 @@ export default function BookingCreate() {
                                                 address: address || prev.address
                                             }))}
                                         />
-                                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                            Click on the map, dragon the marker, or use the "Locate Me" button to pin your exact location.
-                                        </p>
-                                    </div>
-
-                                    <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
-                                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 uppercase">Address (Auto-detected)</label>
-                                        <p className="text-gray-900 dark:text-gray-200 font-medium">
-                                            {data.address || "No location selected"}
-                                        </p>
                                     </div>
 
                                     <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1.5">
@@ -386,7 +347,8 @@ export default function BookingCreate() {
                             )}
                         </form>
                     </div>
-                )}
+                )
+                }
             </div>
         </DashboardLayout>
     );

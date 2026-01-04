@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\User;
+use App\Models\City;
+use App\Models\Profile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -17,6 +19,11 @@ beforeEach(function () {
     if (!Role::where('name', 'business')->exists()) {
         Role::create(['name' => 'business']);
     }
+
+    // Create a city for testing
+    if (City::count() === 0) {
+        City::factory()->create(['name' => 'Karachi', 'state' => 'SD']);
+    }
 });
 
 test('users can register with phone number', function () {
@@ -26,6 +33,7 @@ test('users can register with phone number', function () {
         'password' => 'password',
         'password_confirmation' => 'password',
         'role' => 'user',
+        'city_id' => City::first()->id,
     ]);
     // User gets JSON response with verification info, not logged in yet
     $response->assertStatus(200)
@@ -44,6 +52,7 @@ test('users cannot register without phone', function () {
         'password' => 'password',
         'password_confirmation' => 'password',
         'role' => 'user',
+        'city_id' => City::first()->id,
     ]);
 
     $response->assertStatus(422)
@@ -51,7 +60,7 @@ test('users cannot register without phone', function () {
 });
 
 test('users cannot register with duplicate phone', function () {
-    User::factory()->create(['phone' => '03001234567']);
+    User::factory()->create(['phone' => '+923001234567']);
 
     $response = $this->postJson('/api/register', [
         'name' => 'Test User',
@@ -59,6 +68,7 @@ test('users cannot register with duplicate phone', function () {
         'password' => 'password',
         'password_confirmation' => 'password',
         'role' => 'user',
+        'city_id' => City::first()->id,
     ]);
 
     $response->assertStatus(422)
@@ -71,7 +81,9 @@ test('password must be confirmed', function () {
         'phone' => '03001234567',
         'password' => 'password',
         'password_confirmation' => 'different-password',
+        'password_confirmation' => 'different-password',
         'role' => 'user',
+        'city_id' => City::first()->id,
     ]);
 
     $response->assertStatus(422)
@@ -84,10 +96,30 @@ test('registered user is assigned the correct role', function () {
         'phone' => '03007654321',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'password_confirmation' => 'password',
         'role' => 'helper',
+        'city_id' => City::first()->id,
     ]);
 
     $response->assertStatus(200);
     $user = User::where('phone', '+923007654321')->first();
     expect($user->hasRole('helper'))->toBeTrue();
+
+    // Verify profile creation with city
+    $profile = Profile::where('profileable_id', $user->id)->first();
+    expect($profile)->not->toBeNull()
+        ->and($profile->city_id)->toBe(City::first()->id);
+});
+
+test('city_id is required', function () {
+    $response = $this->postJson('/api/register', [
+        'name' => 'Test User',
+        'phone' => '03001234567',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'role' => 'user',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['city_id']);
 });

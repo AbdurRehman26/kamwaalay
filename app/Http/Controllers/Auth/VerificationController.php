@@ -10,10 +10,8 @@ use App\Models\UserSession;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 use OpenApi\Attributes as OA;
 
@@ -207,35 +205,11 @@ class VerificationController extends Controller
         ]);
 
         // Validate that at least one identifier is provided
-        if (!$request->has('email') && !$request->has('phone') && !$request->has('verification_token')) {
+        if (!$request->has('phone') && !$request->has('verification_token')) {
             return response()->json([
                 'message' => 'Either email, phone, or verification_token must be provided.',
                 'errors' => ['email' => ['Either email, phone, or verification_token must be provided.']]
             ], 422);
-        }
-
-        // If email is provided, use it directly for email verification
-        if ($request->has('email') && $request->email) {
-            // Find user by email
-            $user = User::where('email', $request->email)->first();
-
-            if (!$user) {
-                return response()->json([
-                    'message' => 'User not found with this email address.',
-                    'errors' => ['email' => ['User not found with this email address.']]
-                ], 422);
-            }
-
-            // Determine if this is a login or registration flow
-            $isLogin = $request->has('verification_token') && $request->verification_token;
-
-            $verificationData = [
-                'user_id' => $user->id,
-                'method' => 'email',
-                'identifier' => $request->email,
-            ];
-
-            return $this->verifyEmailOtp($request, $user, $isLogin, $verificationData);
         }
 
         // If phone is provided, use it directly for phone verification
@@ -256,7 +230,17 @@ class VerificationController extends Controller
             }
 
             // Determine if this is a login or registration flow
-            $isLogin = $request->has('verification_token') && $request->verification_token;
+            $isLogin = false;
+            if ($request->has('verification_token') && $request->verification_token) {
+                 try {
+                     $tokenData = decrypt($request->verification_token);
+                     $isLogin = isset($tokenData['is_login']) ? $tokenData['is_login'] : true;
+                 } catch (\Exception $e) {
+                     // If token is invalid/expired (though specific error will show later), 
+                     // fallback to default behavior or let verifyPhoneOtp handle it
+                     $isLogin = true; 
+                 }
+            }
 
             $verificationData = [
                 'user_id' => $user->id,
@@ -282,7 +266,7 @@ class VerificationController extends Controller
 
                 $userId = $verificationData['user_id'] ?? null;
                 $method = $verificationData['method'] ?? null;
-                $isLogin = true;
+                $isLogin = isset($verificationData['is_login']) ? $verificationData['is_login'] : true;
 
                 if (!$userId || !$method) {
                     return response()->json([

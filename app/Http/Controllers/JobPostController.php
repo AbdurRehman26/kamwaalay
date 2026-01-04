@@ -64,7 +64,9 @@ class JobPostController extends Controller
                 properties: [
                     new OA\Property(property: "service_type", type: "integer", description: "Service type ID"),
                     new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
-                    new OA\Property(property: "city_id", type: "integer", description: "City ID"),
+                    new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
+                    new OA\Property(property: "city_id", type: "integer", nullable: true, description: "City ID (optional, defaults to user's profile city)"),
+                    new OA\Property(property: "start_date", type: "string", format: "date", nullable: true),
                     new OA\Property(property: "start_date", type: "string", format: "date", nullable: true),
                     new OA\Property(property: "start_time", type: "string", format: "time", nullable: true, example: "09:00"),
                     new OA\Property(property: "name", type: "string", maxLength: 255),
@@ -120,7 +122,7 @@ class JobPostController extends Controller
         $validated = $request->validate([
             'service_type' => 'required|exists:service_types,id',
             'work_type' => 'required|in:full_time,part_time',
-            'city_id' => 'required|exists:cities,id',
+            'city_id' => 'nullable|exists:cities,id',
             'start_date' => 'nullable|date',
             'start_time' => 'nullable|date_format:H:i',
             'name' => 'required|string|max:255',
@@ -134,7 +136,11 @@ class JobPostController extends Controller
             'estimated_salary' => 'nullable|numeric|min:0',
         ]);
 
-        // Get city name from city model
+        // Get city from request, or user profile, or default to Karachi
+        if (empty($validated['city_id'])) {
+             $validated['city_id'] = $user->profile?->city_id ?? \App\Models\City::where('name', 'Karachi')->first()?->id;
+        }
+
         $city = \App\Models\City::find($validated['city_id']);
         $validated['city'] = $city ? $city->name : 'Karachi';
         $validated['user_id'] = Auth::id();
@@ -516,7 +522,7 @@ class JobPostController extends Controller
 
         // Allow updating all job post fields if provided, otherwise just status/admin_notes
         $validated = $request->validate([
-            'service_type' => 'sometimes|in:maid,cook,babysitter,caregiver,cleaner,domestic_helper,driver,security_guard',
+            'service_type' => 'sometimes|exists:service_types,id',
             'work_type' => 'sometimes|in:full_time,part_time',
             'start_date' => 'nullable|date',
             'start_time' => 'nullable|date_format:H:i',
@@ -533,8 +539,7 @@ class JobPostController extends Controller
         ]);
 
         if (isset($validated['service_type'])) {
-            $serviceType = ServiceType::where('slug', $validated['service_type'])->firstOrFail();
-            $validated['service_type_id'] = $serviceType->id;
+            $validated['service_type_id'] = $validated['service_type'];
             unset($validated['service_type']);
         }
 

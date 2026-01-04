@@ -132,53 +132,7 @@ export default function MapPicker({ latitude, longitude, onChange, height = "300
                     fullscreenControl: true,
                 }}
             >
-                {/* Search Bar */}
-                <div className="absolute top-2 left-2 right-12 z-10 flex gap-2">
-                    <Autocomplete
-                        onLoad={onAutocompleteLoad}
-                        onPlaceChanged={onPlaceChanged}
-                        className="flex-grow"
-                    >
-                        <input
-                            type="text"
-                            placeholder="Search location..."
-                            className="w-full px-4 py-2 rounded-lg border-0 shadow-md text-gray-900 focus:ring-2 focus:ring-indigo-500"
-                            style={{ width: "300px", maxWidth: "100%" }}
-                        />
-                    </Autocomplete>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            if (navigator.geolocation) {
-                                navigator.geolocation.getCurrentPosition(
-                                    (pos) => {
-                                        const { latitude, longitude } = pos.coords;
-                                        // Geocode the position
-                                        updatePositionAndAddress(latitude, longitude);
-
-                                        if (map) {
-                                            map.panTo({ lat: latitude, lng: longitude });
-                                            map.setZoom(15);
-                                        }
-                                    },
-                                    (error) => {
-                                        console.error("Error getting location:", error);
-                                        alert("Could not get your location. Please check browser permissions.");
-                                    }
-                                );
-                            } else {
-                                alert("Geolocation is not supported by this browser.");
-                            }
-                        }}
-                        className="bg-white p-2 rounded-lg shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
-                        title="Locate Me"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                        </svg>
-                    </button>
-                </div>
+                {/* Search Bar and Locate Me (Removed - External Control) */}
 
                 {(position || (latitude && longitude)) && (
                     <Marker

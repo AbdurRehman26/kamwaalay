@@ -20,6 +20,7 @@ class JobPostResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'assigned_user_id' => $this->assigned_user_id,
+            'service_type_id' => $this->service_type_id,
             'service_type' => $this->serviceType ? $this->serviceType->slug : $this->service_type,
             'service_type_label' => $this->service_type_label,
             'work_type' => $this->work_type,

@@ -7,6 +7,8 @@ import PublicLayout from "@/Layouts/PublicLayout";
 import { useState } from "react";
 import { authService } from "@/services/auth";
 import { route } from "@/utils/routes";
+import { useEffect } from "react";
+import api from "@/services/api";
 
 export default function Register() {
     const navigate = useNavigate();
@@ -16,10 +18,24 @@ export default function Register() {
         password_confirmation: "",
         role: "user",
         phone: "",
+        city_id: "",
     });
     const [selectedRole, setSelectedRole] = useState("user");
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
+    const [cities, setCities] = useState([]);
+
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const response = await api.get("/cities");
+                setCities(response.data);
+            } catch (error) {
+                console.error("Failed to fetch cities", error);
+            }
+        };
+        fetchCities();
+    }, []);
 
     const handleRoleChange = (role) => {
         setSelectedRole(role);
@@ -239,6 +255,26 @@ export default function Register() {
                                     Enter your 10-digit mobile number without country code. Example: 3001234567
                                 </p>
                                 <InputError message={errors.phone} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="city_id" value="City" className="text-gray-700 dark:text-gray-300 font-bold uppercase tracking-wide" />
+                                <select
+                                    id="city_id"
+                                    name="city_id"
+                                    value={formData.city_id}
+                                    className="mt-2 block w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 py-3"
+                                    onChange={(e) => handleInputChange("city_id", e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select City</option>
+                                    {cities.map((city) => (
+                                        <option key={city.id} value={city.id}>
+                                            {city.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.city_id} className="mt-2" />
                             </div>
 
 

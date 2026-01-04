@@ -77,7 +77,7 @@ test('users can create service requests', function () {
         'phone' => '03001234567',
         'service_type' => $serviceType->id,
         'work_type' => 'full_time',
-        'city_id' => $city->id,
+        // 'city_id' => $city->id, // Removed to test auto-assignment
         'area' => 'Saddar',
         'address' => '123 Main Street',
         'special_requirements' => 'Need a maid for house cleaning',
