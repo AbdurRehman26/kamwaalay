@@ -241,15 +241,17 @@ class OnboardingController extends Controller
             $profile = $user->profile()->create([]);
         }
 
-        // Create service listing (location is now on profile)
-        $listing = ServiceListing::create([
-            'profile_id' => $profile->id,
-            'work_type' => $validated['work_type'],
-            'monthly_rate' => $validated['monthly_rate'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'is_active' => true,
-            'status' => 'active',
-        ]);
+        // Create or update service listing (location is now on profile)
+        $listing = ServiceListing::updateOrCreate(
+            ['profile_id' => $profile->id],
+            [
+                'work_type' => $validated['work_type'],
+                'monthly_rate' => $validated['monthly_rate'] ?? null,
+                'description' => $validated['description'] ?? null,
+                'is_active' => true,
+                'status' => 'active',
+            ]
+        );
 
         // Sync service types (services are now sent as IDs directly)
         $listing->serviceTypes()->sync($validated['services']);

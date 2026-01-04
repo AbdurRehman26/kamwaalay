@@ -111,13 +111,12 @@ export default function EditWorker() {
                             });
                             setSelectedServiceTypes(Array.from(allServiceTypeIds));
 
-                            // Load pin location from first service listing
-                            const firstListing = worker.service_listings[0];
-                            if (firstListing) {
+                            // Load pin location from profile
+                            if (worker.profile) {
                                 setLocationData({
-                                    pin_address: firstListing.pin_address || "",
-                                    pin_latitude: firstListing.pin_latitude || "",
-                                    pin_longitude: firstListing.pin_longitude || ""
+                                    pin_address: worker.profile.pin_address || "",
+                                    pin_latitude: worker.profile.pin_latitude || "",
+                                    pin_longitude: worker.profile.pin_longitude || ""
                                 });
                             }
                         }
@@ -597,9 +596,9 @@ export default function EditWorker() {
                                     id="pin_address"
                                     className="block w-full pl-10 pr-12 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-xl focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm py-3 bg-gray-50 dark:bg-gray-800 cursor-not-allowed"
                                     placeholder="Use the location button..."
-                                    defaultValue={locationData.pin_address}
-                                    key={locationData.pin_address}
-                                    readOnly
+                                    value={locationData.pin_address}
+                                    onChange={(e) => setLocationData({ ...locationData, pin_address: e.target.value })}
+                                    readOnly={false}
                                 />
 
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">

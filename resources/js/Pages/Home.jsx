@@ -239,48 +239,50 @@ export default function Home() {
             </div>
 
             {/* Services Section */}
-            <section className="py-12 lg:py-16 bg-gray-50/50 dark:bg-gray-900/50">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    <div className="text-center max-w-3xl mx-auto mb-8">
-                        <h2 className="text-indigo-600 dark:text-indigo-400 font-bold tracking-wide uppercase text-sm mb-3">Our Services</h2>
-                        <h3 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">Professional Home Services</h3>
-                        <p className="text-xl text-gray-600 dark:text-gray-300">
-                            Choose from a wide range of professional house help services tailored to your specific needs.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                        {serviceTypes.slice(0, 6).map((service) => (
-                            <a
-                                key={service.value}
-                                href={route("helpers.index") + `?service_type=${service.value}`}
-                                className="group relative bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
-                            >
-                                <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${service.color || "from-indigo-500 to-purple-600"}`}></div>
-                                <div className="text-6xl mb-6 transform group-hover:scale-110 transition-transform duration-300 filter drop-shadow-sm">{service.icon}</div>
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                    {service.label}
-                                </h3>
-                            </a>
-                        ))}
-                    </div>
-
-                    {/* View More Button */}
-                    {serviceTypes.length > 6 && (
-                        <div className="mt-12 text-center">
-                            <Link
-                                to={route("helpers.index")}
-                                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                            >
-                                View All Services
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg>
-                            </Link>
+            {!isHelperOrBusiness(user) && (
+                <section className="py-12 lg:py-16 bg-gray-50/50 dark:bg-gray-900/50">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                        <div className="text-center max-w-3xl mx-auto mb-8">
+                            <h2 className="text-indigo-600 dark:text-indigo-400 font-bold tracking-wide uppercase text-sm mb-3">Our Services</h2>
+                            <h3 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">Professional Home Services</h3>
+                            <p className="text-xl text-gray-600 dark:text-gray-300">
+                                Choose from a wide range of professional house help services tailored to your specific needs.
+                            </p>
                         </div>
-                    )}
-                </div>
-            </section>
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            {serviceTypes.slice(0, 6).map((service) => (
+                                <a
+                                    key={service.value}
+                                    href={route("helpers.index") + `?service_type=${service.value}`}
+                                    className="group relative bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+                                >
+                                    <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${service.color || "from-indigo-500 to-purple-600"}`}></div>
+                                    <div className="text-6xl mb-6 transform group-hover:scale-110 transition-transform duration-300 filter drop-shadow-sm">{service.icon}</div>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                        {service.label}
+                                    </h3>
+                                </a>
+                            ))}
+                        </div>
+
+                        {/* View More Button */}
+                        {serviceTypes.length > 6 && (
+                            <div className="mt-12 text-center">
+                                <Link
+                                    to={route("helpers.index")}
+                                    className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                                >
+                                    View All Services
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                </section>
+            )}
 
             {/* Featured Helpers */}
             {!loading && !isHelperOrBusiness(user) && featuredHelpers && featuredHelpers.length > 0 && (

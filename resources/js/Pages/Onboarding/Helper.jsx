@@ -37,7 +37,7 @@ export default function OnboardingHelper() {
         photo: null,
         nic: null,
         nic_number: "",
-        city_id: "",
+        city_id: user?.city_id || user?.profile?.city_id || "",
         experience_years: user?.experience_years || "",
         bio: user?.bio || "",
         age: user?.age || "",
@@ -86,6 +86,7 @@ export default function OnboardingHelper() {
                 age: user?.age || prev.age,
                 gender: user?.gender || prev.gender,
                 religion: user?.religion?.value || user?.religion || prev.religion,
+                city_id: user?.city_id || user?.profile?.city_id || prev.city_id,
             }));
         }
     }, [user]);

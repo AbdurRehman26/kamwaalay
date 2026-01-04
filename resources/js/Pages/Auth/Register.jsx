@@ -2,6 +2,7 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
+import SearchableSelect from "@/Components/SearchableSelect";
 import { Link } from "react-router-dom"; import { useNavigate } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { useState } from "react";
@@ -259,22 +260,15 @@ export default function Register() {
 
                             <div>
                                 <InputLabel htmlFor="city_id" value="City" className="text-gray-700 dark:text-gray-300 font-bold uppercase tracking-wide" />
-                                <select
-                                    id="city_id"
-                                    name="city_id"
-                                    value={formData.city_id}
-                                    className="mt-2 block w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 py-3"
-                                    onChange={(e) => handleInputChange("city_id", e.target.value)}
-                                    required
-                                >
-                                    <option value="">Select City</option>
-                                    {cities.map((city) => (
-                                        <option key={city.id} value={city.id}>
-                                            {city.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <InputError message={errors.city_id} className="mt-2" />
+                                <div className="mt-2">
+                                    <SearchableSelect
+                                        items={cities}
+                                        value={formData.city_id}
+                                        onChange={(value) => handleInputChange("city_id", value)}
+                                        placeholder="Select City"
+                                        error={errors.city_id}
+                                    />
+                                </div>
                             </div>
 
 

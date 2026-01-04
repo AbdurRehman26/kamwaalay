@@ -2,6 +2,7 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
+import SearchableSelect from "@/Components/SearchableSelect";
 import { Transition } from "@headlessui/react";
 import { useState, useEffect, useRef } from "react";
 import { profileService } from "@/services/profile";
@@ -254,21 +255,13 @@ export default function UpdateProfileInformation({
                 <div>
                     <InputLabel htmlFor="city_id" value="City" />
 
-                    <select
-                        id="city_id"
-                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                    <SearchableSelect
+                        items={cities}
                         value={data.city_id}
-                        onChange={(e) => setData({ ...data, city_id: e.target.value })}
-                    >
-                        <option value="">Select City</option>
-                        {cities.map((city) => (
-                            <option key={city.id} value={city.id}>
-                                {city.name}
-                            </option>
-                        ))}
-                    </select>
-
-                    <InputError className="mt-2" message={errors.city_id} />
+                        onChange={(value) => setData({ ...data, city_id: value })}
+                        placeholder="Select City"
+                        error={errors.city_id}
+                    />
                 </div>
 
                 {/* Only show age, gender, religion, languages, and location for helper users */}

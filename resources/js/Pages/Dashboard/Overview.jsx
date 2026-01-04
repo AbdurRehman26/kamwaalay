@@ -3,8 +3,9 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { dashboardService } from "@/services/dashboard";
 import { Link } from "react-router-dom";
+
 import { route } from "@/utils/routes";
-import { isUser, isHelperOrBusiness } from "@/utils/permissions";
+import { isUser, isHelperOrBusiness, isHelper } from "@/utils/permissions";
 
 export default function DashboardOverview() {
     const { user } = useAuth();
@@ -165,15 +166,27 @@ export default function DashboardOverview() {
 
                     {isHelperOrBusiness(user) && (
                         <>
-                            <Link
-                                to={route("service-listings.create")}
-                                className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
-                            >
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full group-hover:bg-emerald-500/10 transition-colors"></div>
-                                <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">📝</div>
-                                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Create Service</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Offer a new service</p>
-                            </Link>
+                            {isHelper(user) ? (
+                                <Link
+                                    to={route("service-listings.create")}
+                                    className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                                >
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full group-hover:bg-emerald-500/10 transition-colors"></div>
+                                    <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">📝</div>
+                                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Create Service</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Offer a new service</p>
+                                </Link>
+                            ) : (
+                                <Link
+                                    to={route("business.workers.create")}
+                                    className="group relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                                >
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full group-hover:bg-emerald-500/10 transition-colors"></div>
+                                    <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">➕</div>
+                                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Add Worker</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Add a new worker</p>
+                                </Link>
+                            )}
 
                             <Link
                                 to="/dashboard/documents"
