@@ -12,8 +12,7 @@ import { route } from "@/utils/routes";
 
 export default function Login() {
     const navigate = useNavigate();
-    // Access appDebug from window object injected in app.blade.php
-    const app_debug = window.Laravel?.app_debug;
+
 
     const { login, updateUser } = useAuth();
     const [authMethod, setAuthMethod] = useState("password"); // 'otp' or 'password'
@@ -378,38 +377,7 @@ export default function Login() {
                         </div>
                     </form>
 
-                    {/* Developer Options - Only visible in debug mode */}
-                    {app_debug && (
-                        <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 mb-24 opacity-80 hover:opacity-100 transition-opacity">
-                            <h3 className="text-gray-500 uppercase font-bold text-xs tracking-wider mb-4 text-center">Developer Options (Debug Mode)</h3>
-                            <div className="space-y-3">
-                                <button
-                                    type="button"
-                                    onClick={() => handleTestLogin("business")}
-                                    disabled={processing}
-                                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm flex items-center justify-center gap-2"
-                                >
-                                    🏢 Sign in as Test Business
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => handleTestLogin("helper")}
-                                    disabled={processing}
-                                    className="w-full bg-orange-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-600 transition-colors text-sm flex items-center justify-center gap-2"
-                                >
-                                    🧹 Sign in as Test Helper
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => handleTestLogin("user")}
-                                    disabled={processing}
-                                    className="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-700 transition-colors text-sm flex items-center justify-center gap-2"
-                                >
-                                    👤 Sign in as Test User
-                                </button>
-                            </div>
-                        </div>
-                    )}
+
                 </div>
             </div>
         </PublicLayout>
