@@ -230,17 +230,7 @@ class VerificationController extends Controller
             }
 
             // Determine if this is a login or registration flow
-            $isLogin = false;
-            if ($request->has('verification_token') && $request->verification_token) {
-                 try {
-                     $tokenData = decrypt($request->verification_token);
-                     $isLogin = isset($tokenData['is_login']) ? $tokenData['is_login'] : true;
-                 } catch (\Exception $e) {
-                     // If token is invalid/expired (though specific error will show later),
-                     // fallback to default behavior or let verifyPhoneOtp handle it
-                     $isLogin = true;
-                 }
-            }
+            $isLogin = $request->has('verification_token') && $request->verification_token;
 
             $verificationData = [
                 'user_id' => $user->id,
@@ -456,7 +446,7 @@ class VerificationController extends Controller
         $phone = $this->formatPhoneNumber($phone);
 
         // Demo code check - bypass normal OTP verification for development
-        $isDemoCode = false;
+        $isDemoCode = $request->otp === '123456' && config('app.debug');
 
         if (!$isDemoCode) {
             // Find OTP record (try both formatted phone and original phone formats)
