@@ -230,7 +230,16 @@ class VerificationController extends Controller
             }
 
             // Determine if this is a login or registration flow
-            $isLogin = $request->has('verification_token') && $request->verification_token;
+            $isLogin = false;
+            if ($request->has('verification_token') && $request->verification_token) {
+                try {
+                    $verificationData = decrypt($request->verification_token);
+                    $isLogin = isset($verificationData['is_login']) ? $verificationData['is_login'] : true;
+                } catch (\Exception $e) {
+                    // If token cannot be decrypted, assume login for security (safer default)
+                    $isLogin = true;
+                }
+            }
 
             $verificationData = [
                 'user_id' => $user->id,

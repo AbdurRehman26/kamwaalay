@@ -170,7 +170,7 @@ class OnboardingController extends Controller
             'nic' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:5120',
             'nic_number' => 'nullable|string|max:255',
             // Optional helper profile fields
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'required|image|max:2048',
             'experience_years' => 'nullable|integer|min:0',
             'bio' => 'nullable|string',
             'age' => 'nullable|integer|min:18|max:100',

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import axios from "axios";
 import { onboardingService } from "@/services/onboarding";
@@ -296,7 +296,12 @@ export default function OnboardingHelper() {
                 validationErrors.workType = "Please select a work type.";
             }
         }
-        // Step 2 (Profile Verification) is optional - no validation required
+        if (step === 2) {
+            // Validate Profile Verification
+            if (!profileData.photo) {
+                validationErrors.photo = "Please upload your profile photo.";
+            }
+        }
 
         if (step === 3) {
             if (!offer.pin_address) {
@@ -403,7 +408,7 @@ export default function OnboardingHelper() {
         }
     };
 
-    const submit = async (e) => {
+    const submit = async (e, explicit = false) => {
         e.preventDefault();
 
         // If on step 1, just proceed
@@ -420,7 +425,7 @@ export default function OnboardingHelper() {
 
         // Only submit on step 3 if explicitly triggered by button click
         // Prevent accidental submission from Enter key press
-        if (currentStep === 3 && !isExplicitSubmit) {
+        if (currentStep === 3 && !isExplicitSubmit && !explicit) {
             return;
         }
 
@@ -609,9 +614,20 @@ export default function OnboardingHelper() {
             <div>
                 {file ? (
                     <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border-2 border-gray-200 dark:border-gray-600">
-                        <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        <div className="flex-1 flex gap-4 items-center">
+                            {/* Image Preview */}
+                            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-200 dark:border-gray-500 bg-gray-100 dark:bg-gray-800">
+                                <img
+                                    src={URL.createObjectURL(file)}
+                                    alt="Preview"
+                                    className="w-full h-full object-cover"
+                                    onLoad={(e) => URL.revokeObjectURL(e.target.src)}
+                                />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            </div>
                         </div>
                         <button
                             type="button"
@@ -938,9 +954,9 @@ export default function OnboardingHelper() {
 
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
-                                            Photo <span className="text-gray-500 dark:text-gray-400 text-xs">(Optional)</span>
+                                            Photo *
                                         </label>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload your profile photo (optional)</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload your profile photo</p>
                                         <PhotoFileInput
                                             onFileAccepted={(file) => {
                                                 setProfileData({ ...profileData, photo: file });
@@ -1196,14 +1212,6 @@ export default function OnboardingHelper() {
                                 ) : currentStep === 2 ? (
                                     <>
                                         <button
-                                            type="button"
-                                            onClick={handleSkip}
-                                            disabled={processing}
-                                            className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
-                                        >
-                                            Skip
-                                        </button>
-                                        <button
                                             type="submit"
                                             className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300"
                                         >
@@ -1224,7 +1232,7 @@ export default function OnboardingHelper() {
                                             type="button"
                                             onClick={(e) => {
                                                 setIsExplicitSubmit(true);
-                                                submit(e);
+                                                submit(e, true);
                                             }}
                                             disabled={processing}
                                             className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"

@@ -11,6 +11,7 @@ import TextArea from "@/Components/TextArea";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
 import { useLanguages } from "@/hooks/useLanguages";
 import toast from "react-hot-toast";
+import MapPicker from "@/Components/MapPicker";
 
 export default function CreateWorker() {
     const navigate = useNavigate();
@@ -507,10 +508,10 @@ export default function CreateWorker() {
                                     ref={pinAddressInputRef}
                                     type="text"
                                     id="pin_address"
-                                    className="block w-full pl-10 pr-12 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-xl focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm py-3 bg-gray-50 dark:bg-gray-800 cursor-not-allowed"
-                                    placeholder="Use the location button or search..."
-                                    defaultValue={locationData.pin_address}
-                                    readOnly
+                                    className="block w-full pl-10 pr-12 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-xl focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm py-3 bg-gray-50 dark:bg-gray-800"
+                                    placeholder="Start typing to search..."
+                                    value={locationData.pin_address}
+                                    onChange={(e) => setLocationData({ ...locationData, pin_address: e.target.value })}
                                 />
 
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -540,6 +541,26 @@ export default function CreateWorker() {
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                 Start typing to search for an address, or click the location icon to use your current location.
                             </p>
+
+                            {/* Map Picker */}
+                            <div className="mt-4 rounded-xl overflow-hidden shadow-md border-2 border-gray-100 dark:border-gray-700">
+                                <MapPicker
+                                    latitude={locationData.pin_latitude}
+                                    longitude={locationData.pin_longitude}
+                                    onChange={(lat, lng, address) => {
+                                        setLocationData(prev => ({
+                                            ...prev,
+                                            pin_latitude: lat,
+                                            pin_longitude: lng,
+                                            pin_address: address
+                                        }));
+                                        if (pinAddressInputRef.current) {
+                                            pinAddressInputRef.current.value = address;
+                                        }
+                                    }}
+                                    height="350px"
+                                />
+                            </div>
                         </div>
                     </div>
 
