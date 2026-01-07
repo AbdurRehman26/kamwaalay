@@ -151,7 +151,7 @@ export default function OnboardingHelper() {
                 }
             }
         });
-    }, [offers.length]);
+    }, [offers.length, currentStep]);
 
     const handleGetCurrentLocation = (offerIndex) => {
         if (!navigator.geolocation) {
@@ -292,15 +292,17 @@ export default function OnboardingHelper() {
             if (!offer.selectedServiceTypes.length) {
                 validationErrors.serviceTypes = "Please select at least one service type.";
             }
-            if (!offer.pin_address) {
-                validationErrors.pin_address = "Please enter your address.";
-            }
             if (!offer.work_type) {
                 validationErrors.workType = "Please select a work type.";
             }
         }
         // Step 2 (Profile Verification) is optional - no validation required
-        // Step 3 (Additional Information) has no required fields
+
+        if (step === 3) {
+            if (!offer.pin_address) {
+                validationErrors.pin_address = "Please enter your address.";
+            }
+        }
 
         if (Object.keys(validationErrors).length > 0) {
             setFieldErrors(prev => ({ ...prev, ...validationErrors }));
@@ -376,16 +378,11 @@ export default function OnboardingHelper() {
 
     const handleNext = async () => {
         if (currentStep === 1) {
-            // Validate and save service listing on step 1
+            // Validate on step 1
             if (!validateStep(1)) {
                 return;
             }
-            setProcessing(true);
-            const saved = await saveServiceListing();
-            setProcessing(false);
-            if (saved) {
-                setCurrentStep(2);
-            }
+            setCurrentStep(2);
         } else if (validateStep(currentStep)) {
             if (currentStep < totalSteps) {
                 setCurrentStep(currentStep + 1);
@@ -409,9 +406,9 @@ export default function OnboardingHelper() {
     const submit = async (e) => {
         e.preventDefault();
 
-        // If on step 1, save service listing
+        // If on step 1, just proceed
         if (currentStep === 1) {
-            await handleNext();
+            handleNext();
             return;
         }
 
@@ -807,48 +804,7 @@ export default function OnboardingHelper() {
                                 </div>
 
 
-                                {/* Pin Address */}
-                                <div className="mb-8" data-error-field={fieldErrors.pin_address ? "true" : undefined}>
-                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">
-                                        <span className="mr-2">📍</span>
-                                        Your Address *
-                                    </h3>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Enter the address where you provide services, or click the button to get your current location.</p>
-                                    {fieldErrors.pin_address && (
-                                        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
-                                            <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.pin_address}</p>
-                                        </div>
-                                    )}
-                                    <div className="flex gap-2">
-                                        <input
-                                            ref={el => pinAddressInputRefs.current[offerIndex] = el}
-                                            type="text"
-                                            value={offer.pin_address}
-                                            readOnly
-                                            className="flex-1 border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3 shadow-sm cursor-pointer"
-                                            placeholder="Click to search or use Get Location button"
-                                            onClick={() => pinAddressInputRefs.current[offerIndex]?.focus()}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => handleGetCurrentLocation(offerIndex)}
-                                            disabled={gettingLocation[offerIndex]}
-                                            className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
-                                        >
-                                            {gettingLocation[offerIndex] ? (
-                                                <>
-                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                                    <span>Getting...</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <span>📍</span>
-                                                    <span>Get Location</span>
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
-                                </div>
+
 
                                 {/* Offer Details */}
                                 <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -1010,6 +966,51 @@ export default function OnboardingHelper() {
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Optional: Add more details about yourself</p>
 
                                 <div className="space-y-6">
+                                    {/* Address Selection (Moved from Step 1) */}
+                                    {offers.map((offer, offerIndex) => (
+                                        <div key={offerIndex} className="mb-8" data-error-field={fieldErrors.pin_address ? "true" : undefined}>
+                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">
+                                                <span className="mr-2">📍</span>
+                                                Your Address *
+                                            </h3>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Enter the address where you provide services, or click the button to get your current location.</p>
+                                            {fieldErrors.pin_address && (
+                                                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
+                                                    <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.pin_address}</p>
+                                                </div>
+                                            )}
+                                            <div className="flex gap-2">
+                                                <input
+                                                    ref={el => pinAddressInputRefs.current[offerIndex] = el}
+                                                    type="text"
+                                                    value={offer.pin_address}
+                                                    readOnly
+                                                    className="flex-1 border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3 shadow-sm cursor-pointer"
+                                                    placeholder="Click to search or use Get Location button"
+                                                    onClick={() => pinAddressInputRefs.current[offerIndex]?.focus()}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleGetCurrentLocation(offerIndex)}
+                                                    disabled={gettingLocation[offerIndex]}
+                                                    className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+                                                >
+                                                    {gettingLocation[offerIndex] ? (
+                                                        <>
+                                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                            <span>Getting...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span>📍</span>
+                                                            <span>Get Location</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+
                                     <div className="grid md:grid-cols-2 gap-6">
                                         <div>
                                             <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Age</label>
