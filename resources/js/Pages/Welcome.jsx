@@ -1,4 +1,4 @@
-// Head removed
+import { Head } from "@inertiajs/react";
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const handleImageError = () => {
@@ -14,6 +14,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
     return (
         <>
+            <Head>
+                <title>Welcome</title>
+                <meta property="og:image" content="/images/kamwaalay-poster.png" />
+                <meta property="og:type" content="website" />
+                <meta property="twitter:card" content="summary_large_image" />
+                <meta property="twitter:image" content="/images/kamwaalay-poster.png" />
+            </Head>
 
             <div className="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
                 <img
