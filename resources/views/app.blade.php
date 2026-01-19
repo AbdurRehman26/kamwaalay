@@ -8,6 +8,15 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        <!-- Social Media Meta Tags -->
+        <meta property="og:site_name" content="{{ config('app.name', 'Kamwaalay') }}">
+        <meta property="og:title" content="{{ config('app.name', 'Kamwaalay') }}">
+        <meta property="og:description" content="Connect with skilled helpers and grow your business today.">
+        <meta property="og:image" content="{{ asset('images/kamwaalay-poster.png') }}">
+        <meta property="og:type" content="website">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="{{ asset('images/kamwaalay-poster.png') }}">
+
         <!-- PWA Manifest -->
         <link rel="manifest" href="{{ asset('manifest.json') }}">
 
