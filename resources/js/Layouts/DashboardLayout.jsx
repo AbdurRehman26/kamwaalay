@@ -112,8 +112,16 @@ export default function DashboardLayout({ children }) {
                     <div className="sticky top-28 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
                         {/* User Profile Summary in Sidebar */}
                         <div className="p-6 bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-center">
-                            <div className="w-20 h-20 mx-auto bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-3xl mb-3 shadow-inner border border-white/30">
-                                {user?.name?.charAt(0).toUpperCase()}
+                            <div className="w-20 h-20 mx-auto bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-3xl mb-3 shadow-inner border border-white/30 overflow-hidden">
+                                {user?.photo ? (
+                                    <img
+                                        src={`/storage/${user.photo}`}
+                                        alt={user.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    user?.name?.charAt(0).toUpperCase()
+                                )}
                             </div>
                             <h3 className="font-bold text-lg truncate">{user?.name}</h3>
                             <p className="text-indigo-100 text-xs uppercase tracking-wider font-medium">{user?.role}</p>

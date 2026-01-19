@@ -164,7 +164,6 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
                         )}
                         <div>
                             <h3 className="font-semibold">{recipientName || "User"}</h3>
-                            <p className="text-xs text-white/80">Online</p>
                         </div>
                     </div>
                     <button
@@ -214,6 +213,7 @@ export default function ChatPopup({ recipientId, recipientName, recipientPhoto, 
                                                 {new Date(message.created_at).toLocaleTimeString([], {
                                                     hour: "2-digit",
                                                     minute: "2-digit",
+                                                    hour12: true
                                                 })}
                                             </p>
                                         </div>

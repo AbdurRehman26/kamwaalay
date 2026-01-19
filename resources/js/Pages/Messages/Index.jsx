@@ -326,7 +326,7 @@ export default function MessagesIndex() {
                                                     {conversation.last_message && (
                                                         <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                                                             {new Date(conversation.last_message.created_at).toLocaleDateString() === new Date().toLocaleDateString()
-                                                                ? new Date(conversation.last_message.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                                                                ? new Date(conversation.last_message.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })
                                                                 : new Date(conversation.last_message.created_at).toLocaleDateString([], { month: "short", day: "numeric" })
                                                             }
                                                         </p>
@@ -361,7 +361,6 @@ export default function MessagesIndex() {
                                                 <p className="font-bold text-gray-900 dark:text-white">
                                                     {selectedConversation.other_user.name}
                                                 </p>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">Online</p>
                                             </div>
                                         </div>
                                         <button
@@ -429,6 +428,7 @@ export default function MessagesIndex() {
                                                                     {new Date(message.created_at).toLocaleTimeString([], {
                                                                         hour: "2-digit",
                                                                         minute: "2-digit",
+                                                                        hour12: true
                                                                     })}
                                                                 </p>
                                                             </div>
