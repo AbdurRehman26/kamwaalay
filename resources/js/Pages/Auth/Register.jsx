@@ -129,7 +129,7 @@ export default function Register() {
                             rel="noopener noreferrer"
                             className="inline-block transition-all duration-300 transform hover:-translate-y-1"
                         >
-                            <img src="/images/google-play-download-android-app-logo.webp" alt="Get on Google Play" className="h-28 w-auto" />
+                            <img src="/images/google-play-download-android-app-logo.webp" alt="Get on Google Play" className="h-28 w-auto mt-5" />
                         </a>
                     </div>
                 </div>

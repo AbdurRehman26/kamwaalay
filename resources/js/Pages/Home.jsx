@@ -181,7 +181,7 @@ export default function Home() {
                                     rel="noopener noreferrer"
                                     className="inline-block transition-all duration-300 transform hover:-translate-y-1"
                                 >
-                                    <img src="/images/google-play-download-android-app-logo.webp" alt="Get on Google Play" className="h-28 w-auto mb-5" />
+                                    <img src="/images/google-play-download-android-app-logo.webp" alt="Get on Google Play" className="h-28 w-auto mb-10" />
                                 </a>
                             </div>
                         </div>
