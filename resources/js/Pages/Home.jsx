@@ -172,6 +172,18 @@ export default function Home() {
                                     </Link>
                                 )}
                             </div>
+
+                            {/* Android App Download Button */}
+                            <div className="mt-6 flex justify-center lg:justify-start">
+                                <a
+                                    href="https://play.google.com/store/apps/details?id=com.kamwaalay.app"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-block transition-all duration-300 transform hover:-translate-y-1"
+                                >
+                                    <img src="/images/google-play-download-android-app-logo.webp" alt="Get on Google Play" className="h-28 w-auto mb-5" />
+                                </a>
+                            </div>
                         </div>
 
                         {/* Hero Visual */}

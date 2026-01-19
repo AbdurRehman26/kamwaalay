@@ -109,7 +109,7 @@ export default function Register() {
     return (
         <PublicLayout>
             {/* Hero Section */}
-            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden py-16 md:py-24">
+            <div className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white overflow-hidden py-16 md:py-20">
                 {/* Abstract Background Shapes */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[100px] animate-pulse"></div>
@@ -121,6 +121,17 @@ export default function Register() {
                     <p className="text-xl text-indigo-100/90 max-w-2xl mx-auto leading-relaxed">
                         Join us and start your journey today
                     </p>
+                    {/* Android App Download Button */}
+                    <div className="mt-0">
+                        <a
+                            href="https://play.google.com/store/apps/details?id=com.kamwaalay.app"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block transition-all duration-300 transform hover:-translate-y-1"
+                        >
+                            <img src="/images/google-play-download-android-app-logo.webp" alt="Get on Google Play" className="h-28 w-auto" />
+                        </a>
+                    </div>
                 </div>
             </div>
 

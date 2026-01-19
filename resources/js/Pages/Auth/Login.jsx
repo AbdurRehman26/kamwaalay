@@ -201,6 +201,17 @@ export default function Login() {
                     <p className="text-lg text-indigo-100/90 max-w-2xl mx-auto">
                         Sign in to your account to continue
                     </p>
+                    {/* Android App Download Button */}
+                    <div className="mt-6">
+                        <a
+                            href="https://play.google.com/store/apps/details?id=com.kamwaalay.app"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block transition-all duration-300 transform hover:-translate-y-1"
+                        >
+                            <img src="/images/google-play-download-android-app-logo.webp" alt="Get on Google Play" className="h-28 w-auto" />
+                        </a>
+                    </div>
                 </div>
             </div>
 
