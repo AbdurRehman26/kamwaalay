@@ -269,7 +269,7 @@ export default function JobApplicationCreate() {
                                         </p>
                                         <button
                                             type="button"
-                                            onClick={() => navigate(route("job-applications.index"))}
+                                            onClick={() => navigate(route("job-applications.my-applications"))}
                                             className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 font-bold"
                                         >
                                             View My Applications

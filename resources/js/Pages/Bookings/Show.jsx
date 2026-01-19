@@ -134,12 +134,7 @@ export default function BookingShow() {
                                     </div>
                                 )}
                             </div>
-                            {booking.start_date && (
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Start Date</h3>
-                                    <p className="text-gray-900 dark:text-white">{booking.start_date}</p>
-                                </div>
-                            )}
+
                             {booking.special_requirements && (
                                 <div className="md:col-span-2">
                                     <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Special Requirements</h3>

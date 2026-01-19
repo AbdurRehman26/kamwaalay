@@ -330,31 +330,7 @@ export default function JobApplicationShow() {
                                     )}
                                 </div>
 
-                                {jobPost?.start_date && (
-                                    <div>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Start Date</p>
-                                        <p className="text-gray-900 dark:text-white font-semibold">
-                                            {new Date(jobPost.start_date).toLocaleDateString("en-US", {
-                                                year: "numeric",
-                                                month: "long",
-                                                day: "numeric"
-                                            })}
-                                        </p>
-                                    </div>
-                                )}
 
-                                {jobPost?.start_time && (
-                                    <div>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Start Time</p>
-                                        <p className="text-gray-900 dark:text-white font-semibold">
-                                            {new Date(jobPost.start_time).toLocaleTimeString("en-US", {
-                                                hour: "numeric",
-                                                minute: "2-digit",
-                                                hour12: true
-                                            })}
-                                        </p>
-                                    </div>
-                                )}
 
                                 {jobPost && (
                                     <div className="pt-3 border-t border-gray-200 dark:border-gray-700">

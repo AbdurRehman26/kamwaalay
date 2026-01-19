@@ -305,7 +305,12 @@ export default function CreateWorker() {
                                     type="tel"
                                     className="mt-1 block w-full"
                                     value={data.phone}
-                                    onChange={(e) => setData({ ...data, phone: e.target.value })}
+                                    onChange={(e) => {
+                                        const value = e.target.value.replace(/\D/g, "").slice(0, 11);
+                                        setData({ ...data, phone: value });
+                                    }}
+                                    placeholder="03001234567"
+                                    maxLength={11}
                                 />
                                 <InputError message={errors.phone} className="mt-1.5" />
                             </div>

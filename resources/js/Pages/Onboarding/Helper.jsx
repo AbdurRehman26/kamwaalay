@@ -8,6 +8,193 @@ import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
 import { useLanguages } from "@/hooks/useLanguages";
 
+
+// NIC File Input Component
+const NICFileInput = ({ onFileAccepted, file, error, fieldErrors, setFieldErrors }) => {
+    const fileInputRef = useRef(null);
+    const fileInputIdRef = useRef(`nic-file-${Date.now()}-${Math.random()}`);
+    const [previewUrl, setPreviewUrl] = useState(null);
+
+    useEffect(() => {
+        if (file && file.type.startsWith("image/")) {
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+            return () => URL.revokeObjectURL(url);
+        } else {
+            setPreviewUrl(null);
+        }
+    }, [file]);
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            // Validate file type
+            const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+            if (!validTypes.includes(selectedFile.type)) {
+                setFieldErrors(prev => ({ ...prev, nicFileType: "Invalid file type. Please upload JPG, PNG, or PDF." }));
+                e.target.value = ""; // Reset input
+                setTimeout(() => setFieldErrors(prev => ({ ...prev, nicFileType: "" })), 5000);
+                return;
+            }
+            // Validate file size (5MB)
+            if (selectedFile.size > 5 * 1024 * 1024) {
+                setFieldErrors(prev => ({ ...prev, nicFileSize: "File size exceeds 5MB limit." }));
+                e.target.value = ""; // Reset input
+                setTimeout(() => setFieldErrors(prev => ({ ...prev, nicFileSize: "" })), 5000);
+                return;
+            }
+            // Clear errors on successful file selection
+            setFieldErrors(prev => ({ ...prev, nicFileType: "", nicFileSize: "" }));
+            onFileAccepted(selectedFile);
+        }
+    };
+
+    const removeFile = () => {
+        onFileAccepted(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    return (
+        <div>
+            {file ? (
+                <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border-2 border-gray-200 dark:border-gray-600">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 flex items-center justify-center">
+                        {previewUrl ? (
+                            <img
+                                src={previewUrl}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <span className="text-3xl">{file.type === "application/pdf" ? "📄" : "📁"}</span>
+                        )}
+                    </div>
+
+                    <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={removeFile}
+                        className="px-3 py-1 text-sm bg-red-500 dark:bg-red-600 text-white rounded-xl hover:bg-red-600 dark:hover:bg-red-700 transition-all duration-300"
+                    >
+                        Remove
+                    </button>
+                </div>
+            ) : (
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300">
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={handleFileChange}
+                        className="hidden"
+                        id={fileInputIdRef.current}
+                    />
+                    <label htmlFor={fileInputIdRef.current} className="cursor-pointer">
+                        <div className="text-4xl mb-2">📄</div>
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Click to upload NIC</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF, JPG, or PNG up to 5MB</p>
+                    </label>
+                </div>
+            )}
+            {(error || fieldErrors.nicFileType || fieldErrors.nicFileSize) && (
+                <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{error || fieldErrors.nicFileType || fieldErrors.nicFileSize}</div>
+            )}
+        </div>
+    );
+};
+
+// Photo File Input Component
+const PhotoFileInput = ({ onFileAccepted, file, error, fieldErrors, setFieldErrors }) => {
+    const fileInputRef = useRef(null);
+    const fileInputIdRef = useRef(`photo-file-${Date.now()}-${Math.random()}`);
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            // Validate file type
+            const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+            if (!validTypes.includes(selectedFile.type)) {
+                setFieldErrors(prev => ({ ...prev, photoFileType: "Invalid file type. Please upload JPG or PNG." }));
+                e.target.value = ""; // Reset input
+                setTimeout(() => setFieldErrors(prev => ({ ...prev, photoFileType: "" })), 5000);
+                return;
+            }
+            // Validate file size (2MB)
+            if (selectedFile.size > 2 * 1024 * 1024) {
+                setFieldErrors(prev => ({ ...prev, photoFileSize: "File size exceeds 2MB limit." }));
+                e.target.value = ""; // Reset input
+                setTimeout(() => setFieldErrors(prev => ({ ...prev, photoFileSize: "" })), 5000);
+                return;
+            }
+            // Clear errors on successful file selection
+            setFieldErrors(prev => ({ ...prev, photoFileType: "", photoFileSize: "" }));
+            onFileAccepted(selectedFile);
+        }
+    };
+
+    const removeFile = () => {
+        onFileAccepted(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    return (
+        <div>
+            {file ? (
+                <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border-2 border-gray-200 dark:border-gray-600">
+                    <div className="flex-1 flex gap-4 items-center">
+                        {/* Image Preview */}
+                        <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-200 dark:border-gray-500 bg-gray-100 dark:bg-gray-800">
+                            <img
+                                src={URL.createObjectURL(file)}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                                onLoad={(e) => URL.revokeObjectURL(e.target.src)}
+                            />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={removeFile}
+                        className="px-3 py-1 text-sm bg-red-500 dark:bg-red-600 text-white rounded-xl hover:bg-red-600 dark:hover:bg-red-700 transition-all duration-300"
+                    >
+                        Remove
+                    </button>
+                </div>
+            ) : (
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300">
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".jpg,.jpeg,.png"
+                        onChange={handleFileChange}
+                        className="hidden"
+                        id={fileInputIdRef.current}
+                    />
+                    <label htmlFor={fileInputIdRef.current} className="cursor-pointer">
+                        <div className="text-4xl mb-2">📷</div>
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Click to upload photo</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">JPG or PNG up to 2MB</p>
+                    </label>
+                </div>
+            )}
+            {(error || fieldErrors.photoFileType || fieldErrors.photoFileSize) && (
+                <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{error || fieldErrors.photoFileType || fieldErrors.photoFileSize}</div>
+            )}
+        </div>
+    );
+};
+
 export default function OnboardingHelper() {
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -499,167 +686,6 @@ export default function OnboardingHelper() {
     };
 
     // NIC File Input Component
-    const NICFileInput = ({ onFileAccepted, file, error }) => {
-        const fileInputRef = useRef(null);
-        const fileInputIdRef = useRef(`nic-file-${Date.now()}-${Math.random()}`);
-
-        const handleFileChange = (e) => {
-            const selectedFile = e.target.files?.[0];
-            if (selectedFile) {
-                // Validate file type
-                const validTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
-                if (!validTypes.includes(selectedFile.type)) {
-                    setFieldErrors(prev => ({ ...prev, nicFileType: "Invalid file type. Please upload JPG, PNG, or PDF." }));
-                    e.target.value = ""; // Reset input
-                    setTimeout(() => setFieldErrors(prev => ({ ...prev, nicFileType: "" })), 5000);
-                    return;
-                }
-                // Validate file size (5MB)
-                if (selectedFile.size > 5 * 1024 * 1024) {
-                    setFieldErrors(prev => ({ ...prev, nicFileSize: "File size exceeds 5MB limit." }));
-                    e.target.value = ""; // Reset input
-                    setTimeout(() => setFieldErrors(prev => ({ ...prev, nicFileSize: "" })), 5000);
-                    return;
-                }
-                // Clear errors on successful file selection
-                setFieldErrors(prev => ({ ...prev, nicFileType: "", nicFileSize: "" }));
-                onFileAccepted(selectedFile);
-            }
-        };
-
-        const removeFile = () => {
-            onFileAccepted(null);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = "";
-            }
-        };
-
-        return (
-            <div>
-                {file ? (
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border-2 border-gray-200 dark:border-gray-600">
-                        <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={removeFile}
-                            className="px-3 py-1 text-sm bg-red-500 dark:bg-red-600 text-white rounded-xl hover:bg-red-600 dark:hover:bg-red-700 transition-all duration-300"
-                        >
-                            Remove
-                        </button>
-                    </div>
-                ) : (
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300">
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={handleFileChange}
-                            className="hidden"
-                            id={fileInputIdRef.current}
-                        />
-                        <label htmlFor={fileInputIdRef.current} className="cursor-pointer">
-                            <div className="text-4xl mb-2">📄</div>
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Click to upload NIC</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF, JPG, or PNG up to 5MB</p>
-                        </label>
-                    </div>
-                )}
-                {(error || fieldErrors.nicFileType || fieldErrors.nicFileSize) && (
-                    <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{error || fieldErrors.nicFileType || fieldErrors.nicFileSize}</div>
-                )}
-            </div>
-        );
-    };
-
-    // Photo File Input Component
-    const PhotoFileInput = ({ onFileAccepted, file, error }) => {
-        const fileInputRef = useRef(null);
-        const fileInputIdRef = useRef(`photo-file-${Date.now()}-${Math.random()}`);
-
-        const handleFileChange = (e) => {
-            const selectedFile = e.target.files?.[0];
-            if (selectedFile) {
-                // Validate file type
-                const validTypes = ["image/jpeg", "image/jpg", "image/png"];
-                if (!validTypes.includes(selectedFile.type)) {
-                    setFieldErrors(prev => ({ ...prev, photoFileType: "Invalid file type. Please upload JPG or PNG." }));
-                    e.target.value = ""; // Reset input
-                    setTimeout(() => setFieldErrors(prev => ({ ...prev, photoFileType: "" })), 5000);
-                    return;
-                }
-                // Validate file size (2MB)
-                if (selectedFile.size > 2 * 1024 * 1024) {
-                    setFieldErrors(prev => ({ ...prev, photoFileSize: "File size exceeds 2MB limit." }));
-                    e.target.value = ""; // Reset input
-                    setTimeout(() => setFieldErrors(prev => ({ ...prev, photoFileSize: "" })), 5000);
-                    return;
-                }
-                // Clear errors on successful file selection
-                setFieldErrors(prev => ({ ...prev, photoFileType: "", photoFileSize: "" }));
-                onFileAccepted(selectedFile);
-            }
-        };
-
-        const removeFile = () => {
-            onFileAccepted(null);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = "";
-            }
-        };
-
-        return (
-            <div>
-                {file ? (
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border-2 border-gray-200 dark:border-gray-600">
-                        <div className="flex-1 flex gap-4 items-center">
-                            {/* Image Preview */}
-                            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-200 dark:border-gray-500 bg-gray-100 dark:bg-gray-800">
-                                <img
-                                    src={URL.createObjectURL(file)}
-                                    alt="Preview"
-                                    className="w-full h-full object-cover"
-                                    onLoad={(e) => URL.revokeObjectURL(e.target.src)}
-                                />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                            </div>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={removeFile}
-                            className="px-3 py-1 text-sm bg-red-500 dark:bg-red-600 text-white rounded-xl hover:bg-red-600 dark:hover:bg-red-700 transition-all duration-300"
-                        >
-                            Remove
-                        </button>
-                    </div>
-                ) : (
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300">
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept=".jpg,.jpeg,.png"
-                            onChange={handleFileChange}
-                            className="hidden"
-                            id={fileInputIdRef.current}
-                        />
-                        <label htmlFor={fileInputIdRef.current} className="cursor-pointer">
-                            <div className="text-4xl mb-2">📷</div>
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Click to upload photo</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">JPG or PNG up to 2MB</p>
-                        </label>
-                    </div>
-                )}
-                {(error || fieldErrors.photoFileType || fieldErrors.photoFileSize) && (
-                    <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{error || fieldErrors.photoFileType || fieldErrors.photoFileSize}</div>
-                )}
-            </div>
-        );
-    };
 
     const steps = [
         { number: 1, title: "Service Information", description: "Tell us about the services you offer" },
@@ -929,6 +955,8 @@ export default function OnboardingHelper() {
                                             }}
                                             file={profileData.nic}
                                             error={errors.nic}
+                                            fieldErrors={fieldErrors}
+                                            setFieldErrors={setFieldErrors}
                                         />
                                         {(fieldErrors.nicFileType || fieldErrors.nicFileSize) && (
                                             <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
@@ -944,9 +972,13 @@ export default function OnboardingHelper() {
                                         <input
                                             type="text"
                                             value={profileData.nic_number}
-                                            onChange={(e) => setProfileData({ ...profileData, nic_number: e.target.value })}
+                                            onChange={(e) => {
+                                                const value = e.target.value.replace(/\D/g, "").slice(0, 13);
+                                                setProfileData({ ...profileData, nic_number: value });
+                                            }}
                                             className="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm"
-                                            placeholder="e.g., 42101-1234567-1"
+                                            placeholder="e.g. 4210112345671"
+                                            maxLength={13}
                                             required
                                         />
                                         {errors.nic_number && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.nic_number}</div>}
@@ -964,6 +996,8 @@ export default function OnboardingHelper() {
                                             }}
                                             file={profileData.photo}
                                             error={errors.photo}
+                                            fieldErrors={fieldErrors}
+                                            setFieldErrors={setFieldErrors}
                                         />
                                         {(fieldErrors.photoFileType || fieldErrors.photoFileSize) && (
                                             <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">

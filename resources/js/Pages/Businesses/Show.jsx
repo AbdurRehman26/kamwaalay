@@ -119,6 +119,20 @@ export default function BusinessShow() {
                                 )}
                             </div>
                         </div>
+                        <div className="hidden md:block">
+                            <a
+                                href="https://play.google.com/store/apps/details?id=com.kamwaalay.app"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-block transition-all duration-300 transform hover:-translate-y-1"
+                            >
+                                <img
+                                    src="/images/google-play-download-android-app-logo.webp"
+                                    alt="Get it on Google Play"
+                                    className="h-24 w-auto hover:opacity-90 transition-opacity cursor-pointer"
+                                />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -146,7 +160,9 @@ export default function BusinessShow() {
                                 {business.city && (
                                     <div>
                                         <p className="text-sm text-gray-600 dark:text-gray-400">Location</p>
-                                        <p className="font-semibold text-gray-900 dark:text-white">{business.city}, {business.area || "N/A"}</p>
+                                        <p className="font-semibold text-gray-900 dark:text-white">
+                                            {typeof business.city === "object" ? business.city.name : business.city}, {business.area || "N/A"}
+                                        </p>
                                     </div>
                                 )}
                             </div>
@@ -275,7 +291,7 @@ export default function BusinessShow() {
                                                 <div className="text-sm text-gray-600 dark:text-gray-400 mb-3 space-y-1">
                                                     {listing.location_details.slice(0, 2).map((location, idx) => (
                                                         <p key={idx}>
-                                                            📍 {location.area || location.city_name}
+                                                            📍 {location.area || (typeof location.city_name === "object" ? location.city_name?.name : location.city_name)}
                                                         </p>
                                                     ))}
                                                     {listing.location_details.length > 2 && (
@@ -315,7 +331,7 @@ export default function BusinessShow() {
                         )}
 
                         {/* Workers Section */}
-                        {workers && workers.length > 0 && (
+                        {workers && workers.length > 0 ? (
                             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
                                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Our Workers</h2>
                                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -403,12 +419,17 @@ export default function BusinessShow() {
                                                                     new Map(allServices.map(s => [s.id || s.name, s])).values()
                                                                 );
 
-                                                                return uniqueServices.map((service, idx) => (
-                                                                    <span key={idx} className="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs px-2 py-1 rounded-md font-medium">
-                                                                        {service.icon && <span>{service.icon}</span>}
-                                                                        <span className="capitalize">{service.name}</span>
-                                                                    </span>
-                                                                ));
+                                                                return uniqueServices.map((service, idx) => {
+                                                                    const serviceName = service.name && typeof service.name === "object" ? service.name.name || "" : service.name;
+                                                                    const serviceIcon = service.icon && typeof service.icon === "object" ? null : service.icon;
+
+                                                                    return (
+                                                                        <span key={idx} className="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs px-2 py-1 rounded-md font-medium">
+                                                                            {serviceIcon && <span>{serviceIcon}</span>}
+                                                                            <span className="capitalize">{serviceName}</span>
+                                                                        </span>
+                                                                    );
+                                                                });
                                                             })()}
                                                         </div>
                                                     </div>
@@ -466,6 +487,18 @@ export default function BusinessShow() {
                                         </p>
                                     </div>
                                 )}
+
+                            </div>
+                        ) : (
+                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center">
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Our Workers</h2>
+                                <div className="py-8 bg-gray-50 dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
+                                    <div className="text-5xl mb-4 opacity-50">👥</div>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Workers Available</h3>
+                                    <p className="text-gray-600 dark:text-gray-400 max-w-sm mx-auto">
+                                        This business hasn't listed any workers yet. Please check back later or contact the business directly for inquiries.
+                                    </p>
+                                </div>
                             </div>
                         )}
                     </div>

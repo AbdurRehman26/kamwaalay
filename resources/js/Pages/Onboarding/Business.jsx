@@ -9,6 +9,68 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 
+// NIC Dropzone Component
+const NICDropzone = ({ onFileAccepted, file, error, fileError, setFileError }) => {
+    const [previewUrl, setPreviewUrl] = useState(null);
+
+    useEffect(() => {
+        if (file && file.type.startsWith("image/")) {
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+            return () => URL.revokeObjectURL(url);
+        } else {
+            setPreviewUrl(null);
+        }
+    }, [file]);
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        accept: { "image/*": [".jpeg", ".jpg", ".png"], "application/pdf": [".pdf"] },
+        maxFiles: 1, maxSize: 5 * 1024 * 1024,
+        onDropAccepted: (files) => { setFileError(null); if (files.length > 0) onFileAccepted(files[0]); },
+        onDropRejected: (files) => {
+            if (files.length > 0) setFileError(files[0].errors[0].message);
+        },
+    });
+
+    return (
+        <div>
+            <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${isDragActive ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20" : error ? "border-red-300 bg-red-50 dark:bg-red-900/20" : "border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-400 bg-white dark:bg-gray-800"}`}>
+                <input {...getInputProps()} />
+
+                {file ? (
+                    <div className="space-y-4">
+                        {previewUrl ? (
+                            <div className="mx-auto w-40 h-40 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 shadow-sm">
+                                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                            </div>
+                        ) : (
+                            <div className="text-5xl mb-2">📄</div>
+                        )}
+                        <div>
+                            <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{file.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); onFileAccepted(null); }}
+                                className="px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors text-sm font-semibold"
+                            >
+                                Remove File
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="text-5xl mb-3">📄</div>
+                        <p className="text-base font-medium text-gray-700 dark:text-gray-300">{isDragActive ? "Drop here..." : "Click or Drag to Upload NIC"}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">JPG, PNG, PDF (Max 5MB)</p>
+                    </>
+                )}
+            </div>
+            {(error || fileError) && <div className="text-red-500 text-sm mt-1 font-medium">{error || fileError}</div>}
+        </div>
+    );
+};
+
 export default function OnboardingBusiness() {
     const navigate = useNavigate();
     const { user, isLoading } = useAuth();
@@ -70,32 +132,6 @@ export default function OnboardingBusiness() {
     };
 
     // NIC Dropzone Component
-    const NICDropzone = ({ onFileAccepted, file, error }) => {
-        const { getRootProps, getInputProps, isDragActive } = useDropzone({
-            accept: { "image/*": [".jpeg", ".jpg", ".png"], "application/pdf": [".pdf"] },
-            maxFiles: 1, maxSize: 5 * 1024 * 1024,
-            onDropAccepted: (files) => { setFileError(null); if (files.length > 0) onFileAccepted(files[0]); },
-            onDropRejected: (files) => {
-                if (files.length > 0) setFileError(files[0].errors[0].message);
-            },
-        });
-
-        return (
-            <div>
-                <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${isDragActive ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20" : error ? "border-red-300 bg-red-50 dark:bg-red-900/20" : "border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-400 bg-white dark:bg-gray-800"}`}>
-                    <input {...getInputProps()} />
-                    <div className="text-4xl mb-2">📄</div>
-                    {file ? (
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{file.name}</p>
-                            <button type="button" onClick={(e) => { e.stopPropagation(); onFileAccepted(null); }} className="text-red-600 dark:text-red-400 text-xs underline">Remove</button>
-                        </div>
-                    ) : <p className="text-sm text-gray-500 dark:text-gray-400">{isDragActive ? "Drop here" : "Upload NIC (JPG, PNG, PDF)"}</p>}
-                </div>
-                {(error || fileError) && <div className="text-red-500 text-sm mt-1">{error || fileError}</div>}
-            </div>
-        );
-    };
 
     return (
         <PublicLayout>
@@ -128,15 +164,25 @@ export default function OnboardingBusiness() {
                             <div className="space-y-6">
                                 <div>
                                     <InputLabel value="NIC Image *" />
-                                    <NICDropzone onFileAccepted={(file) => setProfileData({ ...profileData, nic: file })} file={profileData.nic} error={errors.nic} />
+                                    <NICDropzone
+                                        onFileAccepted={(file) => setProfileData({ ...profileData, nic: file })}
+                                        file={profileData.nic}
+                                        error={errors.nic}
+                                        fileError={fileError}
+                                        setFileError={setFileError}
+                                    />
                                 </div>
                                 <div>
                                     <InputLabel value="NIC Number *" />
                                     <TextInput
                                         value={profileData.nic_number}
-                                        onChange={(e) => setProfileData({ ...profileData, nic_number: e.target.value })}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "").slice(0, 13);
+                                            setProfileData({ ...profileData, nic_number: value });
+                                        }}
                                         className="mt-1 block w-full"
-                                        placeholder="e.g. 42101-1234567-8"
+                                        placeholder="e.g. 4210112345671"
+                                        maxLength={13}
                                         required
                                     />
                                     <InputError message={errors.nic_number} className="mt-1.5" />

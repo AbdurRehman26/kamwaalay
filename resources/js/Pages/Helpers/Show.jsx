@@ -164,6 +164,20 @@ export default function HelperShow() {
                                 </div>
                             )}
                         </div>
+                        <div className="hidden md:block">
+                            <a
+                                href="https://play.google.com/store/apps/details?id=com.kamwaalay.app"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-block transition-all duration-300 transform hover:-translate-y-1"
+                            >
+                                <img
+                                    src="/images/google-play-download-android-app-logo.webp"
+                                    alt="Get it on Google Play"
+                                    className="h-24 w-auto hover:opacity-90 transition-opacity cursor-pointer"
+                                />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
