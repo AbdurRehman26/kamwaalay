@@ -10,6 +10,7 @@ import TextArea from "@/Components/TextArea";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
 import { useLanguages } from "@/hooks/useLanguages";
 import toast from "react-hot-toast";
+import MapPicker from "@/Components/MapPicker";
 
 export default function EditWorker() {
     const navigate = useNavigate();
@@ -197,18 +198,24 @@ export default function EditWorker() {
                                 pinAddressInputRef.current.value = results[0].formatted_address;
                             }
                         } else {
-                            setLocationData(prev => ({ ...prev, pin_address: `${latitude}, ${longitude}` }));
-                            if (pinAddressInputRef.current) {
-                                pinAddressInputRef.current.value = `${latitude}, ${longitude}`;
-                            }
+                            // Geocoding failed - set coordinates but prompt user to select from map
+                            setLocationData(prev => ({
+                                ...prev,
+                                pin_latitude: latitude,
+                                pin_longitude: longitude
+                            }));
+                            toast.error("Could not find address. Please click on the map to select your location.");
                         }
                         setGettingLocation(false);
                     });
                 } else {
-                    setLocationData(prev => ({ ...prev, pin_address: `${latitude}, ${longitude}` }));
-                    if (pinAddressInputRef.current) {
-                        pinAddressInputRef.current.value = `${latitude}, ${longitude}`;
-                    }
+                    // No geocoder available - set coordinates but prompt user to select from map
+                    setLocationData(prev => ({
+                        ...prev,
+                        pin_latitude: latitude,
+                        pin_longitude: longitude
+                    }));
+                    toast.error("Could not find address. Please click on the map to select your location.");
                     setGettingLocation(false);
                 }
             },
@@ -626,8 +633,28 @@ export default function EditWorker() {
                             {gettingLocation && <p className="text-xs text-indigo-500 mt-1">Getting current location...</p>}
                             <InputError message={errors.pin_address} className="mt-1.5" />
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                Start typing to search for an address, or click the location icon to use your current location.
+                                Start typing to search for an address, click on the map, or use the location icon to get your current location.
                             </p>
+
+                            {/* Map Picker for visual location selection */}
+                            <div className="mt-4 rounded-xl overflow-hidden shadow-md border-2 border-gray-100 dark:border-gray-700">
+                                <MapPicker
+                                    latitude={locationData.pin_latitude}
+                                    longitude={locationData.pin_longitude}
+                                    onChange={(lat, lng, address) => {
+                                        setLocationData(prev => ({
+                                            ...prev,
+                                            pin_latitude: lat,
+                                            pin_longitude: lng,
+                                            pin_address: address || prev.pin_address
+                                        }));
+                                        if (pinAddressInputRef.current && address) {
+                                            pinAddressInputRef.current.value = address;
+                                        }
+                                    }}
+                                    height="350px"
+                                />
+                            </div>
                         </div>
                     </div>
 

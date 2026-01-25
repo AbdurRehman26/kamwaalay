@@ -3,6 +3,7 @@ import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import SearchableSelect from "@/Components/SearchableSelect";
+import MapPicker from "@/Components/MapPicker";
 import { Transition } from "@headlessui/react";
 import { useState, useEffect, useRef } from "react";
 import { profileService } from "@/services/profile";
@@ -69,10 +70,9 @@ export default function UpdateProfileInformation({
         }
     }, [user]);
 
-    // Initialize Google Places Autocomplete for helper location
+    // Initialize Google Places Autocomplete for pin location
     useEffect(() => {
-        const isHelper = user?.role === "helper" || user?.roles?.includes("helper");
-        if (isHelper && pinAddressInputRef.current && window.google?.maps?.places) {
+        if (pinAddressInputRef.current && window.google?.maps?.places) {
             try {
                 const autocomplete = new window.google.maps.places.Autocomplete(
                     pinAddressInputRef.current,
@@ -107,7 +107,7 @@ export default function UpdateProfileInformation({
                 console.error("Error initializing Google Places Autocomplete:", error);
             }
         }
-    }, [user?.role]);
+    }, []);
 
     const handleGetCurrentLocation = () => {
         if (!navigator.geolocation) {
@@ -136,12 +136,13 @@ export default function UpdateProfileInformation({
                             pin_longitude: longitude.toString()
                         }));
                     } else {
+                        // Geocoding failed - set coordinates but prompt user to select address from map
                         setData(prev => ({
                             ...prev,
-                            pin_address: `${latitude}, ${longitude}`,
                             pin_latitude: latitude.toString(),
                             pin_longitude: longitude.toString()
                         }));
+                        toast.error("Could not find address. Please click on the map to select your location.");
                     }
                     setGettingLocation(false);
                 });
@@ -375,47 +376,64 @@ export default function UpdateProfileInformation({
 
                             <InputError className="mt-2" message={errors.languages} />
                         </div>
-
-                        {/* Service Location for helpers */}
-                        <div>
-                            <InputLabel htmlFor="pin_address" value="Service Location" />
-                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                Enter the address where you provide services
-                            </p>
-
-                            <div className="mt-2 flex gap-2">
-                                <TextInput
-                                    ref={pinAddressInputRef}
-                                    id="pin_address"
-                                    className="flex-1"
-                                    value={data.pin_address}
-                                    onChange={(e) => setData({ ...data, pin_address: e.target.value })}
-                                    placeholder="Start typing address..."
-                                />
-                                <button
-                                    type="button"
-                                    onClick={handleGetCurrentLocation}
-                                    disabled={gettingLocation}
-                                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                >
-                                    {gettingLocation ? (
-                                        <>
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                            <span>Getting...</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span>📍</span>
-                                            <span>Get Location</span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-
-                            <InputError className="mt-2" message={errors.pin_address} />
-                        </div>
                     </>
                 )}
+
+                {/* Pin Location - available for all users */}
+                <div>
+                    <InputLabel htmlFor="pin_address" value="Pin Location" />
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        Set your location by typing an address, clicking on the map, or using your current location
+                    </p>
+
+                    <div className="mt-2 flex gap-2">
+                        <TextInput
+                            ref={pinAddressInputRef}
+                            id="pin_address"
+                            className="flex-1"
+                            value={data.pin_address}
+                            onChange={(e) => setData({ ...data, pin_address: e.target.value })}
+                            placeholder="Start typing address..."
+                        />
+                        <button
+                            type="button"
+                            onClick={handleGetCurrentLocation}
+                            disabled={gettingLocation}
+                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {gettingLocation ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    <span>Getting...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>📍</span>
+                                    <span>Get Location</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+
+                    {/* Map Picker for visual location selection */}
+                    <div className="mt-4 rounded-xl overflow-hidden shadow-md border border-gray-200 dark:border-gray-700">
+                        <MapPicker
+                            latitude={data.pin_latitude}
+                            longitude={data.pin_longitude}
+                            onChange={(lat, lng, address) => {
+                                setData(prev => ({
+                                    ...prev,
+                                    pin_latitude: lat ? lat.toString() : "",
+                                    pin_longitude: lng ? lng.toString() : "",
+                                    pin_address: address || prev.pin_address
+                                }));
+                            }}
+                            height="300px"
+                        />
+                    </div>
+
+                    <InputError className="mt-2" message={errors.pin_address} />
+                </div>
 
                 <div className="flex items-center gap-4">
                     <PrimaryButton disabled={processing}>Save</PrimaryButton>

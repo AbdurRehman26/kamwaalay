@@ -7,6 +7,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
 import { useLanguages } from "@/hooks/useLanguages";
+import MapPicker from "@/Components/MapPicker";
+import toast from "react-hot-toast";
 
 
 // NIC File Input Component
@@ -373,12 +375,13 @@ export default function OnboardingHelper() {
                                 pin_longitude: longitude.toString()
                             };
                         } else {
+                            // Geocoding failed - set coordinates but prompt user to select from map
                             newOffers[offerIndex] = {
                                 ...newOffers[offerIndex],
-                                pin_address: `${latitude}, ${longitude}`,
                                 pin_latitude: latitude.toString(),
                                 pin_longitude: longitude.toString()
                             };
+                            toast.error("Could not find address. Please click on the map to select your location.");
                         }
                         setOffers(newOffers);
                         const newGetting = [...gettingLocation];
@@ -387,14 +390,15 @@ export default function OnboardingHelper() {
                     });
                 } catch (error) {
                     console.error("Error reverse geocoding:", error);
+                    // Geocoding failed - set coordinates but prompt user to select from map
                     const newOffers = [...offers];
                     newOffers[offerIndex] = {
                         ...newOffers[offerIndex],
-                        pin_address: `${latitude}, ${longitude}`,
                         pin_latitude: latitude.toString(),
                         pin_longitude: longitude.toString()
                     };
                     setOffers(newOffers);
+                    toast.error("Could not find address. Please click on the map to select your location.");
                     const newGetting = [...gettingLocation];
                     newGetting[offerIndex] = false;
                     setGettingLocation(newGetting);
@@ -1023,7 +1027,7 @@ export default function OnboardingHelper() {
                                                 <span className="mr-2">📍</span>
                                                 Your Address *
                                             </h3>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Enter the address where you provide services, or click the button to get your current location.</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Enter the address where you provide services, select on the map, or click the button to get your current location.</p>
                                             {fieldErrors.pin_address && (
                                                 <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl">
                                                     <p className="text-sm text-red-600 dark:text-red-400">{fieldErrors.pin_address}</p>
@@ -1057,6 +1061,25 @@ export default function OnboardingHelper() {
                                                         </>
                                                     )}
                                                 </button>
+                                            </div>
+
+                                            {/* Map Picker for visual location selection */}
+                                            <div className="mt-4 rounded-xl overflow-hidden shadow-md border border-gray-200 dark:border-gray-700">
+                                                <MapPicker
+                                                    latitude={offer.pin_latitude}
+                                                    longitude={offer.pin_longitude}
+                                                    onChange={(lat, lng, address) => {
+                                                        const newOffers = [...offers];
+                                                        newOffers[offerIndex] = {
+                                                            ...newOffers[offerIndex],
+                                                            pin_latitude: lat ? lat.toString() : "",
+                                                            pin_longitude: lng ? lng.toString() : "",
+                                                            pin_address: address || newOffers[offerIndex].pin_address
+                                                        };
+                                                        setOffers(newOffers);
+                                                    }}
+                                                    height="300px"
+                                                />
                                             </div>
                                         </div>
                                     ))}
