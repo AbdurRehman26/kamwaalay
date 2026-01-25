@@ -197,20 +197,42 @@ export default function BookingCreate() {
 
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Phone *</label>
-                                    <input
-                                        type="tel"
-                                        value={data.phone}
-                                        onChange={(e) => setData(prev => ({ ...prev, phone: e.target.value }))}
-                                        disabled={!!user}
-                                        className={`w-full border-2 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4 shadow-sm ${user ? "border-gray-200 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed dark:text-gray-300" : "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                                            }`}
-                                        required
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-l-xl">
+                                            <span className="text-xl">🇵🇰</span>
+                                            <span className="text-xs font-bold text-gray-700 dark:text-gray-300">+92</span>
+                                        </div>
+                                        <input
+                                            type="tel"
+                                            value={data.phone}
+                                            onChange={(e) => {
+                                                let value = e.target.value;
+                                                // Remove any non-numeric characters
+                                                value = value.replace(/\D/g, "");
+                                                // Remove leading +92, 92, or 0 if present
+                                                if (value.startsWith("92")) {
+                                                    value = value.substring(2);
+                                                } else if (value.startsWith("0")) {
+                                                    value = value.substring(1);
+                                                }
+                                                // Enforce max length of 10 digits
+                                                if (value.length > 10) {
+                                                    value = value.substring(0, 10);
+                                                }
+                                                setData(prev => ({ ...prev, phone: value }));
+                                            }}
+                                            disabled={!!user}
+                                            className={`flex-1 rounded-r-xl border-2 py-2.5 px-4 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 ${user ? "border-gray-200 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 cursor-not-allowed dark:text-gray-300" : "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                                }`}
+                                            placeholder="3001234567"
+                                            required
+                                        />
+                                    </div>
                                     <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1.5">
                                         <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                         </svg>
-                                        <span>Your phone number will not be visible to helpers unless you accept their application.</span>
+                                        <span>Your phone number will not be visible to helpers unless you accept their application. Enter 10 digits.</span>
                                     </p>
                                     {errors.phone && <div className="text-red-500 dark:text-red-400 text-sm mt-1.5">{errors.phone}</div>}
                                 </div>

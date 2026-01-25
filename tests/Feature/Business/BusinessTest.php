@@ -102,11 +102,11 @@ test('businesses can create a worker', function () {
 
     $response->assertStatus(200);
     $this->assertDatabaseHas('users', [
-        'phone' => '03001234567',
+        'phone' => '+923001234567',
         'name' => 'Worker Name',
     ]);
 
-    $helper = User::where('phone', '03001234567')->first();
+    $helper = User::where('phone', '+923001234567')->first();
     expect($business->helpers()->where('users.id', $helper->id)->exists())->toBeTrue();
 });
 

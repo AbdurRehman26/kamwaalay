@@ -35,7 +35,7 @@ export default function CreateWorker() {
 
     return (
         <PublicLayout>
-            
+
 
             <div className="py-12">
                 <div className="max-w-3xl mx-auto sm:px-6 lg:px-8">
@@ -74,14 +74,36 @@ export default function CreateWorker() {
 
                             <div>
                                 <InputLabel htmlFor="phone" value="Phone Number *" className="text-gray-700 font-medium" />
-                                <TextInput
-                                    id="phone"
-                                    type="tel"
-                                    value={data.phone}
-                                    onChange={(e) => setData("phone", e.target.value)}
-                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                                    required
-                                />
+                                <div className="mt-2 flex items-center gap-2">
+                                    <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-l-xl">
+                                        <span className="text-xl">🇵🇰</span>
+                                        <span className="text-xs font-bold text-gray-700 dark:text-gray-300">+92</span>
+                                    </div>
+                                    <TextInput
+                                        id="phone"
+                                        type="tel"
+                                        value={data.phone}
+                                        onChange={(e) => {
+                                            let value = e.target.value;
+                                            // Remove any non-numeric characters
+                                            value = value.replace(/\D/g, "");
+                                            // Remove leading +92, 92, or 0 if present
+                                            if (value.startsWith("92")) {
+                                                value = value.substring(2);
+                                            } else if (value.startsWith("0")) {
+                                                value = value.substring(1);
+                                            }
+                                            // Enforce max length of 10 digits
+                                            if (value.length > 10) {
+                                                value = value.substring(0, 10);
+                                            }
+                                            setData("phone", value);
+                                        }}
+                                        className="flex-1 rounded-r-xl border-2 py-2.5 border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                        placeholder="3001234567"
+                                        required
+                                    />
+                                </div>
                                 <InputError message={errors.phone} className="mt-2" />
                             </div>
 

@@ -242,13 +242,19 @@ export default function UpdateProfileInformation({
                 <div>
                     <InputLabel htmlFor="phone" value="Phone" />
 
-                    <TextInput
-                        id="phone"
-                        type="tel"
-                        className="mt-1 block w-full bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        value={data.phone}
-                        disabled
-                    />
+                    <div className="mt-1 flex items-center gap-2">
+                        <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-l-xl opacity-60">
+                            <span className="text-xl">🇵🇰</span>
+                            <span className="text-xs font-bold text-gray-700 dark:text-gray-300">+92</span>
+                        </div>
+                        <TextInput
+                            id="phone"
+                            type="tel"
+                            className="flex-1 rounded-r-xl bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            value={data.phone?.replace(/^\+92/, "") || ""}
+                            disabled
+                        />
+                    </div>
 
                     <InputError className="mt-2" message={errors.phone} />
                 </div>

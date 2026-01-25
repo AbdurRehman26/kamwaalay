@@ -149,6 +149,9 @@ class JobPostController extends Controller
         $validated['service_type_id'] = $validated['service_type'];
         unset($validated['service_type']);
 
+        // format phone number
+        $validated['phone'] = $this->formatPhoneNumber($validated['phone']);
+
         $jobPost = JobPost::create($validated);
 
         // Send notifications (you can add email/notification logic here)
@@ -543,6 +546,10 @@ class JobPostController extends Controller
             unset($validated['service_type']);
         }
 
+        if (isset($validated['phone'])) {
+            $validated['phone'] = $this->formatPhoneNumber($validated['phone']);
+        }
+
         $jobPost->update($validated);
 
         return response()->json([
@@ -586,6 +593,46 @@ class JobPostController extends Controller
         return response()->json([
             'message' => 'Job post cancelled successfully!',
         ]);
+    }
+
+    /**
+     * Format phone number to +92xxxxx format
+     */
+    private function formatPhoneNumber(string $phone): string
+    {
+        // Remove all non-numeric characters except +
+        $phone = preg_replace('/[^0-9+]/', '', $phone);
+
+        // Remove leading + if present (we'll add it back at the end)
+        $phone = ltrim($phone, '+');
+
+        // Handle different input formats
+        if (strpos($phone, '0092') === 0) {
+            // Format: 0092xxxxxxxxx -> +92xxxxxxxxx
+            $phone = substr($phone, 2); // Remove 00, keep 92
+        } elseif (strpos($phone, '92') === 0 && strlen($phone) >= 12) {
+            // Format: 92xxxxxxxxx -> +92xxxxxxxxx (already has country code)
+            // Keep as is
+        } elseif (strpos($phone, '0') === 0 && strlen($phone) >= 10) {
+            // Format: 03xxxxxxxxx -> +923xxxxxxxxx (local format starting with 0)
+            $phone = '92' . substr($phone, 1); // Remove leading 0, add 92
+        } elseif (strlen($phone) >= 10 && strlen($phone) <= 11) {
+            // Format: 3xxxxxxxxx (10-11 digits without leading 0 or country code)
+            // Assume it's a local number, add 92
+            $phone = '92' . $phone;
+        } elseif (strlen($phone) < 10) {
+            // Too short, might be incomplete - still try to format
+            if (strpos($phone, '92') !== 0) {
+                $phone = '92' . $phone;
+            }
+        }
+
+        // Ensure it starts with +
+        if (strpos($phone, '+') !== 0) {
+            $phone = '+' . $phone;
+        }
+
+        return $phone;
     }
 }
 

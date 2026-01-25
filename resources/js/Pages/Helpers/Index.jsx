@@ -671,14 +671,36 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone *</label>
-                                        <input
-                                            type="tel"
-                                            value={formData.phone}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                                            className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500"
-                                            required
-                                        />
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-bold uppercase tracking-wide">Phone *</label>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-l-xl">
+                                                <span className="text-xl">🇵🇰</span>
+                                                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">+92</span>
+                                            </div>
+                                            <input
+                                                type="tel"
+                                                value={formData.phone}
+                                                onChange={(e) => {
+                                                    let value = e.target.value;
+                                                    // Remove any non-numeric characters
+                                                    value = value.replace(/\D/g, "");
+                                                    // Remove leading +92, 92, or 0 if present
+                                                    if (value.startsWith("92")) {
+                                                        value = value.substring(2);
+                                                    } else if (value.startsWith("0")) {
+                                                        value = value.substring(1);
+                                                    }
+                                                    // Enforce max length of 10 digits
+                                                    if (value.length > 10) {
+                                                        value = value.substring(0, 10);
+                                                    }
+                                                    setFormData(prev => ({ ...prev, phone: value }));
+                                                }}
+                                                className="flex-1 rounded-r-xl border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 py-2.5 px-4"
+                                                placeholder="3001234567"
+                                                required
+                                            />
+                                        </div>
                                         {formErrors.phone && <div className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.phone}</div>}
                                     </div>
 

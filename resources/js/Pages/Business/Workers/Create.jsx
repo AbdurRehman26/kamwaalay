@@ -300,18 +300,38 @@ export default function CreateWorker() {
 
                             <div>
                                 <InputLabel htmlFor="phone" value="Phone" />
-                                <TextInput
-                                    id="phone"
-                                    type="tel"
-                                    className="mt-1 block w-full"
-                                    value={data.phone}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "").slice(0, 11);
-                                        setData({ ...data, phone: value });
-                                    }}
-                                    placeholder="03001234567"
-                                    maxLength={11}
-                                />
+                                <div className="mt-1 flex items-center gap-2">
+                                    <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-l-xl">
+                                        <span className="text-2xl">🇵🇰</span>
+                                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">+92</span>
+                                    </div>
+                                    <TextInput
+                                        id="phone"
+                                        type="tel"
+                                        className="flex-1 rounded-r-xl border-2 py-2.5 border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                        value={data.phone}
+                                        onChange={(e) => {
+                                            let value = e.target.value;
+                                            // Remove any non-numeric characters
+                                            value = value.replace(/\D/g, "");
+                                            // Remove leading +92, 92, or 0 if present
+                                            if (value.startsWith("92")) {
+                                                value = value.substring(2);
+                                            } else if (value.startsWith("0")) {
+                                                value = value.substring(1);
+                                            }
+                                            // Enforce max length of 10 digits
+                                            if (value.length > 10) {
+                                                value = value.substring(0, 10);
+                                            }
+                                            setData({ ...data, phone: value });
+                                        }}
+                                        placeholder="3001234567"
+                                    />
+                                </div>
+                                <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                                    Enter 10-digit mobile number. Example: 3001234567
+                                </p>
                                 <InputError message={errors.phone} className="mt-1.5" />
                             </div>
 
