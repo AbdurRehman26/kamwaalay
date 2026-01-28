@@ -198,7 +198,7 @@ class User extends Authenticatable implements FilamentUser
         }
 
         // Normal user onboarding is complete when they have updated their profile
-        return true;
+        return !is_null($this->profile_updated_at);
     }
 
     // Job applications (helpers applying to service requests)
