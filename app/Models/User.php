@@ -50,6 +50,7 @@ class User extends Authenticatable implements FilamentUser
         'address',
         'is_active',
         'phone_verified_at',
+        'profile_updated_at'
     ];
 
     /**
