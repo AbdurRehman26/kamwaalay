@@ -212,7 +212,7 @@ class BusinessController extends Controller
     )]
     public function workers(Request $request)
     {
-        $business = Auth::user();
+        $business = auth()->user();
 
         if (!$business->isBusiness()) {
             abort(403);
