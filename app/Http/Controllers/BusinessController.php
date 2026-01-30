@@ -445,7 +445,7 @@ class BusinessController extends Controller
     )]
     public function editWorker(User $helper)
     {
-        $business = Auth::user();
+        $business = auth()->user();
 
         if (!$business->isBusiness() || !$business->helpers()->where('users.id', $helper->id)->exists()) {
             abort(403);
