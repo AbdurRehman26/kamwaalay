@@ -36,6 +36,8 @@
             window.Laravel = {
                 app_debug: {{ config('app.debug') ? 'true' : 'false' }}
             };
+            // Make Google Maps API key available to Vite
+            window.GOOGLE_MAPS_API_KEY = "{{ env('GOOGLE_PLACES_API_KEY') }}";
         </script>
         @viteReactRefresh
         @vite(['resources/js/app.jsx'])

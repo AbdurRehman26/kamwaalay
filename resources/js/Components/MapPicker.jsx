@@ -15,11 +15,22 @@ const defaultCenter = {
 const libraries = ["places"];
 
 export default function MapPicker({ latitude, longitude, onChange, height = "300px" }) {
-    const { isLoaded } = useJsApiLoader({
+    // Get API key from environment or use window global if already loaded
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || (typeof window !== "undefined" ? window.GOOGLE_MAPS_API_KEY : "") || "";
+    
+    // Check if Google Maps is already loaded (from script tag in app.blade.php)
+    const isAlreadyLoaded = typeof window !== "undefined" && window.google && window.google.maps;
+    
+    const { isLoaded, loadError } = useJsApiLoader({
         id: "google-map-script",
-        googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "",
-        libraries: libraries
+        googleMapsApiKey: apiKey,
+        libraries: libraries,
+        // Prevent reloading if already loaded
+        preventGoogleFontsLoading: false,
     });
+    
+    // Use already loaded Google Maps if available
+    const mapsLoaded = isAlreadyLoaded || isLoaded;
 
     const [map, setMap] = useState(null);
     const [autocomplete, setAutocomplete] = useState(null);
@@ -100,15 +111,28 @@ export default function MapPicker({ latitude, longitude, onChange, height = "300
         }
     }, [autocomplete, map, updatePositionAndAddress]);
 
-    if (!isLoaded) {
+    if (loadError && !isAlreadyLoaded) {
         return (
-            <div style={{ height: height, width: "100%", borderRadius: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f3f4f6" }}>
-                <p className="text-gray-500">Loading Maps...</p>
+            <div style={{ height: height, width: "100%", borderRadius: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#fee2e2", color: "#ef4444", padding: "1rem", flexDirection: "column", textAlign: "center" }}>
+                <p className="font-bold">⚠️ Google Maps Error</p>
+                <p className="text-sm mt-1">This page can't load Google Maps correctly.</p>
+                <p className="text-xs mt-2">Please check your API key configuration.</p>
             </div>
         );
     }
 
-    if (!import.meta.env.VITE_GOOGLE_MAPS_API_KEY) {
+    if (!mapsLoaded) {
+        return (
+            <div style={{ height: height, width: "100%", borderRadius: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f3f4f6" }}>
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-2"></div>
+                    <p className="text-gray-500">Loading Maps...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!apiKey && !isAlreadyLoaded) {
         return (
             <div style={{ height: height, width: "100%", borderRadius: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#fee2e2", color: "#ef4444", padding: "1rem", flexDirection: "column", textAlign: "center" }}>
                 <p className="font-bold">Google Maps API Key Missing</p>
