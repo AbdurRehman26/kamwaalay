@@ -27,10 +27,10 @@ class JobPostFactory extends Factory
             'address' => fake()->address(),
             'special_requirements' => fake()->optional()->sentence(),
             'status' => fake()->randomElement(['pending', 'confirmed', 'cancelled', 'completed']),
+            'is_system_generated' => false,
         ];
     }
 }
-
 
 
 

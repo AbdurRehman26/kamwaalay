@@ -49,6 +49,7 @@ class JobPost extends Model
         'special_requirements',
         'status',
         'admin_notes',
+        'is_system_generated',
     ];
 
     protected function casts(): array
@@ -56,6 +57,7 @@ class JobPost extends Model
         return [
             'start_date' => 'date',
             'start_time' => 'datetime',
+            'is_system_generated' => 'boolean',
         ];
     }
 
@@ -149,4 +151,3 @@ class JobPost extends Model
         return $query->where('status', 'confirmed');
     }
 }
-

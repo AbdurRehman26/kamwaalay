@@ -22,9 +22,9 @@ class ProfileFactory extends Factory
             'profileable_id' => User::factory(),
             'profileable_type' => 'App\Models\User',
             'bio' => fake()->sentence(),
+            'is_system_generated' => false,
             'city' => 'Karachi',
             'area' => fake()->randomElement(['Saddar', 'DHA', 'Clifton', 'Gulshan']),
         ];
     }
 }
-

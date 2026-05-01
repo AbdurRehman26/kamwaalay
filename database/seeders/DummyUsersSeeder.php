@@ -30,7 +30,9 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'user',
                     'phone' => '03001234567',
                     'address' => 'House 123, Street 4, Karachi',
+                    'is_system_generated' => true,
                     'profile' => [
+                        'is_system_generated' => true,
                     ]
                 ],
                 [
@@ -39,7 +41,9 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'user',
                     'phone' => '03001234568',
                     'address' => 'Apartment 45, Block 2, Karachi',
+                    'is_system_generated' => true,
                     'profile' => [
+                        'is_system_generated' => true,
                     ]
                 ],
                 [
@@ -48,7 +52,9 @@ class DummyUsersSeeder extends Seeder
                     'role' => 'user',
                     'phone' => '03001234569',
                     'address' => 'Villa 789, Phase 5, Karachi',
+                    'is_system_generated' => true,
                     'profile' => [
+                        'is_system_generated' => true,
                     ]
                 ],
             ];
@@ -90,6 +96,7 @@ class DummyUsersSeeder extends Seeder
                     'phone' => '03001234570',
                     'address' => 'Quarter 12, Workers Colony, Karachi',
                     'is_active' => true,
+                    'is_system_generated' => true,
                     'profile' => [
                         'age' => 32,
                         'gender' => 'female',
@@ -99,6 +106,7 @@ class DummyUsersSeeder extends Seeder
                         'verification_status' => 'verified',
                         'police_verified' => true,
                         'is_active' => true,
+                        'is_system_generated' => true,
                         'rating' => 4.8,
                         'total_reviews' => 12,
                     ],
@@ -116,6 +124,7 @@ class DummyUsersSeeder extends Seeder
                     'phone' => '03001234571',
                     'address' => 'Street 5, Block A, Karachi',
                     'is_active' => true,
+                    'is_system_generated' => true,
                     'profile' => [
                         'age' => 45,
                         'gender' => 'male',
@@ -126,6 +135,7 @@ class DummyUsersSeeder extends Seeder
                         'verification_status' => 'verified',
                         'police_verified' => true,
                         'is_active' => true,
+                        'is_system_generated' => true,
                         'rating' => 4.9,
                         'total_reviews' => 25,
                     ],
@@ -143,6 +153,7 @@ class DummyUsersSeeder extends Seeder
                     'phone' => '03001234572',
                     'address' => 'Flat 302, Building B, Karachi',
                     'is_active' => true,
+                    'is_system_generated' => true,
                     'profile' => [
                         'age' => 28,
                         'gender' => 'female',
@@ -153,6 +164,7 @@ class DummyUsersSeeder extends Seeder
                         'verification_status' => 'verified',
                         'police_verified' => true,
                         'is_active' => true,
+                        'is_system_generated' => true,
                         'rating' => 4.7,
                         'total_reviews' => 8,
                     ],
@@ -170,6 +182,7 @@ class DummyUsersSeeder extends Seeder
                     'phone' => '03001234573',
                     'address' => 'House 56, Sector 11, Karachi',
                     'is_active' => true,
+                    'is_system_generated' => true,
                     'profile' => [
                         'age' => 52,
                         'gender' => 'female',
@@ -180,6 +193,7 @@ class DummyUsersSeeder extends Seeder
                         'verification_status' => 'verified',
                         'police_verified' => true,
                         'is_active' => true,
+                        'is_system_generated' => true,
                         'rating' => 5.0,
                         'total_reviews' => 15,
                     ],
@@ -197,6 +211,7 @@ class DummyUsersSeeder extends Seeder
                     'phone' => '03001234574',
                     'address' => 'Shop 23, Main Road, Karachi',
                     'is_active' => true,
+                    'is_system_generated' => true,
                     'profile' => [
                         'age' => 38,
                         'gender' => 'male',
@@ -207,6 +222,7 @@ class DummyUsersSeeder extends Seeder
                         'verification_status' => 'verified',
                         'police_verified' => true,
                         'is_active' => true,
+                        'is_system_generated' => true,
                         'rating' => 4.6,
                         'total_reviews' => 10,
                     ],
@@ -224,6 +240,7 @@ class DummyUsersSeeder extends Seeder
                     'phone' => '03001234575',
                     'address' => 'Flat 201, Tower C, Karachi',
                     'is_active' => true,
+                    'is_system_generated' => true,
                     'profile' => [
                         'age' => 35,
                         'gender' => 'female',
@@ -234,6 +251,7 @@ class DummyUsersSeeder extends Seeder
                         'verification_status' => 'verified',
                         'police_verified' => true,
                         'is_active' => true,
+                        'is_system_generated' => true,
                         'rating' => 4.8,
                         'total_reviews' => 18,
                     ],
@@ -302,6 +320,7 @@ class DummyUsersSeeder extends Seeder
                                     'description' => $serviceData['description'] ?? null,
                                     'is_active' => true,
                                     'status' => 'active',
+                                    'is_system_generated' => true,
                                 ],
                                 'service_types' => [],
                                 'locations' => [],
@@ -344,24 +363,27 @@ class DummyUsersSeeder extends Seeder
         if ($businessRole) {
             $businesses = [
                 [
-                    'name' => 'HomeHelp Agency',
+                    'name' => 'Amanat Home Services',
                     'password' => Hash::make('password'),
                     'role' => 'business',
                     'phone' => '03001234576',
                     'address' => 'Office 101, Business Center, Karachi',
                     'is_active' => true,
+                    'is_system_generated' => true,
                     'profile' => [
                         'bio' => 'Leading agency providing verified domestic help services.',
                         'is_active' => true,
+                        'is_system_generated' => true,
                     ],
                     // Agency Workers
                     'workers' => [
                         [
-                            'name' => 'Agency Maid 1',
+                            'name' => 'Shabana Yousaf',
                             'password' => Hash::make('password'),
                             'phone' => '03001234901',
                             'address' => 'Worker Colony, Karachi',
                             'is_active' => true,
+                            'is_system_generated' => true,
                             'profile' => [
                                 'age' => 25,
                                 'gender' => 'female',
@@ -371,17 +393,19 @@ class DummyUsersSeeder extends Seeder
                                 'verification_status' => 'verified',
                                 'police_verified' => true,
                                 'is_active' => true,
+                                'is_system_generated' => true,
                             ],
                             'services' => [
                                 ['service_type' => 'maid', 'work_type' => 'full_time', 'monthly_rate' => 16000, 'description' => 'Agency trained maid'],
                             ]
                         ],
                         [
-                            'name' => 'Agency Cook 1',
+                            'name' => 'Imran Qureshi',
                             'password' => Hash::make('password'),
                             'phone' => '03001234902',
                             'address' => 'Worker Colony, Karachi',
                             'is_active' => true,
+                            'is_system_generated' => true,
                             'profile' => [
                                 'age' => 40,
                                 'gender' => 'male',
@@ -391,17 +415,19 @@ class DummyUsersSeeder extends Seeder
                                 'verification_status' => 'verified',
                                 'police_verified' => true,
                                 'is_active' => true,
+                                'is_system_generated' => true,
                             ],
                             'services' => [
                                 ['service_type' => 'cook', 'work_type' => 'full_time', 'monthly_rate' => 25000, 'description' => 'Premium cooking service'],
                             ]
                         ],
                         [
-                            'name' => 'Agency Driver 1',
+                            'name' => 'Javed Iqbal',
                             'password' => Hash::make('password'),
                             'phone' => '03001234904',
                             'address' => 'Baldia Town, Karachi',
                             'is_active' => true,
+                            'is_system_generated' => true,
                             'profile' => [
                                 'age' => 35,
                                 'gender' => 'male',
@@ -411,6 +437,7 @@ class DummyUsersSeeder extends Seeder
                                 'verification_status' => 'verified',
                                 'police_verified' => true,
                                 'is_active' => true,
+                                'is_system_generated' => true,
                             ],
                             'services' => [
                                 ['service_type' => 'driver', 'work_type' => 'full_time', 'monthly_rate' => 22000, 'description' => 'Full time driver'],
@@ -419,24 +446,27 @@ class DummyUsersSeeder extends Seeder
                     ]
                 ],
                 [
-                    'name' => 'Care Services Pvt Ltd',
+                    'name' => 'Mehr Care Network',
                     'password' => Hash::make('password'),
                     'role' => 'business',
                     'phone' => '03001234577',
                     'address' => 'Suite 205, Corporate Tower, Karachi',
                     'is_active' => true,
+                    'is_system_generated' => true,
                     'profile' => [
                         'bio' => 'Reliable and professional care services for homes and businesses.',
                         'is_active' => true,
+                        'is_system_generated' => true,
                     ],
                     // Agency Workers
                     'workers' => [
                         [
-                            'name' => 'Care Nurse 1',
+                            'name' => 'Noreen Aslam',
                             'password' => Hash::make('password'),
                             'phone' => '03001234903',
                             'address' => 'Clifton, Karachi',
                             'is_active' => true,
+                            'is_system_generated' => true,
                             'profile' => [
                                 'age' => 30,
                                 'gender' => 'female',
@@ -446,17 +476,19 @@ class DummyUsersSeeder extends Seeder
                                 'verification_status' => 'verified',
                                 'police_verified' => true,
                                 'is_active' => true,
+                                'is_system_generated' => true,
                             ],
                             'services' => [
                                 ['service_type' => 'caregiver', 'work_type' => 'full_time', 'monthly_rate' => 30000, 'description' => 'Professional patient care'],
                             ]
                         ],
                         [
-                            'name' => 'Care Maid 2',
+                            'name' => 'Sadia Bano',
                             'password' => Hash::make('password'),
                             'phone' => '03001234905',
                             'address' => 'Saddar, Karachi',
                             'is_active' => true,
+                            'is_system_generated' => true,
                             'profile' => [
                                 'age' => 26,
                                 'gender' => 'female',
@@ -466,6 +498,7 @@ class DummyUsersSeeder extends Seeder
                                 'verification_status' => 'verified',
                                 'police_verified' => true,
                                 'is_active' => true,
+                                'is_system_generated' => true,
                             ],
                             'services' => [
                                 ['service_type' => 'maid', 'work_type' => 'part_time', 'monthly_rate' => 14000, 'description' => 'Part-time cleaning'],
@@ -558,6 +591,7 @@ class DummyUsersSeeder extends Seeder
                                         'description' => $serviceData['description'] ?? null,
                                         'is_active' => true,
                                         'status' => 'active',
+                                        'is_system_generated' => true,
                                     ],
                                     'service_types' => [],
                                     'locations' => [],
@@ -589,12 +623,14 @@ class DummyUsersSeeder extends Seeder
         if ($adminRole) {
             $admins = [
                 [
-                    'name' => 'Admin Manager',
+                    'name' => 'Usman Siddiqui',
                     'password' => Hash::make('password'),
                     'role' => 'admin',
                     'phone' => '03001234578',
                     'address' => 'Admin Office, Main Building, Karachi',
+                    'is_system_generated' => true,
                     'profile' => [
+                        'is_system_generated' => true,
                     ]
                 ],
             ];

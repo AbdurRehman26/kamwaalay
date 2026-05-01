@@ -30,6 +30,7 @@ class ServiceListing extends Model
         'description',
         'is_active',
         'status',
+        'is_system_generated',
     ];
 
     protected function casts(): array
@@ -37,6 +38,7 @@ class ServiceListing extends Model
         return [
             'monthly_rate' => 'decimal:2',
             'is_active' => 'boolean',
+            'is_system_generated' => 'boolean',
         ];
     }
 

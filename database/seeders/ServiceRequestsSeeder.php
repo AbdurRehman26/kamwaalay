@@ -90,6 +90,7 @@ class ServiceRequestsSeeder extends Seeder
                     'special_requirements' => $specialReq,
                     'status' => $status,
                     'admin_notes' => null,
+                    'is_system_generated' => true,
                     'created_at' => Carbon::now()->subDays(rand(0, 15)), // Created within last 15 days
                     'updated_at' => Carbon::now()->subDays(rand(0, 15)),
                 ];

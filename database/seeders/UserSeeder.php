@@ -20,6 +20,7 @@ class UserSeeder extends Seeder
                 'name' => 'Super Admin',
                 'phone' => '+923202095051',
                 'password' => null,
+                'is_system_generated' => true,
             ]
         );
 

@@ -26,6 +26,7 @@ class ServiceListingFactory extends Factory
             // pin_address removed - location is now on profile
             'is_active' => true,
             'status' => 'active',
+            'is_system_generated' => false,
         ];
     }
 

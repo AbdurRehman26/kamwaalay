@@ -49,6 +49,7 @@ class User extends Authenticatable implements FilamentUser
         'phone',
         'address',
         'is_active',
+        'is_system_generated',
         'phone_verified_at',
         'profile_updated_at'
     ];
@@ -74,6 +75,7 @@ class User extends Authenticatable implements FilamentUser
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'is_system_generated' => 'boolean',
         ];
     }
 
