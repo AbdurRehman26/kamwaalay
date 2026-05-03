@@ -41,30 +41,11 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): void
     {
-        $this->ensureIsNotRateLimited();
+        $user = $this->verifyCredentials();
 
-        $credentials = ['password' => $this->input('password')];
-
-        // Add email or phone to credentials
-        // For phone login, we need to find user by phone and use their email for Auth::attempt
-        $phone = $this->formatPhoneNumber($this->input('phone'));
-        // Try both formatted and original format for backward compatibility
-        $user = User::where('phone', $phone)
-            ->orWhere('phone', preg_replace('/[^0-9+]/', '', $this->input('phone')))
-            ->first();
         if ($user) {
-            $credentials['email'] = $user->email; // Auth::attempt requires email field
+            Auth::login($user, $this->boolean('remember'));
         }
-
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'phone' => trans('auth.failed'),
-            ]);
-        }
-
-        RateLimiter::clear($this->throttleKey());
     }
 
     /**
@@ -111,7 +92,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Find user by email or phone (for OTP flow).
+     * Find user by phone (for OTP flow).
      *
      * @return User|null
      * @throws \Illuminate\Validation\ValidationException
@@ -132,9 +113,8 @@ class LoginRequest extends FormRequest
         if (!$user) {
             RateLimiter::hit($this->throttleKey());
 
-            $field = $this->filled('email') ? 'email' : 'phone';
             throw ValidationException::withMessages([
-                $field => trans('auth.failed'),
+                'phone' => trans('auth.failed'),
             ]);
         }
 

@@ -59,12 +59,9 @@ class TestLoginTest extends TestCase
         $token = $response->json('token');
         $this->withToken($token)->getJson('/api/user')
             ->assertStatus(200)
-            ->assertJson([
-                'user' => [
-                    'id' => $user->id,
-                    'email' => $user->email,
-                ]
-            ]);
+            ->assertJsonPath('user.id', $user->id)
+            ->assertJsonPath('user.phone', $user->phone)
+            ->assertJsonMissingPath('user.email');
     }
 
     public function test_login_as_test_business_works_in_debug_mode()

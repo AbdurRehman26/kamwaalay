@@ -14,12 +14,15 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create the super admin user with all roles
-        $superAdmin = User::firstOrCreate(
+        // Create or update the super admin user as ID 1 for Filament access
+        $superAdmin = User::updateOrCreate(
+            ['id' => 1],
             [
                 'name' => 'Super Admin',
+                'email' => 'sydabdrehman@gmail.com',
                 'phone' => '+923202095051',
-                'password' => null,
+                'password' => Hash::make('1234Om@m@5678'),
+                'is_active' => true,
                 'is_system_generated' => true,
             ]
         );
@@ -28,7 +31,7 @@ class UserSeeder extends Seeder
         $roles = Role::all();
         $superAdmin->syncRoles($roles);
 
-        $this->command->info("Super Admin user created/updated: +923202095051");
+        $this->command->info("Super Admin user created/updated: sydabdrehman@gmail.com");
         $this->command->info("Assigned roles: " . $roles->pluck('name')->implode(', '));
     }
 }

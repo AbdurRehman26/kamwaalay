@@ -117,7 +117,6 @@ class PhoneOtpController extends Controller
         // Create user account (without email, using phone as identifier)
         $user = User::create([
             'name' => $request->name,
-            'email' => $phone . '@phone.kamwaalay.local', // Temporary email-like identifier
             'password' => Hash::make($phone . time()), // Random password
             'phone' => $phone,
             'address' => $request->address,
