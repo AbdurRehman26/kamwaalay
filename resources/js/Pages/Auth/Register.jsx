@@ -13,6 +13,7 @@ import api from "@/services/api";
 
 export default function Register() {
     const navigate = useNavigate();
+    const agencySignupEnabled = window.Laravel?.features?.agency_signup ?? true;
     const [formData, setFormData] = useState({
         name: "",
         password: "",
@@ -39,6 +40,10 @@ export default function Register() {
     }, []);
 
     const handleRoleChange = (role) => {
+        if (role === "business" && !agencySignupEnabled) {
+            return;
+        }
+
         setSelectedRole(role);
         setFormData(prev => ({ ...prev, role }));
     };
@@ -169,7 +174,7 @@ export default function Register() {
                         {/* Role Selection */}
                         <div>
                             <InputLabel value="I want to" className="text-gray-700 dark:text-gray-300 font-bold mb-4 uppercase tracking-wide" />
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className={`grid grid-cols-1 ${agencySignupEnabled ? "md:grid-cols-3" : "md:grid-cols-2"} gap-4`}>
                                 <button
                                     type="button"
                                     onClick={() => handleRoleChange("user")}
@@ -194,18 +199,20 @@ export default function Register() {
                                     <h3 className={`font-bold text-lg mb-2 ${selectedRole === "helper" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Work as Helper</h3>
                                     <p className="text-sm text-gray-600 dark:text-gray-400">Offer your services</p>
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={() => handleRoleChange("business")}
-                                    className={`p-6 rounded-xl border-2 transition-all duration-300 ${selectedRole === "business"
-                                        ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
-                                        : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
-                                        }`}
-                                >
-                                    <div className="text-4xl mb-3">🏢</div>
-                                    <h3 className={`font-bold text-lg mb-2 ${selectedRole === "business" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Agency/Business</h3>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">Manage multiple workers</p>
-                                </button>
+                                {agencySignupEnabled && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRoleChange("business")}
+                                        className={`p-6 rounded-xl border-2 transition-all duration-300 ${selectedRole === "business"
+                                            ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 shadow-lg"
+                                            : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 bg-white dark:bg-gray-700"
+                                            }`}
+                                    >
+                                        <div className="text-4xl mb-3">🏢</div>
+                                        <h3 className={`font-bold text-lg mb-2 ${selectedRole === "business" ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"}`}>Agency/Business</h3>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">Manage multiple workers</p>
+                                    </button>
+                                )}
                             </div>
                             <InputError message={errors.role} className="mt-2" />
                         </div>

@@ -111,6 +111,44 @@ test('registered user is assigned the correct role', function () {
         ->and($profile->city_id)->toBe(City::first()->id);
 });
 
+test('business registration is rejected when agency signup is disabled', function () {
+    config(['features.agency_signup' => false]);
+
+    $response = $this->postJson('/api/register', [
+        'name' => 'Test Agency',
+        'phone' => '03008765432',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'role' => 'business',
+        'city_id' => City::first()->id,
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['role']);
+
+    $this->assertDatabaseMissing('users', [
+        'phone' => '+923008765432',
+    ]);
+});
+
+test('business registration is allowed when agency signup is enabled', function () {
+    config(['features.agency_signup' => true]);
+
+    $response = $this->postJson('/api/register', [
+        'name' => 'Test Agency',
+        'phone' => '03008765433',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'role' => 'business',
+        'city_id' => City::first()->id,
+    ]);
+
+    $response->assertStatus(200);
+
+    $user = User::where('phone', '+923008765433')->first();
+    expect($user->hasRole('business'))->toBeTrue();
+});
+
 test('city_id is required', function () {
     $response = $this->postJson('/api/register', [
         'name' => 'Test User',

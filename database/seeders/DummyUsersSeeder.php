@@ -360,7 +360,7 @@ class DummyUsersSeeder extends Seeder
 
         // Businesses (agencies managing workers)
         $businessRole = Role::where('name', 'business')->first();
-        if ($businessRole) {
+        if ($businessRole && config('features.agency_signup')) {
             $businesses = [
                 [
                     'name' => 'Amanat Home Services',
@@ -616,6 +616,8 @@ class DummyUsersSeeder extends Seeder
                     }
                 }
             }
+        } elseif ($businessRole) {
+            $this->command->warn('Agency signup is disabled. Skipping business/agency dummy users.');
         }
 
         // Admin Users

@@ -34,7 +34,10 @@
         <!-- Scripts -->
         <script>
             window.Laravel = {
-                app_debug: {{ config('app.debug') ? 'true' : 'false' }}
+                app_debug: {{ config('app.debug') ? 'true' : 'false' }},
+                features: {
+                    agency_signup: {{ config('features.agency_signup') ? 'true' : 'false' }}
+                }
             };
             // Make Google Maps API key available to Vite
             window.GOOGLE_MAPS_API_KEY = "{{ env('GOOGLE_PLACES_API_KEY') }}";

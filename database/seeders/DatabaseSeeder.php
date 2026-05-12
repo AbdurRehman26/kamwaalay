@@ -15,18 +15,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed roles and permissions
         $this->call([
             CountrySeeder::class,
             CitySeeder::class,
-//            LocationsSeeder::class,
             RolePermissionSeeder::class,
             UserSeeder::class,
             LanguageSeeder::class,
             ServiceTypeSeeder::class,
-            DummyUsersSeeder::class,
-            ServiceRequestsSeeder::class,
-            AdditionalDataSeeder::class,
         ]);
+
+        if (config('features.demo_seeders')) {
+            $this->call([
+                DummyUsersSeeder::class,
+                ServiceRequestsSeeder::class,
+                AdditionalDataSeeder::class,
+            ]);
+        }
     }
 }

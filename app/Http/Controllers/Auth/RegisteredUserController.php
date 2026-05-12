@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
@@ -92,11 +93,15 @@ class RegisteredUserController extends Controller
             $request->merge(['phone' => $this->formatPhoneNumber($request->phone)]);
         }
 
+        $allowedRoles = config('features.agency_signup')
+            ? ['user', 'helper', 'business']
+            : ['user', 'helper'];
+
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:user,helper,business',
+            'role' => ['required', Rule::in($allowedRoles)],
             'city_id' => 'required|exists:cities,id',
         ]);
 
