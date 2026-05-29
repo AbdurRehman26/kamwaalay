@@ -59,7 +59,7 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['roles', 'profile.city']);
+            ->with(['roles', 'profile.city', 'documents']);
     }
 
     public static function getPages(): array
