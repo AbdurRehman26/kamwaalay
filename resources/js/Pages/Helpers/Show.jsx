@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { useEffect, useState } from "react";
 import { helpersService } from "@/services/helpers";
@@ -465,6 +465,20 @@ export default function HelperShow() {
                                         </svg>
                                     </a>
                                 </div>
+                            </div>
+                        )}
+                        {!user && (
+                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-amber-200 dark:border-amber-900/50">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Want to contact this helper?</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                                    You need to log in to view contact options.
+                                </p>
+                                <Link
+                                    to="/login"
+                                    className="inline-flex items-center justify-center w-full px-4 py-3 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors"
+                                >
+                                    Log in to contact
+                                </Link>
                             </div>
                         )}
                     </div>
