@@ -25,6 +25,38 @@ class UsersTable
                     ->searchable()
                     ->copyable()
                     ->toggleable(),
+                TextColumn::make('latestPhoneOtp.otp')
+                    ->label('Latest OTP')
+                    ->copyable()
+                    ->placeholder('-')
+                    ->toggleable(),
+                TextColumn::make('latest_otp_status')
+                    ->label('OTP Status')
+                    ->badge()
+                    ->getStateUsing(function ($record): string {
+                        $otp = $record->latestPhoneOtp;
+
+                        if (! $otp) {
+                            return 'None';
+                        }
+
+                        if ($otp->verified) {
+                            return 'Verified';
+                        }
+
+                        if ($otp->isExpired()) {
+                            return 'Expired';
+                        }
+
+                        return 'Pending';
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'Verified' => 'success',
+                        'Expired' => 'danger',
+                        'Pending' => 'warning',
+                        default => 'gray',
+                    })
+                    ->toggleable(),
                 TextColumn::make('email')
                     ->searchable()
                     ->toggleable(),

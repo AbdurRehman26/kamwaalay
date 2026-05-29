@@ -6,6 +6,7 @@ namespace App\Models;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -147,6 +148,11 @@ class User extends Authenticatable implements FilamentUser
     public function documents()
     {
         return $this->hasMany(Document::class, 'user_id');
+    }
+
+    public function latestPhoneOtp(): HasOne
+    {
+        return $this->hasOne(PhoneOtp::class, 'phone', 'phone')->latestOfMany();
     }
 
     // User sessions relationship (login session tracking)

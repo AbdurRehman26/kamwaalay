@@ -19,7 +19,6 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
     const [locationId, setLocationId] = useState(filters?.location_id || "");
     const [locationDisplay, setLocationDisplay] = useState(filters?.location_display || "");
     const [sortBy, setSortBy] = useState(filters?.sort_by || "rating");
-    const [userType, setUserType] = useState(filters?.user_type || "all");
     const [showBookingForm, setShowBookingForm] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
@@ -96,7 +95,6 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         const urlLatitude = urlParams.get("latitude");
         const urlLongitude = urlParams.get("longitude");
         const urlSortBy = urlParams.get("sort_by");
-        const urlUserType = urlParams.get("user_type");
 
         if (urlCityId) setCityId(urlCityId);
         if (urlServiceType) setServiceType(urlServiceType);
@@ -107,7 +105,6 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
             setLocationFilterQuery("Near Me");
         }
         if (urlSortBy) setSortBy(urlSortBy);
-        if (urlUserType) setUserType(urlUserType);
     }, []);
 
     // Fetch location suggestions for booking form
@@ -223,7 +220,6 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                         latitude: latitude,
                         longitude: longitude,
                         sort_by: sortBy,
-                        user_type: userType,
                         page: 1,
                     };
 
@@ -233,7 +229,6 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                     urlParams.append("latitude", latitude);
                     urlParams.append("longitude", longitude);
                     if (sortBy) urlParams.append("sort_by", sortBy);
-                    if (userType) urlParams.append("user_type", userType);
                     window.history.pushState({}, "", `${route("helpers.index")}?${urlParams.toString()}`);
 
                     // Trigger fetch (via useEffect dependency, or setFilters manually if useEffect depends on props/url only?
@@ -268,7 +263,6 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
             latitude: latitude || undefined,
             longitude: longitude || undefined,
             sort_by: sortBy,
-            user_type: userType,
             page: currentPage,
         };
 
@@ -309,7 +303,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                 console.error("Error fetching helpers:", error);
                 setLoading(false);
             });
-    }, [serviceType, locationId, cityId, latitude, longitude, sortBy, userType, currentPage]);
+    }, [serviceType, locationId, cityId, latitude, longitude, sortBy, currentPage]);
 
     const handleFilter = () => {
         // Reset to first page when filters change
@@ -328,7 +322,6 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
         }
 
         if (sortBy) params.append("sort_by", sortBy);
-        if (userType) params.append("user_type", userType);
         window.history.pushState({}, "", `${route("helpers.index")}?${params.toString()}`);
     };
 
@@ -417,30 +410,7 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                             <span>🔍</span> Filter Helpers
                         </h2>
 
-                        <div className="grid md:grid-cols-4 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Type</label>
-                                <select
-                                    value={userType}
-                                    onChange={(e) => {
-                                        const newUserType = e.target.value;
-                                        setUserType(newUserType);
-                                        // Update URL immediately
-                                        const urlParams = new URLSearchParams(window.location.search);
-                                        if (newUserType && newUserType !== "all") {
-                                            urlParams.set("user_type", newUserType);
-                                        } else {
-                                            urlParams.delete("user_type");
-                                        }
-                                        window.history.pushState({}, "", `${route("helpers.index")}${urlParams.toString() ? "?" + urlParams.toString() : ""}`);
-                                    }}
-                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-primary-500 focus:ring-primary-500 py-3 px-4 shadow-sm"
-                                >
-                                    <option value="all">All</option>
-                                    <option value="helper">Helpers Only</option>
-                                    <option value="business">Businesses Only</option>
-                                </select>
-                            </div>
+                        <div className="grid md:grid-cols-3 gap-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Service Type</label>
                                 <select
@@ -881,7 +851,8 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                     const uniqueLocations = Array.from(
                                         new Map(allLocations.map(loc => [loc.display_text, loc])).values()
                                     );
-                                    const primaryLocation = uniqueLocations[0];
+                                    const pinnedLocation = helper.profile?.pin_address;
+                                    const displayAddress = pinnedLocation || helper.address;
 
                                     return (
                                         <div
@@ -968,17 +939,17 @@ export default function HelpersIndex({ helperId: initialHelperId, filters: initi
                                                     </div>
                                                 )}
                                                 {/* Locations */}
-                                                {(helper.city || helper.address || uniqueLocations.length > 0) ? (
+                                                {(helper.city || displayAddress || uniqueLocations.length > 0) ? (
                                                     <div className="mb-6">
                                                         <div className="flex items-start gap-2">
                                                             <span className="text-gray-500 dark:text-gray-400 mt-0.5">📍</span>
                                                             <div className="flex flex-wrap gap-1.5 flex-1">
-                                                                {/* Display direct address if available */}
-                                                                {(helper.address) ? (
+                                                                {/* Prefer the pinned profile address when available */}
+                                                                {(displayAddress) ? (
                                                                     <span
                                                                         className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
                                                                     >
-                                                                        {helper.address}
+                                                                        {displayAddress}
                                                                     </span>
                                                                 ) : (
                                                                     // Fallback to service listing locations

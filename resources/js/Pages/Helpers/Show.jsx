@@ -1,21 +1,22 @@
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { useEffect, useState } from "react";
 import { helpersService } from "@/services/helpers";
 import { useAuth } from "@/contexts/AuthContext";
-import { route } from "@/utils/routes";
 import ChatPopup from "@/Components/ChatPopup";
 
 export default function HelperShow() {
     const { helperId } = useParams();
     const { user } = useAuth();
-    const navigate = useNavigate();
     const [helper, setHelper] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const serviceListings = helper?.service_listings || [];
     const reviews = helper?.helper_reviews || [];
     const [chatOpen, setChatOpen] = useState(false);
+    const displayLocation = helper?.profile?.pin_address
+        || helper?.address
+        || (helper?.city ? `${typeof helper.city === "object" ? helper.city?.name : helper.city}, ${helper.area || "N/A"}` : "");
 
     // Format phone number for WhatsApp (add +92 if needed)
     const formatPhoneForWhatsApp = (phone) => {
@@ -394,14 +395,10 @@ export default function HelperShow() {
                                         </div>
                                     </div>
                                 )}
-                                {(helper.address || helper.city) && (
+                                {displayLocation && (
                                     <div>
                                         <p className="text-sm text-gray-600 dark:text-gray-400">Location</p>
-                                        <p className="font-semibold text-gray-900 dark:text-white">
-                                            {helper.address ||
-                                                `${typeof helper.city === "object" ? helper.city?.name : helper.city}, ${helper.area || "N/A"}`
-                                            }
-                                        </p>
+                                        <p className="font-semibold text-gray-900 dark:text-white">{displayLocation}</p>
                                     </div>
                                 )}
                                 {helper.availability && (
@@ -416,7 +413,7 @@ export default function HelperShow() {
                                         <p className="font-semibold text-gray-900 dark:text-white">{new Date(helper.created_at).toLocaleDateString()}</p>
                                     </div>
                                 )}
-                                {helper.phone && (
+                                {user && helper.phone && (
                                     <div>
                                         <p className="text-sm text-gray-600 dark:text-gray-400">Phone</p>
                                         <p className="font-semibold text-gray-900 dark:text-white">{helper.phone}</p>
@@ -426,38 +423,23 @@ export default function HelperShow() {
                         </div>
 
                         {/* Contact Options */}
-                        {helper.phone && (
+                        {user && helper.phone && (
                             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Contact Helper</h3>
                                 <div className="flex items-center justify-center gap-4">
                                     {/* In-app Message Icon */}
-                                    {user ? (
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setChatOpen(true);
-                                            }}
-                                            className="flex items-center justify-center w-14 h-14 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg"
-                                            title="Send Message"
-                                        >
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                            </svg>
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                navigate(route("login"));
-                                            }}
-                                            className="flex items-center justify-center w-14 h-14 bg-gray-400 dark:bg-gray-600 text-white rounded-full cursor-not-allowed opacity-60 hover:bg-gray-500 dark:hover:bg-gray-700 transition-all duration-300 shadow-md"
-                                            title="Please login to send message"
-                                        >
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                            </svg>
-                                        </button>
-                                    )}
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setChatOpen(true);
+                                        }}
+                                        className="flex items-center justify-center w-14 h-14 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg"
+                                        title="Send Message"
+                                    >
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                        </svg>
+                                    </button>
 
                                     {/* Call Icon */}
                                     <a
@@ -490,7 +472,7 @@ export default function HelperShow() {
             </div>
 
             {/* Chat Popup */}
-            {helper && (
+            {user && helper && (
                 <ChatPopup
                     recipientId={helper.id}
                     recipientName={helper.name}
@@ -502,5 +484,3 @@ export default function HelperShow() {
         </PublicLayout>
     );
 }
-
-
