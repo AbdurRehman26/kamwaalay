@@ -25,6 +25,12 @@ class UsersTable
                     ->searchable()
                     ->copyable()
                     ->toggleable(),
+                TextColumn::make('otp_verified')
+                    ->label('User OTP')
+                    ->badge()
+                    ->getStateUsing(fn ($record): string => filled($record->phone_verified_at) ? 'Verified' : 'Not verified')
+                    ->color(fn (string $state): string => $state === 'Verified' ? 'success' : 'danger')
+                    ->toggleable(),
                 TextColumn::make('latestPhoneOtp.otp')
                     ->label('Latest OTP')
                     ->copyable()

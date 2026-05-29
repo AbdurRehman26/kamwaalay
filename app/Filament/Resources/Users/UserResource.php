@@ -59,7 +59,16 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['roles', 'profile.city', 'documents', 'latestPhoneOtp']);
+            ->with([
+                'roles',
+                'profile.city',
+                'documents',
+                'latestPhoneOtp',
+                'serviceListings.serviceTypes',
+                'jobPosts.serviceType',
+                'jobPosts.cityRelation',
+                'jobPosts.assignedUser',
+            ]);
     }
 
     public static function getPages(): array

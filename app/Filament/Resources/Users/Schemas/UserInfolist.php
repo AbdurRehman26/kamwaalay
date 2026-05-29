@@ -37,7 +37,13 @@ class UserInfolist
                                     ->boolean(),
                                 IconEntry::make('is_system_generated')
                                     ->boolean(),
+                                TextEntry::make('otp_verified')
+                                    ->label('User OTP')
+                                    ->badge()
+                                    ->getStateUsing(fn ($record): string => filled($record->phone_verified_at) ? 'Verified' : 'Not verified')
+                                    ->color(fn (string $state): string => $state === 'Verified' ? 'success' : 'danger'),
                                 TextEntry::make('phone_verified_at')
+                                    ->label('OTP verified at')
                                     ->dateTime()
                                     ->placeholder('-'),
                             ]),
@@ -127,6 +133,93 @@ class UserInfolist
                                             ->formatStateUsing(fn (?string $state): string => filled($state) ? 'Open file' : '-')
                                             ->url(fn (?string $state): ?string => filled($state) ? Storage::disk('public')->url($state) : null, true)
                                             ->openUrlInNewTab(),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+                Section::make('Services posted')
+                    ->schema([
+                        RepeatableEntry::make('serviceListings')
+                            ->label('Services')
+                            ->placeholder('No services posted.')
+                            ->grid(2)
+                            ->schema([
+                                Grid::make(2)
+                                    ->schema([
+                                        TextEntry::make('serviceTypes.name')
+                                            ->label('Service types')
+                                            ->badge()
+                                            ->separator(', ')
+                                            ->placeholder('-')
+                                            ->columnSpanFull(),
+                                        TextEntry::make('work_type')
+                                            ->label('Work type')
+                                            ->formatStateUsing(fn (?string $state): string => filled($state) ? str_replace('_', ' ', $state) : '-')
+                                            ->badge(),
+                                        TextEntry::make('status')
+                                            ->badge()
+                                            ->color(fn (?string $state): string => $state === 'active' ? 'success' : 'gray')
+                                            ->placeholder('-'),
+                                        TextEntry::make('monthly_rate')
+                                            ->money('PKR')
+                                            ->placeholder('-'),
+                                        IconEntry::make('is_active')
+                                            ->label('Active')
+                                            ->boolean(),
+                                        TextEntry::make('description')
+                                            ->placeholder('-')
+                                            ->columnSpanFull(),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+                Section::make('Jobs posted')
+                    ->schema([
+                        RepeatableEntry::make('jobPosts')
+                            ->label('Jobs')
+                            ->placeholder('No jobs posted.')
+                            ->grid(2)
+                            ->schema([
+                                Grid::make(2)
+                                    ->schema([
+                                        TextEntry::make('serviceType.name')
+                                            ->label('Service')
+                                            ->badge()
+                                            ->placeholder('-'),
+                                        TextEntry::make('status')
+                                            ->badge()
+                                            ->color(fn (?string $state): string => match ($state) {
+                                                'confirmed', 'completed' => 'success',
+                                                'cancelled' => 'danger',
+                                                'in_progress' => 'info',
+                                                default => 'warning',
+                                            })
+                                            ->placeholder('-'),
+                                        TextEntry::make('work_type')
+                                            ->label('Work type')
+                                            ->formatStateUsing(fn (?string $state): string => filled($state) ? str_replace('_', ' ', $state) : '-')
+                                            ->placeholder('-'),
+                                        TextEntry::make('estimated_salary')
+                                            ->money('PKR')
+                                            ->placeholder('-'),
+                                        TextEntry::make('cityRelation.name')
+                                            ->label('City')
+                                            ->placeholder('-'),
+                                        TextEntry::make('assignedUser.name')
+                                            ->label('Assigned helper')
+                                            ->placeholder('-'),
+                                        TextEntry::make('start_date')
+                                            ->date()
+                                            ->placeholder('-'),
+                                        TextEntry::make('start_time')
+                                            ->time()
+                                            ->placeholder('-'),
+                                        TextEntry::make('address')
+                                            ->placeholder('-')
+                                            ->columnSpanFull(),
+                                        TextEntry::make('special_requirements')
+                                            ->placeholder('-')
+                                            ->columnSpanFull(),
                                     ]),
                             ])
                             ->columnSpanFull(),
