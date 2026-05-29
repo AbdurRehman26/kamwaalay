@@ -303,7 +303,7 @@ export default function Home() {
                         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
                             <div className="max-w-2xl">
                                 <h2 className="text-indigo-600 dark:text-indigo-400 font-bold tracking-wide uppercase text-sm mb-3">Featured Profiles</h2>
-                                <h3 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">Top Rated Helpers</h3>
+                                <h3 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">Featured Helpers</h3>
                                 <p className="text-xl text-gray-600 dark:text-gray-300">
                                     Verified professionals ready to help you today.
                                 </p>
@@ -338,6 +338,8 @@ export default function Home() {
                                 const uniqueLocations = Array.from(
                                     new Map(allLocations.map(loc => [loc.display_text, loc])).values()
                                 );
+                                const pinnedLocation = helper.profile?.pin_address;
+                                const displayLocation = pinnedLocation || helper.address;
 
                                 return (
                                     <Link
@@ -357,10 +359,6 @@ export default function Home() {
                                                     <span className="text-6xl text-indigo-300 dark:text-indigo-600">👤</span>
                                                 </div>
                                             )}
-                                            <div className="absolute top-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                                                <span className="text-yellow-500 text-sm">⭐</span>
-                                                <span className="font-bold text-gray-900 dark:text-white text-sm">{helper.rating || "New"}</span>
-                                            </div>
                                         </div>
                                         <div className="p-8">
                                             {/* Services */}
@@ -387,24 +385,32 @@ export default function Home() {
                                                 {helper.name}
                                             </h3>
                                             {/* Locations */}
-                                            {uniqueLocations.length > 0 ? (
+                                            {displayLocation || uniqueLocations.length > 0 ? (
                                                 <div className="mb-6">
                                                     <div className="flex items-start gap-2">
                                                         <span className="text-gray-500 dark:text-gray-400 mt-0.5">📍</span>
                                                         <div className="flex flex-wrap gap-1.5 flex-1">
-                                                            {uniqueLocations.slice(0, 2).map((location, idx) => (
-                                                                <span
-                                                                    key={idx}
-                                                                    className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
-                                                                    title={location.area || location.display_text}
-                                                                >
-                                                                    {location.area || location.display_text}
+                                                            {displayLocation ? (
+                                                                <span className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md">
+                                                                    {displayLocation}
                                                                 </span>
-                                                            ))}
-                                                            {uniqueLocations.length > 2 && (
-                                                                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md">
-                                                                    +{uniqueLocations.length - 2} more
-                                                                </span>
+                                                            ) : (
+                                                                <>
+                                                                    {uniqueLocations.slice(0, 2).map((location, idx) => (
+                                                                        <span
+                                                                            key={idx}
+                                                                            className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md"
+                                                                            title={location.area || location.display_text}
+                                                                        >
+                                                                            {location.area || location.display_text}
+                                                                        </span>
+                                                                    ))}
+                                                                    {uniqueLocations.length > 2 && (
+                                                                        <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-md">
+                                                                            +{uniqueLocations.length - 2} more
+                                                                        </span>
+                                                                    )}
+                                                                </>
                                                             )}
                                                         </div>
                                                     </div>

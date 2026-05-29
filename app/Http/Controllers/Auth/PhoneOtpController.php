@@ -119,6 +119,7 @@ class PhoneOtpController extends Controller
             'name' => $request->name,
             'password' => Hash::make($phone . time()), // Random password
             'phone' => $phone,
+            'phone_verified_at' => Carbon::now(),
             'address' => $request->address,
         ]);
 
