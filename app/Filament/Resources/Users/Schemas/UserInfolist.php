@@ -19,34 +19,71 @@ class UserInfolist
     {
         return $schema
             ->components([
+                Section::make('Profile overview')
+                    ->description('A quick read on identity, trust, profile completeness, and marketplace activity.')
+                    ->icon('heroicon-o-sparkles')
+                    ->schema([
+                        Grid::make(5)
+                            ->schema([
+                                ImageEntry::make('profile.photo')
+                                    ->label('Photo')
+                                    ->disk('public')
+                                    ->imageSize(140)
+                                    ->square()
+                                    ->visible(fn (?string $state): bool => filled($state)),
+                                TextEntry::make('name')
+                                    ->label('Full name')
+                                    ->weight('bold')
+                                    ->size('xl')
+                                    ->columnSpan(2),
+                                TextEntry::make('roles.name')
+                                    ->label('Role')
+                                    ->badge()
+                                    ->separator(', '),
+                                TextEntry::make('profile.verification_status')
+                                    ->label('Profile approval')
+                                    ->badge()
+                                    ->color(fn (?string $state): string => self::profileStatusColor($state))
+                                    ->placeholder('Pending'),
+                                TextEntry::make('phone')
+                                    ->copyable()
+                                    ->placeholder('-'),
+                                TextEntry::make('otp_verified')
+                                    ->label('OTP status')
+                                    ->badge()
+                                    ->getStateUsing(fn ($record): string => filled($record->phone_verified_at) ? 'Verified' : 'Not verified')
+                                    ->color(fn (string $state): string => $state === 'Verified' ? 'success' : 'danger'),
+                                TextEntry::make('profile_quality')
+                                    ->label('Profile quality')
+                                    ->badge()
+                                    ->getStateUsing(fn ($record): string => self::profileQualityLabel($record))
+                                    ->color(fn (string $state): string => match ($state) {
+                                        'Complete' => 'success',
+                                        'Good' => 'info',
+                                        default => 'warning',
+                                    }),
+                                TextEntry::make('activity_summary')
+                                    ->label('Activity')
+                                    ->getStateUsing(fn ($record): string => sprintf(
+                                        '%d document(s), %d service(s), %d job(s)',
+                                        $record->documents->count(),
+                                        $record->serviceListings->count(),
+                                        $record->jobPosts->count(),
+                                    ))
+                                    ->columnSpan(2),
+                            ]),
+                    ]),
                 Grid::make(3)
                     ->schema([
-                        Section::make('Account summary')
-                            ->description('Identity, role, login verification, and account state.')
+                        Section::make('Account')
+                            ->description('Contact details and platform state.')
                             ->icon('heroicon-o-user-circle')
-                            ->columnSpan(2)
                             ->schema([
-                                Grid::make(2)
+                                Grid::make(1)
                                     ->schema([
-                                        TextEntry::make('name')
-                                            ->label('Full name')
-                                            ->weight('bold')
-                                            ->size('lg'),
-                                        TextEntry::make('roles.name')
-                                            ->label('User role')
-                                            ->badge()
-                                            ->separator(', '),
-                                        TextEntry::make('phone')
-                                            ->copyable()
-                                            ->placeholder('-'),
                                         TextEntry::make('email')
                                             ->copyable()
                                             ->placeholder('-'),
-                                        TextEntry::make('otp_verified')
-                                            ->label('User OTP')
-                                            ->badge()
-                                            ->getStateUsing(fn ($record): string => filled($record->phone_verified_at) ? 'Verified' : 'Not verified')
-                                            ->color(fn (string $state): string => $state === 'Verified' ? 'success' : 'danger'),
                                         TextEntry::make('phone_verified_at')
                                             ->label('OTP verified at')
                                             ->dateTime()
@@ -58,33 +95,33 @@ class UserInfolist
                                             ->label('System generated')
                                             ->boolean(),
                                         TextEntry::make('address')
-                                            ->placeholder('-')
-                                            ->columnSpanFull(),
+                                            ->placeholder('-'),
                                     ]),
                             ]),
-                        Section::make('Profile snapshot')
-                            ->description('Verification, profile photo, location, and public details.')
+                        Section::make('Profile')
+                            ->description('Demographics and public profile content.')
                             ->icon('heroicon-o-identification')
-                            ->columnSpan(1)
                             ->schema([
-                                ImageEntry::make('profile.photo')
-                                    ->label('Profile photo')
-                                    ->disk('public')
-                                    ->imageSize(160)
-                                    ->square()
-                                    ->visible(fn (?string $state): bool => filled($state))
-                                    ->columnSpanFull(),
-                                TextEntry::make('profile.verification_status')
-                                    ->label('Profile status')
-                                    ->badge()
-                                    ->color(fn (?string $state): string => match ($state) {
-                                        'verified' => 'success',
-                                        'rejected' => 'danger',
-                                        default => 'warning',
-                                    })
+                                TextEntry::make('profile.age')
+                                            ->placeholder('-'),
+                                TextEntry::make('profile.gender')
                                     ->placeholder('-'),
+                                TextEntry::make('profile.religion')
+                                    ->formatStateUsing(fn ($state) => $state instanceof \App\Enums\Religion ? $state->label() : ($state ? str_replace('_', ' ', $state) : '-')),
+                                TextEntry::make('profile.pin_address')
+                                    ->label('Pinned address')
+                                            ->placeholder('-')
+                                            ->columnSpanFull(),
+                            ]),
+                        Section::make('Trust & location')
+                            ->description('Approval signals and pinned service area.')
+                            ->icon('heroicon-o-shield-check')
+                            ->schema([
                                 IconEntry::make('profile.is_active')
                                     ->label('Profile active')
+                                    ->boolean(),
+                                IconEntry::make('profile.police_verified')
+                                    ->label('Police verified')
                                     ->boolean(),
                                 TextEntry::make('profile.city.name')
                                     ->label('City')
@@ -93,24 +130,20 @@ class UserInfolist
                                     ->label('Experience')
                                     ->suffix(' years')
                                     ->placeholder('-'),
-                                IconEntry::make('profile.police_verified')
-                                    ->label('Police verified')
-                                    ->boolean(),
-                                TextEntry::make('profile.age')
-                                    ->placeholder('-'),
-                                TextEntry::make('profile.gender')
-                                    ->placeholder('-'),
-                                TextEntry::make('profile.religion')
-                                    ->formatStateUsing(fn ($state) => $state instanceof \App\Enums\Religion ? $state->label() : ($state ? str_replace('_', ' ', $state) : '-')),
                                 TextEntry::make('profile.pin_address')
                                     ->label('Pinned address')
                                     ->placeholder('-')
                                     ->columnSpanFull(),
-                                TextEntry::make('profile.bio')
-                                    ->label('Bio')
-                                    ->placeholder('-')
-                                    ->columnSpanFull(),
                             ]),
+                    ]),
+                Section::make('Public bio')
+                    ->description('The customer-facing summary shown around the marketplace.')
+                    ->icon('heroicon-o-document-text')
+                    ->schema([
+                        TextEntry::make('profile.bio')
+                            ->hiddenLabel()
+                            ->placeholder('No bio added yet.')
+                            ->columnSpanFull(),
                     ]),
                 Tabs::make('User activity')
                     ->persistTabInQueryString()
@@ -123,16 +156,16 @@ class UserInfolist
                                     ->description('Verification files uploaded by the user.')
                                     ->schema([
                                         RepeatableEntry::make('documents')
-                                            ->label('Documents')
+                                            ->hiddenLabel()
                                             ->placeholder('No documents uploaded.')
-                                            ->grid(2)
+                                            ->grid(3)
                                             ->schema([
                                                 Grid::make(2)
                                                     ->schema([
                                                         ImageEntry::make('file_path')
                                                             ->label('Preview')
                                                             ->disk('public')
-                                                            ->imageHeight(180)
+                                                            ->imageHeight(220)
                                                             ->visible(fn (?string $state): bool => self::isImagePath($state))
                                                             ->url(fn (?string $state): ?string => filled($state) ? Storage::disk('public')->url($state) : null, true)
                                                             ->columnSpanFull(),
@@ -149,11 +182,20 @@ class UserInfolist
                                                         TextEntry::make('document_number')
                                                             ->label('Number')
                                                             ->placeholder('-'),
+                                                        TextEntry::make('created_at')
+                                                            ->label('Uploaded')
+                                                            ->dateTime()
+                                                            ->placeholder('-'),
                                                         TextEntry::make('file_path')
                                                             ->label('File')
                                                             ->formatStateUsing(fn (?string $state): string => filled($state) ? 'Open file' : '-')
                                                             ->url(fn (?string $state): ?string => filled($state) ? Storage::disk('public')->url($state) : null, true)
-                                                            ->openUrlInNewTab(),
+                                                            ->openUrlInNewTab()
+                                                            ->columnSpanFull(),
+                                                        TextEntry::make('admin_notes')
+                                                            ->label('Admin notes')
+                                                            ->placeholder('-')
+                                                            ->columnSpanFull(),
                                                     ]),
                                             ])
                                             ->columnSpanFull(),
@@ -167,7 +209,7 @@ class UserInfolist
                                     ->description('Service listings offered by this user.')
                                     ->schema([
                                         RepeatableEntry::make('serviceListings')
-                                            ->label('Services')
+                                            ->hiddenLabel()
                                             ->placeholder('No services posted.')
                                             ->grid(2)
                                             ->schema([
@@ -209,7 +251,7 @@ class UserInfolist
                                     ->description('Job requests created by this user.')
                                     ->schema([
                                         RepeatableEntry::make('jobPosts')
-                                            ->label('Jobs')
+                                            ->hiddenLabel()
                                             ->placeholder('No jobs posted.')
                                             ->grid(2)
                                             ->schema([
@@ -270,5 +312,40 @@ class UserInfolist
         }
 
         return in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp'], true);
+    }
+
+    private static function profileStatusColor(?string $state): string
+    {
+        return match ($state) {
+            'verified' => 'success',
+            'rejected' => 'danger',
+            default => 'warning',
+        };
+    }
+
+    private static function profileQualityLabel($record): string
+    {
+        $profile = $record->profile;
+
+        if (! $profile) {
+            return 'Needs attention';
+        }
+
+        $completed = collect([
+            $profile->bio,
+            $profile->city_id,
+            $profile->pin_address,
+            $profile->age,
+            $profile->gender,
+            $profile->experience_years,
+            $profile->verification_status === 'verified',
+            filled($record->phone_verified_at),
+        ])->filter(fn ($value): bool => filled($value))->count();
+
+        return match (true) {
+            $completed >= 7 => 'Complete',
+            $completed >= 5 => 'Good',
+            default => 'Needs attention',
+        };
     }
 }
