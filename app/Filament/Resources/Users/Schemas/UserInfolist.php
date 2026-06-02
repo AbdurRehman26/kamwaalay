@@ -29,7 +29,7 @@ class UserInfolist
                                     ->label('Photo')
                                     ->disk('public')
                                     ->imageSize(140)
-                                    ->square()
+                                    ->circular()
                                     ->visible(fn (?string $state): bool => filled($state)),
                                 TextEntry::make('name')
                                     ->label('Full name')
@@ -166,6 +166,9 @@ class UserInfolist
                                                             ->label('Preview')
                                                             ->disk('public')
                                                             ->imageHeight(220)
+                                                            ->extraImgAttributes([
+                                                                'class' => 'rounded-2xl shadow-sm',
+                                                            ])
                                                             ->visible(fn (?string $state): bool => self::isImagePath($state))
                                                             ->url(fn (?string $state): ?string => filled($state) ? Storage::disk('public')->url($state) : null, true)
                                                             ->columnSpanFull(),

@@ -64,9 +64,7 @@ class JobPostController extends Controller
                 properties: [
                     new OA\Property(property: "service_type", type: "integer", description: "Service type ID"),
                     new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
-                    new OA\Property(property: "work_type", type: "string", enum: ["full_time", "part_time"]),
                     new OA\Property(property: "city_id", type: "integer", nullable: true, description: "City ID (optional, defaults to user's profile city)"),
-                    new OA\Property(property: "start_date", type: "string", format: "date", nullable: true),
                     new OA\Property(property: "start_date", type: "string", format: "date", nullable: true),
                     new OA\Property(property: "start_time", type: "string", format: "time", nullable: true, example: "09:00"),
                     new OA\Property(property: "name", type: "string", maxLength: 255),
@@ -635,4 +633,3 @@ class JobPostController extends Controller
         return $phone;
     }
 }
-

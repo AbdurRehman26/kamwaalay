@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AppConfigController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobPostController;
@@ -45,6 +46,7 @@ Route::post('/locale/{locale}', [LanguageController::class, 'switch']);
 Route::get('/translations/{locale?}', [LanguageController::class, 'translations']);
 
 // Public routes
+Route::get('/config', AppConfigController::class);
 Route::get('/home', [HomeController::class, 'index']);
 Route::get('/about', [PageController::class, 'about']);
 Route::get('/contact', [PageController::class, 'contact']);

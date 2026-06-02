@@ -399,6 +399,102 @@
                 ]
             }
         },
+        "/api/config": {
+            "get": {
+                "tags": [
+                    "Config"
+                ],
+                "summary": "Get app config",
+                "description": "Returns public app configuration values for clients such as mobile apps.",
+                "operationId": "getAppConfig",
+                "responses": {
+                    "200": {
+                        "description": "Public app configuration",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "app_name": {
+                                            "description": "Public application name",
+                                            "type": "string",
+                                            "example": "Kamwaalay"
+                                        },
+                                        "app_version": {
+                                            "description": "Current app version",
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        },
+                                        "min_supported_version": {
+                                            "description": "Minimum supported client version",
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        },
+                                        "latest_version_url": {
+                                            "description": "Store or download URL for the latest app version",
+                                            "type": "string",
+                                            "example": "https://www.kamwaalay.com/download",
+                                            "nullable": true
+                                        },
+                                        "support_phone": {
+                                            "description": "Public support phone number",
+                                            "type": "string",
+                                            "example": "+923001234567",
+                                            "nullable": true
+                                        },
+                                        "support_whatsapp": {
+                                            "description": "Public support WhatsApp number",
+                                            "type": "string",
+                                            "example": "+923001234567",
+                                            "nullable": true
+                                        },
+                                        "support_email": {
+                                            "description": "Public support email",
+                                            "type": "string",
+                                            "example": "support@kamwaalay.com",
+                                            "nullable": true
+                                        },
+                                        "default_locale": {
+                                            "description": "Default application locale",
+                                            "type": "string",
+                                            "example": "en"
+                                        },
+                                        "features": {
+                                            "description": "Public feature flags exposed to clients",
+                                            "properties": {
+                                                "agency_signup": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "demo_seeders": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "example": {
+                                    "app_name": "Kamwaalay",
+                                    "app_version": "1.0.0",
+                                    "min_supported_version": "1.0.0",
+                                    "latest_version_url": "https://www.kamwaalay.com/download",
+                                    "support_phone": "+923001234567",
+                                    "support_whatsapp": "+923001234567",
+                                    "support_email": "support@kamwaalay.com",
+                                    "default_locale": "en",
+                                    "features": {
+                                        "agency_signup": false,
+                                        "demo_seeders": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/login": {
             "get": {
                 "tags": [
@@ -923,7 +1019,8 @@
                                 "required": [
                                     "name",
                                     "password",
-                                    "role"
+                                    "role",
+                                    "city_id"
                                 ],
                                 "properties": {
                                     "name": {
@@ -953,10 +1050,9 @@
                                             "business"
                                         ]
                                     },
-                                    "address": {
-                                        "type": "string",
-                                        "maxLength": 255,
-                                        "nullable": true
+                                    "city_id": {
+                                        "description": "City ID",
+                                        "type": "integer"
                                     }
                                 },
                                 "type": "object"
@@ -1527,17 +1623,7 @@
                                     "service_types": {
                                         "type": "array",
                                         "items": {
-                                            "type": "string",
-                                            "enum": [
-                                                "maid",
-                                                "cook",
-                                                "babysitter",
-                                                "caregiver",
-                                                "cleaner",
-                                                "domestic_helper",
-                                                "driver",
-                                                "security_guard"
-                                            ]
+                                            "type": "integer"
                                         }
                                     },
                                     "locations": {
@@ -1729,18 +1815,11 @@
                                         "format": "binary",
                                         "nullable": true
                                     },
-                                    "service_type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "maid",
-                                            "cook",
-                                            "babysitter",
-                                            "caregiver",
-                                            "cleaner",
-                                            "domestic_helper",
-                                            "driver",
-                                            "security_guard"
-                                        ]
+                                    "service_types": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
                                     },
                                     "experience_years": {
                                         "type": "integer",
@@ -1877,20 +1956,10 @@
                     {
                         "name": "service_type",
                         "in": "query",
-                        "description": "Filter by service type",
+                        "description": "Filter by service type ID or slug",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "enum": [
-                                "maid",
-                                "cook",
-                                "babysitter",
-                                "caregiver",
-                                "cleaner",
-                                "domestic_helper",
-                                "driver",
-                                "security_guard"
-                            ]
+                            "type": "integer"
                         }
                     },
                     {
@@ -1992,17 +2061,8 @@
                                         "format": "binary"
                                     },
                                     "service_type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "maid",
-                                            "cook",
-                                            "babysitter",
-                                            "caregiver",
-                                            "cleaner",
-                                            "domestic_helper",
-                                            "driver",
-                                            "security_guard"
-                                        ]
+                                        "description": "Service type ID",
+                                        "type": "integer"
                                     },
                                     "experience_years": {
                                         "type": "integer",
@@ -2146,17 +2206,8 @@
                                         "format": "binary"
                                     },
                                     "service_type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "maid",
-                                            "cook",
-                                            "babysitter",
-                                            "caregiver",
-                                            "cleaner",
-                                            "domestic_helper",
-                                            "driver",
-                                            "security_guard"
-                                        ]
+                                        "description": "Service type ID",
+                                        "type": "integer"
                                     },
                                     "experience_years": {
                                         "type": "integer",
@@ -2471,22 +2522,14 @@
                                 "required": [
                                     "service_type",
                                     "work_type",
+                                    "city_id",
                                     "name",
                                     "phone"
                                 ],
                                 "properties": {
                                     "service_type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "maid",
-                                            "cook",
-                                            "babysitter",
-                                            "caregiver",
-                                            "cleaner",
-                                            "domestic_helper",
-                                            "driver",
-                                            "security_guard"
-                                        ]
+                                        "description": "Service type ID",
+                                        "type": "integer"
                                     },
                                     "work_type": {
                                         "type": "string",
@@ -2494,6 +2537,11 @@
                                             "full_time",
                                             "part_time"
                                         ]
+                                    },
+                                    "city_id": {
+                                        "description": "City ID (optional, defaults to user's profile city)",
+                                        "type": "integer",
+                                        "nullable": true
                                     },
                                     "start_date": {
                                         "type": "string",
@@ -5191,50 +5239,42 @@
                                 ],
                                 "properties": {
                                     "services": {
+                                        "description": "Array of service type IDs",
                                         "type": "array",
                                         "items": {
-                                            "required": [
-                                                "service_type",
-                                                "work_type",
-                                                "location_id"
-                                            ],
-                                            "properties": {
-                                                "service_type": {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "maid",
-                                                        "cook",
-                                                        "babysitter",
-                                                        "caregiver",
-                                                        "cleaner",
-                                                        "domestic_helper",
-                                                        "driver",
-                                                        "security_guard"
-                                                    ]
-                                                },
-                                                "work_type": {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "full_time",
-                                                        "part_time"
-                                                    ]
-                                                },
-                                                "location_id": {
-                                                    "type": "integer"
-                                                },
-                                                "monthly_rate": {
-                                                    "type": "number",
-                                                    "minimum": 0,
-                                                    "nullable": true
-                                                },
-                                                "description": {
-                                                    "type": "string",
-                                                    "maxLength": 2000,
-                                                    "nullable": true
-                                                }
-                                            },
-                                            "type": "object"
+                                            "type": "integer"
                                         }
+                                    },
+                                    "pin_address": {
+                                        "description": "Full address",
+                                        "type": "string"
+                                    },
+                                    "pin_latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    },
+                                    "pin_longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    },
+                                    "work_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "full_time",
+                                            "part_time"
+                                        ]
+                                    },
+                                    "monthly_rate": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 2000,
+                                        "nullable": true
                                     },
                                     "nic": {
                                         "description": "NIC document file (jpeg, jpg, png, pdf, max 5MB) - optional",
@@ -5384,62 +5424,18 @@
                         "multipart/form-data": {
                             "schema": {
                                 "required": [
-                                    "services",
-                                    "locations",
-                                    "work_type"
+                                    "nic",
+                                    "nic_number"
                                 ],
                                 "properties": {
-                                    "services": {
-                                        "description": "Array of service type slugs (can be sent as JSON string in FormData)",
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "enum": [
-                                                "maid",
-                                                "cook",
-                                                "babysitter",
-                                                "caregiver",
-                                                "cleaner",
-                                                "domestic_helper",
-                                                "driver",
-                                                "security_guard"
-                                            ]
-                                        }
-                                    },
-                                    "locations": {
-                                        "description": "Array of location IDs (can be sent as JSON string in FormData)",
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        }
-                                    },
-                                    "work_type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "full_time",
-                                            "part_time"
-                                        ]
-                                    },
-                                    "monthly_rate": {
-                                        "type": "number",
-                                        "minimum": 0,
-                                        "nullable": true
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "maxLength": 2000,
-                                        "nullable": true
-                                    },
                                     "nic": {
-                                        "description": "NIC document file (jpeg, jpg, png, pdf, max 5MB) - optional",
+                                        "description": "NIC document file (jpeg, jpg, png, pdf, max 5MB)",
                                         "type": "string",
-                                        "format": "binary",
-                                        "nullable": true
+                                        "format": "binary"
                                     },
                                     "nic_number": {
                                         "type": "string",
-                                        "maxLength": 255,
-                                        "nullable": true
+                                        "maxLength": 255
                                     },
                                     "photo": {
                                         "type": "string",
@@ -5448,16 +5444,6 @@
                                     },
                                     "bio": {
                                         "type": "string",
-                                        "nullable": true
-                                    },
-                                    "city": {
-                                        "type": "string",
-                                        "maxLength": 255,
-                                        "nullable": true
-                                    },
-                                    "area": {
-                                        "type": "string",
-                                        "maxLength": 255,
                                         "nullable": true
                                     },
                                     "age": {
@@ -6838,20 +6824,10 @@
                             "schema": {
                                 "properties": {
                                     "service_types": {
-                                        "description": "Array of service types",
+                                        "description": "Array of service type IDs",
                                         "type": "array",
                                         "items": {
-                                            "type": "string",
-                                            "enum": [
-                                                "maid",
-                                                "cook",
-                                                "babysitter",
-                                                "caregiver",
-                                                "cleaner",
-                                                "domestic_helper",
-                                                "driver",
-                                                "security_guard"
-                                            ]
+                                            "type": "integer"
                                         },
                                         "nullable": true
                                     },
@@ -7055,17 +7031,7 @@
                                     "service_types": {
                                         "type": "array",
                                         "items": {
-                                            "type": "string",
-                                            "enum": [
-                                                "maid",
-                                                "cook",
-                                                "babysitter",
-                                                "caregiver",
-                                                "cleaner",
-                                                "domestic_helper",
-                                                "driver",
-                                                "security_guard"
-                                            ]
+                                            "type": "integer"
                                         }
                                     },
                                     "work_type": {
@@ -7297,6 +7263,10 @@
         {
             "name": "Admin",
             "description": "Admin management endpoints"
+        },
+        {
+            "name": "Config",
+            "description": "Public app configuration endpoints"
         },
         {
             "name": "Authentication",
