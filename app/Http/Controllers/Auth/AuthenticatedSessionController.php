@@ -356,10 +356,7 @@ class AuthenticatedSessionController extends Controller
             'expires_at' => Carbon::now()->addMinutes(3), // OTP valid for 3 minutes
         ]);
 
-        if(config('app.env') == 'local') {
-            // Send SMS (mock implementation - replace with actual SMS service)
-            $this->sendSms($phone, $otp);
-        }
+        $this->sendSms($phone, $otp);
 
         // For development, log the OTP
         Log::info("Login Phone OTP for {$phone}: {$otp}");
