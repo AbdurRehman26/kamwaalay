@@ -132,18 +132,18 @@ export default function Contact() {
                         </form>
                     )}
                     <div className="mt-12 grid md:grid-cols-3 gap-6">
-                        <a href="mailto:contact@kamwaalay.com" className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <a href="mailto:sydabdrehman@gmail.com" className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                             <div className="w-12 h-12 mx-auto bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">📧</div>
                             <h3 className="font-bold text-gray-900 dark:text-white mb-2">Email</h3>
                             <p className="text-indigo-600 dark:text-indigo-400 font-medium group-hover:underline">
-                                contact@kamwaalay.com
+                                sydabdrehman@gmail.com
                             </p>
                         </a>
-                        <a href="tel:+923001234567" className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <a href="https://wa.me/4917685475615" target="_blank" rel="noreferrer" className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                             <div className="w-12 h-12 mx-auto bg-green-50 dark:bg-green-900/30 rounded-full flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">📞</div>
-                            <h3 className="font-bold text-gray-900 dark:text-white mb-2">Phone</h3>
+                            <h3 className="font-bold text-gray-900 dark:text-white mb-2">WhatsApp</h3>
                             <p className="text-green-600 dark:text-green-400 font-medium group-hover:underline">
-                                +92 300 1234567
+                                +49 176 85475615
                             </p>
                         </a>
                         <div className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -157,4 +157,3 @@ export default function Contact() {
         </PublicLayout>
     );
 }
-
