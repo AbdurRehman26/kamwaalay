@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\ContactMessage;
 use App\Models\ServiceType;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Pages", description: "Public page endpoints")]
@@ -96,19 +98,22 @@ class PageController extends Controller
     )]
     public function sendContactMessage(Request $request): JsonResponse
     {
+        $user = $request->user() ?? Auth::guard('sanctum')->user();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'message' => 'required|string|max:5000',
         ]);
 
-        // In a real application, you would:
-        // 1. Store the message in a database
-        // 2. Send an email notification
-        // 3. Send a confirmation email to the user
-
-        // For now, we'll just log it and return success
-        \Log::info('Contact form submission', $validated);
+        ContactMessage::create([
+            'user_id' => $user?->id,
+            'name' => $validated['name'],
+            'phone' => $validated['phone'] ?? null,
+            'message' => $validated['message'],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
         return response()->json([
             'message' => 'Thank you for contacting us. We\'ll get back to you soon.',
