@@ -45,6 +45,55 @@ class GenerateDummyAccounts extends Command
         ['area' => 'Bahadurabad', 'latitude' => 24.8844, 'longitude' => 67.0677],
     ];
 
+    private array $customerNames = [
+        'Abdul Rehman Khan',
+        'Ayesha Siddiqui',
+        'Bilal Ahmed',
+        'Fatima Noor',
+        'Hassan Raza',
+        'Hira Javed',
+        'Imran Ali',
+        'Kiran Malik',
+        'Muneeb Aslam',
+        'Nadia Farooq',
+        'Omar Tariq',
+        'Rabia Saleem',
+        'Saad Hussain',
+        'Sana Iqbal',
+        'Usman Qureshi',
+        'Zainab Waheed',
+    ];
+
+    private array $femaleHelperNames = [
+        'Shabana Yousaf',
+        'Sadia Bano',
+        'Noreen Aslam',
+        'Farzana Ilyas',
+        'Rukhsana Parveen',
+        'Shazia Akhtar',
+        'Samina Bashir',
+        'Kausar Bibi',
+        'Parveen Riaz',
+        'Nasreen Jamil',
+        'Mehwish Iqbal',
+        'Uzma Khalid',
+    ];
+
+    private array $maleHelperNames = [
+        'Imran Qureshi',
+        'Javed Iqbal',
+        'Naveed Alam',
+        'Tariq Mehmood',
+        'Asif Bashir',
+        'Rashid Latif',
+        'Shahid Hussain',
+        'Kamran Yasin',
+        'Sajid Ali',
+        'Waqar Ahmed',
+        'Zeeshan Malik',
+        'Aamir Raza',
+    ];
+
     public function handle(): int
     {
         $helperCount = max(0, (int) $this->option('helpers'));
@@ -131,7 +180,7 @@ class GenerateDummyAccounts extends Command
             $user = User::updateOrCreate(
                 ['phone' => sprintf('+9231199%04d', $number)],
                 [
-                    'name' => "Demo Customer {$number}",
+                    'name' => $this->resolveName($this->customerNames, $number),
                     'password' => Hash::make('password'),
                     'address' => "House {$number}, {$location['area']}, Karachi",
                     'is_active' => true,
@@ -146,7 +195,7 @@ class GenerateDummyAccounts extends Command
                 ['profileable_type' => User::class, 'profileable_id' => $user->id],
                 [
                     'city_id' => $city->id,
-                    'bio' => 'System generated customer account for demo service requests.',
+                    'bio' => 'System generated customer account for local service requests.',
                     'is_active' => true,
                     'is_system_generated' => true,
                     'pin_address' => "House {$number}, {$location['area']}, Karachi",
@@ -167,11 +216,13 @@ class GenerateDummyAccounts extends Command
         return collect(range(1, $count))->map(function (int $number) use ($city, $serviceTypes, $servicesPerHelper, $genders, $religions): User {
             $location = $this->locations[($number - 1) % count($this->locations)];
             $primaryServiceType = $serviceTypes[($number - 1) % $serviceTypes->count()];
+            $gender = $genders[$number % count($genders)];
+            $helperNamePool = $gender === 'female' ? $this->femaleHelperNames : $this->maleHelperNames;
 
             $helper = User::updateOrCreate(
                 ['phone' => sprintf('+9231299%04d', $number)],
                 [
-                    'name' => "Demo Helper {$number}",
+                    'name' => $this->resolveName($helperNamePool, $number),
                     'password' => Hash::make('password'),
                     'address' => "Street {$number}, {$location['area']}, Karachi",
                     'is_active' => true,
@@ -186,7 +237,7 @@ class GenerateDummyAccounts extends Command
                 ['profileable_type' => User::class, 'profileable_id' => $helper->id],
                 [
                     'age' => 24 + ($number % 28),
-                    'gender' => $genders[$number % count($genders)],
+                    'gender' => $gender,
                     'religion' => $religions[$number % count($religions)],
                     'experience_years' => 1 + ($number % 12),
                     'city_id' => $city->id,
@@ -258,7 +309,7 @@ class GenerateDummyAccounts extends Command
                         'special_requirements' => "System generated request for {$serviceType->name} help.",
                         'estimated_salary' => 15000 + ($jobNumber * 1000),
                         'status' => $statuses[($userIndex + $jobNumber) % count($statuses)],
-                        'admin_notes' => 'System generated demo job.',
+                        'admin_notes' => 'System generated job.',
                         'is_system_generated' => true,
                     ]
                 );
@@ -267,5 +318,15 @@ class GenerateDummyAccounts extends Command
         }
 
         return $created;
+    }
+
+    private function resolveName(array $pool, int $number): string
+    {
+        $index = ($number - 1) % count($pool);
+        $cycle = intdiv($number - 1, count($pool));
+
+        return $cycle === 0
+            ? $pool[$index]
+            : $pool[$index] . ' ' . ($cycle + 1);
     }
 }
