@@ -6,9 +6,7 @@ export default forwardRef(function TextInput(
 ) {
     const localRef = useRef(null);
 
-    useImperativeHandle(ref, () => ({
-        focus: () => localRef.current?.focus(),
-    }));
+    useImperativeHandle(ref, () => localRef.current);
 
     useEffect(() => {
         if (isFocused) {
