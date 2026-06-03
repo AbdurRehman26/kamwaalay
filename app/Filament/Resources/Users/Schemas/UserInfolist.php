@@ -73,49 +73,53 @@ class UserInfolist
                                     ->columnSpan(2),
                             ]),
                     ]),
-                Grid::make(3)
+                Section::make('Account')
+                    ->description('Contact details and platform state.')
+                    ->icon('heroicon-o-user-circle')
                     ->schema([
-                        Section::make('Account')
-                            ->description('Contact details and platform state.')
-                            ->icon('heroicon-o-user-circle')
+                        Grid::make(2)
                             ->schema([
-                                Grid::make(1)
-                                    ->schema([
-                                        TextEntry::make('email')
-                                            ->copyable()
-                                            ->placeholder('-'),
-                                        TextEntry::make('phone_verified_at')
-                                            ->label('OTP verified at')
-                                            ->dateTime()
-                                            ->placeholder('-'),
-                                        IconEntry::make('is_active')
-                                            ->label('Account active')
-                                            ->boolean(),
-                                        IconEntry::make('is_system_generated')
-                                            ->label('System generated')
-                                            ->boolean(),
-                                        TextEntry::make('address')
-                                            ->placeholder('-'),
-                                    ]),
+                                TextEntry::make('email')
+                                    ->copyable()
+                                    ->placeholder('-'),
+                                TextEntry::make('phone_verified_at')
+                                    ->label('OTP verified at')
+                                    ->dateTime()
+                                    ->placeholder('-'),
+                                IconEntry::make('is_active')
+                                    ->label('Account active')
+                                    ->boolean(),
+                                IconEntry::make('is_system_generated')
+                                    ->label('System generated')
+                                    ->boolean(),
+                                TextEntry::make('address')
+                                    ->placeholder('-')
+                                    ->columnSpanFull(),
                             ]),
-                        Section::make('Profile')
-                            ->description('Demographics and public profile content.')
-                            ->icon('heroicon-o-identification')
+                    ]),
+                Section::make('Profile')
+                    ->description('Demographics and public profile content.')
+                    ->icon('heroicon-o-identification')
+                    ->schema([
+                        Grid::make(2)
                             ->schema([
                                 TextEntry::make('profile.age')
-                                            ->placeholder('-'),
+                                    ->placeholder('-'),
                                 TextEntry::make('profile.gender')
                                     ->placeholder('-'),
                                 TextEntry::make('profile.religion')
                                     ->formatStateUsing(fn ($state) => $state instanceof \App\Enums\Religion ? $state->label() : ($state ? str_replace('_', ' ', $state) : '-')),
                                 TextEntry::make('profile.pin_address')
                                     ->label('Pinned address')
-                                            ->placeholder('-')
-                                            ->columnSpanFull(),
+                                    ->placeholder('-')
+                                    ->columnSpanFull(),
                             ]),
-                        Section::make('Trust & location')
-                            ->description('Approval signals and pinned service area.')
-                            ->icon('heroicon-o-shield-check')
+                    ]),
+                Section::make('Trust & location')
+                    ->description('Approval signals and pinned service area.')
+                    ->icon('heroicon-o-shield-check')
+                    ->schema([
+                        Grid::make(2)
                             ->schema([
                                 IconEntry::make('profile.is_active')
                                     ->label('Profile active')
@@ -158,9 +162,9 @@ class UserInfolist
                                         RepeatableEntry::make('documents')
                                             ->hiddenLabel()
                                             ->placeholder('No documents uploaded.')
-                                            ->grid(3)
+                                            ->grid(1)
                                             ->schema([
-                                                Grid::make(2)
+                                                Grid::make(6)
                                                     ->schema([
                                                         ImageEntry::make('file_path')
                                                             ->label('Preview')
@@ -171,7 +175,7 @@ class UserInfolist
                                                             ])
                                                             ->visible(fn (?string $state): bool => self::isImagePath($state))
                                                             ->url(fn (?string $state): ?string => filled($state) ? Storage::disk('public')->url($state) : null, true)
-                                                            ->columnSpanFull(),
+                                                            ->columnSpan(2),
                                                         TextEntry::make('document_type')
                                                             ->label('Type')
                                                             ->badge(),
@@ -194,11 +198,11 @@ class UserInfolist
                                                             ->formatStateUsing(fn (?string $state): string => filled($state) ? 'Open file' : '-')
                                                             ->url(fn (?string $state): ?string => filled($state) ? Storage::disk('public')->url($state) : null, true)
                                                             ->openUrlInNewTab()
-                                                            ->columnSpanFull(),
+                                                            ->columnSpan(2),
                                                         TextEntry::make('admin_notes')
                                                             ->label('Admin notes')
                                                             ->placeholder('-')
-                                                            ->columnSpanFull(),
+                                                            ->columnSpan(2),
                                                     ]),
                                             ])
                                             ->columnSpanFull(),

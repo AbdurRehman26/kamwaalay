@@ -29,8 +29,6 @@
 
         <!-- Google Places API -->
         <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_PLACES_API_KEY') }}&libraries=places,geocoding&loading=async" async defer></script>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-
         <!-- Scripts -->
         <script>
             window.Laravel = {
