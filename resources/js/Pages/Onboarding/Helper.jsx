@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { route } from "@/utils/routes";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
 import { useLanguages } from "@/hooks/useLanguages";
+import useGoogleMapsReady from "@/hooks/useGoogleMapsReady";
 import MapPicker from "@/Components/MapPicker";
 import toast from "react-hot-toast";
 
@@ -220,6 +221,7 @@ export default function OnboardingHelper() {
     const cityRefs = useRef([]);
     const pinAddressInputRefs = useRef([]);
     const autocompleteRefs = useRef([]);
+    const googleMapsReady = useGoogleMapsReady();
 
     // Helper profile fields
     const [profileData, setProfileData] = useState({
@@ -306,6 +308,10 @@ export default function OnboardingHelper() {
 
     // Initialize Google Places Autocomplete for each offer
     useEffect(() => {
+        if (!googleMapsReady) {
+            return undefined;
+        }
+
         offers.forEach((offer, index) => {
             const inputRef = pinAddressInputRefs.current[index];
             if (inputRef && window.google && window.google.maps && window.google.maps.places && !autocompleteRefs.current[index]) {
@@ -340,7 +346,16 @@ export default function OnboardingHelper() {
                 }
             }
         });
-    }, [offers.length, currentStep]);
+
+        return () => {
+            autocompleteRefs.current.forEach((autocomplete, index) => {
+                if (autocomplete) {
+                    window.google.maps.event.clearInstanceListeners(autocomplete);
+                    autocompleteRefs.current[index] = null;
+                }
+            });
+        };
+    }, [googleMapsReady, offers.length, currentStep]);
 
     const handleGetCurrentLocation = (offerIndex) => {
         if (!navigator.geolocation) {

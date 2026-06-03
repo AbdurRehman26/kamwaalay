@@ -10,6 +10,7 @@ import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
 import { useServiceTypes } from "@/hooks/useServiceTypes";
 import { useLanguages } from "@/hooks/useLanguages";
+import useGoogleMapsReady from "@/hooks/useGoogleMapsReady";
 import toast from "react-hot-toast";
 import MapPicker from "@/Components/MapPicker";
 
@@ -28,6 +29,7 @@ export default function CreateWorker() {
     const [gettingLocation, setGettingLocation] = useState(false);
     const pinAddressInputRef = useRef(null);
     const autocompleteRef = useRef(null);
+    const googleMapsReady = useGoogleMapsReady();
 
     const [data, setData] = useState({
         name: "",
@@ -69,7 +71,11 @@ export default function CreateWorker() {
 
     // Google Places Autocomplete Effect
     useEffect(() => {
-        if (pinAddressInputRef.current && window.google && window.google.maps && window.google.maps.places) {
+        if (autocompleteRef.current || !googleMapsReady || !pinAddressInputRef.current) {
+            return undefined;
+        }
+
+        if (window.google && window.google.maps && window.google.maps.places) {
             try {
                 const autocomplete = new window.google.maps.places.Autocomplete(
                     pinAddressInputRef.current,
@@ -98,13 +104,15 @@ export default function CreateWorker() {
                 return () => {
                     if (autocompleteRef.current) {
                         window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
+                        autocompleteRef.current = null;
                     }
                 };
             } catch (error) {
                 console.error("Error initializing Google Places Autocomplete:", error);
             }
         }
-    }, []);
+        return undefined;
+    }, [googleMapsReady]);
 
     // Get Current Location Handler
     const handleGetCurrentLocation = () => {
