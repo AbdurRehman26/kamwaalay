@@ -28,7 +28,7 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Google Places API -->
-        <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_PLACES_API_KEY') }}&libraries=places,geocoding&loading=async" async defer></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&libraries=places,geocoding&loading=async" async defer></script>
         <!-- Scripts -->
         <script>
             window.Laravel = {
@@ -38,7 +38,7 @@
                 }
             };
             // Make Google Maps API key available to Vite
-            window.GOOGLE_MAPS_API_KEY = "{{ env('GOOGLE_PLACES_API_KEY') }}";
+            window.GOOGLE_MAPS_API_KEY = "{{ config('services.google_maps.api_key') }}";
         </script>
         @viteReactRefresh
         @vite(['resources/js/app.jsx'])
