@@ -25,12 +25,6 @@ class UsersTable
                     ->searchable()
                     ->copyable()
                     ->toggleable(),
-                TextColumn::make('otp_verified')
-                    ->label('User OTP')
-                    ->badge()
-                    ->getStateUsing(fn ($record): string => filled($record->phone_verified_at) ? 'Verified' : 'Not verified')
-                    ->color(fn (string $state): string => $state === 'Verified' ? 'success' : 'danger')
-                    ->toggleable(),
                 TextColumn::make('latestPhoneOtp.otp')
                     ->label('Latest OTP')
                     ->copyable()
@@ -63,9 +57,6 @@ class UsersTable
                         default => 'gray',
                     })
                     ->toggleable(),
-                TextColumn::make('email')
-                    ->searchable()
-                    ->toggleable(),
                 TextColumn::make('profile.city.name')
                     ->label('City')
                     ->toggleable(),
@@ -81,8 +72,9 @@ class UsersTable
                 IconColumn::make('is_active')
                     ->boolean(),
                 IconColumn::make('is_system_generated')
+                    ->label('System Generated')
                     ->boolean()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
