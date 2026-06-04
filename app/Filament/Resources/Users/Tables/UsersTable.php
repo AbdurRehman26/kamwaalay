@@ -71,10 +71,11 @@ class UsersTable
                     ->toggleable(),
                 IconColumn::make('is_active')
                     ->boolean(),
-                IconColumn::make('is_system_generated')
+                TextColumn::make('is_system_generated')
                     ->label('System Generated')
-                    ->boolean()
-                    ->toggleable(),
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Yes' : 'No')
+                    ->color(fn (bool $state): string => $state ? 'warning' : 'gray'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
